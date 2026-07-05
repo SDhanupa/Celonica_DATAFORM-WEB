@@ -6,7 +6,11 @@ import {
   DialogActions,
   TextField,
   Button,
+  Box,
+  CircularProgress,
+  Typography,
 } from '@mui/material';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useMutation } from '@apollo/client';
 import { CREATE_CATEGORY, UPDATE_CATEGORY } from '../graphql/mutations';
 import { GET_CATEGORIES, GET_CATEGORY_BY_SLUG } from '../graphql/queries';
@@ -25,6 +29,7 @@ const CategoryDialog: React.FC<CategoryDialogProps> = ({ open, onClose, category
   const [nameSi, setNameSi] = useState('');
   const [imagePath, setImagePath] = useState('');
   const [sortOrder, setSortOrder] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
 
   const [createCategory] = useMutation(CREATE_CATEGORY);
   const [updateCategory] = useMutation(UPDATE_CATEGORY);
@@ -83,6 +88,34 @@ const CategoryDialog: React.FC<CategoryDialogProps> = ({ open, onClose, category
     }
   };
 
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const response = await fetch('http://localhost:8000/api/upload-category-image', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setImagePath(data.url);
+      } else {
+        alert(data.message || 'Failed to upload image');
+      }
+    } catch (err) {
+      console.error('Error uploading image:', err);
+      alert('Error uploading image');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>{category ? 'Edit Category' : 'Add Category'}</DialogTitle>
@@ -105,12 +138,32 @@ const CategoryDialog: React.FC<CategoryDialogProps> = ({ open, onClose, category
           onChange={(e) => setNameSi(e.target.value)}
           fullWidth
         />
-        <TextField
-          label="Image Path (Optional, e.g., /images/categories/xxx.png)"
-          value={imagePath}
-          onChange={(e) => setImagePath(e.target.value)}
-          fullWidth
-        />
+        
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, border: '1px dashed #ccc', p: 2, borderRadius: 1, alignItems: 'center' }}>
+          <Typography variant="subtitle2" color="textSecondary">Category Icon</Typography>
+          {imagePath && (
+            <img src={imagePath} alt="Preview" style={{ width: 100, height: 100, objectFit: 'contain', marginBottom: 8 }} />
+          )}
+          <input
+            accept="image/*"
+            style={{ display: 'none' }}
+            id="icon-upload-button"
+            type="file"
+            onChange={handleFileUpload}
+            disabled={isUploading}
+          />
+          <label htmlFor="icon-upload-button">
+            <Button
+              variant="outlined"
+              component="span"
+              startIcon={isUploading ? <CircularProgress size={20} /> : <CloudUploadIcon />}
+              disabled={isUploading}
+            >
+              {isUploading ? 'Uploading...' : 'Browse Image'}
+            </Button>
+          </label>
+        </Box>
+
         <TextField
           label="Sort Order"
           type="number"
