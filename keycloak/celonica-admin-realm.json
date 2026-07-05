@@ -1,0 +1,94 @@
+{
+  "id": "celonica-admin",
+  "realm": "celonica-admin",
+  "displayName": "Celonica Admin",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "clients": [
+    {
+      "clientId": "celonica-frontend",
+      "name": "Celonica Admin Frontend",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      },
+      "redirectUris": [
+        "http://localhost:5173/*",
+        "http://localhost:5173"
+      ],
+      "webOrigins": [
+        "http://localhost:5173"
+      ],
+      "protocol": "openid-connect"
+    },
+    {
+      "clientId": "admin-cli",
+      "name": "Admin CLI for Backend",
+      "enabled": true,
+      "publicClient": false,
+      "bearerOnly": false,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "secret": "my-super-secret-keycloak-client-secret",
+      "protocol": "openid-connect"
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "super_admin",
+        "description": "Super Administrator with full access"
+      },
+      {
+        "name": "admin",
+        "description": "Administrator with standard access"
+      },
+      {
+        "name": "moderator",
+        "description": "Moderator with limited access"
+      }
+    ]
+  },
+  "users": [
+    {
+      "username": "superadmin",
+      "email": "superadmin@celonica.com",
+      "firstName": "Super",
+      "lastName": "Admin",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Admin@1234",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["super_admin"]
+    },
+    {
+      "username": "service-account-admin-cli",
+      "enabled": true,
+      "emailVerified": false,
+      "serviceAccountClientId": "admin-cli",
+      "clientRoles": {
+        "realm-management": [
+          "manage-users",
+          "view-users"
+        ]
+      }
+    }
+  ],
+  "passwordPolicy": "length(8) and upperCase(1) and specialChars(1)"
+}

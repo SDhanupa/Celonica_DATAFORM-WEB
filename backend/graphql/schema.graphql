@@ -1,0 +1,259 @@
+"A datetime string in ISO 8601 format"
+scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+
+enum AdminRole {
+    SUPER_ADMIN @enum(value: "super_admin")
+    ADMIN @enum(value: "admin")
+    MODERATOR @enum(value: "moderator")
+}
+
+type Admin {
+    id: ID!
+    keycloakSub: String! @rename(attribute: "keycloak_sub")
+    email: String!
+    name: String!
+    nic: String
+    mobileNumber: String @rename(attribute: "mobile_number")
+    address: String
+    dob: String
+    gender: String
+    role: AdminRole!
+    isActive: Boolean! @rename(attribute: "is_active")
+    lastLoginAt: DateTime @rename(attribute: "last_login_at")
+    createdAt: DateTime! @rename(attribute: "created_at")
+    updatedAt: DateTime @rename(attribute: "updated_at")
+}
+
+type DashboardStats {
+    totalAdmins: Int!
+    activeAdmins: Int!
+    totalUsers: Int!
+    totalQuestions: Int!
+    totalReports: Int!
+    pendingReports: Int!
+}
+
+type User {
+    id: ID!
+    keycloakSub: String! @rename(attribute: "keycloak_sub")
+    email: String!
+    name: String!
+    firstName: String! @rename(attribute: "first_name")
+    lastName: String! @rename(attribute: "last_name")
+    nic: String
+    mobileNumber: String @rename(attribute: "mobile_number")
+    address: String
+    dob: String
+    gender: String
+    createdAt: DateTime! @rename(attribute: "created_at")
+    updatedAt: DateTime @rename(attribute: "updated_at")
+}
+
+type Question {
+    id: ID!
+    category: Category @belongsTo
+    section: String
+    questionTextEn: String! @rename(attribute: "question_text_en")
+    questionTextSi: String @rename(attribute: "question_text_si")
+    inputType: String! @rename(attribute: "input_type")
+    isRepeater: Boolean! @rename(attribute: "is_repeater")
+    sortOrder: Int! @rename(attribute: "sort_order")
+    isActive: Boolean! @rename(attribute: "is_active")
+    createdAt: DateTime! @rename(attribute: "created_at")
+    updatedAt: DateTime @rename(attribute: "updated_at")
+}
+
+type UserAnswer {
+    id: ID!
+    user: User! @belongsTo
+    question: Question! @belongsTo
+    answerValue: String @rename(attribute: "answer_value")
+    iteration: Int!
+    isSkipped: Boolean! @rename(attribute: "is_skipped")
+    createdAt: DateTime! @rename(attribute: "created_at")
+    updatedAt: DateTime @rename(attribute: "updated_at")
+}
+
+type Query {
+    "Get the currently authenticated admin"
+    me: Admin
+        @field(resolver: "App\\GraphQL\\Queries\\AdminQueries@me")
+
+    "Get all admins"
+    admins: [Admin!]!
+        @field(resolver: "App\\GraphQL\\Queries\\AdminQueries@admins")
+
+    "Get a single admin by ID"
+    admin(id: ID! @eq): Admin
+        @field(resolver: "App\\GraphQL\\Queries\\AdminQueries@admin")
+
+    "Dashboard overview statistics"
+    dashboardStats: DashboardStats!
+        @field(resolver: "App\\GraphQL\\Queries\\AdminQueries@dashboardStats")
+
+    "Get the currently authenticated normal user"
+    meUser: User
+        @field(resolver: "App\\GraphQL\\Queries\\UserQueries@meUser")
+    
+    "Check if the user needs onboarding"
+    needsOnboarding: Boolean!
+        @field(resolver: "App\\GraphQL\\Queries\\UserQueries@needsOnboarding")
+
+    "Get all active questions"
+    questions: [Question!]!
+        @field(resolver: "App\\GraphQL\\Queries\\QuestionQueries@questions")
+
+    "Get user answers"
+    myAnswers: [UserAnswer!]!
+        @field(resolver: "App\\GraphQL\\Queries\\QuestionQueries@myAnswers")
+
+    "Get root categories"
+    categories: [Category!]!
+        @field(resolver: "App\\GraphQL\\Queries\\CategoryQueries@categories")
+
+    "Get subcategories by parent slug"
+    categoryBySlug(slug: String!): Category
+        @field(resolver: "App\\GraphQL\\Queries\\CategoryQueries@categoryBySlug")
+
+    "Get all answers for questions in a specific category"
+    categoryAnswers(categoryId: ID!): [UserAnswer!]!
+        @field(resolver: "App\\GraphQL\\Queries\\QuestionQueries@categoryAnswers")
+}
+
+type Category {
+    id: ID!
+    parent: Category
+    children: [Category!]
+    ancestors: [Category!]!
+    questions: [Question!]
+    slug: String!
+    nameEn: String! @rename(attribute: "name_en")
+    nameSi: String! @rename(attribute: "name_si")
+    imagePath: String @rename(attribute: "image_path")
+    sortOrder: Int! @rename(attribute: "sort_order")
+    progress: Float! @field(resolver: "App\\GraphQL\\Queries\\CategoryQueries@progress")
+    createdAt: DateTime! @rename(attribute: "created_at")
+    updatedAt: DateTime @rename(attribute: "updated_at")
+}
+
+type Mutation {
+    "Register a new admin linked to a Keycloak user"
+    registerAdmin(
+        keycloakSub: String!
+        email: String!
+        name: String!
+        role: AdminRole! = ADMIN
+    ): Admin!
+        @field(resolver: "App\\GraphQL\\Mutations\\AdminMutations@registerAdmin")
+
+    "Update an admin's role"
+    updateAdminRole(id: ID!, role: AdminRole!): Admin!
+        @field(resolver: "App\\GraphQL\\Mutations\\AdminMutations@updateAdminRole")
+
+    "Deactivate an admin account"
+    deactivateAdmin(id: ID!): Admin!
+        @field(resolver: "App\\GraphQL\\Mutations\\AdminMutations@deactivateAdmin")
+
+    "Reactivate an admin account"
+    activateAdmin(id: ID!): Admin!
+        @field(resolver: "App\\GraphQL\\Mutations\\AdminMutations@activateAdmin")
+
+    "Register a normal user or admin via Super Admin"
+    registerUser(
+        email: String!
+        firstName: String!
+        lastName: String!
+        nic: String
+        password: String!
+        mobileNumber: String
+        role: String! # USER, ADMIN, SUPER_ADMIN
+    ): Boolean!
+        @field(resolver: "App\\GraphQL\\Mutations\\UserMutations@registerUser")
+
+    "Complete onboarding for a first-time Keycloak user"
+    completeUserOnboarding(
+        firstName: String!
+        lastName: String!
+        nic: String!
+        mobileNumber: String!
+        address: String!
+        dob: String!
+        gender: String!
+    ): Boolean!
+        @field(resolver: "App\\GraphQL\\Mutations\\OnboardingMutations@completeUserOnboarding")
+
+    "Update user profile information"
+    updateUserProfile(
+        nic: String
+        mobileNumber: String
+        address: String
+        dob: String
+        gender: String
+    ): User!
+        @field(resolver: "App\\GraphQL\\Mutations\\UserMutations@updateUserProfile")
+
+    "Create a new question"
+    createQuestion(
+        categoryId: ID @rename(attribute: "category_id")
+        section: String
+        questionTextEn: String! @rename(attribute: "question_text_en")
+        questionTextSi: String @rename(attribute: "question_text_si")
+        inputType: String! @rename(attribute: "input_type")
+        isRepeater: Boolean @rename(attribute: "is_repeater")
+        sortOrder: Int! @rename(attribute: "sort_order")
+    ): Question!
+        @field(resolver: "App\\GraphQL\\Mutations\\QuestionMutations@createQuestion")
+
+    "Update an existing question"
+    updateQuestion(
+        id: ID!
+        categoryId: ID @rename(attribute: "category_id")
+        section: String
+        questionTextEn: String @rename(attribute: "question_text_en")
+        questionTextSi: String @rename(attribute: "question_text_si")
+        inputType: String @rename(attribute: "input_type")
+        isRepeater: Boolean @rename(attribute: "is_repeater")
+        sortOrder: Int @rename(attribute: "sort_order")
+        isActive: Boolean @rename(attribute: "is_active")
+    ): Question!
+        @field(resolver: "App\\GraphQL\\Mutations\\QuestionMutations@updateQuestion")
+
+    "Delete a question"
+    deleteQuestion(id: ID!): Boolean!
+        @field(resolver: "App\\GraphQL\\Mutations\\QuestionMutations@deleteQuestion")
+
+    "Answer a question"
+    answerQuestion(
+        questionId: ID!
+        iteration: Int = 1
+        answerValue: String
+        isSkipped: Boolean!
+    ): UserAnswer!
+        @field(resolver: "App\\GraphQL\\Mutations\\QuestionMutations@answerQuestion")
+
+    "Create a new category"
+    createCategory(
+        parentId: ID @rename(attribute: "parent_id")
+        slug: String!
+        nameEn: String! @rename(attribute: "name_en")
+        nameSi: String! @rename(attribute: "name_si")
+        imagePath: String @rename(attribute: "image_path")
+        sortOrder: Int = 0 @rename(attribute: "sort_order")
+    ): Category!
+        @field(resolver: "App\\GraphQL\\Mutations\\CategoryMutations@createCategory")
+
+    "Update an existing category"
+    updateCategory(
+        id: ID!
+        slug: String
+        nameEn: String @rename(attribute: "name_en")
+        nameSi: String @rename(attribute: "name_si")
+        imagePath: String @rename(attribute: "image_path")
+        sortOrder: Int @rename(attribute: "sort_order")
+    ): Category!
+        @field(resolver: "App\\GraphQL\\Mutations\\CategoryMutations@updateCategory")
+
+    "Delete a category"
+    deleteCategory(id: ID!): Boolean!
+        @field(resolver: "App\\GraphQL\\Mutations\\CategoryMutations@deleteCategory")
+}

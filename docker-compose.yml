@@ -1,0 +1,63 @@
+# Project name: celonica-web
+# Run with: docker compose -p celonica-web up -d
+#
+# This uses a Docker PostgreSQL container for Keycloak ONLY.
+# Laravel connects to your LOCAL PostgreSQL (postgres/dhanu231) directly.
+
+services:
+  # ─── PostgreSQL for Keycloak only ─────────────────────────
+  keycloak-db:
+    image: postgres:16-alpine
+    container_name: celonica-web-keycloakdb
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: keycloak_db
+      POSTGRES_USER: keycloak_user
+      POSTGRES_PASSWORD: keycloak_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - keycloak_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak_user -d keycloak_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - celonica_net
+
+  # ─── Keycloak ─────────────────────────────────────────────
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.3
+    container_name: celonica-web-keycloak
+    restart: unless-stopped
+    command: start-dev --import-realm
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak_db
+      KC_DB_USERNAME: keycloak_user
+      KC_DB_PASSWORD: keycloak_pass
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin123
+      KC_HTTP_PORT: 8080
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_HTTP_ENABLED: "true"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    networks:
+      - celonica_net
+
+volumes:
+  keycloak_db_data:
+    name: celonica-web-keycloak-db-data
+
+networks:
+  celonica_net:
+    name: celonica-web-network
+    driver: bridge
