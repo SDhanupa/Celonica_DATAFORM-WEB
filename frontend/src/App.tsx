@@ -20,6 +20,9 @@ import QuestionsPage from './pages/QuestionsPage';
 import SurveyPage from './pages/SurveyPage';
 import CategoriesPage from './pages/CategoriesPage';
 import DynamicCategoryWrapper from './components/DynamicCategoryWrapper';
+import GramaNiladharisPage from './pages/GramaNiladharisPage';
+import PoliceConnectionsPage from './pages/PoliceConnectionsPage';
+import PostOfficeConnectionsPage from './pages/PostOfficeConnectionsPage';
 
 const App: React.FC = () => {
   return (
@@ -109,6 +112,36 @@ const App: React.FC = () => {
                   <ProtectedRoute>
                     <AdminLayout>
                       <CategoriesPage />
+                    </AdminLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/gm-divisions"
+                element={
+                  <ProtectedRoute>
+                    <AdminLayout>
+                      <GramaNiladharisPage />
+                    </AdminLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/police-database-map"
+                element={
+                  <ProtectedRoute>
+                    <AdminLayout>
+                      <PoliceConnectionsPage />
+                    </AdminLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/postoffice-database-map"
+                element={
+                  <ProtectedRoute>
+                    <AdminLayout>
+                      <PostOfficeConnectionsPage />
                     </AdminLayout>
                   </ProtectedRoute>
                 }

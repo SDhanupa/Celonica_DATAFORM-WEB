@@ -245,3 +245,42 @@ export const DELETE_CATEGORY = gql`
     deleteCategory(id: $id)
   }
 `;
+
+export const UPDATE_POLICE_MAPPING = gql`
+  mutation UpdatePoliceMapping(
+    $code: String!
+    $psId: String
+    $psName: String!
+    $psNameSi: String
+    $psNameTa: String
+  ) {
+    updatePoliceMapping(
+      code: $code
+      psId: $psId
+      psName: $psName
+      psNameSi: $psNameSi
+      psNameTa: $psNameTa
+    ) {
+      id
+      gndNum
+      psName
+      psNameSi
+      psNameTa
+    }
+  }
+`;
+
+export const UPDATE_GND_POST_OFFICE_MAPPING = gql`
+  mutation UpdateGndPostOfficeMapping($gndId: ID!, $postOfficeId: ID) {
+    updateGndPostOfficeMapping(gndId: $gndId, postOfficeId: $postOfficeId) {
+      id
+      code
+      nameEn
+      postOffice {
+        id
+        placeNameEnglish
+        postalCode
+      }
+    }
+  }
+`;

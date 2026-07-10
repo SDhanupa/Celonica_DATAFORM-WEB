@@ -181,3 +181,88 @@ export const GET_CATEGORY_ANSWERS = gql`
     }
   }
 `;
+
+export const GET_GRAMA_NILADHARIS = gql`
+  query GetGramaNiladharis($first: Int!, $page: Int!, $search: String) {
+    gramaNiladharis(first: $first, page: $page, search: $search) {
+      data {
+        id
+        provinceCode
+        PCCODE
+        districtCode
+        DCCODE
+        divisionalSecretariatCode
+        DSCCODE
+        code
+        CCODE
+        nameSi
+        nameEn
+        nameTa
+        disEn
+        police {
+          id
+          name
+          psName
+          psNameSi
+          psNameTa
+        }
+        postOffice {
+          id
+          placeNameEnglish
+          postalCode
+        }
+      }
+      paginatorInfo {
+        count
+        currentPage
+        firstItem
+        hasMorePages
+        lastItem
+        lastPage
+        perPage
+        total
+      }
+    }
+  }
+`;
+
+export const GET_POLICES = gql`
+  query GetPolices($first: Int!, $page: Int!, $search: String) {
+    polices(first: $first, page: $page, search: $search) {
+      data {
+        id
+        psName
+        psNameSi
+        psNameTa
+        psId
+      }
+      paginatorInfo {
+        total
+        currentPage
+        lastPage
+      }
+    }
+  }
+`;
+
+export const GET_POST_OFFICES_BY_DISTRICT = gql`
+  query GetPostOfficesByDistrict($district: String!) {
+    postOfficesByDistrict(district: $district) {
+      id
+      placeNameEnglish
+      district
+      postalCode
+    }
+  }
+`;
+
+export const GET_DISTRICTS = gql`
+  query GetDistricts($search: String, $first: Int, $page: Int) {
+    districts(search: $search, first: $first, page: $page) {
+      code
+      nameEn
+      nameSi
+      nameTa
+    }
+  }
+`;

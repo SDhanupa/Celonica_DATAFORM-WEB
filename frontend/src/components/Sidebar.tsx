@@ -27,6 +27,7 @@ import {
   Menu as MenuIcon,
   PersonAdd as UserPlusIcon,
   Category as CategoryIcon,
+  Map as MapIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../auth/AuthProvider';
 
@@ -40,7 +41,10 @@ const navItems = [
   { label: 'Questions', icon: <QuestionsIcon />, path: '/questions', roles: ['super_admin', 'admin', 'moderator'] },
   { label: 'Reports', icon: <ReportsIcon />, path: '/reports', roles: ['super_admin', 'admin', 'moderator'] },
   { label: 'Categories', icon: <CategoryIcon />, path: '/categories', roles: ['super_admin'] },
+  { label: 'GM Divisions', icon: <MapIcon />, path: '/gm-divisions', roles: ['super_admin'] },
   { label: 'Register User', icon: <UserPlusIcon />, path: '/registration', roles: ['super_admin'] },
+  { label: 'Data Base Mapping', icon: <MapIcon />, path: '/police-database-map', roles: ['super_admin'] },
+  { label: 'Post Office Mapping', icon: <MapIcon />, path: '/postoffice-database-map', roles: ['super_admin'] },
   { label: 'Take Survey', icon: <QuestionsIcon />, path: '/survey', roles: ['user'] },
 ];
 
@@ -72,6 +76,8 @@ const Sidebar: React.FC = () => {
           transition: 'width 0.2s',
           overflow: 'hidden',
           zIndex: 1000,
+          display: 'flex',
+          flexDirection: 'column',
         },
       }}
     >
@@ -167,7 +173,28 @@ const Sidebar: React.FC = () => {
       )}
 
       {/* Navigation */}
-      <List sx={{ px: 0, flex: 1, mt: 1 }}>
+      <List 
+        sx={{ 
+          px: 0, 
+          flex: 1, 
+          mt: 1,
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          '&::-webkit-scrollbar': {
+            width: '6px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: 'transparent',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: 'rgba(0,0,0,0.2)',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            background: 'rgba(0,0,0,0.3)',
+          },
+        }}
+      >
         {navItems.map((item: any) => {
           if (item.roles && !item.roles.includes(role)) {
             return null;

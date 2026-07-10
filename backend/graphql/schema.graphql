@@ -118,6 +118,33 @@ type Query {
     "Get all answers for questions in a specific category"
     categoryAnswers(categoryId: ID!): [UserAnswer!]!
         @field(resolver: "App\\GraphQL\\Queries\\QuestionQueries@categoryAnswers")
+
+    "Get post offices filtered by district"
+    postOfficesByDistrict(district: String!): [PostOffice!]!
+        @field(resolver: "App\\GraphQL\\Queries\\PostOfficeQueries@postOfficesByDistrict")
+
+    "Grama Niladharis"
+    gramaNiladharis(search: String @builder(method: "App\\Models\\GramaNiladhari@scopeSearch")): [GramaNiladhari!]! @paginate(defaultCount: 50)
+    gramaNiladhari(id: ID! @eq): GramaNiladhari @find
+
+    "Polices"
+    polices(search: String @builder(method: "App\\Models\\Police@scopeSearch")): [Police!]! @paginate(defaultCount: 50)
+    police(id: ID! @eq): Police @find
+
+    "Users"
+    users(search: String @where(operator: "like")): [User!]! @paginate(defaultCount: 10)
+    user(id: ID @eq): User @find
+
+    "Districts"
+    districts(search: String, first: Int, page: Int): [District!]!
+        @field(resolver: "App\\GraphQL\\Queries\\DistrictQueries@getDistricts")
+}
+
+type District {
+    code: String!
+    nameEn: String
+    nameSi: String
+    nameTa: String
 }
 
 type Category {
@@ -256,4 +283,78 @@ type Mutation {
     "Delete a category"
     deleteCategory(id: ID!): Boolean!
         @field(resolver: "App\\GraphQL\\Mutations\\CategoryMutations@deleteCategory")
+
+    "Update Police Mapping"
+    updatePoliceMapping(
+        code: String!
+        psId: String @rename(attribute: "ps_id")
+        psName: String! @rename(attribute: "ps_name")
+        psNameSi: String @rename(attribute: "ps_name_si")
+        psNameTa: String @rename(attribute: "ps_name_ta")
+    ): Police!
+        @field(resolver: "App\\GraphQL\\Mutations\\PoliceMutations@updatePoliceMapping")
+
+    "Update GND Post Office Mapping"
+    updateGndPostOfficeMapping(
+        gndId: ID!
+        postOfficeId: ID
+    ): GramaNiladhari!
+        @field(resolver: "App\\GraphQL\\Mutations\\PostOfficeMutations@updateGndPostOfficeMapping")
+}
+
+type GramaNiladhari {
+    id: ID!
+    provinceCode: String @rename(attribute: "province_code")
+    PCCODE: String
+    districtCode: String @rename(attribute: "district_code")
+    DCCODE: String
+    divisionalSecretariatCode: String @rename(attribute: "divisional_secretariat_code")
+    DSCCODE: String
+    code: String
+    CCODE: String
+    nameSi: String @rename(attribute: "name_si")
+    nameEn: String @rename(attribute: "name_en")
+    nameTa: String @rename(attribute: "name_ta")
+    disEn: String @rename(attribute: "dis_en")
+    police: Police @hasOne
+    postOffice: PostOffice @belongsTo
+}
+
+type Police {
+    id: ID!
+    ccode: String
+    gndId: String @rename(attribute: "gnd_id")
+    name: String
+    provinceId: String @rename(attribute: "province_id")
+    districtId: String @rename(attribute: "district_id")
+    dsdId: String @rename(attribute: "dsd_id")
+    pdId: String @rename(attribute: "pd_id")
+    gndNum: String @rename(attribute: "gnd_num")
+    lat: String
+    lng: String
+    psId: String @rename(attribute: "ps_id")
+    psName: String @rename(attribute: "ps_name")
+    psNameSi: String @rename(attribute: "ps_name_si")
+    psNameTa: String @rename(attribute: "ps_name_ta")
+    distanceToThePoliceStation: String @rename(attribute: "distance_to_the_police_station")
+    gramaNiladhari: GramaNiladhari @belongsTo
+}
+
+type PostOffice {
+    id: ID!
+    countryCode: String @rename(attribute: "country_code")
+    province: String
+    provinceCode: String @rename(attribute: "province_code")
+    district: String
+    disid: String
+    dsAga: String @rename(attribute: "ds_aga")
+    dsCode: String @rename(attribute: "ds_code")
+    postalCode: String @rename(attribute: "postal_code")
+    placeNameEnglish: String @rename(attribute: "place_name_english")
+    sinhala: String
+    tamil: String
+    latitude: Float
+    longitude: Float
+    accuracy: String
+    gramaNiladharis: [GramaNiladhari!] @hasMany
 }
