@@ -487,6 +487,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           minHeight: '100vh', // Full screen
           display: 'flex',
           alignItems: 'center',
+          justifyContent: 'center',
           position: 'relative',
           overflow: 'hidden',
         }}
@@ -509,7 +510,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
 
         <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, py: { xs: 8, md: 0 } }}>
           <Grid container spacing={4} alignItems="center">
-            <Grid item xs={12} md={6}>
+            {/* Words / Text on the right side (order 2 on desktop, order 1 on mobile) */}
+            <Grid item xs={12} md={6} sx={{ order: { xs: 1, md: 2 } }}>
               {!showLocationModal && (
                 <Box
                   sx={{
@@ -517,7 +519,17 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                     '@keyframes fadeSlideUp': {
                       '0%': { opacity: 0, transform: 'translateY(40px)' },
                       '100%': { opacity: 1, transform: 'translateY(0)' },
-                    }
+                    },
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: { xs: 'center', md: 'flex-start' },
+                    textAlign: { xs: 'center', md: 'left' },
+                    bgcolor: { xs: isDarkMode ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.2)', md: 'transparent' },
+                    backdropFilter: { xs: 'blur(10px)', md: 'none' },
+                    borderRadius: '24px',
+                    p: { xs: 3, md: 0 },
+                    border: { xs: '1px solid rgba(255, 255, 255, 0.1)', md: 'none' },
+                    boxShadow: { xs: '0 8px 32px rgba(0,0,0,0.3)', md: 'none' }
                   }}
                 >
                   {/* District - Top Glass Pill */}
@@ -585,15 +597,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                   )}
                 </Box>
               )}
-
-
-
-
-
-
             </Grid>
-            {/* Population Infographic on the right side */}
-            <Grid item xs={12} md={6}>
+
+            {/* Population Infographic on the left side (order 1 on desktop, order 2 on mobile) */}
+            <Grid item xs={12} md={6} sx={{ order: { xs: 2, md: 1 } }}>
               {!showLocationModal && (displayGN || displayCity || displayDistrict) && (
                 <Box
                   sx={{
@@ -601,10 +608,16 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                     '@keyframes fadeIn': {
                       '0%': { opacity: 0 },
                       '100%': { opacity: 1 },
-                    }
+                    },
+                    bgcolor: { xs: isDarkMode ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.2)', md: 'transparent' },
+                    backdropFilter: { xs: 'blur(10px)', md: 'none' },
+                    borderRadius: '24px',
+                    p: { xs: 3, md: 0 },
+                    border: { xs: '1px solid rgba(255, 255, 255, 0.1)', md: 'none' },
+                    boxShadow: { xs: '0 8px 32px rgba(0,0,0,0.3)', md: 'none' }
                   }}
                 >
-                  <PopulationInfographic populationData={populationData} />
+                  <PopulationInfographic populationData={populationData} language={language} />
                 </Box>
               )}
             </Grid>

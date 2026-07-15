@@ -20,12 +20,21 @@ const data = [
 
 interface PopulationInfographicProps {
   populationData?: { male: number; female: number; both: number } | null;
+  language?: 'en' | 'si' | 'ta';
 }
 
-export default function PopulationInfographic({ populationData }: PopulationInfographicProps) {
+const translations = {
+  en: { male: 'Male', female: 'Female', total: 'Total', population: 'Population' },
+  si: { male: 'පිරිමි', female: 'කාන්තා', total: 'මුළු', population: 'ජනගහනය' },
+  ta: { male: 'ஆண்', female: 'பெண்', total: 'மொத்த', population: 'மக்கள் தொகை' }
+};
+
+export default function PopulationInfographic({ populationData, language = 'en' }: PopulationInfographicProps) {
   const [mounted, setMounted] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  const t = translations[language];
 
   // Use dynamic data if available, otherwise fallback to 0
   const totalCount = populationData?.both || 0;
@@ -39,8 +48,8 @@ export default function PopulationInfographic({ populationData }: PopulationInfo
   const femalePercent = hasData ? (femaleCount / totalCount) * 100 : 50;
 
   const activeData = [
-    { percent: malePercent, color: hasData ? '#3A7BD5' : '#888', label: 'Male', description: hasData ? maleCount.toLocaleString() : '0', icon: <MaleIcon />, count: maleCount },
-    { percent: femalePercent, color: hasData ? '#E55D87' : '#999', label: 'Female', description: hasData ? femaleCount.toLocaleString() : '0', icon: <FemaleIcon />, count: femaleCount },
+    { percent: malePercent, color: hasData ? '#3A7BD5' : '#888', label: t.male, description: hasData ? maleCount.toLocaleString() : '0', icon: <MaleIcon />, count: maleCount },
+    { percent: femalePercent, color: hasData ? '#E55D87' : '#999', label: t.female, description: hasData ? femaleCount.toLocaleString() : '0', icon: <FemaleIcon />, count: femaleCount },
   ];
 
   useEffect(() => {
@@ -94,11 +103,11 @@ export default function PopulationInfographic({ populationData }: PopulationInfo
   });
 
   return (
-    <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative', minHeight: isMobile ? '300px' : '450px' }}>
+    <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative', minHeight: isMobile ? '280px' : '350px' }}>
       
 
 
-      <svg viewBox="-220 -220 440 440" width="100%" height="100%" style={{ overflow: 'visible', filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.3))' }}>
+      <svg viewBox="-220 -220 440 440" width="100%" height="100%" style={{ overflow: 'visible', filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.3))', transform: isMobile ? 'scale(1.35)' : 'none' }}>
         {slices.map((slice) => (
           <g 
             key={slice.label} 
@@ -116,12 +125,27 @@ export default function PopulationInfographic({ populationData }: PopulationInfo
               strokeWidth="1"
             />
             
-            {/* Count Text on Slice */}
+            {/* Label Text on Slice (Mobile Only) */}
+            {isMobile && (
+              <text
+                x={slice.midPoint.x * 0.70}
+                y={slice.midPoint.y * 0.70 - 10}
+                fill="rgba(255,255,255,0.9)"
+                fontSize="14"
+                fontWeight="normal"
+                textAnchor="middle"
+                dominantBaseline="central"
+              >
+                {slice.label}
+              </text>
+            )}
+
+            {/* Count Text on Slice (Always Visible) */}
             <text
-              x={slice.midPoint.x * 0.65}
-              y={slice.midPoint.y * 0.65}
+              x={slice.midPoint.x * 0.70}
+              y={slice.midPoint.y * 0.70 + (isMobile ? 12 : 0)}
               fill="#fff"
-              fontSize="16"
+              fontSize="18"
               fontWeight="bold"
               textAnchor="middle"
               dominantBaseline="central"
@@ -129,80 +153,75 @@ export default function PopulationInfographic({ populationData }: PopulationInfo
               {slice.count > 0 ? slice.count.toLocaleString() : ''}
             </text>
 
-            {/* Dot at start of line */}
-            <circle 
-              cx={slice.lineStart.x} 
-              cy={slice.lineStart.y} 
-              r="4" 
-              fill="#fff" 
-            />
-
-            {/* Line connecting slice to text */}
-            <path
-              d={`M ${slice.lineStart.x} ${slice.lineStart.y} L ${slice.lineEnd.x} ${slice.lineEnd.y} L ${slice.lineEnd.x > 0 ? slice.lineEnd.x + 20 : slice.lineEnd.x - 20} ${slice.lineEnd.y}`}
-              fill="none"
-              stroke="rgba(255,255,255,0.5)"
-              strokeWidth="1.5"
-            />
-            <circle 
-              cx={slice.lineEnd.x > 0 ? slice.lineEnd.x + 20 : slice.lineEnd.x - 20} 
-              cy={slice.lineEnd.y} 
-              r="3" 
-              fill={slice.color} 
-            />
+            {/* Connecting lines and dots (Desktop Only) */}
+            {!isMobile && (
+              <>
+                {/* Dot at start of line */}
+                <circle cx={slice.lineStart.x} cy={slice.lineStart.y} r="4" fill="#fff" />
+                {/* Line connecting slice to text */}
+                <path
+                  d={`M ${slice.lineStart.x} ${slice.lineStart.y} L ${slice.lineEnd.x} ${slice.lineEnd.y} L ${slice.lineEnd.x > 0 ? slice.lineEnd.x + 20 : slice.lineEnd.x - 20} ${slice.lineEnd.y}`}
+                  fill="none"
+                  stroke="rgba(255,255,255,0.5)"
+                  strokeWidth="1.5"
+                />
+                <circle cx={slice.lineEnd.x > 0 ? slice.lineEnd.x + 20 : slice.lineEnd.x - 20} cy={slice.lineEnd.y} r="3" fill={slice.color} />
+              </>
+            )}
           </g>
         ))}
         
         {/* Center Donut Hole for Total Population */}
-        <circle cx="0" cy="0" r="45" fill="rgba(30, 30, 30, 0.8)" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-        <text x="0" y="-8" fill="#fff" fontSize="12" textAnchor="middle" opacity="0.8">Population</text>
-        <text x="0" y="14" fill="#fff" fontSize="16" fontWeight="bold" textAnchor="middle">{totalCount.toLocaleString()}</text>
+        <circle cx="0" cy="0" r="42" fill="rgba(30, 30, 30, 0.8)" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+        <text x="0" y="-12" fill="#fff" fontSize="9" textAnchor="middle" opacity="0.8">{t.total}</text>
+        <text x="0" y="-2" fill="#fff" fontSize="9" textAnchor="middle" opacity="0.8">{t.population}</text>
+        <text x="0" y="15" fill="#fff" fontSize="14" fontWeight="bold" textAnchor="middle">{totalCount.toLocaleString()}</text>
       </svg>
 
-      {/* HTML overlay for Icons and Text */}
-      <Box sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
-        {slices.map((slice) => {
-          const isRight = slice.midPercent < 0.5;
-          return (
-            <Fade in={mounted} style={{ transitionDelay: `${0.5 + slice.index * 0.1}s` }} key={slice.label}>
-              <Box 
-                sx={{ 
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: `translate(calc(-50% + ${slice.textPos.x * (isMobile ? 1.2 : 1.6)}px), calc(-50% + ${slice.textPos.y * (isMobile ? 1.2 : 1.6)}px))`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  flexDirection: isRight ? 'row' : 'row-reverse',
-                  gap: 1,
-                  color: '#fff',
-                  width: '140px'
-                }}
-              >
-                <Box sx={{ 
-                  bgcolor: 'rgba(255,255,255,0.1)', 
-                  p: 0.5, 
-                  borderRadius: '50%', 
-                  display: 'flex', 
-                  backdropFilter: 'blur(5px)',
-                  color: slice.color,
-                  boxShadow: '0 4px 10px rgba(0,0,0,0.2)'
-                }}>
-                  {slice.icon}
+      {/* HTML overlay for Icons and Text (Desktop Only) */}
+      {!isMobile && (
+        <Box sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
+          {slices.map((slice) => {
+            const isRight = slice.midPercent < 0.5;
+            return (
+              <Fade in={mounted} style={{ transitionDelay: `${0.5 + slice.index * 0.1}s` }} key={slice.label}>
+                <Box 
+                  sx={{ 
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: `translate(calc(-50% + ${slice.textPos.x * 1.6}px), calc(-50% + ${slice.textPos.y * 1.6}px))`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    flexDirection: isRight ? 'row' : 'row-reverse',
+                    gap: 1,
+                    color: '#fff',
+                    width: '140px'
+                  }}
+                >
+                  <Box sx={{ 
+                    bgcolor: 'rgba(255,255,255,0.1)', 
+                    p: 0.5, 
+                    borderRadius: '50%', 
+                    display: 'flex', 
+                    backdropFilter: 'blur(5px)',
+                    color: slice.color,
+                    boxShadow: '0 4px 10px rgba(0,0,0,0.2)'
+                  }}>
+                    {slice.icon}
+                  </Box>
+                  <Box sx={{ textAlign: isRight ? 'left' : 'right' }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold', fontSize: '1rem', letterSpacing: '0.5px' }}>
+                      {slice.label}
+                    </Typography>
+                  </Box>
                 </Box>
-                <Box sx={{ textAlign: isRight ? 'left' : 'right' }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold', fontSize: { xs: '0.7rem', md: '0.85rem' }, lineHeight: 1.2 }}>
-                    {slice.label}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)', fontSize: { xs: '0.6rem', md: '0.7rem' } }}>
-                    {slice.description}
-                  </Typography>
-                </Box>
-              </Box>
-            </Fade>
-          );
-        })}
-      </Box>
+              </Fade>
+            );
+          })}
+        </Box>
+      )}
+
     </Box>
   );
 }
