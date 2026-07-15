@@ -366,6 +366,13 @@ export const GET_GN_BY_COORDINATES = gql`
         admin2NameSi
         admin2NameTa
       }
+      pGn {
+        id
+        gnName
+        populationBoth
+        populationMale
+        populationFemale
+      }
     }
   }
 `;

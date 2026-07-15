@@ -18,10 +18,30 @@ const data = [
   { percent: 20, color: '#F37335', label: 'Employed', description: 'Full-time', icon: <WorkIcon /> },
 ];
 
-export default function PopulationInfographic() {
+interface PopulationInfographicProps {
+  populationData?: { male: number; female: number; both: number } | null;
+}
+
+export default function PopulationInfographic({ populationData }: PopulationInfographicProps) {
   const [mounted, setMounted] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  // Use dynamic data if available, otherwise fallback to 0
+  const totalCount = populationData?.both || 0;
+  const maleCount = populationData?.male || 0;
+  const femaleCount = populationData?.female || 0;
+  
+  const hasData = totalCount > 0;
+  
+  // Calculate percentages for the pie chart slices
+  const malePercent = hasData ? (maleCount / totalCount) * 100 : 50;
+  const femalePercent = hasData ? (femaleCount / totalCount) * 100 : 50;
+
+  const activeData = [
+    { percent: malePercent, color: hasData ? '#3A7BD5' : '#888', label: 'Male', description: hasData ? maleCount.toLocaleString() : '0', icon: <MaleIcon />, count: maleCount },
+    { percent: femalePercent, color: hasData ? '#E55D87' : '#999', label: 'Female', description: hasData ? femaleCount.toLocaleString() : '0', icon: <FemaleIcon />, count: femaleCount },
+  ];
 
   useEffect(() => {
     // Stagger animation
@@ -39,7 +59,7 @@ export default function PopulationInfographic() {
   let cumulativePercent = 0;
   const radius = 100;
   
-  const slices = data.map((slice, index) => {
+  const slices = activeData.map((slice, index) => {
     const startX = getCoordinatesForPercent(cumulativePercent, radius).x;
     const startY = getCoordinatesForPercent(cumulativePercent, radius).y;
     
@@ -76,24 +96,7 @@ export default function PopulationInfographic() {
   return (
     <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative', minHeight: isMobile ? '300px' : '450px' }}>
       
-      {/* Title */}
-      <Typography 
-        variant="h6" 
-        sx={{ 
-          position: 'absolute', 
-          top: isMobile ? 0 : -20, 
-          left: '50%', 
-          transform: 'translateX(-50%)',
-          color: 'rgba(255,255,255,0.9)',
-          letterSpacing: '2px',
-          fontWeight: 700,
-          opacity: mounted ? 1 : 0,
-          transition: 'opacity 1s ease-in',
-          fontSize: { xs: '0.9rem', md: '1.2rem' }
-        }}
-      >
-        GN POPULATION INFOGRAPHIC
-      </Typography>
+
 
       <svg viewBox="-220 -220 440 440" width="100%" height="100%" style={{ overflow: 'visible', filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.3))' }}>
         {slices.map((slice) => (
@@ -113,7 +116,7 @@ export default function PopulationInfographic() {
               strokeWidth="1"
             />
             
-            {/* Percentage Text on Slice */}
+            {/* Count Text on Slice */}
             <text
               x={slice.midPoint.x * 0.65}
               y={slice.midPoint.y * 0.65}
@@ -123,7 +126,7 @@ export default function PopulationInfographic() {
               textAnchor="middle"
               dominantBaseline="central"
             >
-              {slice.percent}%
+              {slice.count > 0 ? slice.count.toLocaleString() : ''}
             </text>
 
             {/* Dot at start of line */}
@@ -149,6 +152,11 @@ export default function PopulationInfographic() {
             />
           </g>
         ))}
+        
+        {/* Center Donut Hole for Total Population */}
+        <circle cx="0" cy="0" r="45" fill="rgba(30, 30, 30, 0.8)" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+        <text x="0" y="-8" fill="#fff" fontSize="12" textAnchor="middle" opacity="0.8">Population</text>
+        <text x="0" y="14" fill="#fff" fontSize="16" fontWeight="bold" textAnchor="middle">{totalCount.toLocaleString()}</text>
       </svg>
 
       {/* HTML overlay for Icons and Text */}

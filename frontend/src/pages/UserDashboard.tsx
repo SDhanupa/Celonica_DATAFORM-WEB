@@ -124,24 +124,67 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   let displayDistrict = '';
   let displayCity = '';
   let displayGN = '';
+  let populationData = null;
+
   if (!showManualForm && autoGnData?.gnByCoordinates) {
     const d = autoGnData.gnByCoordinates.pDistrict;
     displayDistrict = language === 'en' ? d?.admin2NameEn : language === 'si' ? d?.admin2NameSi : d?.admin2NameTa;
     const g = autoGnData.gnByCoordinates;
     displayCity = language === 'en' ? g?.dsEn : language === 'si' ? g?.dsSi : g?.dsTa;
     displayGN = language === 'en' ? g?.nameEn : language === 'si' ? g?.nameSi : g?.nameTa;
-  } else if (showManualForm && selectedDistrict && selectedCity && selectedGN) {
+    if (g?.pGn) {
+      populationData = {
+        both: g.pGn.populationBoth || 0,
+        male: g.pGn.populationMale || 0,
+        female: g.pGn.populationFemale || 0
+      };
+    }
+  } else if (showManualForm && selectedDistrict) {
     const d = districtsData?.pDistricts?.find((x: any) => x.id === selectedDistrict);
     if (d) {
       displayDistrict = language === 'en' ? d.admin2NameEn : language === 'si' ? d.admin2NameSi : d.admin2NameTa;
+      // Fallback to District population
+      populationData = {
+        both: d.populationBoth || 0,
+        male: d.populationMale || 0,
+        female: d.populationFemale || 0
+      };
     }
-    const c = uniqueCities.find((x: any) => x.divisionalSecretariatCode === selectedCity);
-    if (c) {
-      displayCity = language === 'en' ? c.dsEn : language === 'si' ? c.dsSi : c.dsTa;
-    }
-    const g = gnData?.pDistrict?.gramaNiladharis?.find((x: any) => x.id === selectedGN);
-    if (g) {
-      displayGN = language === 'en' ? g.nameEn : language === 'si' ? g.nameSi : g.nameTa;
+    
+    if (selectedCity) {
+      const c = uniqueCities.find((x: any) => x.divisionalSecretariatCode === selectedCity);
+      if (c) {
+        displayCity = language === 'en' ? c.dsEn : language === 'si' ? c.dsSi : c.dsTa;
+        
+        // Sum population for all GNs in this DS Division
+        if (gnData?.pDistrict?.gramaNiladharis) {
+          let cityBoth = 0, cityMale = 0, cityFemale = 0;
+          gnData.pDistrict.gramaNiladharis.forEach((gn: any) => {
+            if (gn.divisionalSecretariatCode === selectedCity && gn.pGn) {
+              cityBoth += gn.pGn.populationBoth || 0;
+              cityMale += gn.pGn.populationMale || 0;
+              cityFemale += gn.pGn.populationFemale || 0;
+            }
+          });
+          if (cityBoth > 0) {
+            populationData = { both: cityBoth, male: cityMale, female: cityFemale };
+          }
+        }
+      }
+      
+      if (selectedGN) {
+        const g = gnData?.pDistrict?.gramaNiladharis?.find((x: any) => x.id === selectedGN);
+        if (g) {
+          displayGN = language === 'en' ? g.nameEn : language === 'si' ? g.nameSi : g.nameTa;
+          if (g.pGn) {
+            populationData = {
+              both: g.pGn.populationBoth || 0,
+              male: g.pGn.populationMale || 0,
+              female: g.pGn.populationFemale || 0
+            };
+          }
+        }
+      }
     }
   }
 
@@ -551,7 +594,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             </Grid>
             {/* Population Infographic on the right side */}
             <Grid item xs={12} md={6}>
-              {!showLocationModal && (
+              {!showLocationModal && (displayGN || displayCity || displayDistrict) && (
                 <Box
                   sx={{
                     animation: 'fadeIn 1.5s ease-out forwards',
@@ -561,7 +604,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                     }
                   }}
                 >
-                  <PopulationInfographic />
+                  <PopulationInfographic populationData={populationData} />
                 </Box>
               )}
             </Grid>

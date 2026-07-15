@@ -318,6 +318,16 @@ type Mutation {
         @field(resolver: "App\\GraphQL\\Mutations\\PostOfficeMutations@updateGndPostOfficeMapping")
 }
 
+type PGn {
+    id: ID!
+    ccode: String @rename(attribute: "CCODE")
+    gramaNiladhariId: ID @rename(attribute: "grama_niladhari_id")
+    gnName: String @rename(attribute: "gn_name")
+    populationBoth: Int @rename(attribute: "population_both")
+    populationMale: Int @rename(attribute: "population_male")
+    populationFemale: Int @rename(attribute: "population_female")
+}
+
 type GramaNiladhari {
     id: ID!
     provinceCode: String @rename(attribute: "province_code")
@@ -416,6 +426,9 @@ type PProvince {
     admin1NameSi: String @rename(attribute: "admin1Name_si")
     admin1NameTa: String @rename(attribute: "admin1Name_ta")
     admin1Pcode: String
+    populationBoth: Int @rename(attribute: "population_both")
+    populationMale: Int @rename(attribute: "population_male")
+    populationFemale: Int @rename(attribute: "population_female")
     districts: [PDistrict!] @hasMany
 }
 
