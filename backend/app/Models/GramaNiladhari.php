@@ -17,7 +17,16 @@ class GramaNiladhari extends Model
         'CCODE',
         'name_si',
         'name_en',
-        'name_ta'
+        'name_ta',
+        'pro_en',
+        'pro_si',
+        'pro_ta',
+        'dis_en',
+        'dis_si',
+        'dis_ta',
+        'ds_en',
+        'ds_si',
+        'ds_ta'
     ];
 
     public function scopeSearch($query, $search)
@@ -40,5 +49,20 @@ class GramaNiladhari extends Model
     public function postOffice()
     {
         return $this->belongsTo(PostOffice::class, 'post_office_id');
+    }
+
+    public function pProvince()
+    {
+        return $this->belongsTo(PProvince::class, 'province_code', 'admin1Pcode');
+    }
+
+    public function pDistrict()
+    {
+        return $this->belongsTo(PDistrict::class, 'district_code', 'admin2Pcode');
+    }
+
+    public function pGn()
+    {
+        return $this->hasOne(PGn::class, 'grama_niladhari_id');
     }
 }

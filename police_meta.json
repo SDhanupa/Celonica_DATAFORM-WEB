@@ -1,0 +1,96 @@
+{
+  "1.1.2 police stations use for database.xlsx": {
+    "columns": [
+      "ccode",
+      "gnd_id",
+      "name",
+      "province_id",
+      "district_id",
+      "dsd_id",
+      "pd_id",
+      "gnd_num",
+      "lat",
+      "lng",
+      "ps_id",
+      "ps_name",
+      "ps_name_si",
+      "ps_name_ta",
+      "distance to the police station"
+    ],
+    "first_row": [
+      {
+        "ccode": NaN,
+        "gnd_id": "LK-1103005",
+        "name": "Sammanthranapura",
+        "province_id": "LK-1",
+        "district_id": "LK-11",
+        "dsd_id": "LK-1103",
+        "pd_id": "EC-01A",
+        "gnd_num": NaN,
+        "lat": 6.978418838,
+        "lng": 79.87836865,
+        "ps_id": "PS-110213",
+        "ps_name": "Mattakkuliya",
+        "ps_name_si": "මට්ටක්කුලිය",
+        "ps_name_ta": "மட்டக்குலியா",
+        "distance to the police station": 0.308625483
+      }
+    ]
+  },
+  "1.1.2 police stations with divisions .xlsx": {
+    "columns": [
+      "Location ",
+      "Full Location Name",
+      "Location Type",
+      "si",
+      "en",
+      "ta"
+    ],
+    "first_row": [
+      {
+        "Location ": "PO-DIV-1",
+        "Full Location Name": "PO-DIV-1 - ගම්පොල පොලිස් කොට්ඨාශය",
+        "Location Type": "පොලිස් කොට්ඨාශය",
+        "si": "ගම්පොල පොලිස් කොට්ඨාශය",
+        "en": "Gampola Police Division",
+        "ta": "கம்பளை பொலிஸ் பிரிவு"
+      }
+    ]
+  },
+  "Police station Numbers .xlsx": {
+    "columns": [
+      "Province",
+      "Division",
+      "Police Station",
+      "OIC Mobile Number",
+      "Office Telephone Number"
+    ],
+    "first_row": [
+      {
+        "Province": "Western Province",
+        "Division": "Colombo Central Police Division",
+        "Police Station": "Pettah",
+        "OIC Mobile Number": "071-8591555",
+        "Office Telephone Number": "011-2323677"
+      }
+    ]
+  },
+  "පොලිස් ස්ථාන 608 -.xlsx": {
+    "columns": [
+      "2026.04.16 දිනට ස්ථාපිත කර ඇති පොලිස් ස්ථාන - 608",
+      "Unnamed: 1",
+      "Unnamed: 2",
+      "Unnamed: 3",
+      "Unnamed: 4"
+    ],
+    "first_row": [
+      {
+        "2026.04.16 දිනට ස්ථාපිත කර ඇති පොලිස් ස්ථාන - 608": "අනු අංකය",
+        "Unnamed: 1": "පළාත",
+        "Unnamed: 2": "දිසාව",
+        "Unnamed: 3": "කොට්ඨාසය",
+        "Unnamed: 4": "පොලිස් ස්ථානය"
+      }
+    ]
+  }
+}

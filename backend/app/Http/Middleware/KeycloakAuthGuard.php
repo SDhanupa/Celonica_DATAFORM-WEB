@@ -26,7 +26,17 @@ class KeycloakAuthGuard
         $token = $this->extractToken($request);
 
         if (!$token) {
-            return response()->json(['error' => 'Unauthorized: No token provided'], 401);
+            $content = json_decode($request->getContent(), true) ?: [];
+            $query = $content['query'] ?? '';
+
+            // Allow any query to pass through (getting data out).
+            // Block all mutations (putting data in) if no token is provided.
+            if (preg_match('/^\s*mutation\b/i', $query)) {
+                return response()->json(['error' => 'Unauthorized: Mutations require a token'], 401);
+            }
+
+            // For queries, proceed without injecting a user
+            return $next($request);
         }
 
         try {

@@ -23,6 +23,9 @@ import {
 import { useAuth } from '../auth/AuthProvider';
 import { useQuery } from '@apollo/client';
 import { GET_ME } from '../graphql/queries';
+import UserDashboard from './UserDashboard';
+import TopNavbar from '../components/TopNavbar';
+import AdminLayout from '../components/AdminLayout';
 
 interface StatCardProps {
   title: string;
@@ -107,31 +110,26 @@ const DashboardPage: React.FC = () => {
   const roles = userInfo?.realm_roles || [];
   const isAdmin = roles.includes('super_admin') || roles.includes('admin');
 
+  if (!isAdmin) {
+    return (
+      <Box>
+        <TopNavbar />
+        <UserDashboard user={data?.me || data?.meUser || userInfo} />
+      </Box>
+    );
+  }
+
   return (
-    <Box
-      sx={
-        !isAdmin
-          ? {
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minHeight: '80vh',
-              textAlign: 'center',
-            }
-          : {}
-      }
-    >
+    <AdminLayout>
+      <Box>
       {/* Header */}
-      <Box sx={{ mb: isAdmin ? 4 : 0 }}>
+      <Box sx={{ mb: 4 }}>
         <Typography variant="h4" color="text.primary" sx={{ fontWeight: 600, mb: 0.5 }}>
           Welcome back, {adminName.split(' ')[0]}
         </Typography>
-        {isAdmin && (
-          <Typography variant="body1" color="text.secondary">
-            Here's what's happening on your platform today.
-          </Typography>
-        )}
+        <Typography variant="body1" color="text.secondary">
+          Here's what's happening on your platform today.
+        </Typography>
       </Box>
 
       {/* Welcome Card */}
@@ -149,33 +147,13 @@ const DashboardPage: React.FC = () => {
               Welcome back, {data?.me?.name || data?.meUser?.firstName || 'User'}! 👋
             </Typography>
             <Typography variant="body1" sx={{ color: '#9898CC', maxWidth: 600 }}>
-              {isAdmin 
-                ? `Here's what's happening on your platform today. You have ${mockStats.pendingReports} pending reports that require your attention.`
-                : `Welcome to the survey platform. Click below to start or continue your survey.`}
+              Here's what's happening on your platform today. You have {mockStats.pendingReports} pending reports that require your attention.
             </Typography>
           </Box>
-          
-          {/* Only show for regular users */}
-          {!isAdmin && (
-            <Button 
-              variant="contained" 
-              href="/categories"
-              sx={{ 
-                background: 'linear-gradient(45deg, #6C63FF 30%, #8A84FF 90%)',
-                boxShadow: '0 3px 5px 2px rgba(108, 99, 255, .3)',
-                px: 4, py: 1.5, fontSize: '1.1rem'
-              }}
-            >
-              Browse Categories
-            </Button>
-          )}
         </CardContent>
       </Card>
 
-      {/* Admin Content */}
-      {isAdmin && (
-        <>
-          {/* Stats Grid */}
+      {/* Stats Grid */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} lg={3}>
           <StatCard
@@ -349,9 +327,8 @@ const DashboardPage: React.FC = () => {
           </Card>
         </Grid>
       </Grid>
-        </>
-      )}
-    </Box>
+      </Box>
+    </AdminLayout>
   );
 };
 

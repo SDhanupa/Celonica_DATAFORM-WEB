@@ -266,3 +266,106 @@ export const GET_DISTRICTS = gql`
     }
   }
 `;
+
+export const GET_PHI_AREAS_BY_DISTRICT = gql`
+  query GetPhiAreasByDistrict($district: String!) {
+    phiAreasByDistrict(district: $district) {
+      id
+      fullLocationName
+      nameEn
+      nameSi
+      nameTa
+      district
+      code
+    }
+  }
+`;
+
+export const GET_TRS_AREAS_BY_DISTRICT = gql`
+  query GetTrsAreasByDistrict($district: String!) {
+    trsAreasByDistrict(district: $district) {
+      id
+      fullLocationName
+      nameEn
+      nameSi
+      nameTa
+      district
+      code
+    }
+  }
+`;
+
+export const GET_P_DISTRICTS = gql`
+  query GetPDistricts {
+    pDistricts {
+      id
+      admin2NameEn
+      admin2NameSi
+      admin2NameTa
+      admin2Pcode
+      admin1Pcode
+      populationBoth
+      populationMale
+      populationFemale
+      pProvince {
+        id
+        admin1NameEn
+        admin1NameSi
+        admin1NameTa
+        admin1Pcode
+      }
+    }
+  }
+`;
+
+export const GET_P_DISTRICT_WITH_GNS = gql`
+  query GetPDistrictWithGns($id: ID!) {
+    pDistrict(id: $id) {
+      id
+      admin2NameEn
+      admin2NameSi
+      admin2NameTa
+      admin2Pcode
+      gramaNiladharis {
+        id
+        code
+        nameEn
+        nameSi
+        nameTa
+        dsEn
+        dsSi
+        dsTa
+        divisionalSecretariatCode
+        pGn {
+          id
+          gnName
+          populationBoth
+          populationMale
+          populationFemale
+        }
+      }
+    }
+  }
+`;
+
+export const GET_GN_BY_COORDINATES = gql`
+  query GetGnByCoordinates($lat: Float!, $lng: Float!) {
+    gnByCoordinates(lat: $lat, lng: $lng) {
+      id
+      code
+      nameEn
+      nameSi
+      nameTa
+      dsEn
+      dsSi
+      dsTa
+      divisionalSecretariatCode
+      pDistrict {
+        id
+        admin2NameEn
+        admin2NameSi
+        admin2NameTa
+      }
+    }
+  }
+`;

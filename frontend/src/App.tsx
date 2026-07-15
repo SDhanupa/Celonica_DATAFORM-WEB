@@ -23,6 +23,9 @@ import DynamicCategoryWrapper from './components/DynamicCategoryWrapper';
 import GramaNiladharisPage from './pages/GramaNiladharisPage';
 import PoliceConnectionsPage from './pages/PoliceConnectionsPage';
 import PostOfficeConnectionsPage from './pages/PostOfficeConnectionsPage';
+import PhiConnectionsPage from './pages/PhiConnectionsPage';
+import TrsConnectionsPage from './pages/TrsConnectionsPage';
+import DistrictProvinceConnectionsPage from './pages/DistrictProvinceConnectionsPage';
 
 const App: React.FC = () => {
   return (
@@ -35,17 +38,12 @@ const App: React.FC = () => {
               {/* Public */}
               <Route path="/login" element={<LoginPage />} />
 
-              {/* Protected — wrapped in AdminLayout */}
+              {/* Public Home Page (Admin layout handled inside DashboardPage for admins) */}
               <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <AdminLayout>
-                      <DashboardPage />
-                    </AdminLayout>
-                  </ProtectedRoute>
-                }
+                path="/"
+                element={<DashboardPage />}
               />
+              {/* Protected — wrapped in AdminLayout */}
               <Route
                 path="/admins"
                 element={
@@ -147,6 +145,36 @@ const App: React.FC = () => {
                 }
               />
               <Route
+                path="/health-database-map"
+                element={
+                  <ProtectedRoute>
+                    <AdminLayout>
+                      <PhiConnectionsPage />
+                    </AdminLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/trs-database-map"
+                element={
+                  <ProtectedRoute>
+                    <AdminLayout>
+                      <TrsConnectionsPage />
+                    </AdminLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/district-province-map"
+                element={
+                  <ProtectedRoute>
+                    <AdminLayout>
+                      <DistrictProvinceConnectionsPage />
+                    </AdminLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/categories/*"
                 element={
                   <ProtectedRoute>
@@ -159,8 +187,8 @@ const App: React.FC = () => {
 
 
               {/* Default redirect */}
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/dashboard" element={<Navigate to="/" replace />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </AuthProvider>
         </Router>

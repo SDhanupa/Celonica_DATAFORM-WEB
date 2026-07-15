@@ -1,0 +1,612 @@
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, Button, Container, Grid, Card, CardContent, CardMedia, FormControl, useTheme, useMediaQuery, CircularProgress, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Autocomplete, TextField, IconButton, Divider } from '@mui/material';
+import { useQuery } from '@apollo/client';
+import { GET_P_DISTRICTS, GET_P_DISTRICT_WITH_GNS, GET_GN_BY_COORDINATES } from '../graphql/queries';
+import { useAuth } from '../auth/AuthProvider';
+import { useNavigate } from 'react-router-dom';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+
+const getThemeColors = (isDark: boolean) => ({
+  primary: '#00A8FF',
+  secondary: '#FF4E3A',
+  darkCharcoal: isDark ? '#121212' : '#1D1F21',
+  lightBg: isDark ? '#1D1F21' : '#F5F6F8',
+  textLight: isDark ? '#F5F6F8' : '#FFFFFF',
+  textDark: isDark ? '#FFFFFF' : '#1A1A1D',
+  textMuted: isDark ? '#AAAAAA' : '#666666',
+  cardBg: isDark ? '#2A2C30' : '#FFFFFF',
+});
+
+interface UserDashboardProps {
+  user: any;
+}
+
+const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
+  const theme = useTheme();
+  const isMobileView = useMediaQuery(theme.breakpoints.down('sm'));
+  const { login, register } = useAuth();
+  const navigate = useNavigate();
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const themeColors = getThemeColors(isDarkMode);
+
+  // GPS State
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [locating, setLocating] = useState<boolean>(false);
+
+  // Dropdown State
+  const [selectedDistrict, setSelectedDistrict] = useState<string>('');
+  const [selectedGN, setSelectedGN] = useState<string>('');
+  const [selectedCity, setSelectedCity] = useState<string>('');
+
+  const [showLocationModal, setShowLocationModal] = useState<boolean>(true);
+  const [language, setLanguage] = useState<'en' | 'si' | 'ta'>('en');
+  const [showManualForm, setShowManualForm] = useState(!window.matchMedia('(max-width: 600px)').matches);
+  const canContinue = !showManualForm
+    ? (location !== null || locationError !== null)
+    : (selectedDistrict !== '' && selectedCity !== '' && selectedGN !== '');
+
+  const cycleLanguage = () => {
+    if (language === 'en') setLanguage('si');
+    else if (language === 'si') setLanguage('ta');
+    else setLanguage('en');
+  };
+
+  // GraphQL Queries
+  const { data: districtsData, loading: districtsLoading, error: districtsError } = useQuery(GET_P_DISTRICTS, {
+    skip: !showManualForm,
+  });
+  console.log('Districts query:', { districtsData, districtsLoading, districtsError });
+
+  const { data: gnData, loading: gnLoading } = useQuery(GET_P_DISTRICT_WITH_GNS, {
+    variables: { id: selectedDistrict },
+    skip: !selectedDistrict || !showManualForm,
+  });
+
+  const uniqueCities = React.useMemo(() => {
+    if (!gnData?.pDistrict?.gramaNiladharis) return [];
+    const citiesMap = new Map();
+    gnData.pDistrict.gramaNiladharis.forEach((gn: any) => {
+      if (gn.divisionalSecretariatCode && !citiesMap.has(gn.divisionalSecretariatCode)) {
+        citiesMap.set(gn.divisionalSecretariatCode, gn);
+      }
+    });
+    return Array.from(citiesMap.values());
+  }, [gnData]);
+
+  const filteredGNs = React.useMemo(() => {
+    if (!gnData?.pDistrict?.gramaNiladharis) return [];
+    if (!selectedCity) return gnData.pDistrict.gramaNiladharis;
+    return gnData.pDistrict.gramaNiladharis.filter((gn: any) => gn.divisionalSecretariatCode === selectedCity);
+  }, [gnData, selectedCity]);
+
+  const { data: autoGnData, loading: autoGnLoading } = useQuery(GET_GN_BY_COORDINATES, {
+    variables: { lat: location?.lat, lng: location?.lng },
+    skip: !location || showManualForm,
+  });
+
+  // Geolocation Effect
+  useEffect(() => {
+    if (!showManualForm && !location && !locationError) {
+      setLocating(true);
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            setLocation({
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            });
+            setLocating(false);
+          },
+          (error) => {
+            setLocationError(error.message || 'Unable to retrieve your location');
+            setLocating(false);
+          }
+        );
+      } else {
+        setLocationError('Geolocation is not supported by your browser');
+        setLocating(false);
+      }
+    }
+  }, [showManualForm, location, locationError]);
+
+  useEffect(() => {
+    if (autoGnData?.gnByCoordinates) {
+      setSelectedDistrict(autoGnData.gnByCoordinates.pDistrict?.id || '');
+      setSelectedCity(autoGnData.gnByCoordinates.divisionalSecretariatCode || '');
+      setSelectedGN(autoGnData.gnByCoordinates.id || '');
+    }
+  }, [autoGnData]);
+
+  // Compute display names for District, City, and GN Division
+  let displayDistrict = '';
+  let displayCity = '';
+  let displayGN = '';
+  if (!showManualForm && autoGnData?.gnByCoordinates) {
+    const d = autoGnData.gnByCoordinates.pDistrict;
+    displayDistrict = language === 'en' ? d?.admin2NameEn : language === 'si' ? d?.admin2NameSi : d?.admin2NameTa;
+    const g = autoGnData.gnByCoordinates;
+    displayCity = language === 'en' ? g?.dsEn : language === 'si' ? g?.dsSi : g?.dsTa;
+    displayGN = language === 'en' ? g?.nameEn : language === 'si' ? g?.nameSi : g?.nameTa;
+  } else if (showManualForm && selectedDistrict && selectedCity && selectedGN) {
+    const d = districtsData?.pDistricts?.find((x: any) => x.id === selectedDistrict);
+    if (d) {
+      displayDistrict = language === 'en' ? d.admin2NameEn : language === 'si' ? d.admin2NameSi : d.admin2NameTa;
+    }
+    const c = uniqueCities.find((x: any) => x.divisionalSecretariatCode === selectedCity);
+    if (c) {
+      displayCity = language === 'en' ? c.dsEn : language === 'si' ? c.dsSi : c.dsTa;
+    }
+    const g = gnData?.pDistrict?.gramaNiladharis?.find((x: any) => x.id === selectedGN);
+    if (g) {
+      displayGN = language === 'en' ? g.nameEn : language === 'si' ? g.nameSi : g.nameTa;
+    }
+  }
+
+  return (
+    <Box sx={{ fontFamily: "'Inter', sans-serif" }}>
+      {/* Navigation Bar */}
+      <Box sx={{ position: 'absolute', top: { xs: '30px', sm: 0 }, left: 0, right: 0, p: 3, display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, pointerEvents: 'none' }}>
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexWrap: 'wrap',
+          gap: { xs: 1.5, sm: 3 },
+          pointerEvents: 'auto',
+          bgcolor: isDarkMode ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.2)',
+          backdropFilter: 'blur(10px)',
+          px: { xs: 2, sm: 3 },
+          py: { xs: 1, sm: 1.5 },
+          borderRadius: 30,
+          color: '#ffffff',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+          maxWidth: '90vw'
+        }}>
+
+          <IconButton
+            onClick={() => setIsDarkMode(!isDarkMode)}
+            size="small"
+            sx={{ color: '#ffffff', p: 0, transition: 'transform 0.2s', '&:hover': { transform: 'scale(1.1)' } }}
+          >
+            {isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
+          </IconButton>
+
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, fontWeight: 600, fontSize: '0.95rem', letterSpacing: '0.5px' }}>
+            <Typography
+              onClick={() => navigate('/')}
+              sx={{
+                cursor: 'pointer',
+                transition: 'opacity 0.2s',
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: 600,
+                color: '#ffffff',
+                '&:hover': { opacity: 0.7 }
+              }}
+            >
+              Home
+            </Typography>
+            <Typography sx={{ opacity: 0.4, fontWeight: 300, color: '#ffffff' }}>|</Typography>
+            <Typography
+              onClick={login}
+              sx={{
+                cursor: 'pointer',
+                transition: 'opacity 0.2s',
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: 600,
+                color: '#ffffff',
+                '&:hover': { opacity: 0.7 }
+              }}
+            >
+              Login
+            </Typography>
+            <Typography sx={{ opacity: 0.4, fontWeight: 300, color: '#ffffff' }}>|</Typography>
+            <Typography
+              onClick={register}
+              sx={{
+                cursor: 'pointer',
+                transition: 'opacity 0.2s',
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: 600,
+                color: '#ffffff',
+                '&:hover': { opacity: 0.7 }
+              }}
+            >
+              Signup
+            </Typography>
+            <Typography sx={{ opacity: 0.4, fontWeight: 300, color: '#ffffff' }}>|</Typography>
+            <Typography
+              onClick={cycleLanguage}
+              sx={{
+                cursor: 'pointer',
+                textTransform: 'uppercase',
+                transition: 'opacity 0.2s',
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: 700,
+                color: themeColors.primary,
+                '&:hover': { opacity: 0.7 }
+              }}
+            >
+              {language}
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Location Modal */}
+      <Dialog
+        open={showLocationModal}
+        disableEscapeKeyDown
+        PaperProps={{ sx: { borderRadius: 2, minWidth: { xs: '90%', sm: 400 }, position: 'relative' } }}
+        slotProps={{ backdrop: { sx: { backdropFilter: 'blur(10px)', bgcolor: 'rgba(0,0,0,0.8)' } } }}
+      >
+        <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold' }}>
+          {!showManualForm
+            ? (language === 'en' ? 'Your Location' : language === 'si' ? 'ඔබගේ ස්ථානය' : 'உங்கள் இடம்')
+            : (language === 'en' ? 'Select Your Location' : language === 'si' ? 'ස්ථානය තෝරන්න' : 'உங்கள் இடத்தை தேர்வு செய்யவும்')
+          }
+        </DialogTitle>
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 2 }}>
+          {!showManualForm ? (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {locating ? (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2 }}>
+                  <CircularProgress size={24} sx={{ color: themeColors.primary }} />
+                  <Typography>Fetching GPS coordinates...</Typography>
+                </Box>
+              ) : locationError ? (
+                <Alert severity="warning" sx={{ bgcolor: 'rgba(255, 152, 0, 0.1)', color: '#ff9800' }}>
+                  {locationError}
+                </Alert>
+              ) : location ? (
+                <Box sx={{ p: 2, bgcolor: 'rgba(0, 168, 255, 0.1)', borderRadius: 2, position: 'relative' }}>
+                  <Typography variant="body2" color="text.secondary">Coordinates: {location.lat.toFixed(4)}, {location.lng.toFixed(4)}</Typography>
+
+                  {autoGnLoading ? (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
+                      <CircularProgress size={16} />
+                      <Typography variant="body2">Identifying Location...</Typography>
+                    </Box>
+                  ) : autoGnData?.gnByCoordinates ? (
+                    <Box sx={{ mt: 1 }}>
+                      <Typography variant="body1" fontWeight="bold">
+                        {language === 'en' ? 'District' : language === 'si' ? 'දිස්ත්‍රික්කය' : 'மாவட்டம்'}: {
+                          language === 'en' ? autoGnData.gnByCoordinates.pDistrict?.admin2NameEn :
+                            language === 'si' ? autoGnData.gnByCoordinates.pDistrict?.admin2NameSi :
+                              autoGnData.gnByCoordinates.pDistrict?.admin2NameTa
+                        }
+                      </Typography>
+                      <Typography variant="body1" fontWeight="bold">
+                        {language === 'en' ? 'City / DS Division' : language === 'si' ? 'නගරය / ප්‍රාදේශීය ලේකම් කොට්ඨාශය' : 'நகரம் / பிரதேச செயலகம்'}: {
+                          language === 'en' ? autoGnData.gnByCoordinates.dsEn :
+                            language === 'si' ? autoGnData.gnByCoordinates.dsSi :
+                              autoGnData.gnByCoordinates.dsTa
+                        }
+                      </Typography>
+                      <Typography variant="body1" fontWeight="bold">
+                        {language === 'en' ? 'GN Division' : language === 'si' ? 'ග්‍රාම නිලධාරී වසම' : 'கிராம உத்தியோகத்தர் பிரிவு'}: {
+                          language === 'en' ? autoGnData.gnByCoordinates.nameEn :
+                            language === 'si' ? autoGnData.gnByCoordinates.nameSi :
+                              autoGnData.gnByCoordinates.nameTa
+                        }
+                      </Typography>
+                    </Box>
+                  ) : (
+                    <Typography variant="body2" color="error" sx={{ mt: 1 }}>Location not found in database.</Typography>
+                  )}
+                </Box>
+              ) : (
+                <Typography variant="body2" color="text.secondary">Location not available.</Typography>
+              )}
+
+              <Button
+                variant="outlined"
+                onClick={() => setShowManualForm(true)}
+                sx={{ mt: 2, color: themeColors.primary, borderColor: themeColors.primary }}
+              >
+                Select Manually
+              </Button>
+            </Box>
+          ) : (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
+              <FormControl fullWidth>
+                <Autocomplete
+                  options={districtsData?.pDistricts || []}
+                  getOptionLabel={(option: any) => {
+                    const name = language === 'en' ? option.admin2NameEn : language === 'si' ? option.admin2NameSi : option.admin2NameTa;
+                    return name || option.admin2NameEn || '';
+                  }}
+                  value={districtsData?.pDistricts?.find((d: any) => d.id === selectedDistrict) || null}
+                  onChange={(event, newValue) => {
+                    setSelectedDistrict(newValue ? newValue.id : '');
+                    setSelectedCity('');
+                    setSelectedGN('');
+                  }}
+                  loading={districtsLoading}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="District"
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                          <React.Fragment>
+                            {districtsLoading ? <CircularProgress color="inherit" size={20} /> : null}
+                            {params.InputProps.endAdornment}
+                          </React.Fragment>
+                        ),
+                      }}
+                    />
+                  )}
+                />
+              </FormControl>
+
+              <FormControl fullWidth disabled={!selectedDistrict || gnLoading}>
+                <Autocomplete
+                  options={uniqueCities}
+                  getOptionLabel={(option: any) => {
+                    const name = language === 'en' ? option.dsEn : language === 'si' ? option.dsSi : option.dsTa;
+                    return name || option.dsEn || option.divisionalSecretariatCode || '';
+                  }}
+                  value={uniqueCities.find((c: any) => c.divisionalSecretariatCode === selectedCity) || null}
+                  onChange={(event, newValue) => {
+                    setSelectedCity(newValue ? newValue.divisionalSecretariatCode : '');
+                    setSelectedGN('');
+                  }}
+                  loading={gnLoading}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label={language === 'en' ? 'City / DS Division' : language === 'si' ? 'නගරය / ප්‍රාදේශීය ලේකම් කොට්ඨාශය' : 'நகரம் / பிரதேச செயலகம்'}
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                          <React.Fragment>
+                            {gnLoading ? <CircularProgress color="inherit" size={20} /> : null}
+                            {params.InputProps.endAdornment}
+                          </React.Fragment>
+                        ),
+                      }}
+                    />
+                  )}
+                />
+              </FormControl>
+
+              <FormControl fullWidth disabled={!selectedCity || gnLoading}>
+                <Autocomplete
+                  options={filteredGNs}
+                  getOptionLabel={(option: any) => {
+                    const name = language === 'en' ? option.nameEn : language === 'si' ? option.nameSi : option.nameTa;
+                    return name || option.nameEn || option.gnName || option.code || '';
+                  }}
+                  value={gnData?.pDistrict?.gramaNiladharis?.find((gn: any) => gn.id === selectedGN) || null}
+                  onChange={(event, newValue) => {
+                    setSelectedGN(newValue ? newValue.id : '');
+                  }}
+                  loading={gnLoading}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Grama Niladhari (GN)"
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                          <React.Fragment>
+                            {gnLoading ? <CircularProgress color="inherit" size={20} /> : null}
+                            {params.InputProps.endAdornment}
+                          </React.Fragment>
+                        ),
+                      }}
+                    />
+                  )}
+                />
+              </FormControl>
+
+              <Divider sx={{ my: 1 }}>OR</Divider>
+
+              <Button
+                variant="outlined"
+                onClick={() => setShowManualForm(false)}
+                sx={{ color: themeColors.primary, borderColor: themeColors.primary, alignSelf: 'center' }}
+                startIcon={<span style={{ fontSize: '1.2em' }}>📍</span>}
+              >
+                Use GPS Auto-Location
+              </Button>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 0, justifyContent: 'center' }}>
+          <Button
+            variant="contained"
+            onClick={() => setShowLocationModal(false)}
+            disabled={!canContinue}
+            sx={{
+              bgcolor: themeColors.primary,
+              color: 'white',
+              px: 4,
+              py: 1,
+              borderRadius: 8,
+              '&:hover': { bgcolor: '#0085CC' }
+            }}
+          >
+            Continue
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Hero Section */}
+      <Box
+        sx={{
+          bgcolor: themeColors.darkCharcoal,
+          color: themeColors.textLight,
+          minHeight: '100vh', // Full screen
+          display: 'flex',
+          alignItems: 'center',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Background Image */}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundImage: 'url(/hero-image.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            opacity: 0.4,
+            zIndex: 0,
+          }}
+        />
+
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, py: { xs: 8, md: 0 } }}>
+          <Grid container spacing={4}>
+            <Grid item xs={12} md={10} lg={8}>
+              <Typography
+                variant="overline"
+                sx={{
+                  color: themeColors.textLight,
+                  letterSpacing: { xs: '1px', md: '2px' },
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  mb: { xs: 2, md: 3 },
+                  fontSize: { xs: '0.75rem', md: '1rem' }
+                }}
+              >
+                <Box component="span" sx={{ width: { xs: 30, md: 40 }, height: 2, bgcolor: themeColors.secondary }} />
+                {language === 'en' ? 'LOCATION DATA' : language === 'si' ? 'ස්ථාන දත්ත' : 'இடத் தரவு'}
+              </Typography>
+
+              <Typography
+                variant="h1"
+                sx={{
+                  color: '#ffffff',
+                  fontFamily: "'Playfair Display', serif",
+                  fontWeight: 700,
+                  fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4.5rem', lg: '5.5rem' },
+                  lineHeight: 1.1,
+                  mb: { xs: 3, md: 4 }
+                }}
+              >
+                {displayDistrict} <br />
+                <Box component="span" sx={{ color: '#ffffff', fontSize: '0.6em' }}>
+                  {displayCity ? `--» ${displayCity} ` : ''}
+                  {displayGN ? `--» ${displayGN}` : ''}
+                </Box>
+              </Typography>
+
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 400,
+                  color: '#ffffff',
+                  mb: { xs: 4, md: 6 },
+                  maxWidth: { xs: '100%', md: '80%' },
+                  fontSize: { xs: '1rem', md: '1.25rem' },
+                  lineHeight: 1.6
+                }}
+              >
+                Welcome, {user?.name || user?.firstName || 'Explorer'}. Embark on a journey through our categories and uncover insights.
+              </Typography>
+
+              <Box sx={{ mb: 4 }} />
+
+              <Button
+                variant="contained"
+                size="large"
+                href="/categories"
+                sx={{
+                  bgcolor: themeColors.primary,
+                  color: '#fff',
+                  borderRadius: 0,
+                  px: { xs: 4, md: 6 },
+                  py: { xs: 1.5, md: 2 },
+                  fontSize: { xs: '0.9rem', md: '1rem' },
+                  fontWeight: 600,
+                  letterSpacing: '1px',
+                  boxShadow: 'none',
+                  width: { xs: '100%', sm: 'auto' }, // Full width button on very small screens
+                  '&:hover': {
+                    bgcolor: '#0085CC',
+                    boxShadow: 'none',
+                  }
+                }}
+              >
+                START EXPLORING
+              </Button>
+            </Grid>
+          </Grid>
+        </Container>
+      </Box>
+
+      {/* Featured Section */}
+      <Box sx={{ bgcolor: themeColors.lightBg, py: 10 }}>
+        <Container maxWidth="lg">
+          <Box sx={{ textAlign: 'center', mb: 8 }}>
+            <Typography
+              variant="overline"
+              sx={{ color: themeColors.secondary, letterSpacing: '2px', fontWeight: 700 }}
+            >
+              DISCOVER MORE
+            </Typography>
+            <Typography
+              variant="h2"
+              sx={{ fontFamily: "'Playfair Display', serif", color: themeColors.textDark, fontWeight: 700, mt: 1 }}
+            >
+              Find your perfect category
+            </Typography>
+          </Box>
+
+          <Grid container spacing={4}>
+            {[1, 2, 3].map((item) => (
+              <Grid item xs={12} md={4} key={item}>
+                <Card sx={{ borderRadius: 0, boxShadow: '0px 10px 30px rgba(0,0,0,0.05)', border: 'none', bgcolor: themeColors.cardBg, color: themeColors.textDark }}>
+                  <CardMedia
+                    component="img"
+                    height="240"
+                    image={`https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&q=80&w=600&sig=${item}`}
+                    alt="Category"
+                  />
+                  <CardContent sx={{ p: 4, textAlign: 'center' }}>
+                    <Typography gutterBottom variant="h5" component="div" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, color: themeColors.textDark }}>
+                      Category {item}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                      Explore various questions and answers related to this exciting topic. Dive deep into the details.
+                    </Typography>
+                    <Button
+                      variant="outlined"
+                      href="/categories"
+                      sx={{
+                        borderRadius: 0,
+                        borderColor: themeColors.primary,
+                        color: themeColors.primary,
+                        fontWeight: 600,
+                        px: 4,
+                        '&:hover': {
+                          borderColor: themeColors.darkCharcoal,
+                          color: themeColors.darkCharcoal,
+                          bgcolor: 'transparent'
+                        }
+                      }}
+                    >
+                      VIEW DETAILS
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      </Box>
+    </Box>
+  );
+};
+
+export default UserDashboard;

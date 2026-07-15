@@ -35,7 +35,7 @@ const DRAWER_WIDTH = 280;
 const COLLAPSED_WIDTH = 70;
 
 const navItems = [
-  { label: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
+  { label: 'Dashboard', icon: <DashboardIcon />, path: '/' },
   { label: 'Admins', icon: <AdminsIcon />, path: '/admins', roles: ['super_admin', 'admin'] },
   { label: 'Users', icon: <UsersIcon />, path: '/users', roles: ['super_admin', 'admin', 'moderator'] },
   { label: 'Questions', icon: <QuestionsIcon />, path: '/questions', roles: ['super_admin', 'admin', 'moderator'] },
@@ -45,6 +45,9 @@ const navItems = [
   { label: 'Register User', icon: <UserPlusIcon />, path: '/registration', roles: ['super_admin'] },
   { label: 'Data Base Mapping', icon: <MapIcon />, path: '/police-database-map', roles: ['super_admin'] },
   { label: 'Post Office Mapping', icon: <MapIcon />, path: '/postoffice-database-map', roles: ['super_admin'] },
+  { label: 'Health Mapping', icon: <MapIcon />, path: '/health-database-map', roles: ['super_admin'] },
+  { label: 'Telecom Mapping', icon: <MapIcon />, path: '/trs-database-map', roles: ['super_admin'] },
+  { label: 'District-Prov Mapping', icon: <MapIcon />, path: '/district-province-map', roles: ['super_admin'] },
   { label: 'Take Survey', icon: <QuestionsIcon />, path: '/survey', roles: ['user'] },
 ];
 

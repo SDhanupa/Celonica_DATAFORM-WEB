@@ -66,15 +66,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const logout = () => {
-    keycloak.logout({ redirectUri: window.location.origin + '/login' });
+    keycloak.logout({ redirectUri: window.location.origin + '/' });
   };
 
   const login = () => {
-    keycloak.login({ redirectUri: window.location.origin + '/dashboard' });
+    keycloak.login({ redirectUri: window.location.origin + '/' });
   };
 
   const register = () => {
-    keycloak.register({ redirectUri: window.location.origin + '/dashboard' });
+    keycloak.register({ redirectUri: window.location.origin + '/' });
   };
 
   return (

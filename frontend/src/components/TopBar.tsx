@@ -66,7 +66,7 @@ const TopBar: React.FC = () => {
           )}
           {!isAdmin && (
             <Box sx={{ display: 'flex', gap: 2 }}>
-              <Button color="inherit" onClick={() => navigate('/dashboard')} sx={{ fontWeight: 500, textTransform: 'none' }}>
+              <Button color="inherit" onClick={() => navigate('/')} sx={{ fontWeight: 500, textTransform: 'none' }}>
                 Home
               </Button>
               <Button color="inherit" onClick={() => navigate('/survey')} sx={{ fontWeight: 500, textTransform: 'none' }}>

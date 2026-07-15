@@ -123,9 +123,18 @@ type Query {
     postOfficesByDistrict(district: String!): [PostOffice!]!
         @field(resolver: "App\\GraphQL\\Queries\\PostOfficeQueries@postOfficesByDistrict")
 
+    "Get PHI areas filtered by district"
+    phiAreasByDistrict(district: String!): [PhiArea!]!
+        @field(resolver: "App\\GraphQL\\Queries\\PhiAreaQueries@phiAreasByDistrict")
+
+    "Get TRS areas filtered by district"
+    trsAreasByDistrict(district: String!): [TrsArea!]!
+        @field(resolver: "App\\GraphQL\\Queries\\TrsAreaQueries@trsAreasByDistrict")
+
     "Grama Niladharis"
     gramaNiladharis(search: String @builder(method: "App\\Models\\GramaNiladhari@scopeSearch")): [GramaNiladhari!]! @paginate(defaultCount: 50)
     gramaNiladhari(id: ID! @eq): GramaNiladhari @find
+    gnByCoordinates(lat: Float!, lng: Float!): GramaNiladhari @field(resolver: "App\\GraphQL\\Queries\\GnByCoordinates")
 
     "Polices"
     polices(search: String @builder(method: "App\\Models\\Police@scopeSearch")): [Police!]! @paginate(defaultCount: 50)
@@ -138,6 +147,13 @@ type Query {
     "Districts"
     districts(search: String, first: Int, page: Int): [District!]!
         @field(resolver: "App\\GraphQL\\Queries\\DistrictQueries@getDistricts")
+
+    "PProvinces"
+    pProvinces: [PProvince!]! @all
+
+    "PDistricts"
+    pDistricts: [PDistrict!]! @all
+    pDistrict(id: ID! @eq): PDistrict @find
 }
 
 type District {
@@ -315,9 +331,19 @@ type GramaNiladhari {
     nameSi: String @rename(attribute: "name_si")
     nameEn: String @rename(attribute: "name_en")
     nameTa: String @rename(attribute: "name_ta")
+    proEn: String @rename(attribute: "pro_en")
+    proSi: String @rename(attribute: "pro_si")
+    proTa: String @rename(attribute: "pro_ta")
     disEn: String @rename(attribute: "dis_en")
+    disSi: String @rename(attribute: "dis_si")
+    disTa: String @rename(attribute: "dis_ta")
+    dsEn: String @rename(attribute: "ds_en")
+    dsSi: String @rename(attribute: "ds_si")
+    dsTa: String @rename(attribute: "ds_ta")
     police: Police @hasOne
     postOffice: PostOffice @belongsTo
+    pGn: PGn @hasOne
+    pDistrict: PDistrict @belongsTo
 }
 
 type Police {
@@ -357,4 +383,61 @@ type PostOffice {
     longitude: Float
     accuracy: String
     gramaNiladharis: [GramaNiladhari!] @hasMany
+}
+
+type PhiArea {
+    id: ID!
+    ccode: String
+    code: String
+    location: String
+    fullLocationName: String @rename(attribute: "full_location_name")
+    locationType: String @rename(attribute: "location_type")
+    nameSi: String @rename(attribute: "name_si")
+    nameEn: String @rename(attribute: "name_en")
+    nameTa: String @rename(attribute: "name_ta")
+    district: String
+}
+
+type TrsArea {
+    id: ID!
+    code: String
+    location: String
+    fullLocationName: String @rename(attribute: "full_location_name")
+    locationType: String @rename(attribute: "location_type")
+    nameSi: String @rename(attribute: "name_si")
+    nameEn: String @rename(attribute: "name_en")
+    nameTa: String @rename(attribute: "name_ta")
+    district: String
+}
+
+type PProvince {
+    id: ID!
+    admin1NameEn: String @rename(attribute: "admin1Name_en")
+    admin1NameSi: String @rename(attribute: "admin1Name_si")
+    admin1NameTa: String @rename(attribute: "admin1Name_ta")
+    admin1Pcode: String
+    districts: [PDistrict!] @hasMany
+}
+
+type PDistrict {
+    id: ID!
+    admin2NameEn: String @rename(attribute: "admin2Name_en")
+    admin2NameSi: String @rename(attribute: "admin2Name_si")
+    admin2NameTa: String @rename(attribute: "admin2Name_ta")
+    admin2Pcode: String
+    admin1Pcode: String
+    populationBoth: Int @rename(attribute: "population_both")
+    populationMale: Int @rename(attribute: "population_male")
+    populationFemale: Int @rename(attribute: "population_female")
+    pProvince: PProvince @belongsTo
+    gramaNiladharis: [GramaNiladhari!] @hasMany
+}
+
+type PGn {
+    id: ID!
+    gnName: String @rename(attribute: "gn_name")
+    populationBoth: Int @rename(attribute: "population_both")
+    populationMale: Int @rename(attribute: "population_male")
+    populationFemale: Int @rename(attribute: "population_female")
+    gramaNiladhari: GramaNiladhari @belongsTo
 }

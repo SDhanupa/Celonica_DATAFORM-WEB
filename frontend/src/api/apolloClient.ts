@@ -8,8 +8,12 @@ const httpLink = createHttpLink({
 
 const authLink = setContext(async (_, { headers }) => {
   // Refresh token if expiring soon
-  if (keycloak.isTokenExpired(30)) {
-    await keycloak.updateToken(30);
+  if (keycloak.authenticated && keycloak.isTokenExpired(30)) {
+    try {
+      await keycloak.updateToken(30);
+    } catch (err) {
+      console.error('Failed to refresh token', err);
+    }
   }
 
   const token = keycloak.token;

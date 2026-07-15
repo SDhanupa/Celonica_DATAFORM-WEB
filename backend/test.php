@@ -1,14 +1,9 @@
 <?php
+$ch = curl_init("http://localhost:8000/graphql");
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(["query" => "{ pDistrict(id: 1) { id gramaNiladharis { id pGn { id populationBoth } } } }"]));
+$response = curl_exec($ch);
+curl_close($ch);
+echo json_encode(json_decode($response), JSON_PRETTY_PRINT);
 
-require __DIR__.'/vendor/autoload.php';
-$app = require_once __DIR__.'/bootstrap/app.php';
-$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
-
-try {
-    $response = Illuminate\Support\Facades\Http::post('http://127.0.0.1:8000/graphql', [
-        'query' => 'query { categories { id slug nameEn nameSi imagePath sortOrder children { id } } }'
-    ]);
-    echo $response->body();
-} catch (\Exception $e) {
-    echo "Error: " . $e->getMessage() . "\n";
-}
