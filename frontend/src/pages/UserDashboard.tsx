@@ -466,80 +466,87 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, py: { xs: 8, md: 0 } }}>
           <Grid container spacing={4}>
             <Grid item xs={12} md={10} lg={8}>
-              <Typography
-                variant="overline"
-                sx={{
-                  color: themeColors.textLight,
-                  letterSpacing: { xs: '1px', md: '2px' },
-                  fontWeight: 600,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 2,
-                  mb: { xs: 2, md: 3 },
-                  fontSize: { xs: '0.75rem', md: '1rem' }
-                }}
-              >
-                <Box component="span" sx={{ width: { xs: 30, md: 40 }, height: 2, bgcolor: themeColors.secondary }} />
-                {language === 'en' ? 'LOCATION DATA' : language === 'si' ? 'ස්ථාන දත්ත' : 'இடத் தரவு'}
-              </Typography>
+              {!showLocationModal && (
+                <Box
+                  sx={{
+                    animation: 'fadeSlideUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards',
+                    '@keyframes fadeSlideUp': {
+                      '0%': { opacity: 0, transform: 'translateY(40px)' },
+                      '100%': { opacity: 1, transform: 'translateY(0)' },
+                    }
+                  }}
+                >
+                  {/* District - Top Glass Pill */}
+                  {displayDistrict && (
+                    <Box
+                      sx={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        px: { xs: 2, md: 3 },
+                        py: { xs: 0.75, md: 1 },
+                        mb: { xs: 3, md: 4 },
+                        borderRadius: '50px',
+                        bgcolor: 'rgba(255, 255, 255, 0.1)',
+                        backdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                      }}
+                    >
+                      <Typography
+                        variant="overline"
+                        sx={{
+                          color: '#ffffff',
+                          letterSpacing: { xs: '1px', md: '2px' },
+                          fontWeight: 600,
+                          fontSize: { xs: '0.75rem', md: '0.9rem' },
+                          lineHeight: 1,
+                          m: 0
+                        }}
+                      >
+                        {displayDistrict}
+                      </Typography>
+                    </Box>
+                  )}
 
-              <Typography
-                variant="h1"
-                sx={{
-                  color: '#ffffff',
-                  fontFamily: "'Playfair Display', serif",
-                  fontWeight: 700,
-                  fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4.5rem', lg: '5.5rem' },
-                  lineHeight: 1.1,
-                  mb: { xs: 3, md: 4 }
-                }}
-              >
-                {displayDistrict} <br />
-                <Box component="span" sx={{ color: '#ffffff', fontSize: '0.6em' }}>
-                  {displayCity ? `--» ${displayCity} ` : ''}
-                  {displayGN ? `--» ${displayGN}` : ''}
+                  {/* GN Division - Main Title (Biggest) */}
+                  <Typography
+                    variant="h1"
+                    sx={{
+                      color: '#ffffff',
+                      fontFamily: "'Playfair Display', serif",
+                      fontWeight: 700,
+                      fontSize: { xs: '3rem', sm: '4.5rem', md: '5.5rem', lg: '6.5rem' },
+                      lineHeight: 1.1,
+                      mb: 1
+                    }}
+                  >
+                    {displayGN || (language === 'en' ? 'Your Location' : language === 'si' ? 'ඔබගේ ස්ථානය' : 'உங்கள் இடம்')}
+                  </Typography>
+
+                  {/* City / DS Division - Subtitle (Half size of GN Division) */}
+                  {displayCity && (
+                    <Typography
+                      variant="h3"
+                      sx={{
+                        color: 'rgba(255, 255, 255, 0.9)',
+                        fontFamily: "'Playfair Display', serif",
+                        fontWeight: 500,
+                        fontSize: { xs: '1.5rem', sm: '2.25rem', md: '2.75rem', lg: '3.25rem' },
+                        mb: 1
+                      }}
+                    >
+                      {displayCity}
+                    </Typography>
+                  )}
                 </Box>
-              </Typography>
+              )}
 
-              <Typography
-                variant="h6"
-                sx={{
-                  fontWeight: 400,
-                  color: '#ffffff',
-                  mb: { xs: 4, md: 6 },
-                  maxWidth: { xs: '100%', md: '80%' },
-                  fontSize: { xs: '1rem', md: '1.25rem' },
-                  lineHeight: 1.6
-                }}
-              >
-                Welcome, {user?.name || user?.firstName || 'Explorer'}. Embark on a journey through our categories and uncover insights.
-              </Typography>
 
-              <Box sx={{ mb: 4 }} />
 
-              <Button
-                variant="contained"
-                size="large"
-                href="/categories"
-                sx={{
-                  bgcolor: themeColors.primary,
-                  color: '#fff',
-                  borderRadius: 0,
-                  px: { xs: 4, md: 6 },
-                  py: { xs: 1.5, md: 2 },
-                  fontSize: { xs: '0.9rem', md: '1rem' },
-                  fontWeight: 600,
-                  letterSpacing: '1px',
-                  boxShadow: 'none',
-                  width: { xs: '100%', sm: 'auto' }, // Full width button on very small screens
-                  '&:hover': {
-                    bgcolor: '#0085CC',
-                    boxShadow: 'none',
-                  }
-                }}
-              >
-                START EXPLORING
-              </Button>
+
+
+
             </Grid>
           </Grid>
         </Container>

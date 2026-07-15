@@ -41,10 +41,20 @@ class GnByCoordinates
             $details = json_decode($found->details, true);
             $gnCode = $details['GND_NO_Cen'] ?? null;
             
+            $exactCode = null;
+            if (isset($details['PROVINCE_C']) && isset($details['DISTRICT_C']) && isset($details['DSD_C']) && isset($details['GND_C'])) {
+                $exactCode = 'LK' . $details['PROVINCE_C'] . $details['DISTRICT_C'] . $details['DSD_C'] . $details['GND_C'];
+            }
+            
             $districtName = explode(' ', $found->district)[0]; // e.g. "AMPARA (1)" -> "AMPARA"
             $district = DB::table('p_district')->where('admin2Name_en', 'ilike', '%' . $districtName . '%')->first();
             
             if ($district) {
+                if ($exactCode) {
+                    $gn = GramaNiladhari::where('code', $exactCode)->first();
+                    if ($gn) return $gn;
+                }
+
                 if ($gnCode) {
                     $gn = GramaNiladhari::where('district_code', $district->admin2Pcode)
                         ->where('code', 'like', '%' . $gnCode . '%')
@@ -58,6 +68,11 @@ class GnByCoordinates
                     ->first();
                 if ($gn) return $gn;
             } else {
+                if ($exactCode) {
+                    $gn = GramaNiladhari::where('code', $exactCode)->first();
+                    if ($gn) return $gn;
+                }
+
                 if ($gnCode) {
                     $gn = GramaNiladhari::where('code', 'like', '%' . $gnCode . '%')->first();
                     if ($gn) return $gn;
