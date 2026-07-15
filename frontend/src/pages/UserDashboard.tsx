@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, Container, Grid, Card, CardContent, CardMedia, FormControl, useTheme, useMediaQuery, CircularProgress, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Autocomplete, TextField, IconButton, Divider } from '@mui/material';
 import { useQuery } from '@apollo/client';
 import { GET_P_DISTRICTS, GET_P_DISTRICT_WITH_GNS, GET_GN_BY_COORDINATES } from '../graphql/queries';
+import PopulationInfographic from '../components/PopulationInfographic';
 import { useAuth } from '../auth/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 import LightModeIcon from '@mui/icons-material/LightMode';
@@ -464,8 +465,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         />
 
         <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, py: { xs: 8, md: 0 } }}>
-          <Grid container spacing={4}>
-            <Grid item xs={12} md={10} lg={8}>
+          <Grid container spacing={4} alignItems="center">
+            <Grid item xs={12} md={6}>
               {!showLocationModal && (
                 <Box
                   sx={{
@@ -547,6 +548,22 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
 
 
 
+            </Grid>
+            {/* Population Infographic on the right side */}
+            <Grid item xs={12} md={6}>
+              {!showLocationModal && (
+                <Box
+                  sx={{
+                    animation: 'fadeIn 1.5s ease-out forwards',
+                    '@keyframes fadeIn': {
+                      '0%': { opacity: 0 },
+                      '100%': { opacity: 1 },
+                    }
+                  }}
+                >
+                  <PopulationInfographic />
+                </Box>
+              )}
             </Grid>
           </Grid>
         </Container>
