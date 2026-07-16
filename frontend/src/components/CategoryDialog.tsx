@@ -97,7 +97,7 @@ const CategoryDialog: React.FC<CategoryDialogProps> = ({ open, onClose, category
     formData.append('image', file);
 
     try {
-      const response = await fetch('http://localhost:8000/api/upload-category-image', {
+      const response = await fetch('/api/upload-category-image', {
         method: 'POST',
         body: formData,
       });
