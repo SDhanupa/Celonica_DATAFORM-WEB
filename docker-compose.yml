@@ -20,8 +20,6 @@ services:
     build:
       context: ./backend
     container_name: celonica-web-backend
-    volumes:
-      - ./backend:/var/www
     depends_on:
       - db
       - keycloak
@@ -33,6 +31,7 @@ services:
       - DB_DATABASE=celonica_db
       - DB_USERNAME=celonica_user
       - DB_PASSWORD=celonica_pass
+      - APP_KEY=base64:WF3BWHK3x5pSsaSmtWOzB3jCHkM3kpQH+DMH0lHM5aQ=
     networks:
       - celonica_net
 
