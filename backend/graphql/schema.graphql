@@ -428,9 +428,9 @@ type PProvince {
     admin1NameSi: String @rename(attribute: "admin1Name_si")
     admin1NameTa: String @rename(attribute: "admin1Name_ta")
     admin1Pcode: String
-    populationBoth: Int @rename(attribute: "population_both")
-    populationMale: Int @rename(attribute: "population_male")
-    populationFemale: Int @rename(attribute: "population_female")
+    populationBoth: Int
+    populationMale: Int
+    populationFemale: Int
     districts: [PDistrict!] @hasMany
 }
 
@@ -441,9 +441,9 @@ type PDistrict {
     admin2NameTa: String @rename(attribute: "admin2Name_ta")
     admin2Pcode: String
     admin1Pcode: String
-    populationBoth: Int @rename(attribute: "population_both")
-    populationMale: Int @rename(attribute: "population_male")
-    populationFemale: Int @rename(attribute: "population_female")
+    populationBoth: Int
+    populationMale: Int
+    populationFemale: Int
     pProvince: PProvince @belongsTo
     gramaNiladharis: [GramaNiladhari!] @hasMany
 }
