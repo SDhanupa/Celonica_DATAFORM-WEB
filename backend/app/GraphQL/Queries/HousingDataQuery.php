@@ -22,23 +22,23 @@ class HousingDataQuery
             $query->where('grama_niladhari_id', $args['gn_id']);
             $gn = GramaNiladhari::find($args['gn_id']);
             if ($gn) {
-                $locationName = $gn->nameEn . ' GN Division';
+                $locationName = $gn->name_en . ' GN Division';
                 $hasData = true;
             }
         } elseif (!empty($args['city_code'])) {
-            $gnIds = GramaNiladhari::where('divisionalSecretariatCode', $args['city_code'])->pluck('id');
+            $gnIds = GramaNiladhari::where('divisional_secretariat_code', $args['city_code'])->pluck('id');
             if ($gnIds->isNotEmpty()) {
                 $query->whereIn('grama_niladhari_id', $gnIds);
-                // We'll just grab the dsEn of the first GN to use as the City Name
-                $firstGn = GramaNiladhari::where('divisionalSecretariatCode', $args['city_code'])->first();
-                $locationName = ($firstGn ? $firstGn->dsEn : $args['city_code']) . ' DS Division';
+                // We'll just grab the ds_en of the first GN to use as the City Name
+                $firstGn = GramaNiladhari::where('divisional_secretariat_code', $args['city_code'])->first();
+                $locationName = ($firstGn ? $firstGn->ds_en : $args['city_code']) . ' DS Division';
                 $hasData = true;
             }
         } elseif (!empty($args['district_id'])) {
             $district = PDistrict::find($args['district_id']);
             if ($district) {
                 // Find GNs that have this district Code
-                $gnIds = GramaNiladhari::where('districtCode', $district->admin2Pcode)->pluck('id');
+                $gnIds = GramaNiladhari::where('district_code', $district->admin2Pcode)->pluck('id');
                 if ($gnIds->isNotEmpty()) {
                     $query->whereIn('grama_niladhari_id', $gnIds);
                     $locationName = $district->admin2NameEn . ' District';
