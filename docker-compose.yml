@@ -85,6 +85,9 @@ services:
       KC_HOSTNAME_STRICT: "false"
       KC_HOSTNAME_STRICT_HTTPS: "false"
       KC_HTTP_ENABLED: "true"
+      KC_PROXY_HEADERS: xforwarded
+      KC_HOSTNAME_URL: https://lauth.ceylonica.org
+      KC_HOSTNAME_ADMIN_URL: https://lauth.ceylonica.org
     ports:
       - "8081:8080"
     volumes:
