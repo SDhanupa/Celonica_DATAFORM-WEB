@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, Container, Grid, Card, CardContent, CardMedia, FormControl, useTheme, useMediaQuery, CircularProgress, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Autocomplete, TextField, IconButton, Divider } from '@mui/material';
+import { useSwipeable } from 'react-swipeable';
 import { useQuery } from '@apollo/client';
 import { GET_P_DISTRICTS, GET_P_DISTRICT_WITH_GNS, GET_GN_BY_COORDINATES } from '../graphql/queries';
 import PopulationInfographic from '../components/PopulationInfographic';
@@ -55,7 +56,16 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
     else setLanguage('en');
   };
 
-  // GraphQL Queries
+  // Mobile UI States
+  const [activeMobileChart, setActiveMobileChart] = useState<'pie' | 'bar'>('pie');
+
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => setActiveMobileChart('bar'),
+    onSwipedRight: () => setActiveMobileChart('pie'),
+    trackMouse: true
+  });
+
+  // Search Logic Queries
   const { data: districtsData, loading: districtsLoading, error: districtsError } = useQuery(GET_P_DISTRICTS, {
     skip: !showManualForm,
   });
@@ -600,10 +610,11 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
               )}
             </Grid>
 
-            {/* Population Infographic on the left side (order 1 on desktop, order 2 on mobile) */}
+            {/* Charts Section on the left side (order 1 on desktop, order 2 on mobile) */}
             <Grid item xs={12} md={6} sx={{ order: { xs: 2, md: 1 } }}>
               {!showLocationModal && (displayGN || displayCity || displayDistrict) && (
                 <Box
+                  {...swipeHandlers}
                   sx={{
                     animation: 'fadeIn 1.5s ease-out forwards',
                     '@keyframes fadeIn': {
@@ -618,7 +629,52 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                     boxShadow: { xs: '0 8px 32px rgba(0,0,0,0.3)', md: 'none' }
                   }}
                 >
-                  <PopulationInfographic populationData={populationData} language={language} />
+                  {/* Mobile Toggle Buttons */}
+                  {isMobileView && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3, gap: 2 }}>
+                      <Button 
+                        variant={activeMobileChart === 'pie' ? 'contained' : 'outlined'} 
+                        onClick={() => setActiveMobileChart('pie')}
+                        sx={{ 
+                          borderRadius: '20px',
+                          color: activeMobileChart === 'pie' ? '#fff' : 'rgba(255,255,255,0.7)',
+                          borderColor: 'rgba(255,255,255,0.3)',
+                          bgcolor: activeMobileChart === 'pie' ? 'primary.main' : 'transparent',
+                          '&:hover': { bgcolor: activeMobileChart === 'pie' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
+                        }}
+                      >
+                        Population
+                      </Button>
+                      <Button 
+                        variant={activeMobileChart === 'bar' ? 'contained' : 'outlined'} 
+                        onClick={() => setActiveMobileChart('bar')}
+                        sx={{ 
+                          borderRadius: '20px',
+                          color: activeMobileChart === 'bar' ? '#fff' : 'rgba(255,255,255,0.7)',
+                          borderColor: 'rgba(255,255,255,0.3)',
+                          bgcolor: activeMobileChart === 'bar' ? 'primary.main' : 'transparent',
+                          '&:hover': { bgcolor: activeMobileChart === 'bar' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
+                        }}
+                      >
+                        Housing
+                      </Button>
+                    </Box>
+                  )}
+
+                  {(!isMobileView || activeMobileChart === 'pie') && (
+                    <PopulationInfographic populationData={populationData} language={language} />
+                  )}
+
+                  {isMobileView && activeMobileChart === 'bar' && (
+                    <Box sx={{ height: '350px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Custom3DBarChart 
+                        gn_id={selectedGN} 
+                        city_code={selectedCity} 
+                        district_id={selectedDistrict} 
+                        location_name={displayGN || displayCity || displayDistrict}
+                      />
+                    </Box>
+                  )}
                 </Box>
               )}
             </Grid>
@@ -626,8 +682,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         </Container>
       </Box>
 
-      {/* 3D Bar Chart Section */}
-      {(selectedGN || selectedCity || selectedDistrict) && (
+      {/* 3D Bar Chart Section (Desktop Only) */}
+      {!isMobileView && (selectedGN || selectedCity || selectedDistrict) && (
         <Custom3DBarChart 
           gn_id={selectedGN} 
           city_code={selectedCity} 

@@ -26,7 +26,7 @@ const palette = [
   { color: '#00cec9', gradient: 'linear-gradient(to right, #00b894 0%, #00cec9 40%, #00cec9 60%, #00b894 100%)', topColor: '#81ecec' },
 ];
 
-const categoryLabels = [
+const desktopCategoryLabels = [
   { key: 'before_80', label: 'Before 1980' },
   { key: 'y_1980_1989', label: '1980 - 1989' },
   { key: 'y_1990_1994', label: '1990 - 1994' },
@@ -39,6 +39,14 @@ const categoryLabels = [
   { key: 'y_2009', label: '2009' },
   { key: 'y_2010', label: '2010' },
   { key: 'y_2011', label: '2011' },
+];
+
+const mobileCategoryLabels = [
+  { key: 'group_before_90', label: 'Before 1990', sumKeys: ['before_80', 'y_1980_1989'] },
+  { key: 'group_90s', label: '1990 - 1999', sumKeys: ['y_1990_1994', 'y_1995_1999'] },
+  { key: 'group_early_00s', label: '2000 - 2006', sumKeys: ['y_2000_2004', 'y_2005', 'y_2006'] },
+  { key: 'group_late_00s', label: '2007 - 2009', sumKeys: ['y_2007', 'y_2008', 'y_2009'] },
+  { key: 'group_2010s', label: '2010 & Newer', sumKeys: ['y_2010', 'y_2011'] },
 ];
 
 export default function Custom3DBarChart({ district_id, city_code, gn_id, location_name }: Custom3DBarChartProps) {
@@ -64,46 +72,64 @@ export default function Custom3DBarChart({ district_id, city_code, gn_id, locati
   const total = housingData.total_housing_units;
   const displayLocation = housingData.location_name || location_name || "Selected Location";
 
-  // Prepare chart data dynamically based on the 12 categories
-  const chartData = categoryLabels.map((cat, index) => {
-    const value = housingData[cat.key] || 0;
+  // Prepare chart data dynamically based on the categories
+  const categories = isMobile ? mobileCategoryLabels : desktopCategoryLabels;
+  
+  const chartData = categories.map((cat, index) => {
+    let value = 0;
+    if (isMobile && cat.sumKeys) {
+      value = cat.sumKeys.reduce((sum, key) => sum + (housingData[key] || 0), 0);
+    } else {
+      value = housingData[cat.key] || 0;
+    }
     const percent = Math.round((value / total) * 100);
     return {
       id: cat.key,
       title: cat.label,
       percent,
       value,
-      ...palette[index]
+      // If mobile, we have 5 bars, so we spread the palette index (e.g. 0, 2, 5, 8, 11) to get distinct colors
+      ...palette[isMobile ? Math.floor((index * palette.length) / categories.length) : index]
     };
   });
 
   // Calculate scaling
   const maxPercent = Math.max(...chartData.map(d => d.percent), 10); // Minimum 10% for scale
-  const containerHeight = isMobile ? 350 : 500;
-  const cylinderWidth = isMobile ? 40 : 60; // Thinner cylinders for 12 bars
-  const ellipseHeight = isMobile ? 12 : 20;
+  const containerHeight = isMobile ? 200 : 500;
+  const cylinderWidth = isMobile ? 25 : 60; // Thinner cylinders for 12 bars
+  const ellipseHeight = isMobile ? 8 : 20;
 
   return (
-    <Box sx={{ bgcolor: '#eef2f3', py: 8, width: '100%', overflowX: 'auto', overflowY: 'hidden' }}>
-      <Container maxWidth="xl">
-        <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: theme.palette.text.primary }}>
-          Housing Units by Construction Year
-        </Typography>
-        <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary', mb: 8 }}>
-          {displayLocation}
-        </Typography>
+    <Box sx={{ 
+      bgcolor: isMobile ? 'transparent' : '#eef2f3', 
+      py: isMobile ? 2 : 8, 
+      width: '100%', 
+      overflowX: 'hidden', 
+      overflowY: 'hidden' 
+    }}>
+      <Container maxWidth={isMobile ? false : "xl"} disableGutters={isMobile}>
+        {!isMobile && (
+          <>
+            <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: theme.palette.text.primary }}>
+              Housing Units by Construction Year
+            </Typography>
+            <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary', mb: 8 }}>
+              {displayLocation}
+            </Typography>
+          </>
+        )}
 
         <Box sx={{ 
           display: 'flex', 
-          justifyContent: 'flex-start', 
+          justifyContent: isMobile ? 'space-between' : 'flex-start', 
           alignItems: 'flex-end', 
           height: containerHeight,
-          gap: { xs: 2, sm: 3, md: 5 },
-          mt: 10,
-          pb: 10,
-          px: 2,
+          gap: { xs: 1, sm: 3, md: 5 },
+          mt: isMobile ? 4 : 10,
+          pb: isMobile ? 4 : 10,
+          px: isMobile ? 1 : 2,
           position: 'relative',
-          minWidth: isMobile ? '800px' : 'auto' // Allow scrolling on mobile
+          minWidth: '100%' // Fit to the box on mobile and desktop
         }}>
           
           {chartData.map((item, index) => {
@@ -125,8 +151,8 @@ export default function Custom3DBarChart({ district_id, city_code, gn_id, locati
                 <Box 
                   sx={{ 
                     position: 'absolute', 
-                    bottom: barHeight + ellipseHeight + (isMobile ? 60 : 90), 
-                    width: cylinderWidth * 1.5,
+                    bottom: barHeight + ellipseHeight + (isMobile ? 45 : 90), 
+                    width: cylinderWidth * 2.5,
                     textAlign: 'center',
                     opacity: 0,
                     animation: 'fadeInUp 0.8s ease forwards',
@@ -143,9 +169,9 @@ export default function Custom3DBarChart({ district_id, city_code, gn_id, locati
                       color: item.topColor, 
                       fontWeight: 800, 
                       fontFamily: "'Oswald', sans-serif",
-                      fontSize: { xs: '0.8rem', md: '1rem' },
+                      fontSize: { xs: '0.65rem', sm: '0.75rem', md: '1rem' },
                       mb: 0.5,
-                      lineHeight: 1.2
+                      lineHeight: 1.1
                     }}
                   >
                     {item.title}
@@ -153,8 +179,8 @@ export default function Custom3DBarChart({ district_id, city_code, gn_id, locati
                   <Typography 
                     variant="body2" 
                     sx={{ 
-                      color: '#7f8c8d', 
-                      fontSize: '0.75rem', 
+                      color: isMobile ? 'rgba(255,255,255,0.8)' : '#7f8c8d', 
+                      fontSize: { xs: '0.6rem', md: '0.75rem' }, 
                       fontWeight: 'bold'
                     }}
                   >
@@ -166,10 +192,10 @@ export default function Custom3DBarChart({ district_id, city_code, gn_id, locati
                 <Box 
                   sx={{
                     position: 'absolute',
-                    bottom: barHeight + ellipseHeight + 20,
+                    bottom: barHeight + ellipseHeight + (isMobile ? 10 : 20),
                     left: '50%',
                     width: '1px',
-                    height: isMobile ? '40px' : '60px',
+                    height: isMobile ? '25px' : '60px',
                     bgcolor: item.topColor,
                     opacity: 0.6,
                     transformOrigin: 'bottom',
@@ -199,12 +225,15 @@ export default function Custom3DBarChart({ district_id, city_code, gn_id, locati
                   <Typography
                     sx={{
                       position: 'absolute',
-                      top: -ellipseHeight - 30,
+                      top: -ellipseHeight - (isMobile ? 15 : 30),
                       left: '50%',
                       transform: 'translateX(-50%)',
-                      color: '#fff',
-                      fontSize: { xs: '1.2rem', md: '1.8rem' },
+                      color: isMobile ? '#fff' : '#2c3e50',
+                      fontSize: { xs: '0.7rem', md: '1.2rem' },
                       fontWeight: 900,
+                      opacity: 0,
+                      animation: 'fadeInUp 0.8s ease forwards',
+                      animationDelay: `${index * 0.1 + 0.5}s`,
                       fontFamily: "'Oswald', sans-serif",
                       textShadow: '0px 2px 10px rgba(0,0,0,0.2)',
                       zIndex: 3
