@@ -46,7 +46,7 @@ services:
       POSTGRES_USER: celonica_user
       POSTGRES_PASSWORD: celonica_pass
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - celonica_net
 
@@ -99,8 +99,8 @@ services:
 volumes:
   keycloak_db_data:
     name: celonica-web-keycloak-db-data
-  db_data:
-    name: celonica-web-mysql-data
+  postgres_data:
+    name: celonica-web-postgres-data
 
 networks:
   celonica_net:
