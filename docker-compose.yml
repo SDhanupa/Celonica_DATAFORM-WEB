@@ -8,7 +8,7 @@ services:
       context: ./frontend
     container_name: celonica-web-frontend
     ports:
-      - "80:80"
+      - "3000:80"
     depends_on:
       - backend
     restart: unless-stopped
@@ -27,29 +27,28 @@ services:
       - keycloak
     restart: unless-stopped
     environment:
-      - DB_CONNECTION=mysql
+      - DB_CONNECTION=pgsql
       - DB_HOST=db
-      - DB_PORT=3306
-      - DB_DATABASE=celonica
+      - DB_PORT=5432
+      - DB_DATABASE=celonica_db
       - DB_USERNAME=celonica_user
       - DB_PASSWORD=celonica_pass
     networks:
       - celonica_net
 
-  # ─── MySQL for Laravel ──────────────────────────────────────
+  # ─── PostgreSQL for Laravel ─────────────────────────────────
   db:
-    image: mysql:8.0
-    container_name: celonica-web-mysql
+    image: postgres:16-alpine
+    container_name: celonica-web-postgres
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: celonica
-      MYSQL_USER: celonica_user
-      MYSQL_PASSWORD: celonica_pass
-      MYSQL_ROOT_PASSWORD: root_pass
+      POSTGRES_DB: celonica_db
+      POSTGRES_USER: celonica_user
+      POSTGRES_PASSWORD: celonica_pass
     volumes:
-      - db_data:/var/lib/mysql
+      - db_data:/var/lib/postgresql/data
     ports:
-      - "3306:3306"
+      - "5432:5432"
     networks:
       - celonica_net
 
