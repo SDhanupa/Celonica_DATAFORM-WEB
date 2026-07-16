@@ -3,6 +3,7 @@ import { Box, Typography, Button, Container, Grid, Card, CardContent, CardMedia,
 import { useQuery } from '@apollo/client';
 import { GET_P_DISTRICTS, GET_P_DISTRICT_WITH_GNS, GET_GN_BY_COORDINATES } from '../graphql/queries';
 import PopulationInfographic from '../components/PopulationInfographic';
+import Custom3DBarChart from '../components/Custom3DBarChart';
 import { useAuth } from '../auth/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 import LightModeIcon from '@mui/icons-material/LightMode';
@@ -624,6 +625,16 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           </Grid>
         </Container>
       </Box>
+
+      {/* 3D Bar Chart Section */}
+      {(selectedGN || selectedCity || selectedDistrict) && (
+        <Custom3DBarChart 
+          gn_id={selectedGN} 
+          city_code={selectedCity} 
+          district_id={selectedDistrict} 
+          location_name={displayGN || displayCity || displayDistrict}
+        />
+      )}
 
       {/* Featured Section */}
       <Box sx={{ bgcolor: themeColors.lightBg, py: 10 }}>

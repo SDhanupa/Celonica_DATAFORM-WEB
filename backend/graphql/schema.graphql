@@ -135,6 +135,8 @@ type Query {
     gramaNiladharis(search: String @builder(method: "App\\Models\\GramaNiladhari@scopeSearch")): [GramaNiladhari!]! @paginate(defaultCount: 50)
     gramaNiladhari(id: ID! @eq): GramaNiladhari @find
     gnByCoordinates(lat: Float!, lng: Float!): GramaNiladhari @field(resolver: "App\\GraphQL\\Queries\\GnByCoordinates")
+    "Housing Data Aggregate"
+    housingData(district_id: ID, city_code: String, gn_id: ID): HousingDataAggregate @field(resolver: "App\\GraphQL\\Queries\\HousingDataQuery")
 
     "Polices"
     polices(search: String @builder(method: "App\\Models\\Police@scopeSearch")): [Police!]! @paginate(defaultCount: 50)
@@ -453,4 +455,21 @@ type PGn {
     populationMale: Int @rename(attribute: "population_male")
     populationFemale: Int @rename(attribute: "population_female")
     gramaNiladhari: GramaNiladhari @belongsTo
+}
+
+type HousingDataAggregate {
+    location_name: String
+    total_housing_units: Int
+    y_2011: Int
+    y_2010: Int
+    y_2009: Int
+    y_2008: Int
+    y_2007: Int
+    y_2006: Int
+    y_2005: Int
+    y_2000_2004: Int
+    y_1995_1999: Int
+    y_1990_1994: Int
+    y_1980_1989: Int
+    before_80: Int
 }

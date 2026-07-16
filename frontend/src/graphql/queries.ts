@@ -34,6 +34,26 @@ export const GET_ME = gql`
     needsOnboarding
   }
 `;
+export const GET_HOUSING_DATA = gql`
+  query GetHousingData($district_id: ID, $city_code: String, $gn_id: ID) {
+    housingData(district_id: $district_id, city_code: $city_code, gn_id: $gn_id) {
+      location_name
+      total_housing_units
+      y_2011
+      y_2010
+      y_2009
+      y_2008
+      y_2007
+      y_2006
+      y_2005
+      y_2000_2004
+      y_1995_1999
+      y_1990_1994
+      y_1980_1989
+      before_80
+    }
+  }
+`;
 
 export const GET_ADMINS = gql`
   query GetAdmins {
@@ -329,6 +349,7 @@ export const GET_P_DISTRICT_WITH_GNS = gql`
       gramaNiladharis {
         id
         code
+        CCODE
         nameEn
         nameSi
         nameTa
@@ -353,6 +374,7 @@ export const GET_GN_BY_COORDINATES = gql`
     gnByCoordinates(lat: $lat, lng: $lng) {
       id
       code
+      CCODE
       nameEn
       nameSi
       nameTa
