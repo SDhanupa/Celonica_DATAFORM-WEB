@@ -104,8 +104,8 @@ class KeycloakAuthGuard
         $keys = JWK::parseKeySet($jwks);
         $decoded = JWT::decode($token, $keys);
 
-        // Validate issuer
-        $expectedIssuer = config('keycloak.base_url') . '/realms/' . config('keycloak.realm');
+        // Validate issuer — use the public URL (what browser sees), not internal Docker URL
+        $expectedIssuer = config('keycloak.public_url') . '/realms/' . config('keycloak.realm');
         if (($decoded->iss ?? '') !== $expectedIssuer) {
             throw new \Exception('Invalid token issuer');
         }

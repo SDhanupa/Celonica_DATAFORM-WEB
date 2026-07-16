@@ -37,6 +37,7 @@ services:
       - DB_USERNAME=celonica_user
       - DB_PASSWORD=celonica_pass
       - KEYCLOAK_BASE_URL=http://celonica-web-keycloak:8080
+      - KEYCLOAK_PUBLIC_URL=https://lauth.ceylonica.org
       - KEYCLOAK_REALM=celonica-admin
       - KEYCLOAK_CLIENT_ID=celonica-frontend
       - KEYCLOAK_ADMIN_CLIENT_ID=admin-cli

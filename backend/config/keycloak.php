@@ -6,11 +6,18 @@ return [
     | Keycloak Configuration
     |--------------------------------------------------------------------------
     */
+
+    // Internal URL for fetching JWKS and admin API (Docker container or localhost)
     'base_url'  => env('KEYCLOAK_BASE_URL', 'http://localhost:8080'),
+
+    // Public URL used in JWT 'iss' claim (what the browser sees)
+    // Falls back to base_url if not set (for local dev)
+    'public_url' => env('KEYCLOAK_PUBLIC_URL', env('KEYCLOAK_BASE_URL', 'http://localhost:8080')),
+
     'realm'     => env('KEYCLOAK_REALM', 'celonica-admin'),
     'client_id' => env('KEYCLOAK_CLIENT_ID', 'celonica-frontend'),
 
-    // Constructed JWKS endpoint
+    // JWKS endpoint (uses internal URL for fetching)
     'jwks_url'  => env('KEYCLOAK_BASE_URL', 'http://localhost:8080')
         . '/realms/'
         . env('KEYCLOAK_REALM', 'celonica-admin')
