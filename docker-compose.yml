@@ -1,11 +1,59 @@
 # Project name: celonica-web
-# Run with: docker compose -p celonica-web up -d
-#
-# This uses a Docker PostgreSQL container for Keycloak ONLY.
-# Laravel connects to your LOCAL PostgreSQL (postgres/dhanu231) directly.
+# Run with: docker compose up -d
 
 services:
-  # ─── PostgreSQL for Keycloak only ─────────────────────────
+  # ─── Frontend (React / Vite) ────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+    container_name: celonica-web-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - celonica_net
+
+  # ─── Backend (Laravel / PHP-FPM) ────────────────────────────
+  backend:
+    build:
+      context: ./backend
+    container_name: celonica-web-backend
+    volumes:
+      - ./backend:/var/www
+    depends_on:
+      - db
+      - keycloak
+    restart: unless-stopped
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=celonica
+      - DB_USERNAME=celonica_user
+      - DB_PASSWORD=celonica_pass
+    networks:
+      - celonica_net
+
+  # ─── MySQL for Laravel ──────────────────────────────────────
+  db:
+    image: mysql:8.0
+    container_name: celonica-web-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: celonica
+      MYSQL_USER: celonica_user
+      MYSQL_PASSWORD: celonica_pass
+      MYSQL_ROOT_PASSWORD: root_pass
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - celonica_net
+
+  # ─── PostgreSQL for Keycloak ───────────────────────────────
   keycloak-db:
     image: postgres:16-alpine
     container_name: celonica-web-keycloakdb
@@ -56,6 +104,8 @@ services:
 volumes:
   keycloak_db_data:
     name: celonica-web-keycloak-db-data
+  db_data:
+    name: celonica-web-mysql-data
 
 networks:
   celonica_net:
