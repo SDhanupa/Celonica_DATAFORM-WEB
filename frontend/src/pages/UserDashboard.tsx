@@ -5,6 +5,7 @@ import { useQuery } from '@apollo/client';
 import { GET_P_DISTRICTS, GET_P_DISTRICT_WITH_GNS, GET_GN_BY_COORDINATES } from '../graphql/queries';
 import PopulationInfographic from '../components/PopulationInfographic';
 import Custom3DBarChart from '../components/Custom3DBarChart';
+import AgeDemographicsChart from '../components/AgeDemographicsChart';
 import { PieChart } from '@mui/x-charts/PieChart';
 import { useAuth } from '../auth/AuthProvider';
 import { useNavigate } from 'react-router-dom';
@@ -58,23 +59,33 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   };
 
   // Mobile UI States
-  const [activeMobileChart, setActiveMobileChart] = useState<'pie' | 'bar'>('pie');
+  const [activeMobileChart, setActiveMobileChart] = useState<'pie' | 'bar' | 'economy' | 'age'>('pie');
 
   const swipeHandlers = useSwipeable({
-    onSwipedLeft: () => setActiveMobileChart('bar'),
-    onSwipedRight: () => setActiveMobileChart('pie'),
+    onSwipedLeft: () => {
+      if (activeMobileChart === 'pie') setActiveMobileChart('bar');
+      else if (activeMobileChart === 'bar') setActiveMobileChart('economy');
+      else if (activeMobileChart === 'economy') setActiveMobileChart('age');
+    },
+    onSwipedRight: () => {
+      if (activeMobileChart === 'age') setActiveMobileChart('economy');
+      else if (activeMobileChart === 'economy') setActiveMobileChart('bar');
+      else if (activeMobileChart === 'bar') setActiveMobileChart('pie');
+    },
     trackMouse: true
   });
 
   // Search Logic Queries
   const { data: districtsData, loading: districtsLoading, error: districtsError } = useQuery(GET_P_DISTRICTS, {
     skip: !showManualForm,
+    fetchPolicy: 'network-only',
   });
   console.log('Districts query:', { districtsData, districtsLoading, districtsError });
 
   const { data: gnData, loading: gnLoading, error: gnError } = useQuery(GET_P_DISTRICT_WITH_GNS, {
     variables: { id: selectedDistrict },
     skip: !selectedDistrict || !showManualForm,
+    fetchPolicy: 'network-only',
   });
   console.log('GN Data query:', { gnData, gnLoading, gnError });
 
@@ -98,6 +109,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const { data: autoGnData, loading: autoGnLoading } = useQuery(GET_GN_BY_COORDINATES, {
     variables: { lat: location?.lat, lng: location?.lng },
     skip: !location || showManualForm,
+    fetchPolicy: 'network-only',
   });
 
   // Geolocation Effect
@@ -137,7 +149,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   let displayDistrict = '';
   let displayCity = '';
   let displayGN = '';
-  let populationData = null;
+  let displayCCODE = '';
+  let populationData: { both: number, male: number, female: number, age_0_14?: number, age_15_59?: number, age_60_64?: number, age_65_above?: number } | null = null;
   let gnEconomyData: any = null;
 
   if (!showManualForm && autoGnData?.gnByCoordinates) {
@@ -146,6 +159,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
     const g = autoGnData.gnByCoordinates;
     displayCity = language === 'en' ? g?.dsEn : language === 'si' ? g?.dsSi : g?.dsTa;
     displayGN = language === 'en' ? g?.nameEn : language === 'si' ? g?.nameSi : g?.nameTa;
+    displayCCODE = g?.CCODE || '';
     if (g?.pGn) {
       populationData = {
         both: g.pGn.populationBoth || 0,
@@ -193,11 +207,16 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         const g = gnData?.pDistrict?.gramaNiladharis?.find((x: any) => x.id === selectedGN);
         if (g) {
           displayGN = language === 'en' ? g.nameEn : language === 'si' ? g.nameSi : g.nameTa;
+          displayCCODE = g.CCODE || '';
           if (g.pGn) {
             populationData = {
               both: g.pGn.populationBoth || 0,
               male: g.pGn.populationMale || 0,
-              female: g.pGn.populationFemale || 0
+              female: g.pGn.populationFemale || 0,
+              age_0_14: g.pGn.age_0_14 || 0,
+              age_15_59: g.pGn.age_15_59 || 0,
+              age_60_64: g.pGn.age_60_64 || 0,
+              age_65_above: g.pGn.age_65_above || 0
             };
           }
           if (g.gnEconomy) {
@@ -207,6 +226,104 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
       }
     }
   }
+
+  const hasEconomyData = gnEconomyData && ((gnEconomyData.employed || 0) > 0 || (gnEconomyData.unemployed || 0) > 0 || (gnEconomyData.economically_not_active || 0) > 0);
+
+  const gnEconomyChartUI = hasEconomyData ? (
+    <>
+      {!isMobileView && (
+        <Box sx={{ textAlign: 'center', mt: 8, mb: 4 }}>
+          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
+            Economy
+          </Typography>
+          <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary' }}>
+            {displayGN || displayCity || displayDistrict || "Selected Location"}
+          </Typography>
+        </Box>
+      )}
+      <Box sx={{ 
+        bgcolor: isMobileView ? 'transparent' : (themeColors.cardBg || '#ffffff'), 
+        borderRadius: '24px', 
+        p: isMobileView ? 0 : 4, 
+        display: 'flex', 
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: isMobileView ? 'none' : '1px solid rgba(0,0,0,0.1)',
+        boxShadow: isMobileView ? 'none' : '0 10px 40px rgba(0,0,0,0.05)',
+        position: 'relative',
+        width: '100%',
+        maxWidth: 500,
+        mx: 'auto'
+      }}>
+      <PieChart
+        series={[
+          {
+            data: [
+              { id: 0, value: gnEconomyData?.employed || 0, label: 'Employed', color: '#2ecc71' },
+              { id: 1, value: gnEconomyData?.unemployed || 0, label: 'Unemployed', color: '#e74c3c' },
+              { id: 2, value: gnEconomyData?.economically_not_active || 0, label: 'Not Active', color: '#f1c40f' },
+            ],
+            innerRadius: 80,
+            outerRadius: 130,
+            paddingAngle: 2,
+            cornerRadius: 4,
+            cx: '50%',
+            cy: '50%',
+            highlightScope: { fade: 'global', highlight: 'item' },
+            faded: { innerRadius: 75, additionalRadius: -20, color: 'gray' },
+          },
+        ]}
+        height={320}
+        margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        slotProps={{
+          legend: { hidden: true }
+        }}
+      />
+      {/* Center Text */}
+      <Box sx={{ 
+        position: 'absolute', 
+        top: '43%', 
+        left: '50%', 
+        transform: 'translate(-50%, -50%)', 
+        textAlign: 'center', 
+        pointerEvents: 'none' 
+      }}>
+        <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : 'text.secondary', display: 'block', lineHeight: 1 }}>
+          Total<br/>Economy
+        </Typography>
+        <Typography variant="h5" sx={{ fontWeight: 800, color: isMobileView ? '#ffffff' : themeColors.textDark, mt: 0.5 }}>
+          {(gnEconomyData?.total || 0).toLocaleString()}
+        </Typography>
+      </Box>
+
+      {/* Custom Legend */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mt: 2, px: isMobileView ? 0 : 2 }}>
+        <Box sx={{ textAlign: 'center' }}>
+          <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : themeColors.textDark, fontWeight: 'bold', display: 'block' }}>Employed</Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
+            <span style={{ color: '#2ecc71', fontSize: '1rem' }}>●</span>
+            <Typography variant="body1" sx={{ color: isMobileView ? '#ffffff' : themeColors.textDark, fontWeight: 800 }}>{(gnEconomyData?.employed || 0).toLocaleString()}</Typography>
+          </Box>
+        </Box>
+        <Box sx={{ textAlign: 'center' }}>
+          <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : themeColors.textDark, fontWeight: 'bold', display: 'block' }}>Unemployed</Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
+            <span style={{ color: '#e74c3c', fontSize: '1rem' }}>●</span>
+            <Typography variant="body1" sx={{ color: isMobileView ? '#ffffff' : themeColors.textDark, fontWeight: 800 }}>{(gnEconomyData?.unemployed || 0).toLocaleString()}</Typography>
+          </Box>
+        </Box>
+        <Box sx={{ textAlign: 'center' }}>
+          <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : themeColors.textDark, fontWeight: 'bold', display: 'block' }}>Not Active</Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
+            <span style={{ color: '#f1c40f', fontSize: '1rem' }}>●</span>
+            <Typography variant="body1" sx={{ color: isMobileView ? '#ffffff' : themeColors.textDark, fontWeight: 800 }}>{(gnEconomyData?.economically_not_active || 0).toLocaleString()}</Typography>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
+    </>
+  ) : null;
 
   return (
     <Box sx={{ fontFamily: "'Inter', sans-serif" }}>
@@ -528,6 +645,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           }}
         />
 
+
         <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, py: { xs: 8, md: 0 } }}>
           <Grid container spacing={4} alignItems="center">
             {/* Words / Text on the right side (order 2 on desktop, order 1 on mobile) */}
@@ -549,9 +667,27 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                     borderRadius: '24px',
                     p: { xs: 3, md: 0 },
                     border: { xs: '1px solid rgba(255, 255, 255, 0.1)', md: 'none' },
-                    boxShadow: { xs: '0 8px 32px rgba(0,0,0,0.3)', md: 'none' }
+                    boxShadow: { xs: '0 8px 32px rgba(0,0,0,0.3)', md: 'none' },
+                    mt: { xs: 0, md: -2 }
                   }}
                 >
+                  {/* CCODE - Above District */}
+                  {displayCCODE && (
+                    <Typography
+                      variant="h3"
+                      sx={{
+                        color: 'rgba(255, 255, 255, 0.9)',
+                        fontFamily: "'Playfair Display', serif",
+                        fontWeight: 500,
+                        fontSize: { xs: '1.5rem', sm: '2.25rem', md: '2.75rem', lg: '3.25rem' },
+                        mb: { xs: 2, md: 3 },
+                        textAlign: { xs: 'center', md: 'left' },
+                      }}
+                    >
+                      {displayCCODE}
+                    </Typography>
+                  )}
+
                   {/* District - Top Glass Pill */}
                   {displayDistrict && (
                     <Box
@@ -561,7 +697,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                         justifyContent: 'center',
                         px: { xs: 2, md: 3 },
                         py: { xs: 0.75, md: 1 },
-                        mb: { xs: 3, md: 4 },
+                        mb: { xs: 1, md: 1.5 },
                         borderRadius: '50px',
                         bgcolor: 'rgba(255, 255, 255, 0.1)',
                         backdropFilter: 'blur(10px)',
@@ -640,10 +776,11 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                 >
                   {/* Mobile Toggle Buttons */}
                   {isMobileView && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3, gap: 2 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3, gap: 1, flexWrap: 'wrap' }}>
                       <Button 
                         variant={activeMobileChart === 'pie' ? 'contained' : 'outlined'} 
                         onClick={() => setActiveMobileChart('pie')}
+                        size="small"
                         sx={{ 
                           borderRadius: '20px',
                           color: activeMobileChart === 'pie' ? '#fff' : 'rgba(255,255,255,0.7)',
@@ -657,6 +794,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                       <Button 
                         variant={activeMobileChart === 'bar' ? 'contained' : 'outlined'} 
                         onClick={() => setActiveMobileChart('bar')}
+                        size="small"
                         sx={{ 
                           borderRadius: '20px',
                           color: activeMobileChart === 'bar' ? '#fff' : 'rgba(255,255,255,0.7)',
@@ -666,6 +804,36 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                         }}
                       >
                         Housing
+                      </Button>
+                      {hasEconomyData && (
+                        <Button 
+                          variant={activeMobileChart === 'economy' ? 'contained' : 'outlined'} 
+                          onClick={() => setActiveMobileChart('economy')}
+                          size="small"
+                          sx={{ 
+                            borderRadius: '20px',
+                            color: activeMobileChart === 'economy' ? '#fff' : 'rgba(255,255,255,0.7)',
+                            borderColor: 'rgba(255,255,255,0.3)',
+                            bgcolor: activeMobileChart === 'economy' ? 'primary.main' : 'transparent',
+                            '&:hover': { bgcolor: activeMobileChart === 'economy' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
+                          }}
+                        >
+                          Economy
+                        </Button>
+                      )}
+                      <Button 
+                        variant={activeMobileChart === 'age' ? 'contained' : 'outlined'} 
+                        onClick={() => setActiveMobileChart('age')}
+                        size="small"
+                        sx={{ 
+                          borderRadius: '20px',
+                          color: activeMobileChart === 'age' ? '#fff' : 'rgba(255,255,255,0.7)',
+                          borderColor: 'rgba(255,255,255,0.3)',
+                          bgcolor: activeMobileChart === 'age' ? 'primary.main' : 'transparent',
+                          '&:hover': { bgcolor: activeMobileChart === 'age' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
+                        }}
+                      >
+                        Age
                       </Button>
                     </Box>
                   )}
@@ -684,6 +852,21 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                       />
                     </Box>
                   )}
+
+                  {isMobileView && activeMobileChart === 'economy' && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                      {gnEconomyChartUI}
+                    </Box>
+                  )}
+
+                  {isMobileView && activeMobileChart === 'age' && (
+                    <Box sx={{ height: '350px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <AgeDemographicsChart 
+                        data={populationData || undefined}
+                        location_name={displayGN || displayCity || displayDistrict}
+                      />
+                    </Box>
+                  )}
                 </Box>
               )}
             </Grid>
@@ -694,6 +877,11 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
       {/* Charts Section (Desktop Only) */}
       {!isMobileView && (selectedGN || selectedCity || selectedDistrict) && (
         <>
+          <AgeDemographicsChart 
+            data={populationData || undefined}
+            location_name={displayGN || displayCity || displayDistrict}
+          />
+          
           <Custom3DBarChart 
             gn_id={selectedGN} 
             city_code={selectedCity} 
@@ -701,87 +889,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             location_name={displayGN || displayCity || displayDistrict}
           />
           
-          <Box sx={{ py: 6, display: 'flex', justifyContent: 'center' }}>
-            <Box sx={{ 
-              bgcolor: themeColors.cardBg || '#ffffff', 
-              borderRadius: '24px', 
-              p: 4, 
-              display: 'flex', 
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: '1px solid rgba(0,0,0,0.1)',
-              boxShadow: '0 10px 40px rgba(0,0,0,0.05)',
-              position: 'relative',
-              width: '100%',
-              maxWidth: 500
-            }}>
-              <PieChart
-                series={[
-                  {
-                    data: [
-                      { id: 0, value: gnEconomyData?.employed || 0, label: 'Employed', color: '#2ecc71' },
-                      { id: 1, value: gnEconomyData?.unemployed || 0, label: 'Unemployed', color: '#e74c3c' },
-                      { id: 2, value: gnEconomyData?.economically_not_active || 0, label: 'Not Active', color: '#f1c40f' },
-                    ],
-                    innerRadius: 80,
-                    outerRadius: 130,
-                    paddingAngle: 2,
-                    cornerRadius: 4,
-                    cx: '50%',
-                    cy: '50%',
-                    highlightScope: { fade: 'global', highlight: 'item' },
-                    faded: { innerRadius: 75, additionalRadius: -20, color: 'gray' },
-                  },
-                ]}
-                height={320}
-                margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                slotProps={{
-                  legend: { hidden: true }
-                }}
-              />
-              {/* Center Text */}
-              <Box sx={{ 
-                position: 'absolute', 
-                top: '43%', 
-                left: '50%', 
-                transform: 'translate(-50%, -50%)', 
-                textAlign: 'center', 
-                pointerEvents: 'none' 
-              }}>
-                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
-                  Total<br/>Economy
-                </Typography>
-                <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
-                  {(gnEconomyData?.total || 0).toLocaleString()}
-                </Typography>
-              </Box>
-
-              {/* Custom Legend */}
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mt: 2, px: 2 }}>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="caption" sx={{ color: themeColors.textDark, fontWeight: 'bold', display: 'block' }}>Employed</Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
-                    <span style={{ color: '#2ecc71', fontSize: '1rem' }}>●</span>
-                    <Typography variant="body1" sx={{ color: themeColors.textDark, fontWeight: 800 }}>{(gnEconomyData?.employed || 0).toLocaleString()}</Typography>
-                  </Box>
-                </Box>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="caption" sx={{ color: themeColors.textDark, fontWeight: 'bold', display: 'block' }}>Unemployed</Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
-                    <span style={{ color: '#e74c3c', fontSize: '1rem' }}>●</span>
-                    <Typography variant="body1" sx={{ color: themeColors.textDark, fontWeight: 800 }}>{(gnEconomyData?.unemployed || 0).toLocaleString()}</Typography>
-                  </Box>
-                </Box>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="caption" sx={{ color: themeColors.textDark, fontWeight: 'bold', display: 'block' }}>Not Active</Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
-                    <span style={{ color: '#f1c40f', fontSize: '1rem' }}>●</span>
-                    <Typography variant="body1" sx={{ color: themeColors.textDark, fontWeight: 800 }}>{(gnEconomyData?.economically_not_active || 0).toLocaleString()}</Typography>
-                  </Box>
-                </Box>
-              </Box>
-            </Box>
+          <Box sx={{ pb: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {gnEconomyChartUI}
           </Box>
         </>
       )}

@@ -328,6 +328,10 @@ type PGn {
     populationBoth: Int @rename(attribute: "population_both")
     populationMale: Int @rename(attribute: "population_male")
     populationFemale: Int @rename(attribute: "population_female")
+    age_0_14: Int
+    age_15_59: Int
+    age_60_64: Int
+    age_65_above: Int
 }
 
 type GramaNiladhari {
@@ -455,6 +459,10 @@ type PGn {
     populationBoth: Int @rename(attribute: "population_both")
     populationMale: Int @rename(attribute: "population_male")
     populationFemale: Int @rename(attribute: "population_female")
+    age_0_14: Int
+    age_15_59: Int
+    age_60_64: Int
+    age_65_above: Int
     gramaNiladhari: GramaNiladhari @belongsTo
 }
 

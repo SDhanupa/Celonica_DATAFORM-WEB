@@ -363,6 +363,10 @@ export const GET_P_DISTRICT_WITH_GNS = gql`
           populationBoth
           populationMale
           populationFemale
+          age_0_14
+          age_15_59
+          age_60_64
+          age_65_above
         }
         gnEconomy {
           id
@@ -401,6 +405,10 @@ export const GET_GN_BY_COORDINATES = gql`
         populationBoth
         populationMale
         populationFemale
+        age_0_14
+        age_15_59
+        age_60_64
+        age_65_above
       }
       gnEconomy {
         id
