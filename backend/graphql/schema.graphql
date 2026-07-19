@@ -356,6 +356,7 @@ type GramaNiladhari {
     postOffice: PostOffice @belongsTo
     pGn: PGn @hasOne
     pDistrict: PDistrict @belongsTo
+    gnEconomy: GnEconomy @hasOne
 }
 
 type Police {
@@ -472,4 +473,14 @@ type HousingDataAggregate {
     y_1990_1994: Int
     y_1980_1989: Int
     before_80: Int
+}
+
+type GnEconomy {
+    id: ID!
+    name: String
+    gn_number: String
+    total: Int
+    employed: Int
+    unemployed: Int
+    economically_not_active: Int
 }

@@ -5,6 +5,7 @@ import { useQuery } from '@apollo/client';
 import { GET_P_DISTRICTS, GET_P_DISTRICT_WITH_GNS, GET_GN_BY_COORDINATES } from '../graphql/queries';
 import PopulationInfographic from '../components/PopulationInfographic';
 import Custom3DBarChart from '../components/Custom3DBarChart';
+import { PieChart } from '@mui/x-charts/PieChart';
 import { useAuth } from '../auth/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 import LightModeIcon from '@mui/icons-material/LightMode';
@@ -71,10 +72,11 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   });
   console.log('Districts query:', { districtsData, districtsLoading, districtsError });
 
-  const { data: gnData, loading: gnLoading } = useQuery(GET_P_DISTRICT_WITH_GNS, {
+  const { data: gnData, loading: gnLoading, error: gnError } = useQuery(GET_P_DISTRICT_WITH_GNS, {
     variables: { id: selectedDistrict },
     skip: !selectedDistrict || !showManualForm,
   });
+  console.log('GN Data query:', { gnData, gnLoading, gnError });
 
   const uniqueCities = React.useMemo(() => {
     if (!gnData?.pDistrict?.gramaNiladharis) return [];
@@ -136,6 +138,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   let displayCity = '';
   let displayGN = '';
   let populationData = null;
+  let gnEconomyData: any = null;
 
   if (!showManualForm && autoGnData?.gnByCoordinates) {
     const d = autoGnData.gnByCoordinates.pDistrict;
@@ -149,6 +152,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         male: g.pGn.populationMale || 0,
         female: g.pGn.populationFemale || 0
       };
+    }
+    if (g?.gnEconomy) {
+      gnEconomyData = g.gnEconomy;
     }
   } else if (showManualForm && selectedDistrict) {
     const d = districtsData?.pDistricts?.find((x: any) => x.id === selectedDistrict);
@@ -193,6 +199,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
               male: g.pGn.populationMale || 0,
               female: g.pGn.populationFemale || 0
             };
+          }
+          if (g.gnEconomy) {
+            gnEconomyData = g.gnEconomy;
           }
         }
       }
@@ -682,14 +691,99 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         </Container>
       </Box>
 
-      {/* 3D Bar Chart Section (Desktop Only) */}
+      {/* Charts Section (Desktop Only) */}
       {!isMobileView && (selectedGN || selectedCity || selectedDistrict) && (
-        <Custom3DBarChart 
-          gn_id={selectedGN} 
-          city_code={selectedCity} 
-          district_id={selectedDistrict} 
-          location_name={displayGN || displayCity || displayDistrict}
-        />
+        <>
+          <Custom3DBarChart 
+            gn_id={selectedGN} 
+            city_code={selectedCity} 
+            district_id={selectedDistrict} 
+            location_name={displayGN || displayCity || displayDistrict}
+          />
+          
+          <Box sx={{ py: 6, display: 'flex', justifyContent: 'center' }}>
+            <Box sx={{ 
+              bgcolor: themeColors.cardBg || '#ffffff', 
+              borderRadius: '24px', 
+              p: 4, 
+              display: 'flex', 
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1px solid rgba(0,0,0,0.1)',
+              boxShadow: '0 10px 40px rgba(0,0,0,0.05)',
+              position: 'relative',
+              width: '100%',
+              maxWidth: 500
+            }}>
+              <PieChart
+                series={[
+                  {
+                    data: [
+                      { id: 0, value: gnEconomyData?.employed || 0, label: 'Employed', color: '#2ecc71' },
+                      { id: 1, value: gnEconomyData?.unemployed || 0, label: 'Unemployed', color: '#e74c3c' },
+                      { id: 2, value: gnEconomyData?.economically_not_active || 0, label: 'Not Active', color: '#f1c40f' },
+                    ],
+                    innerRadius: 80,
+                    outerRadius: 130,
+                    paddingAngle: 2,
+                    cornerRadius: 4,
+                    cx: '50%',
+                    cy: '50%',
+                    highlightScope: { fade: 'global', highlight: 'item' },
+                    faded: { innerRadius: 75, additionalRadius: -20, color: 'gray' },
+                  },
+                ]}
+                height={320}
+                margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                slotProps={{
+                  legend: { hidden: true }
+                }}
+              />
+              {/* Center Text */}
+              <Box sx={{ 
+                position: 'absolute', 
+                top: '43%', 
+                left: '50%', 
+                transform: 'translate(-50%, -50%)', 
+                textAlign: 'center', 
+                pointerEvents: 'none' 
+              }}>
+                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
+                  Total<br/>Economy
+                </Typography>
+                <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
+                  {(gnEconomyData?.total || 0).toLocaleString()}
+                </Typography>
+              </Box>
+
+              {/* Custom Legend */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mt: 2, px: 2 }}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography variant="caption" sx={{ color: themeColors.textDark, fontWeight: 'bold', display: 'block' }}>Employed</Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
+                    <span style={{ color: '#2ecc71', fontSize: '1rem' }}>●</span>
+                    <Typography variant="body1" sx={{ color: themeColors.textDark, fontWeight: 800 }}>{(gnEconomyData?.employed || 0).toLocaleString()}</Typography>
+                  </Box>
+                </Box>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography variant="caption" sx={{ color: themeColors.textDark, fontWeight: 'bold', display: 'block' }}>Unemployed</Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
+                    <span style={{ color: '#e74c3c', fontSize: '1rem' }}>●</span>
+                    <Typography variant="body1" sx={{ color: themeColors.textDark, fontWeight: 800 }}>{(gnEconomyData?.unemployed || 0).toLocaleString()}</Typography>
+                  </Box>
+                </Box>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography variant="caption" sx={{ color: themeColors.textDark, fontWeight: 'bold', display: 'block' }}>Not Active</Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
+                    <span style={{ color: '#f1c40f', fontSize: '1rem' }}>●</span>
+                    <Typography variant="body1" sx={{ color: themeColors.textDark, fontWeight: 800 }}>{(gnEconomyData?.economically_not_active || 0).toLocaleString()}</Typography>
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+        </>
       )}
 
       {/* Featured Section */}

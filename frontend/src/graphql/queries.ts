@@ -364,6 +364,13 @@ export const GET_P_DISTRICT_WITH_GNS = gql`
           populationMale
           populationFemale
         }
+        gnEconomy {
+          id
+          total
+          employed
+          unemployed
+          economically_not_active
+        }
       }
     }
   }
@@ -394,6 +401,13 @@ export const GET_GN_BY_COORDINATES = gql`
         populationBoth
         populationMale
         populationFemale
+      }
+      gnEconomy {
+        id
+        total
+        employed
+        unemployed
+        economically_not_active
       }
     }
   }

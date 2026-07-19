@@ -1,17 +1,17 @@
 import { createTheme } from '@mui/material/styles';
 
-// AdminBite Color Palette
+// A shared, calm visual system for public and management screens.
 const colors = {
-  primary: '#4798e8',
-  secondary: '#6c757d',
-  success: '#22c6ab',
-  info: '#4798e8',
-  warning: '#ffbc34',
-  danger: '#ef6e6e',
-  background: '#eef5f9', // AdminBite body background
+  primary: '#1677c8',
+  secondary: '#5f6f81',
+  success: '#168a6b',
+  info: '#1677c8',
+  warning: '#b87908',
+  danger: '#d64b4b',
+  background: '#f7fafc',
   surface: '#ffffff',
-  text: '#3e5569',
-  textMuted: '#a1aab2',
+  text: '#172b3a',
+  textMuted: '#627486',
 };
 
 const theme = createTheme({
@@ -45,22 +45,22 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: "'Poppins', sans-serif",
-    h1: { fontSize: '36px', fontWeight: 500, color: colors.text },
-    h2: { fontSize: '30px', fontWeight: 500, color: colors.text },
-    h3: { fontSize: '22px', fontWeight: 500, color: colors.text },
-    h4: { fontSize: '18px', fontWeight: 500, color: colors.text },
-    h5: { fontSize: '16px', fontWeight: 500, color: colors.text },
-    h6: { fontSize: '14px', fontWeight: 500, color: colors.text },
-    body1: { fontSize: '0.875rem', fontWeight: 300, color: colors.text },
-    body2: { fontSize: '0.875rem', fontWeight: 300, color: colors.text },
+    fontFamily: "'DM Sans', sans-serif",
+    h1: { fontSize: 'clamp(2.25rem, 4vw, 3.5rem)', fontWeight: 700, letterSpacing: '-0.04em', color: colors.text },
+    h2: { fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', fontWeight: 700, letterSpacing: '-0.035em', color: colors.text },
+    h3: { fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.025em', color: colors.text },
+    h4: { fontSize: '1.2rem', fontWeight: 700, letterSpacing: '-0.02em', color: colors.text },
+    h5: { fontSize: '1rem', fontWeight: 700, color: colors.text },
+    h6: { fontSize: '0.875rem', fontWeight: 700, color: colors.text },
+    body1: { fontSize: '0.9375rem', fontWeight: 400, color: colors.text },
+    body2: { fontSize: '0.875rem', fontWeight: 400, color: colors.text },
     button: {
       textTransform: 'none',
       fontWeight: 500,
     },
   },
   shape: {
-    borderRadius: 2, // AdminBite uses subtle rounded corners (2px)
+    borderRadius: 12,
   },
   components: {
     MuiCssBaseline: {
@@ -74,18 +74,21 @@ const theme = createTheme({
           backgroundColor: colors.background,
           color: colors.text,
           minHeight: '100vh',
-          fontFamily: "'Poppins', sans-serif",
+          fontFamily: "'DM Sans', sans-serif",
         },
       },
     },
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 2,
-          padding: '8px 16px',
-          boxShadow: 'none',
+          borderRadius: 10,
+          padding: '9px 18px',
+          boxShadow: '0 2px 5px rgba(23, 43, 58, 0.08)',
+          fontWeight: 700,
+          transition: 'transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease',
           '&:hover': {
-            boxShadow: 'none',
+            boxShadow: '0 8px 18px rgba(23, 43, 58, 0.14)',
+            transform: 'translateY(-1px)',
           },
         },
       },
@@ -93,10 +96,11 @@ const theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 0, // Square cards
-          boxShadow: '1px 0px 20px rgba(0, 0, 0, 0.08)',
-          border: '1px solid #e9ecef',
+          borderRadius: 16,
+          boxShadow: '0 10px 30px rgba(23, 43, 58, 0.06)',
+          border: '1px solid rgba(23, 43, 58, 0.08)',
           backgroundImage: 'none',
+          overflow: 'hidden',
         },
       },
     },
@@ -110,8 +114,8 @@ const theme = createTheme({
     MuiAppBar: {
       styleOverrides: {
         root: {
-          boxShadow: '1px 0px 20px rgba(0, 0, 0, 0.08)',
-          backgroundColor: colors.primary, // The topbar is usually primary blue in some AdminBite variants
+          boxShadow: '0 4px 18px rgba(23, 43, 58, 0.09)',
+          backgroundColor: colors.primary,
           color: '#ffffff',
         },
       },
@@ -119,29 +123,29 @@ const theme = createTheme({
     MuiDrawer: {
       styleOverrides: {
         paper: {
-          backgroundColor: '#ffffff', // Light sidebar
+          backgroundColor: '#ffffff',
           color: colors.text,
           borderRight: '1px solid rgba(120, 130, 140, 0.13)',
-          boxShadow: '1px 0px 20px rgba(0, 0, 0, 0.08)',
+          boxShadow: '4px 0 24px rgba(23, 43, 58, 0.05)',
         },
       },
     },
     MuiListItemButton: {
       styleOverrides: {
         root: {
-          borderRadius: 0,
-          margin: '0px',
-          padding: '12px 15px',
+          borderRadius: 10,
+          margin: '2px 8px',
+          padding: '10px 12px',
           color: colors.text,
           '&.Mui-selected': {
-            backgroundColor: 'rgba(0,0,0,0.025)',
+            backgroundColor: 'rgba(22, 119, 200, 0.10)',
             color: colors.primary,
             '&:hover': {
-              backgroundColor: 'rgba(0,0,0,0.025)',
+              backgroundColor: 'rgba(22, 119, 200, 0.14)',
             },
           },
           '&:hover': {
-            backgroundColor: 'rgba(0,0,0,0.025)',
+            backgroundColor: 'rgba(23, 43, 58, 0.04)',
           },
         },
       },

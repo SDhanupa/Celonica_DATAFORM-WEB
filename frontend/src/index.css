@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap');
 
 /* Reset — all styling is handled by MUI theme */
 * {
@@ -9,5 +9,18 @@
 
 html, body, #root {
   min-height: 100vh;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'DM Sans', sans-serif;
+}
+
+html {
+  background: #f7fafc;
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+button, input, textarea, select {
+  font: inherit;
 }

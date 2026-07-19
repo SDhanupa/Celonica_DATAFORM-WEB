@@ -65,4 +65,9 @@ class GramaNiladhari extends Model
     {
         return $this->hasOne(PGn::class, 'grama_niladhari_id');
     }
+
+    public function gnEconomy()
+    {
+        return $this->hasOne(GnEconomy::class, 'gn_number', 'id');
+    }
 }
