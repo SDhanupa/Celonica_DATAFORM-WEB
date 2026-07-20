@@ -6,6 +6,7 @@ import { GET_P_DISTRICTS, GET_P_DISTRICT_WITH_GNS, GET_GN_BY_COORDINATES } from 
 import PopulationInfographic from '../components/PopulationInfographic';
 import Custom3DBarChart from '../components/Custom3DBarChart';
 import AgeDemographicsChart from '../components/AgeDemographicsChart';
+import HousingOwnershipChart from '../components/HousingOwnershipChart';
 import { PieChart } from '@mui/x-charts/PieChart';
 import { useAuth } from '../auth/AuthProvider';
 import { useNavigate } from 'react-router-dom';
@@ -59,16 +60,18 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   };
 
   // Mobile UI States
-  const [activeMobileChart, setActiveMobileChart] = useState<'pie' | 'bar' | 'economy' | 'age'>('pie');
+  const [activeMobileChart, setActiveMobileChart] = useState<'pie' | 'bar' | 'economy' | 'age' | 'ownership'>('pie');
 
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => {
       if (activeMobileChart === 'pie') setActiveMobileChart('bar');
       else if (activeMobileChart === 'bar') setActiveMobileChart('economy');
       else if (activeMobileChart === 'economy') setActiveMobileChart('age');
+      else if (activeMobileChart === 'age') setActiveMobileChart('ownership');
     },
     onSwipedRight: () => {
-      if (activeMobileChart === 'age') setActiveMobileChart('economy');
+      if (activeMobileChart === 'ownership') setActiveMobileChart('age');
+      else if (activeMobileChart === 'age') setActiveMobileChart('economy');
       else if (activeMobileChart === 'economy') setActiveMobileChart('bar');
       else if (activeMobileChart === 'bar') setActiveMobileChart('pie');
     },
@@ -152,6 +155,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   let displayCCODE = '';
   let populationData: { both: number, male: number, female: number, age_0_14?: number, age_15_59?: number, age_60_64?: number, age_65_above?: number } | null = null;
   let gnEconomyData: any = null;
+  let housingOwnershipData: any = null;
 
   if (!showManualForm && autoGnData?.gnByCoordinates) {
     const d = autoGnData.gnByCoordinates.pDistrict;
@@ -169,6 +173,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
     }
     if (g?.gnEconomy) {
       gnEconomyData = g.gnEconomy;
+    }
+    if (g?.housingOwnershipStatus) {
+      housingOwnershipData = g.housingOwnershipStatus;
     }
   } else if (showManualForm && selectedDistrict) {
     const d = districtsData?.pDistricts?.find((x: any) => x.id === selectedDistrict);
@@ -221,6 +228,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           }
           if (g.gnEconomy) {
             gnEconomyData = g.gnEconomy;
+          }
+          if (g.housingOwnershipStatus) {
+            housingOwnershipData = g.housingOwnershipStatus;
           }
         }
       }
@@ -835,6 +845,20 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                       >
                         Age
                       </Button>
+                      <Button 
+                        variant={activeMobileChart === 'ownership' ? 'contained' : 'outlined'} 
+                        onClick={() => setActiveMobileChart('ownership')}
+                        size="small"
+                        sx={{ 
+                          borderRadius: '20px',
+                          color: activeMobileChart === 'ownership' ? '#fff' : 'rgba(255,255,255,0.7)',
+                          borderColor: 'rgba(255,255,255,0.3)',
+                          bgcolor: activeMobileChart === 'ownership' ? 'primary.main' : 'transparent',
+                          '&:hover': { bgcolor: activeMobileChart === 'ownership' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
+                        }}
+                      >
+                        Ownership
+                      </Button>
                     </Box>
                   )}
 
@@ -867,6 +891,15 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                       />
                     </Box>
                   )}
+
+                  {isMobileView && activeMobileChart === 'ownership' && (
+                    <Box sx={{ height: '350px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <HousingOwnershipChart 
+                        data={housingOwnershipData || undefined}
+                        location_name={displayGN || displayCity || displayDistrict}
+                      />
+                    </Box>
+                  )}
                 </Box>
               )}
             </Grid>
@@ -892,6 +925,11 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           <Box sx={{ pb: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             {gnEconomyChartUI}
           </Box>
+
+          <HousingOwnershipChart 
+            data={housingOwnershipData || undefined}
+            location_name={displayGN || displayCity || displayDistrict}
+          />
         </>
       )}
 

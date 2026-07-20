@@ -361,6 +361,23 @@ type GramaNiladhari {
     pGn: PGn @hasOne
     pDistrict: PDistrict @belongsTo
     gnEconomy: GnEconomy @hasOne
+    housingOwnershipStatus: HousingOwnershipStatus @hasOne
+}
+
+type HousingOwnershipStatus {
+    id: ID!
+    gn_id: ID
+    gn_name: String
+    ds_division: String
+    district: String
+    province: String
+    total_households: Int
+    owned_by_member: Int
+    rent_gov: Int
+    rent_private: Int
+    free_of_rent: Int
+    encroached: Int
+    other: Int
 }
 
 type Police {

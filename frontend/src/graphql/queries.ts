@@ -375,6 +375,16 @@ export const GET_P_DISTRICT_WITH_GNS = gql`
           unemployed
           economically_not_active
         }
+        housingOwnershipStatus {
+          id
+          total_households
+          owned_by_member
+          rent_gov
+          rent_private
+          free_of_rent
+          encroached
+          other
+        }
       }
     }
   }
@@ -416,6 +426,16 @@ export const GET_GN_BY_COORDINATES = gql`
         employed
         unemployed
         economically_not_active
+      }
+      housingOwnershipStatus {
+        id
+        total_households
+        owned_by_member
+        rent_gov
+        rent_private
+        free_of_rent
+        encroached
+        other
       }
     }
   }

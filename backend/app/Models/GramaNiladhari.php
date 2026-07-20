@@ -70,4 +70,9 @@ class GramaNiladhari extends Model
     {
         return $this->hasOne(GnEconomy::class, 'gn_number', 'id');
     }
+
+    public function housingOwnershipStatus()
+    {
+        return $this->hasOne(HousingOwnershipStatus::class, 'gn_id', 'id');
+    }
 }
