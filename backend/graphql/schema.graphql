@@ -362,6 +362,40 @@ type GramaNiladhari {
     pDistrict: PDistrict @belongsTo
     gnEconomy: GnEconomy @hasOne
     housingOwnershipStatus: HousingOwnershipStatus @hasOne
+    housingWallType: HousingWallType @hasOne
+    housingUnitType: HousingUnitType @hasOne
+}
+
+type HousingUnitType {
+    id: ID!
+    gn_id: ID
+    gn_name: String
+    ds_division: String
+    district: String
+    province: String
+    total_units: Int
+    permanent: Int
+    semi_permanent: Int
+    improvised: Int
+    unclassified: Int
+}
+
+type HousingWallType {
+    id: ID!
+    gn_id: ID
+    gn_name: String
+    ds_division: String
+    district: String
+    province: String
+    total_units: Int
+    brick: Int
+    cement_block_stone: Int
+    cabook: Int
+    soil_bricks: Int
+    mud: Int
+    cadjan_palmyrah: Int
+    plank_metal_sheet: Int
+    other: Int
 }
 
 type HousingOwnershipStatus {

@@ -60,7 +60,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   };
 
   // Mobile UI States
-  const [activeMobileChart, setActiveMobileChart] = useState<'pie' | 'bar' | 'economy' | 'age' | 'ownership'>('pie');
+  const [activeMobileChart, setActiveMobileChart] = useState<'pie' | 'bar' | 'economy' | 'age' | 'ownership' | 'wall' | 'unit'>('pie');
 
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => {
@@ -68,9 +68,13 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
       else if (activeMobileChart === 'bar') setActiveMobileChart('economy');
       else if (activeMobileChart === 'economy') setActiveMobileChart('age');
       else if (activeMobileChart === 'age') setActiveMobileChart('ownership');
+      else if (activeMobileChart === 'ownership') setActiveMobileChart('wall');
+      else if (activeMobileChart === 'wall') setActiveMobileChart('unit');
     },
     onSwipedRight: () => {
-      if (activeMobileChart === 'ownership') setActiveMobileChart('age');
+      if (activeMobileChart === 'unit') setActiveMobileChart('wall');
+      else if (activeMobileChart === 'wall') setActiveMobileChart('ownership');
+      else if (activeMobileChart === 'ownership') setActiveMobileChart('age');
       else if (activeMobileChart === 'age') setActiveMobileChart('economy');
       else if (activeMobileChart === 'economy') setActiveMobileChart('bar');
       else if (activeMobileChart === 'bar') setActiveMobileChart('pie');
@@ -156,6 +160,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   let populationData: { both: number, male: number, female: number, age_0_14?: number, age_15_59?: number, age_60_64?: number, age_65_above?: number } | null = null;
   let gnEconomyData: any = null;
   let housingOwnershipData: any = null;
+  let housingWallData: any = null;
+  let housingUnitData: any = null;
 
   if (!showManualForm && autoGnData?.gnByCoordinates) {
     const d = autoGnData.gnByCoordinates.pDistrict;
@@ -176,6 +182,12 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
     }
     if (g?.housingOwnershipStatus) {
       housingOwnershipData = g.housingOwnershipStatus;
+    }
+    if (g?.housingWallType) {
+      housingWallData = g.housingWallType;
+    }
+    if (g?.housingUnitType) {
+      housingUnitData = g.housingUnitType;
     }
   } else if (showManualForm && selectedDistrict) {
     const d = districtsData?.pDistricts?.find((x: any) => x.id === selectedDistrict);
@@ -231,6 +243,12 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           }
           if (g.housingOwnershipStatus) {
             housingOwnershipData = g.housingOwnershipStatus;
+          }
+          if (g.housingWallType) {
+            housingWallData = g.housingWallType;
+          }
+          if (g.housingUnitType) {
+            housingUnitData = g.housingUnitType;
           }
         }
       }
@@ -330,6 +348,188 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             <Typography variant="body1" sx={{ color: isMobileView ? '#ffffff' : themeColors.textDark, fontWeight: 800 }}>{(gnEconomyData?.economically_not_active || 0).toLocaleString()}</Typography>
           </Box>
         </Box>
+      </Box>
+    </Box>
+    </>
+  ) : null;
+
+  const hasWallData = housingWallData && (housingWallData.total_units || 0) > 0;
+  
+  const wallPalette = [
+    { label: 'Brick', color: '#e74c3c', value: housingWallData?.brick || 0 },
+    { label: 'Cement/Stone', color: '#3498db', value: housingWallData?.cement_block_stone || 0 },
+    { label: 'Cabook', color: '#f1c40f', value: housingWallData?.cabook || 0 },
+    { label: 'Soil Bricks', color: '#e67e22', value: housingWallData?.soil_bricks || 0 },
+    { label: 'Mud', color: '#2ecc71', value: housingWallData?.mud || 0 },
+    { label: 'Cadjan/Palmyrah', color: '#1abc9c', value: housingWallData?.cadjan_palmyrah || 0 },
+    { label: 'Plank/Metal', color: '#9b59b6', value: housingWallData?.plank_metal_sheet || 0 },
+    { label: 'Other', color: '#95a5a6', value: housingWallData?.other || 0 },
+  ].filter(item => item.value > 0);
+
+  const gnWallChartUI = hasWallData ? (
+    <>
+      {!isMobileView && (
+        <Box sx={{ textAlign: 'center', mt: 8, mb: 4 }}>
+          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
+            Housing Wall Type
+          </Typography>
+          <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary' }}>
+            {displayGN || displayCity || displayDistrict || "Selected Location"}
+          </Typography>
+        </Box>
+      )}
+      <Box sx={{ 
+        bgcolor: isMobileView ? 'transparent' : (themeColors.cardBg || '#ffffff'), 
+        borderRadius: '24px', 
+        p: isMobileView ? 0 : 4, 
+        display: 'flex', 
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: isMobileView ? 'none' : '1px solid rgba(0,0,0,0.1)',
+        boxShadow: isMobileView ? 'none' : '0 10px 40px rgba(0,0,0,0.05)',
+        position: 'relative',
+        width: '100%',
+        maxWidth: 500,
+        mx: 'auto'
+      }}>
+      <PieChart
+        series={[
+          {
+            data: wallPalette.map((item, idx) => ({ id: idx, value: item.value, label: item.label, color: item.color })),
+            innerRadius: 80,
+            outerRadius: 130,
+            paddingAngle: 2,
+            cornerRadius: 4,
+            cx: '50%',
+            cy: '50%',
+            highlightScope: { fade: 'global', highlight: 'item' },
+            faded: { innerRadius: 75, additionalRadius: -20, color: 'gray' },
+          },
+        ]}
+        height={320}
+        margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        slotProps={{
+          legend: { hidden: true }
+        }}
+      />
+      {/* Center Text */}
+      <Box sx={{ 
+        position: 'absolute', 
+        top: '40%', 
+        left: '50%', 
+        transform: 'translate(-50%, -50%)', 
+        textAlign: 'center', 
+        pointerEvents: 'none' 
+      }}>
+        <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : 'text.secondary', display: 'block', lineHeight: 1 }}>
+          Total<br/>Units
+        </Typography>
+        <Typography variant="h5" sx={{ fontWeight: 800, color: isMobileView ? '#ffffff' : themeColors.textDark, mt: 0.5 }}>
+          {(housingWallData?.total_units || 0).toLocaleString()}
+        </Typography>
+      </Box>
+
+      {/* Custom Legend */}
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', width: '100%', mt: 2, px: isMobileView ? 0 : 2, gap: 2 }}>
+        {wallPalette.map((item, index) => (
+          <Box key={index} sx={{ textAlign: 'center', minWidth: '80px' }}>
+            <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
+              <span style={{ color: item.color, fontSize: '1rem' }}>●</span>
+              <Typography variant="body2" sx={{ color: isMobileView ? '#ffffff' : themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
+            </Box>
+          </Box>
+        ))}
+      </Box>
+    </Box>
+    </>
+  ) : null;
+
+  const hasUnitData = housingUnitData && (housingUnitData.total_units || 0) > 0;
+  
+  const unitPalette = [
+    { label: 'Permanent', color: '#2ecc71', value: housingUnitData?.permanent || 0 },
+    { label: 'Semi-permanent', color: '#f39c12', value: housingUnitData?.semi_permanent || 0 },
+    { label: 'Improvised', color: '#e74c3c', value: housingUnitData?.improvised || 0 },
+    { label: 'Unclassified', color: '#95a5a6', value: housingUnitData?.unclassified || 0 },
+  ].filter(item => item.value > 0);
+
+  const gnUnitChartUI = hasUnitData ? (
+    <>
+      {!isMobileView && (
+        <Box sx={{ textAlign: 'center', mt: 8, mb: 4 }}>
+          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
+            Housing Unit Type
+          </Typography>
+          <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary' }}>
+            {displayGN || displayCity || displayDistrict || "Selected Location"}
+          </Typography>
+        </Box>
+      )}
+      <Box sx={{ 
+        bgcolor: isMobileView ? 'transparent' : (themeColors.cardBg || '#ffffff'), 
+        borderRadius: '24px', 
+        p: isMobileView ? 0 : 4, 
+        display: 'flex', 
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: isMobileView ? 'none' : '1px solid rgba(0,0,0,0.1)',
+        boxShadow: isMobileView ? 'none' : '0 10px 40px rgba(0,0,0,0.05)',
+        position: 'relative',
+        width: '100%',
+        maxWidth: 500,
+        mx: 'auto'
+      }}>
+      <PieChart
+        series={[
+          {
+            data: unitPalette.map((item, idx) => ({ id: idx, value: item.value, label: item.label, color: item.color })),
+            innerRadius: 80,
+            outerRadius: 130,
+            paddingAngle: 2,
+            cornerRadius: 4,
+            cx: '50%',
+            cy: '50%',
+            highlightScope: { fade: 'global', highlight: 'item' },
+            faded: { innerRadius: 75, additionalRadius: -20, color: 'gray' },
+          },
+        ]}
+        height={320}
+        margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        slotProps={{
+          legend: { hidden: true }
+        }}
+      />
+      {/* Center Text */}
+      <Box sx={{ 
+        position: 'absolute', 
+        top: '40%', 
+        left: '50%', 
+        transform: 'translate(-50%, -50%)', 
+        textAlign: 'center', 
+        pointerEvents: 'none' 
+      }}>
+        <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : 'text.secondary', display: 'block', lineHeight: 1 }}>
+          Total<br/>Units
+        </Typography>
+        <Typography variant="h5" sx={{ fontWeight: 800, color: isMobileView ? '#ffffff' : themeColors.textDark, mt: 0.5 }}>
+          {(housingUnitData?.total_units || 0).toLocaleString()}
+        </Typography>
+      </Box>
+
+      {/* Custom Legend */}
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', width: '100%', mt: 2, px: isMobileView ? 0 : 2, gap: 2 }}>
+        {unitPalette.map((item, index) => (
+          <Box key={index} sx={{ textAlign: 'center', minWidth: '80px' }}>
+            <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
+              <span style={{ color: item.color, fontSize: '1rem' }}>●</span>
+              <Typography variant="body2" sx={{ color: isMobileView ? '#ffffff' : themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
+            </Box>
+          </Box>
+        ))}
       </Box>
     </Box>
     </>
@@ -859,6 +1059,34 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                       >
                         Ownership
                       </Button>
+                      <Button 
+                        variant={activeMobileChart === 'wall' ? 'contained' : 'outlined'} 
+                        onClick={() => setActiveMobileChart('wall')}
+                        size="small"
+                        sx={{ 
+                          borderRadius: '20px',
+                          color: activeMobileChart === 'wall' ? '#fff' : 'rgba(255,255,255,0.7)',
+                          borderColor: 'rgba(255,255,255,0.3)',
+                          bgcolor: activeMobileChart === 'wall' ? 'primary.main' : 'transparent',
+                          '&:hover': { bgcolor: activeMobileChart === 'wall' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
+                        }}
+                      >
+                        Wall Type
+                      </Button>
+                      <Button 
+                        variant={activeMobileChart === 'unit' ? 'contained' : 'outlined'} 
+                        onClick={() => setActiveMobileChart('unit')}
+                        size="small"
+                        sx={{ 
+                          borderRadius: '20px',
+                          color: activeMobileChart === 'unit' ? '#fff' : 'rgba(255,255,255,0.7)',
+                          borderColor: 'rgba(255,255,255,0.3)',
+                          bgcolor: activeMobileChart === 'unit' ? 'primary.main' : 'transparent',
+                          '&:hover': { bgcolor: activeMobileChart === 'unit' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
+                        }}
+                      >
+                        Unit Type
+                      </Button>
                     </Box>
                   )}
 
@@ -900,6 +1128,18 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                       />
                     </Box>
                   )}
+
+                  {isMobileView && activeMobileChart === 'wall' && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                      {gnWallChartUI}
+                    </Box>
+                  )}
+
+                  {isMobileView && activeMobileChart === 'unit' && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                      {gnUnitChartUI}
+                    </Box>
+                  )}
                 </Box>
               )}
             </Grid>
@@ -930,69 +1170,18 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             data={housingOwnershipData || undefined}
             location_name={displayGN || displayCity || displayDistrict}
           />
+
+          <Box sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {gnWallChartUI}
+          </Box>
+
+          <Box sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {gnUnitChartUI}
+          </Box>
         </>
       )}
 
-      {/* Featured Section */}
-      <Box sx={{ bgcolor: themeColors.lightBg, py: 10 }}>
-        <Container maxWidth="lg">
-          <Box sx={{ textAlign: 'center', mb: 8 }}>
-            <Typography
-              variant="overline"
-              sx={{ color: themeColors.secondary, letterSpacing: '2px', fontWeight: 700 }}
-            >
-              DISCOVER MORE
-            </Typography>
-            <Typography
-              variant="h2"
-              sx={{ fontFamily: "'Playfair Display', serif", color: themeColors.textDark, fontWeight: 700, mt: 1 }}
-            >
-              Find your perfect category
-            </Typography>
-          </Box>
 
-          <Grid container spacing={4}>
-            {[1, 2, 3].map((item) => (
-              <Grid item xs={12} md={4} key={item}>
-                <Card sx={{ borderRadius: 0, boxShadow: '0px 10px 30px rgba(0,0,0,0.05)', border: 'none', bgcolor: themeColors.cardBg, color: themeColors.textDark }}>
-                  <CardMedia
-                    component="img"
-                    height="240"
-                    image={`https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&q=80&w=600&sig=${item}`}
-                    alt="Category"
-                  />
-                  <CardContent sx={{ p: 4, textAlign: 'center' }}>
-                    <Typography gutterBottom variant="h5" component="div" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, color: themeColors.textDark }}>
-                      Category {item}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                      Explore various questions and answers related to this exciting topic. Dive deep into the details.
-                    </Typography>
-                    <Button
-                      variant="outlined"
-                      href="/categories"
-                      sx={{
-                        borderRadius: 0,
-                        borderColor: themeColors.primary,
-                        color: themeColors.primary,
-                        fontWeight: 600,
-                        px: 4,
-                        '&:hover': {
-                          borderColor: themeColors.darkCharcoal,
-                          color: themeColors.darkCharcoal,
-                          bgcolor: 'transparent'
-                        }
-                      }}
-                    >
-                      VIEW DETAILS
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Box>
     </Box>
   );
 };

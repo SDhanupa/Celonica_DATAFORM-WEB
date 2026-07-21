@@ -385,6 +385,26 @@ export const GET_P_DISTRICT_WITH_GNS = gql`
           encroached
           other
         }
+        housingWallType {
+          id
+          total_units
+          brick
+          cement_block_stone
+          cabook
+          soil_bricks
+          mud
+          cadjan_palmyrah
+          plank_metal_sheet
+          other
+        }
+        housingUnitType {
+          id
+          total_units
+          permanent
+          semi_permanent
+          improvised
+          unclassified
+        }
       }
     }
   }
@@ -436,6 +456,26 @@ export const GET_GN_BY_COORDINATES = gql`
         free_of_rent
         encroached
         other
+      }
+      housingWallType {
+        id
+        total_units
+        brick
+        cement_block_stone
+        cabook
+        soil_bricks
+        mud
+        cadjan_palmyrah
+        plank_metal_sheet
+        other
+      }
+      housingUnitType {
+        id
+        total_units
+        permanent
+        semi_permanent
+        improvised
+        unclassified
       }
     }
   }

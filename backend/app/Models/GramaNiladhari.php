@@ -75,4 +75,14 @@ class GramaNiladhari extends Model
     {
         return $this->hasOne(HousingOwnershipStatus::class, 'gn_id', 'id');
     }
+
+    public function housingWallType()
+    {
+        return $this->hasOne(HousingWallType::class, 'gn_id', 'id');
+    }
+
+    public function housingUnitType()
+    {
+        return $this->hasOne(HousingUnitType::class, 'gn_id', 'id');
+    }
 }
