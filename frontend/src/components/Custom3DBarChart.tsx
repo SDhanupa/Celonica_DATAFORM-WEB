@@ -65,11 +65,11 @@ export default function Custom3DBarChart({ district_id, city_code, gn_id, locati
   if (!data || !data.housingData) return null;
 
   const housingData = data.housingData;
-  if (!housingData.total_housing_units || housingData.total_housing_units === 0) {
+  if (!Number(housingData.total_housing_units) || Number(housingData.total_housing_units) === 0) {
     return null;
   }
   
-  const total = housingData.total_housing_units;
+  const total = Number(housingData.total_housing_units);
   const displayLocation = housingData.location_name || location_name || "Selected Location";
 
   // Prepare chart data dynamically based on the categories
@@ -78,9 +78,9 @@ export default function Custom3DBarChart({ district_id, city_code, gn_id, locati
   const chartData = categories.map((cat, index) => {
     let value = 0;
     if (isMobile && cat.sumKeys) {
-      value = cat.sumKeys.reduce((sum, key) => sum + (housingData[key] || 0), 0);
+      value = cat.sumKeys.reduce((sum, key) => sum + Number(housingData[key] || 0), 0);
     } else {
-      value = housingData[cat.key] || 0;
+      value = Number(housingData[cat.key] || 0);
     }
     const percent = Math.round((value / total) * 100);
     return {

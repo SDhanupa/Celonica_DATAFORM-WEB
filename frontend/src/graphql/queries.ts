@@ -405,6 +405,92 @@ export const GET_P_DISTRICT_WITH_GNS = gql`
           improvised
           unclassified
         }
+        toiletFacility {
+          id
+          total_households
+          water_seal_piped_sewer
+          water_seal_septic_tank
+          pour_flush
+          direct_pit
+          other
+          not_using
+        }
+        drinkingWaterSource {
+          id
+          total_households
+          protected_well_within
+          protected_well_outside
+          unprotected_well
+          tap_within_unit
+          tap_within_premises_outside
+          tap_outside_premises
+          rural_water_projects
+          tube_well
+          bowser
+          river_tank_stream
+          other
+        }
+        solidWasteDisposal {
+          id
+          total_households
+          collected_by_local_authorities
+          occupants_burn
+          occupants_bury
+          occupants_composting
+          dispose_into_environment
+          other
+        }
+        roomsInHousingUnit {
+          id
+          total_housing_units
+          room_1
+          rooms_2
+          rooms_3
+          rooms_4
+          rooms_5
+          rooms_6
+          rooms_7
+          rooms_8
+          rooms_9
+          rooms_10_and_above
+        }
+        housingRoofType {
+          id
+          total_housing_units
+          tile
+          asbestos
+          concrete
+          zink_aluminium_sheet
+          metal_sheet
+          cadjan_palmyrah_straw
+          other
+        }
+        religiousAffiliation {
+          id
+          total_population
+          buddhist
+          hindu
+          islam
+          roman_catholic
+          other_christian
+          other
+        }
+        householdHeadRelationship {
+          id
+          total_population
+          head
+          wife_husband
+          son_daughter
+          son_daughter_in_law
+          grandchild_great_grandchild
+          parent_of_head_or_spouse
+          other_relative
+          domestic_employee
+          boarder
+          non_relative
+          clergy
+          not_stated
+        }
       }
     }
   }
@@ -476,6 +562,92 @@ export const GET_GN_BY_COORDINATES = gql`
         semi_permanent
         improvised
         unclassified
+      }
+      toiletFacility {
+        id
+        total_households
+        water_seal_piped_sewer
+        water_seal_septic_tank
+        pour_flush
+        direct_pit
+        other
+        not_using
+      }
+      drinkingWaterSource {
+        id
+        total_households
+        protected_well_within
+        protected_well_outside
+        unprotected_well
+        tap_within_unit
+        tap_within_premises_outside
+        tap_outside_premises
+        rural_water_projects
+        tube_well
+        bowser
+        river_tank_stream
+        other
+      }
+      solidWasteDisposal {
+        id
+        total_households
+        collected_by_local_authorities
+        occupants_burn
+        occupants_bury
+        occupants_composting
+        dispose_into_environment
+        other
+      }
+      roomsInHousingUnit {
+        id
+        total_housing_units
+        room_1
+        rooms_2
+        rooms_3
+        rooms_4
+        rooms_5
+        rooms_6
+        rooms_7
+        rooms_8
+        rooms_9
+        rooms_10_and_above
+      }
+      housingRoofType {
+        id
+        total_housing_units
+        tile
+        asbestos
+        concrete
+        zink_aluminium_sheet
+        metal_sheet
+        cadjan_palmyrah_straw
+        other
+      }
+      religiousAffiliation {
+        id
+        total_population
+        buddhist
+        hindu
+        islam
+        roman_catholic
+        other_christian
+        other
+      }
+      householdHeadRelationship {
+        id
+        total_population
+        head
+        wife_husband
+        son_daughter
+        son_daughter_in_law
+        grandchild_great_grandchild
+        parent_of_head_or_spouse
+        other_relative
+        domestic_employee
+        boarder
+        non_relative
+        clergy
+        not_stated
       }
     }
   }

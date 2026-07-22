@@ -30,16 +30,15 @@ export default function Age3DBarChart({ data, location_name }: Age3DBarChartProp
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  if (!data || (data.age_0_14 === 0 && data.age_15_59 === 0 && data.age_60_64 === 0 && data.age_65_above === 0)) {
-    return null;
-  }
+  if (!data) return null;
   
-  const total = (data.age_0_14 || 0) + (data.age_15_59 || 0) + (data.age_60_64 || 0) + (data.age_65_above || 0);
+  const total = Number(data.age_0_14 || 0) + Number(data.age_15_59 || 0) + Number(data.age_60_64 || 0) + Number(data.age_65_above || 0);
+  if (total === 0) return null;
   const displayLocation = location_name || "Selected Location";
 
   // Prepare chart data dynamically
   const chartData = categoryLabels.map((cat, index) => {
-    const value = data[cat.key as keyof typeof data] || 0;
+    const value = Number(data[cat.key as keyof typeof data] || 0);
     const percent = total > 0 ? Math.round((value / total) * 100) : 0;
     return {
       id: cat.key,

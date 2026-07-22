@@ -40,14 +40,19 @@ export default function HousingOwnershipChart({ data, location_name }: HousingOw
     return null;
   }
   
-  const total = (data.owned_by_member || 0) + (data.rent_gov || 0) + (data.rent_private || 0) + 
-                (data.free_of_rent || 0) + (data.encroached || 0) + (data.other || 0);
+  const total = Number(data.owned_by_member || 0) + 
+                Number(data.rent_gov || 0) + 
+                Number(data.rent_private || 0) + 
+                Number(data.free_of_rent || 0) + 
+                Number(data.encroached || 0) + 
+                Number(data.other || 0);
   
+  if (total === 0) return null;
   const displayLocation = location_name || "Selected Location";
 
   // Prepare chart data dynamically
   const chartData = categoryLabels.map((cat, index) => {
-    const value = data[cat.key as keyof typeof data] || 0;
+    const value = Number(data[cat.key as keyof typeof data] || 0);
     const percent = total > 0 ? Math.round((value / total) * 100) : 0;
     return {
       id: cat.key,

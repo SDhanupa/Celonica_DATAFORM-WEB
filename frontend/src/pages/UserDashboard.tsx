@@ -60,27 +60,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   };
 
   // Mobile UI States
-  const [activeMobileChart, setActiveMobileChart] = useState<'pie' | 'bar' | 'economy' | 'age' | 'ownership' | 'wall' | 'unit'>('pie');
+  const [activeMobileChart, setActiveMobileChart] = useState<'pie' | 'bar' | 'economy' | 'age' | 'ownership' | 'wall' | 'unit' | 'toilet' | 'water' | 'waste' | 'rooms' | 'roof' | 'religion' | 'household'>('pie');
 
-  const swipeHandlers = useSwipeable({
-    onSwipedLeft: () => {
-      if (activeMobileChart === 'pie') setActiveMobileChart('bar');
-      else if (activeMobileChart === 'bar') setActiveMobileChart('economy');
-      else if (activeMobileChart === 'economy') setActiveMobileChart('age');
-      else if (activeMobileChart === 'age') setActiveMobileChart('ownership');
-      else if (activeMobileChart === 'ownership') setActiveMobileChart('wall');
-      else if (activeMobileChart === 'wall') setActiveMobileChart('unit');
-    },
-    onSwipedRight: () => {
-      if (activeMobileChart === 'unit') setActiveMobileChart('wall');
-      else if (activeMobileChart === 'wall') setActiveMobileChart('ownership');
-      else if (activeMobileChart === 'ownership') setActiveMobileChart('age');
-      else if (activeMobileChart === 'age') setActiveMobileChart('economy');
-      else if (activeMobileChart === 'economy') setActiveMobileChart('bar');
-      else if (activeMobileChart === 'bar') setActiveMobileChart('pie');
-    },
-    trackMouse: true
-  });
+
 
   // Search Logic Queries
   const { data: districtsData, loading: districtsLoading, error: districtsError } = useQuery(GET_P_DISTRICTS, {
@@ -162,6 +144,13 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   let housingOwnershipData: any = null;
   let housingWallData: any = null;
   let housingUnitData: any = null;
+  let toiletFacilityData: any = null;
+  let drinkingWaterData: any = null;
+  let solidWasteData: any = null;
+  let roomsData: any = null;
+  let roofData: any = null;
+  let religionData: any = null;
+  let householdHeadData: any = null;
 
   if (!showManualForm && autoGnData?.gnByCoordinates) {
     const d = autoGnData.gnByCoordinates.pDistrict;
@@ -174,7 +163,11 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
       populationData = {
         both: g.pGn.populationBoth || 0,
         male: g.pGn.populationMale || 0,
-        female: g.pGn.populationFemale || 0
+        female: g.pGn.populationFemale || 0,
+        age_0_14: g.pGn.age_0_14 || 0,
+        age_15_59: g.pGn.age_15_59 || 0,
+        age_60_64: g.pGn.age_60_64 || 0,
+        age_65_above: g.pGn.age_65_above || 0
       };
     }
     if (g?.gnEconomy) {
@@ -188,6 +181,27 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
     }
     if (g?.housingUnitType) {
       housingUnitData = g.housingUnitType;
+    }
+    if (g?.toiletFacility) {
+      toiletFacilityData = g.toiletFacility;
+    }
+    if (g?.drinkingWaterSource) {
+      drinkingWaterData = g.drinkingWaterSource;
+    }
+    if (g?.solidWasteDisposal) {
+      solidWasteData = g.solidWasteDisposal;
+    }
+    if (g?.roomsInHousingUnit) {
+      roomsData = g.roomsInHousingUnit;
+    }
+    if (g?.housingRoofType) {
+      roofData = g.housingRoofType;
+    }
+    if (g?.religiousAffiliation) {
+      religionData = g.religiousAffiliation;
+    }
+    if (g?.householdHeadRelationship) {
+      householdHeadData = g.householdHeadRelationship;
     }
   } else if (showManualForm && selectedDistrict) {
     const d = districtsData?.pDistricts?.find((x: any) => x.id === selectedDistrict);
@@ -209,15 +223,23 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         // Sum population for all GNs in this DS Division
         if (gnData?.pDistrict?.gramaNiladharis) {
           let cityBoth = 0, cityMale = 0, cityFemale = 0;
+          let cityAge14 = 0, cityAge59 = 0, cityAge64 = 0, cityAge65 = 0;
           gnData.pDistrict.gramaNiladharis.forEach((gn: any) => {
             if (gn.divisionalSecretariatCode === selectedCity && gn.pGn) {
               cityBoth += gn.pGn.populationBoth || 0;
               cityMale += gn.pGn.populationMale || 0;
               cityFemale += gn.pGn.populationFemale || 0;
+              cityAge14 += gn.pGn.age_0_14 || 0;
+              cityAge59 += gn.pGn.age_15_59 || 0;
+              cityAge64 += gn.pGn.age_60_64 || 0;
+              cityAge65 += gn.pGn.age_65_above || 0;
             }
           });
           if (cityBoth > 0) {
-            populationData = { both: cityBoth, male: cityMale, female: cityFemale };
+            populationData = { 
+              both: cityBoth, male: cityMale, female: cityFemale,
+              age_0_14: cityAge14, age_15_59: cityAge59, age_60_64: cityAge64, age_65_above: cityAge65
+            };
           }
         }
       }
@@ -250,12 +272,80 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           if (g.housingUnitType) {
             housingUnitData = g.housingUnitType;
           }
+          if (g.toiletFacility) {
+            toiletFacilityData = g.toiletFacility;
+          }
+          if (g.drinkingWaterSource) {
+            drinkingWaterData = g.drinkingWaterSource;
+          }
+          if (g.solidWasteDisposal) {
+            solidWasteData = g.solidWasteDisposal;
+          }
+          if (g.roomsInHousingUnit) {
+            roomsData = g.roomsInHousingUnit;
+          }
+          if (g.housingRoofType) {
+            roofData = g.housingRoofType;
+          }
+          if (g.religiousAffiliation) {
+            religionData = g.religiousAffiliation;
+          }
+          if (g.householdHeadRelationship) {
+            householdHeadData = g.householdHeadRelationship;
+          }
         }
       }
     }
   }
 
   const hasEconomyData = gnEconomyData && ((gnEconomyData.employed || 0) > 0 || (gnEconomyData.unemployed || 0) > 0 || (gnEconomyData.economically_not_active || 0) > 0);
+  const hasOwnershipData = housingOwnershipData && (housingOwnershipData.total_households || 0) > 0;
+  const hasWallData = housingWallData && (housingWallData.total_units || 0) > 0;
+  const hasUnitData = housingUnitData && (housingUnitData.total_units || 0) > 0;
+  const hasToiletData = toiletFacilityData && (toiletFacilityData.total_households || 0) > 0;
+  const hasWaterData = drinkingWaterData && (drinkingWaterData.total_households || 0) > 0;
+  const hasWasteData = solidWasteData && (solidWasteData.total_households || 0) > 0;
+  const hasRoomsData = roomsData && (roomsData.total_housing_units || 0) > 0;
+  const hasRoofData = roofData && (roofData.total_housing_units || 0) > 0;
+  const hasReligionData = religionData && (religionData.total_population || 0) > 0;
+  const hasHouseholdData = householdHeadData && (householdHeadData.total_population || 0) > 0;
+  
+  const hasAgeData = populationData && (
+    (populationData.age_0_14 || 0) > 0 ||
+    (populationData.age_15_59 || 0) > 0 ||
+    (populationData.age_60_64 || 0) > 0 ||
+    (populationData.age_65_above || 0) > 0
+  );
+
+  const availableCharts = ['pie', 'bar'];
+  if (hasEconomyData) availableCharts.push('economy');
+  if (hasAgeData) availableCharts.push('age');
+  if (hasOwnershipData) availableCharts.push('ownership');
+  if (hasWallData) availableCharts.push('wall');
+  if (hasUnitData) availableCharts.push('unit');
+  if (hasToiletData) availableCharts.push('toilet');
+  if (hasWaterData) availableCharts.push('water');
+  if (hasWasteData) availableCharts.push('waste');
+  if (hasRoomsData) availableCharts.push('rooms');
+  if (hasRoofData) availableCharts.push('roof');
+  if (hasReligionData) availableCharts.push('religion');
+  if (hasHouseholdData) availableCharts.push('household');
+
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => {
+      const idx = availableCharts.indexOf(activeMobileChart);
+      if (idx !== -1 && idx < availableCharts.length - 1) {
+        setActiveMobileChart(availableCharts[idx + 1] as any);
+      }
+    },
+    onSwipedRight: () => {
+      const idx = availableCharts.indexOf(activeMobileChart);
+      if (idx > 0) {
+        setActiveMobileChart(availableCharts[idx - 1] as any);
+      }
+    },
+    trackMouse: true
+  });
 
   const gnEconomyChartUI = hasEconomyData ? (
     <>
@@ -288,9 +378,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         series={[
           {
             data: [
-              { id: 0, value: gnEconomyData?.employed || 0, label: 'Employed', color: '#2ecc71' },
-              { id: 1, value: gnEconomyData?.unemployed || 0, label: 'Unemployed', color: '#e74c3c' },
-              { id: 2, value: gnEconomyData?.economically_not_active || 0, label: 'Not Active', color: '#f1c40f' },
+              { id: 0, value: Number(gnEconomyData?.employed || 0), label: 'Employed', color: '#2ecc71' },
+              { id: 1, value: Number(gnEconomyData?.unemployed || 0), label: 'Unemployed', color: '#e74c3c' },
+              { id: 2, value: Number(gnEconomyData?.economically_not_active || 0), label: 'Not Active', color: '#f1c40f' },
             ],
             innerRadius: 80,
             outerRadius: 130,
@@ -298,7 +388,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             cornerRadius: 4,
             cx: '50%',
             cy: '50%',
-            highlightScope: { fade: 'global', highlight: 'item' },
+            highlightScope: { faded: 'global', highlight: 'item' },
             faded: { innerRadius: 75, additionalRadius: -20, color: 'gray' },
           },
         ]}
@@ -353,7 +443,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
     </>
   ) : null;
 
-  const hasWallData = housingWallData && (housingWallData.total_units || 0) > 0;
+
   
   const wallPalette = [
     { label: 'Brick', color: '#e74c3c', value: housingWallData?.brick || 0 },
@@ -396,14 +486,14 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
       <PieChart
         series={[
           {
-            data: wallPalette.map((item, idx) => ({ id: idx, value: item.value, label: item.label, color: item.color })),
+            data: wallPalette.map((item, idx) => ({ id: idx, value: Number(item.value), label: item.label, color: item.color })),
             innerRadius: 80,
             outerRadius: 130,
             paddingAngle: 2,
             cornerRadius: 4,
             cx: '50%',
             cy: '50%',
-            highlightScope: { fade: 'global', highlight: 'item' },
+            highlightScope: { faded: 'global', highlight: 'item' },
             faded: { innerRadius: 75, additionalRadius: -20, color: 'gray' },
           },
         ]}
@@ -446,7 +536,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
     </>
   ) : null;
 
-  const hasUnitData = housingUnitData && (housingUnitData.total_units || 0) > 0;
+
   
   const unitPalette = [
     { label: 'Permanent', color: '#2ecc71', value: housingUnitData?.permanent || 0 },
@@ -485,14 +575,14 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
       <PieChart
         series={[
           {
-            data: unitPalette.map((item, idx) => ({ id: idx, value: item.value, label: item.label, color: item.color })),
+            data: unitPalette.map((item, idx) => ({ id: idx, value: Number(item.value), label: item.label, color: item.color })),
             innerRadius: 80,
             outerRadius: 130,
             paddingAngle: 2,
             cornerRadius: 4,
             cx: '50%',
             cy: '50%',
-            highlightScope: { fade: 'global', highlight: 'item' },
+            highlightScope: { faded: 'global', highlight: 'item' },
             faded: { innerRadius: 75, additionalRadius: -20, color: 'gray' },
           },
         ]}
@@ -532,6 +622,641 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         ))}
       </Box>
     </Box>
+    </>
+  ) : null;
+
+
+  
+  const toiletPalette = [
+    { label: 'Piped Sewer', color: '#3498db', value: toiletFacilityData?.water_seal_piped_sewer || 0 },
+    { label: 'Septic Tank', color: '#9b59b6', value: toiletFacilityData?.water_seal_septic_tank || 0 },
+    { label: 'Pour Flush', color: '#e67e22', value: toiletFacilityData?.pour_flush || 0 },
+    { label: 'Direct Pit', color: '#f1c40f', value: toiletFacilityData?.direct_pit || 0 },
+    { label: 'Not Using', color: '#c0392b', value: toiletFacilityData?.not_using || 0 },
+    { label: 'Other', color: '#95a5a6', value: toiletFacilityData?.other || 0 },
+  ].filter(item => item.value > 0);
+
+  const gnToiletChartUI = hasToiletData ? (
+    <>
+      {!isMobileView && (
+        <Box sx={{ textAlign: 'center', mt: 8, mb: 4 }}>
+          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
+            Toilet Facilities
+          </Typography>
+          <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary' }}>
+            {displayGN || displayCity || displayDistrict || "Selected Location"}
+          </Typography>
+        </Box>
+      )}
+      <Box sx={{ 
+        bgcolor: isMobileView ? 'transparent' : (themeColors.cardBg || '#ffffff'), 
+        borderRadius: '24px', 
+        p: isMobileView ? 0 : 4, 
+        display: 'flex', 
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: isMobileView ? 'none' : '1px solid rgba(0,0,0,0.1)',
+        boxShadow: isMobileView ? 'none' : '0 10px 40px rgba(0,0,0,0.05)',
+        position: 'relative',
+        width: '100%',
+        maxWidth: 500,
+        mx: 'auto'
+      }}>
+      <PieChart
+        series={[
+          {
+            data: toiletPalette.map((item, idx) => ({ id: idx, value: Number(item.value), label: item.label, color: item.color })),
+            innerRadius: 80,
+            outerRadius: 130,
+            paddingAngle: 2,
+            cornerRadius: 4,
+            cx: '50%',
+            cy: '50%',
+            highlightScope: { faded: 'global', highlight: 'item' },
+            faded: { innerRadius: 75, additionalRadius: -20, color: 'gray' },
+          },
+        ]}
+        height={320}
+        margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        slotProps={{
+          legend: { hidden: true }
+        }}
+      />
+      {/* Center Text */}
+      <Box sx={{ 
+        position: 'absolute', 
+        top: '40%', 
+        left: '50%', 
+        transform: 'translate(-50%, -50%)', 
+        textAlign: 'center', 
+        pointerEvents: 'none' 
+      }}>
+        <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : 'text.secondary', display: 'block', lineHeight: 1 }}>
+          Total<br/>Households
+        </Typography>
+        <Typography variant="h5" sx={{ fontWeight: 800, color: isMobileView ? '#ffffff' : themeColors.textDark, mt: 0.5 }}>
+          {(toiletFacilityData?.total_households || 0).toLocaleString()}
+        </Typography>
+      </Box>
+
+      {/* Custom Legend */}
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', width: '100%', mt: 2, px: isMobileView ? 0 : 2, gap: 2 }}>
+        {toiletPalette.map((item, index) => (
+          <Box key={index} sx={{ textAlign: 'center', minWidth: '80px' }}>
+            <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
+              <span style={{ color: item.color, fontSize: '1rem' }}>●</span>
+              <Typography variant="body2" sx={{ color: isMobileView ? '#ffffff' : themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
+            </Box>
+          </Box>
+        ))}
+      </Box>
+    </Box>
+    </>
+  ) : null;
+
+
+  
+  const waterPalette = [
+    { label: 'Well (Within)', color: '#1abc9c', value: drinkingWaterData?.protected_well_within || 0 },
+    { label: 'Well (Outside)', color: '#16a085', value: drinkingWaterData?.protected_well_outside || 0 },
+    { label: 'Unprotected Well', color: '#f39c12', value: drinkingWaterData?.unprotected_well || 0 },
+    { label: 'Tap (Within Unit)', color: '#3498db', value: drinkingWaterData?.tap_within_unit || 0 },
+    { label: 'Tap (Within Premises)', color: '#2980b9', value: drinkingWaterData?.tap_within_premises_outside || 0 },
+    { label: 'Tap (Outside)', color: '#8e44ad', value: drinkingWaterData?.tap_outside_premises || 0 },
+    { label: 'Rural Projects', color: '#27ae60', value: drinkingWaterData?.rural_water_projects || 0 },
+    { label: 'Tube Well', color: '#f1c40f', value: drinkingWaterData?.tube_well || 0 },
+    { label: 'Bowser', color: '#e67e22', value: drinkingWaterData?.bowser || 0 },
+    { label: 'River/Tank', color: '#34495e', value: drinkingWaterData?.river_tank_stream || 0 },
+    { label: 'Other', color: '#95a5a6', value: drinkingWaterData?.other || 0 },
+  ].filter(item => item.value > 0);
+
+  const gnWaterChartUI = hasWaterData ? (
+    <>
+      {!isMobileView && (
+        <Box sx={{ textAlign: 'center', mt: 8, mb: 4 }}>
+          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
+            Source of Drinking Water
+          </Typography>
+          <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary' }}>
+            {displayGN || displayCity || displayDistrict || "Selected Location"}
+          </Typography>
+        </Box>
+      )}
+      <Box sx={{ 
+        bgcolor: isMobileView ? 'transparent' : (themeColors.cardBg || '#ffffff'), 
+        borderRadius: '24px', 
+        p: isMobileView ? 0 : 4, 
+        display: 'flex', 
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: isMobileView ? 'none' : '1px solid rgba(0,0,0,0.1)',
+        boxShadow: isMobileView ? 'none' : '0 10px 40px rgba(0,0,0,0.05)',
+        position: 'relative',
+        width: '100%',
+        maxWidth: 500,
+        mx: 'auto'
+      }}>
+      <PieChart
+        series={[
+          {
+            data: waterPalette.map((item, idx) => ({ id: idx, value: Number(item.value), label: item.label, color: item.color })),
+            innerRadius: 80,
+            outerRadius: 130,
+            paddingAngle: 2,
+            cornerRadius: 4,
+            cx: '50%',
+            cy: '50%',
+            highlightScope: { faded: 'global', highlight: 'item' },
+            faded: { innerRadius: 75, additionalRadius: -20, color: 'gray' },
+          },
+        ]}
+        height={320}
+        margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        slotProps={{
+          legend: { hidden: true }
+        }}
+      />
+      {/* Center Text */}
+      <Box sx={{ 
+        position: 'absolute', 
+        top: '40%', 
+        left: '50%', 
+        transform: 'translate(-50%, -50%)', 
+        textAlign: 'center', 
+        pointerEvents: 'none' 
+      }}>
+        <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : 'text.secondary', display: 'block', lineHeight: 1 }}>
+          Total<br/>Households
+        </Typography>
+        <Typography variant="h5" sx={{ fontWeight: 800, color: isMobileView ? '#ffffff' : themeColors.textDark, mt: 0.5 }}>
+          {(drinkingWaterData?.total_households || 0).toLocaleString()}
+        </Typography>
+      </Box>
+
+      {/* Custom Legend */}
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', width: '100%', mt: 2, px: isMobileView ? 0 : 2, gap: 2 }}>
+        {waterPalette.map((item, index) => (
+          <Box key={index} sx={{ textAlign: 'center', minWidth: '80px', maxWidth: '120px' }}>
+            <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
+              <span style={{ color: item.color, fontSize: '1rem' }}>●</span>
+              <Typography variant="body2" sx={{ color: isMobileView ? '#ffffff' : themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
+            </Box>
+          </Box>
+        ))}
+      </Box>
+    </Box>
+    </>
+  ) : null;
+
+
+  
+  const wastePalette = [
+    { label: 'Local Auth.', color: '#9b59b6', value: solidWasteData?.collected_by_local_authorities || 0 },
+    { label: 'Burn', color: '#e74c3c', value: solidWasteData?.occupants_burn || 0 },
+    { label: 'Bury', color: '#d35400', value: solidWasteData?.occupants_bury || 0 },
+    { label: 'Compost', color: '#27ae60', value: solidWasteData?.occupants_composting || 0 },
+    { label: 'Environment', color: '#7f8c8d', value: solidWasteData?.dispose_into_environment || 0 },
+    { label: 'Other', color: '#95a5a6', value: solidWasteData?.other || 0 },
+  ].filter(item => item.value > 0);
+
+  const gnWasteChartUI = hasWasteData ? (
+    <>
+      {!isMobileView && (
+        <Box sx={{ textAlign: 'center', mt: 8, mb: 4 }}>
+          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
+            Solid Waste Disposal
+          </Typography>
+          <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary' }}>
+            {displayGN || displayCity || displayDistrict || "Selected Location"}
+          </Typography>
+        </Box>
+      )}
+      <Box sx={{ 
+        bgcolor: isMobileView ? 'transparent' : (themeColors.cardBg || '#ffffff'), 
+        borderRadius: '24px', 
+        p: isMobileView ? 0 : 4, 
+        display: 'flex', 
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: isMobileView ? 'none' : '1px solid rgba(0,0,0,0.1)',
+        boxShadow: isMobileView ? 'none' : '0 10px 40px rgba(0,0,0,0.05)',
+        position: 'relative',
+        width: '100%',
+        maxWidth: 500,
+        mx: 'auto'
+      }}>
+      <PieChart
+        series={[
+          {
+            data: wastePalette.map((item, idx) => ({ id: idx, value: Number(item.value), label: item.label, color: item.color })),
+            innerRadius: 80,
+            outerRadius: 130,
+            paddingAngle: 2,
+            cornerRadius: 4,
+            cx: '50%',
+            cy: '50%',
+            highlightScope: { faded: 'global', highlight: 'item' },
+            faded: { innerRadius: 75, additionalRadius: -20, color: 'gray' },
+          },
+        ]}
+        height={320}
+        margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        slotProps={{
+          legend: { hidden: true }
+        }}
+      />
+      {/* Center Text */}
+      <Box sx={{ 
+        position: 'absolute', 
+        top: '40%', 
+        left: '50%', 
+        transform: 'translate(-50%, -50%)', 
+        textAlign: 'center', 
+        pointerEvents: 'none' 
+      }}>
+        <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : 'text.secondary', display: 'block', lineHeight: 1 }}>
+          Total<br/>Households
+        </Typography>
+        <Typography variant="h5" sx={{ fontWeight: 800, color: isMobileView ? '#ffffff' : themeColors.textDark, mt: 0.5 }}>
+          {(solidWasteData?.total_households || 0).toLocaleString()}
+        </Typography>
+      </Box>
+
+      {/* Custom Legend */}
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', width: '100%', mt: 2, px: isMobileView ? 0 : 2, gap: 2 }}>
+        {wastePalette.map((item, index) => (
+          <Box key={index} sx={{ textAlign: 'center', minWidth: '80px', maxWidth: '120px' }}>
+            <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
+              <span style={{ color: item.color, fontSize: '1rem' }}>●</span>
+              <Typography variant="body2" sx={{ color: isMobileView ? '#ffffff' : themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
+            </Box>
+          </Box>
+        ))}
+      </Box>
+    </Box>
+    </>
+  ) : null;
+
+  const roomsPalette = [
+    { label: '1 Room', color: '#1abc9c', value: roomsData?.room_1 || 0 },
+    { label: '2 Rooms', color: '#16a085', value: roomsData?.rooms_2 || 0 },
+    { label: '3 Rooms', color: '#2ecc71', value: roomsData?.rooms_3 || 0 },
+    { label: '4 Rooms', color: '#27ae60', value: roomsData?.rooms_4 || 0 },
+    { label: '5 Rooms', color: '#3498db', value: roomsData?.rooms_5 || 0 },
+    { label: '6 Rooms', color: '#2980b9', value: roomsData?.rooms_6 || 0 },
+    { label: '7 Rooms', color: '#9b59b6', value: roomsData?.rooms_7 || 0 },
+    { label: '8 Rooms', color: '#8e44ad', value: roomsData?.rooms_8 || 0 },
+    { label: '9 Rooms', color: '#f1c40f', value: roomsData?.rooms_9 || 0 },
+    { label: '10+ Rooms', color: '#e67e22', value: roomsData?.rooms_10_and_above || 0 },
+  ].filter(item => item.value > 0);
+
+  const gnRoomsChartUI = hasRoomsData ? (
+    <>
+      {!isMobileView && (
+        <Box sx={{ textAlign: 'center', mt: 8, mb: 4 }}>
+          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
+            Rooms in Housing Unit
+          </Typography>
+          <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary' }}>
+            {displayGN || displayCity || displayDistrict || "Selected Location"}
+          </Typography>
+        </Box>
+      )}
+      <Box sx={{ 
+        bgcolor: isMobileView ? 'transparent' : (themeColors.cardBg || '#ffffff'), 
+        borderRadius: '24px', 
+        p: isMobileView ? 0 : 4, 
+        display: 'flex', 
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: isMobileView ? 'none' : '1px solid rgba(0,0,0,0.1)',
+        boxShadow: isMobileView ? 'none' : '0 10px 40px rgba(0,0,0,0.05)',
+        position: 'relative',
+        width: '100%',
+        maxWidth: 500,
+        mx: 'auto'
+      }}>
+      <PieChart
+        series={[
+          {
+            data: roomsPalette.map((item, idx) => ({ id: idx, value: Number(item.value), label: item.label, color: item.color })),
+            innerRadius: 80,
+            outerRadius: 130,
+            paddingAngle: 2,
+            cornerRadius: 4,
+            cx: '50%',
+            cy: '50%',
+            highlightScope: { faded: 'global', highlight: 'item' },
+            faded: { innerRadius: 75, additionalRadius: -20, color: 'gray' },
+          },
+        ]}
+        height={320}
+        margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        slotProps={{
+          legend: { hidden: true }
+        }}
+      />
+      {/* Center Text */}
+      <Box sx={{ 
+        position: 'absolute', 
+        top: '40%', 
+        left: '50%', 
+        transform: 'translate(-50%, -50%)', 
+        textAlign: 'center', 
+        pointerEvents: 'none' 
+      }}>
+        <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : 'text.secondary', display: 'block', lineHeight: 1 }}>
+          Total<br/>Units
+        </Typography>
+        <Typography variant="h5" sx={{ fontWeight: 800, color: isMobileView ? '#ffffff' : themeColors.textDark, mt: 0.5 }}>
+          {(roomsData?.total_housing_units || 0).toLocaleString()}
+        </Typography>
+      </Box>
+
+      {/* Custom Legend */}
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', width: '100%', mt: 2, px: isMobileView ? 0 : 2, gap: 2 }}>
+        {roomsPalette.map((item, index) => (
+          <Box key={index} sx={{ textAlign: 'center', minWidth: '80px', maxWidth: '120px' }}>
+            <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
+              <span style={{ color: item.color, fontSize: '1rem' }}>●</span>
+              <Typography variant="body2" sx={{ color: isMobileView ? '#ffffff' : themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
+            </Box>
+          </Box>
+        ))}
+      </Box>
+    </Box>
+    </>
+  ) : null;
+
+  const roofPalette = [
+    { label: 'Tile', color: '#d35400', value: roofData?.tile || 0 },
+    { label: 'Asbestos', color: '#7f8c8d', value: roofData?.asbestos || 0 },
+    { label: 'Concrete', color: '#95a5a6', value: roofData?.concrete || 0 },
+    { label: 'Zink Aluminium', color: '#3498db', value: roofData?.zink_aluminium_sheet || 0 },
+    { label: 'Metal Sheet', color: '#2980b9', value: roofData?.metal_sheet || 0 },
+    { label: 'Cadjan/Straw', color: '#f1c40f', value: roofData?.cadjan_palmyrah_straw || 0 },
+    { label: 'Other', color: '#e67e22', value: roofData?.other || 0 },
+  ].filter(item => item.value > 0);
+
+  const gnRoofChartUI = hasRoofData ? (
+    <>
+      {!isMobileView && (
+        <Box sx={{ textAlign: 'center', mt: 8, mb: 4 }}>
+          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
+            Housing Unit Roof Type
+          </Typography>
+          <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary' }}>
+            {displayGN || displayCity || displayDistrict || "Selected Location"}
+          </Typography>
+        </Box>
+      )}
+      <Box sx={{ 
+        bgcolor: isMobileView ? 'transparent' : (themeColors.cardBg || '#ffffff'), 
+        borderRadius: '24px', 
+        p: isMobileView ? 0 : 4, 
+        display: 'flex', 
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: isMobileView ? 'none' : '1px solid rgba(0,0,0,0.1)',
+        boxShadow: isMobileView ? 'none' : '0 10px 40px rgba(0,0,0,0.05)',
+        position: 'relative',
+        width: '100%',
+        maxWidth: 500,
+        mx: 'auto'
+      }}>
+      <PieChart
+        series={[
+          {
+            data: roofPalette.map((item, idx) => ({ id: idx, value: Number(item.value), label: item.label, color: item.color })),
+            innerRadius: 80,
+            outerRadius: 130,
+            paddingAngle: 2,
+            cornerRadius: 4,
+            cx: '50%',
+            cy: '50%',
+            highlightScope: { faded: 'global', highlight: 'item' },
+            faded: { innerRadius: 75, additionalRadius: -20, color: 'gray' },
+          },
+        ]}
+        height={320}
+        margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        slotProps={{
+          legend: { hidden: true }
+        }}
+      />
+      {/* Center Text */}
+      <Box sx={{ 
+        position: 'absolute', 
+        top: '40%', 
+        left: '50%', 
+        transform: 'translate(-50%, -50%)', 
+        textAlign: 'center', 
+        pointerEvents: 'none' 
+      }}>
+        <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : 'text.secondary', display: 'block', lineHeight: 1 }}>
+          Total<br/>Units
+        </Typography>
+        <Typography variant="h5" sx={{ fontWeight: 800, color: isMobileView ? '#ffffff' : themeColors.textDark, mt: 0.5 }}>
+          {(roofData?.total_housing_units || 0).toLocaleString()}
+        </Typography>
+      </Box>
+
+      {/* Custom Legend */}
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', width: '100%', mt: 2, px: isMobileView ? 0 : 2, gap: 2 }}>
+        {roofPalette.map((item, index) => (
+          <Box key={index} sx={{ textAlign: 'center', minWidth: '80px', maxWidth: '120px' }}>
+            <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
+              <span style={{ color: item.color, fontSize: '1rem' }}>●</span>
+              <Typography variant="body2" sx={{ color: isMobileView ? '#ffffff' : themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
+            </Box>
+          </Box>
+        ))}
+      </Box>
+    </Box>
+    </>
+  ) : null;
+
+  const religionPalette = [
+    { label: 'Buddhist', color: '#f1c40f', value: religionData?.buddhist || 0 },
+    { label: 'Hindu', color: '#e67e22', value: religionData?.hindu || 0 },
+    { label: 'Islam', color: '#2ecc71', value: religionData?.islam || 0 },
+    { label: 'Roman Catholic', color: '#9b59b6', value: religionData?.roman_catholic || 0 },
+    { label: 'Other Christian', color: '#3498db', value: religionData?.other_christian || 0 },
+    { label: 'Other', color: '#95a5a6', value: religionData?.other || 0 },
+  ].filter(item => item.value > 0);
+
+  const gnReligionChartUI = hasReligionData ? (
+    <>
+      {!isMobileView && (
+        <Box sx={{ textAlign: 'center', mt: 8, mb: 4 }}>
+          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
+            Religious Affiliation
+          </Typography>
+          <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary' }}>
+            {displayGN || displayCity || displayDistrict || "Selected Location"}
+          </Typography>
+        </Box>
+      )}
+      <Box sx={{ 
+        bgcolor: isMobileView ? 'transparent' : (themeColors.cardBg || '#ffffff'), 
+        borderRadius: '24px', 
+        p: isMobileView ? 0 : 4, 
+        display: 'flex', 
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: isMobileView ? 'none' : '1px solid rgba(0,0,0,0.1)',
+        boxShadow: isMobileView ? 'none' : '0 10px 40px rgba(0,0,0,0.05)',
+        position: 'relative',
+        width: '100%',
+        maxWidth: 500,
+        mx: 'auto'
+      }}>
+      <PieChart
+        series={[
+          {
+            data: religionPalette.map((item, idx) => ({ id: idx, value: Number(item.value), label: item.label, color: item.color })),
+            innerRadius: 80,
+            outerRadius: 130,
+            paddingAngle: 2,
+            cornerRadius: 4,
+            cx: '50%',
+            cy: '50%',
+            highlightScope: { faded: 'global', highlight: 'item' },
+            faded: { innerRadius: 75, additionalRadius: -20, color: 'gray' },
+          },
+        ]}
+        height={320}
+        margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        slotProps={{
+          legend: { hidden: true }
+        }}
+      />
+      {/* Center Text */}
+      <Box sx={{ 
+        position: 'absolute', 
+        top: '40%', 
+        left: '50%', 
+        transform: 'translate(-50%, -50%)', 
+        textAlign: 'center', 
+        pointerEvents: 'none' 
+      }}>
+        <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : 'text.secondary', display: 'block', lineHeight: 1 }}>
+          Total<br/>Population
+        </Typography>
+        <Typography variant="h5" sx={{ fontWeight: 800, color: isMobileView ? '#ffffff' : themeColors.textDark, mt: 0.5 }}>
+          {(religionData?.total_population || 0).toLocaleString()}
+        </Typography>
+      </Box>
+
+      {/* Custom Legend */}
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', width: '100%', mt: 2, px: isMobileView ? 0 : 2, gap: 2 }}>
+        {religionPalette.map((item, index) => (
+          <Box key={index} sx={{ textAlign: 'center', minWidth: '80px', maxWidth: '120px' }}>
+            <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
+              <span style={{ color: item.color, fontSize: '1rem' }}>●</span>
+              <Typography variant="body2" sx={{ color: isMobileView ? '#ffffff' : themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
+            </Box>
+          </Box>
+        ))}
+      </Box>
+    </Box>
+    </>
+  ) : null;
+
+  const householdPalette = [
+    { label: 'Head',               color: '#2c3e50', value: householdHeadData?.head || 0 },
+    { label: 'Wife/Husband',       color: '#e74c3c', value: householdHeadData?.wife_husband || 0 },
+    { label: 'Son/Daughter',       color: '#3498db', value: householdHeadData?.son_daughter || 0 },
+    { label: 'Son/Daughter-in-law',color: '#9b59b6', value: householdHeadData?.son_daughter_in_law || 0 },
+    { label: 'Grandchild',         color: '#1abc9c', value: householdHeadData?.grandchild_great_grandchild || 0 },
+    { label: 'Parent of Head',     color: '#f39c12', value: householdHeadData?.parent_of_head_or_spouse || 0 },
+    { label: 'Other Relative',     color: '#27ae60', value: householdHeadData?.other_relative || 0 },
+    { label: 'Domestic Employee',  color: '#e67e22', value: householdHeadData?.domestic_employee || 0 },
+    { label: 'Boarder',            color: '#8e44ad', value: householdHeadData?.boarder || 0 },
+    { label: 'Non Relative',       color: '#2980b9', value: householdHeadData?.non_relative || 0 },
+    { label: 'Clergy',             color: '#c0392b', value: householdHeadData?.clergy || 0 },
+    { label: 'Not Stated',         color: '#95a5a6', value: householdHeadData?.not_stated || 0 },
+  ].filter(item => item.value > 0);
+
+  const gnHouseholdChartUI = hasHouseholdData ? (
+    <>
+      {!isMobileView && (
+        <Box sx={{ textAlign: 'center', mt: 8, mb: 4 }}>
+          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
+            Relationship to Household Head
+          </Typography>
+          <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary' }}>
+            {displayGN || displayCity || displayDistrict || "Selected Location"}
+          </Typography>
+        </Box>
+      )}
+      <Box sx={{ 
+        bgcolor: isMobileView ? 'transparent' : (themeColors.cardBg || '#ffffff'), 
+        borderRadius: '24px', 
+        p: isMobileView ? 0 : 4, 
+        display: 'flex', 
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: isMobileView ? 'none' : '1px solid rgba(0,0,0,0.1)',
+        boxShadow: isMobileView ? 'none' : '0 10px 40px rgba(0,0,0,0.05)',
+        position: 'relative',
+        width: '100%',
+        maxWidth: 520,
+        mx: 'auto'
+      }}>
+        <PieChart
+          series={[
+            {
+              data: householdPalette.map((item, idx) => ({ id: idx, value: Number(item.value), label: item.label, color: item.color })),
+              innerRadius: 80,
+              outerRadius: 130,
+              paddingAngle: 2,
+              cornerRadius: 4,
+              cx: '50%',
+              cy: '50%',
+              highlightScope: { faded: 'global', highlight: 'item' },
+              faded: { innerRadius: 75, additionalRadius: -20, color: 'gray' },
+            },
+          ]}
+          height={320}
+          margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          slotProps={{ legend: { hidden: true } }}
+        />
+        {/* Center Text */}
+        <Box sx={{ position: 'absolute', top: '40%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', pointerEvents: 'none' }}>
+          <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : 'text.secondary', display: 'block', lineHeight: 1 }}>
+            Total<br/>Population
+          </Typography>
+          <Typography variant="h5" sx={{ fontWeight: 800, color: isMobileView ? '#ffffff' : themeColors.textDark, mt: 0.5 }}>
+            {(householdHeadData?.total_population || 0).toLocaleString()}
+          </Typography>
+        </Box>
+        {/* Custom Legend */}
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', width: '100%', mt: 2, px: isMobileView ? 0 : 2, gap: 2 }}>
+          {householdPalette.map((item, index) => (
+            <Box key={index} sx={{ textAlign: 'center', minWidth: '80px', maxWidth: '130px' }}>
+              <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
+                <span style={{ color: item.color, fontSize: '1rem' }}>●</span>
+                <Typography variant="body2" sx={{ color: isMobileView ? '#ffffff' : themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
+              </Box>
+            </Box>
+          ))}
+        </Box>
+      </Box>
     </>
   ) : null;
 
@@ -1031,62 +1756,182 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                           Economy
                         </Button>
                       )}
-                      <Button 
-                        variant={activeMobileChart === 'age' ? 'contained' : 'outlined'} 
-                        onClick={() => setActiveMobileChart('age')}
-                        size="small"
-                        sx={{ 
-                          borderRadius: '20px',
-                          color: activeMobileChart === 'age' ? '#fff' : 'rgba(255,255,255,0.7)',
-                          borderColor: 'rgba(255,255,255,0.3)',
-                          bgcolor: activeMobileChart === 'age' ? 'primary.main' : 'transparent',
-                          '&:hover': { bgcolor: activeMobileChart === 'age' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
-                        }}
-                      >
-                        Age
-                      </Button>
-                      <Button 
-                        variant={activeMobileChart === 'ownership' ? 'contained' : 'outlined'} 
-                        onClick={() => setActiveMobileChart('ownership')}
-                        size="small"
-                        sx={{ 
-                          borderRadius: '20px',
-                          color: activeMobileChart === 'ownership' ? '#fff' : 'rgba(255,255,255,0.7)',
-                          borderColor: 'rgba(255,255,255,0.3)',
-                          bgcolor: activeMobileChart === 'ownership' ? 'primary.main' : 'transparent',
-                          '&:hover': { bgcolor: activeMobileChart === 'ownership' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
-                        }}
-                      >
-                        Ownership
-                      </Button>
-                      <Button 
-                        variant={activeMobileChart === 'wall' ? 'contained' : 'outlined'} 
-                        onClick={() => setActiveMobileChart('wall')}
-                        size="small"
-                        sx={{ 
-                          borderRadius: '20px',
-                          color: activeMobileChart === 'wall' ? '#fff' : 'rgba(255,255,255,0.7)',
-                          borderColor: 'rgba(255,255,255,0.3)',
-                          bgcolor: activeMobileChart === 'wall' ? 'primary.main' : 'transparent',
-                          '&:hover': { bgcolor: activeMobileChart === 'wall' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
-                        }}
-                      >
-                        Wall Type
-                      </Button>
-                      <Button 
-                        variant={activeMobileChart === 'unit' ? 'contained' : 'outlined'} 
-                        onClick={() => setActiveMobileChart('unit')}
-                        size="small"
-                        sx={{ 
-                          borderRadius: '20px',
-                          color: activeMobileChart === 'unit' ? '#fff' : 'rgba(255,255,255,0.7)',
-                          borderColor: 'rgba(255,255,255,0.3)',
-                          bgcolor: activeMobileChart === 'unit' ? 'primary.main' : 'transparent',
-                          '&:hover': { bgcolor: activeMobileChart === 'unit' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
-                        }}
-                      >
-                        Unit Type
-                      </Button>
+                      {hasAgeData && (
+                        <Button 
+                          variant={activeMobileChart === 'age' ? 'contained' : 'outlined'} 
+                          onClick={() => setActiveMobileChart('age')}
+                          size="small"
+                          sx={{ 
+                            borderRadius: '20px',
+                            color: activeMobileChart === 'age' ? '#fff' : 'rgba(255,255,255,0.7)',
+                            borderColor: 'rgba(255,255,255,0.3)',
+                            bgcolor: activeMobileChart === 'age' ? 'primary.main' : 'transparent',
+                            '&:hover': { bgcolor: activeMobileChart === 'age' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
+                          }}
+                        >
+                          Age
+                        </Button>
+                      )}
+                      {hasOwnershipData && (
+                        <Button 
+                          variant={activeMobileChart === 'ownership' ? 'contained' : 'outlined'} 
+                          onClick={() => setActiveMobileChart('ownership')}
+                          size="small"
+                          sx={{ 
+                            borderRadius: '20px',
+                            color: activeMobileChart === 'ownership' ? '#fff' : 'rgba(255,255,255,0.7)',
+                            borderColor: 'rgba(255,255,255,0.3)',
+                            bgcolor: activeMobileChart === 'ownership' ? 'primary.main' : 'transparent',
+                            '&:hover': { bgcolor: activeMobileChart === 'ownership' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
+                          }}
+                        >
+                          Ownership
+                        </Button>
+                      )}
+                      {hasWallData && (
+                        <Button 
+                          variant={activeMobileChart === 'wall' ? 'contained' : 'outlined'} 
+                          onClick={() => setActiveMobileChart('wall')}
+                          size="small"
+                          sx={{ 
+                            borderRadius: '20px',
+                            color: activeMobileChart === 'wall' ? '#fff' : 'rgba(255,255,255,0.7)',
+                            borderColor: 'rgba(255,255,255,0.3)',
+                            bgcolor: activeMobileChart === 'wall' ? 'primary.main' : 'transparent',
+                            '&:hover': { bgcolor: activeMobileChart === 'wall' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
+                          }}
+                        >
+                          Wall Type
+                        </Button>
+                      )}
+                      {hasUnitData && (
+                        <Button 
+                          variant={activeMobileChart === 'unit' ? 'contained' : 'outlined'} 
+                          onClick={() => setActiveMobileChart('unit')}
+                          size="small"
+                          sx={{ 
+                            borderRadius: '20px',
+                            color: activeMobileChart === 'unit' ? '#fff' : 'rgba(255,255,255,0.7)',
+                            borderColor: 'rgba(255,255,255,0.3)',
+                            bgcolor: activeMobileChart === 'unit' ? 'primary.main' : 'transparent',
+                            '&:hover': { bgcolor: activeMobileChart === 'unit' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
+                          }}
+                        >
+                          Unit Type
+                        </Button>
+                      )}
+                      {hasToiletData && (
+                        <Button 
+                          variant={activeMobileChart === 'toilet' ? 'contained' : 'outlined'} 
+                          onClick={() => setActiveMobileChart('toilet')}
+                          size="small"
+                          sx={{ 
+                            borderRadius: '20px',
+                            color: activeMobileChart === 'toilet' ? '#fff' : 'rgba(255,255,255,0.7)',
+                            borderColor: 'rgba(255,255,255,0.3)',
+                            bgcolor: activeMobileChart === 'toilet' ? 'primary.main' : 'transparent',
+                            '&:hover': { bgcolor: activeMobileChart === 'toilet' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
+                          }}
+                        >
+                          Toilet
+                        </Button>
+                      )}
+                      {hasWaterData && (
+                        <Button 
+                          variant={activeMobileChart === 'water' ? 'contained' : 'outlined'} 
+                          onClick={() => setActiveMobileChart('water')}
+                          size="small"
+                          sx={{ 
+                            borderRadius: '20px',
+                            color: activeMobileChart === 'water' ? '#fff' : 'rgba(255,255,255,0.7)',
+                            borderColor: 'rgba(255,255,255,0.3)',
+                            bgcolor: activeMobileChart === 'water' ? 'primary.main' : 'transparent',
+                            '&:hover': { bgcolor: activeMobileChart === 'water' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
+                          }}
+                        >
+                          Water
+                        </Button>
+                      )}
+                      {hasWasteData && (
+                        <Button 
+                          variant={activeMobileChart === 'waste' ? 'contained' : 'outlined'} 
+                          onClick={() => setActiveMobileChart('waste')}
+                          size="small"
+                          sx={{ 
+                            borderRadius: '20px',
+                            color: activeMobileChart === 'waste' ? '#fff' : 'rgba(255,255,255,0.7)',
+                            borderColor: 'rgba(255,255,255,0.3)',
+                            bgcolor: activeMobileChart === 'waste' ? 'primary.main' : 'transparent',
+                            '&:hover': { bgcolor: activeMobileChart === 'waste' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
+                          }}
+                        >
+                          Waste
+                        </Button>
+                      )}
+                      {hasRoomsData && (
+                        <Button 
+                          variant={activeMobileChart === 'rooms' ? 'contained' : 'outlined'} 
+                          onClick={() => setActiveMobileChart('rooms')}
+                          size="small"
+                          sx={{ 
+                            borderRadius: '20px',
+                            color: activeMobileChart === 'rooms' ? '#fff' : 'rgba(255,255,255,0.7)',
+                            borderColor: 'rgba(255,255,255,0.3)',
+                            bgcolor: activeMobileChart === 'rooms' ? 'primary.main' : 'transparent',
+                            '&:hover': { bgcolor: activeMobileChart === 'rooms' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
+                          }}
+                        >
+                          Rooms
+                        </Button>
+                      )}
+                      {hasRoofData && (
+                        <Button 
+                          variant={activeMobileChart === 'roof' ? 'contained' : 'outlined'} 
+                          onClick={() => setActiveMobileChart('roof')}
+                          size="small"
+                          sx={{ 
+                            borderRadius: '20px',
+                            color: activeMobileChart === 'roof' ? '#fff' : 'rgba(255,255,255,0.7)',
+                            borderColor: 'rgba(255,255,255,0.3)',
+                            bgcolor: activeMobileChart === 'roof' ? 'primary.main' : 'transparent',
+                            '&:hover': { bgcolor: activeMobileChart === 'roof' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
+                          }}
+                        >
+                          Roof Type
+                        </Button>
+                      )}
+                      {hasReligionData && (
+                        <Button 
+                          variant={activeMobileChart === 'religion' ? 'contained' : 'outlined'} 
+                          onClick={() => setActiveMobileChart('religion')}
+                          size="small"
+                          sx={{ 
+                            borderRadius: '20px',
+                            color: activeMobileChart === 'religion' ? '#fff' : 'rgba(255,255,255,0.7)',
+                            borderColor: 'rgba(255,255,255,0.3)',
+                            bgcolor: activeMobileChart === 'religion' ? 'primary.main' : 'transparent',
+                            '&:hover': { bgcolor: activeMobileChart === 'religion' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
+                          }}
+                        >
+                          Religion
+                        </Button>
+                      )}
+                      {hasHouseholdData && (
+                        <Button 
+                          variant={activeMobileChart === 'household' ? 'contained' : 'outlined'} 
+                          onClick={() => setActiveMobileChart('household')}
+                          size="small"
+                          sx={{ 
+                            borderRadius: '20px',
+                            color: activeMobileChart === 'household' ? '#fff' : 'rgba(255,255,255,0.7)',
+                            borderColor: 'rgba(255,255,255,0.3)',
+                            bgcolor: activeMobileChart === 'household' ? 'primary.main' : 'transparent',
+                            '&:hover': { bgcolor: activeMobileChart === 'household' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
+                          }}
+                        >
+                          Household
+                        </Button>
+                      )}
                     </Box>
                   )}
 
@@ -1140,6 +1985,48 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                       {gnUnitChartUI}
                     </Box>
                   )}
+
+                  {isMobileView && activeMobileChart === 'toilet' && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                      {gnToiletChartUI}
+                    </Box>
+                  )}
+
+                  {isMobileView && activeMobileChart === 'water' && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                      {gnWaterChartUI}
+                    </Box>
+                  )}
+
+                  {isMobileView && activeMobileChart === 'waste' && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                      {gnWasteChartUI}
+                    </Box>
+                  )}
+
+                  {isMobileView && activeMobileChart === 'rooms' && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                      {gnRoomsChartUI}
+                    </Box>
+                  )}
+
+                  {isMobileView && activeMobileChart === 'roof' && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                      {gnRoofChartUI}
+                    </Box>
+                  )}
+
+                  {isMobileView && activeMobileChart === 'religion' && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                      {gnReligionChartUI}
+                    </Box>
+                  )}
+
+                  {isMobileView && activeMobileChart === 'household' && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                      {gnHouseholdChartUI}
+                    </Box>
+                  )}
                 </Box>
               )}
             </Grid>
@@ -1154,6 +2041,12 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             data={populationData || undefined}
             location_name={displayGN || displayCity || displayDistrict}
           />
+
+          {gnReligionChartUI && (
+            <Box sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              {gnReligionChartUI}
+            </Box>
+          )}
           
           <Custom3DBarChart 
             gn_id={selectedGN} 
@@ -1162,22 +2055,64 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             location_name={displayGN || displayCity || displayDistrict}
           />
           
-          <Box sx={{ pb: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            {gnEconomyChartUI}
-          </Box>
+          {gnEconomyChartUI && (
+            <Box sx={{ pb: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              {gnEconomyChartUI}
+            </Box>
+          )}
 
           <HousingOwnershipChart 
             data={housingOwnershipData || undefined}
             location_name={displayGN || displayCity || displayDistrict}
           />
 
-          <Box sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            {gnWallChartUI}
-          </Box>
+          {gnWallChartUI && (
+            <Box sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              {gnWallChartUI}
+            </Box>
+          )}
 
-          <Box sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            {gnUnitChartUI}
-          </Box>
+          {gnUnitChartUI && (
+            <Box sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              {gnUnitChartUI}
+            </Box>
+          )}
+
+          {gnToiletChartUI && (
+            <Box sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              {gnToiletChartUI}
+            </Box>
+          )}
+
+          {gnRoomsChartUI && (
+            <Box sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              {gnRoomsChartUI}
+            </Box>
+          )}
+
+          {gnWaterChartUI && (
+            <Box sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              {gnWaterChartUI}
+            </Box>
+          )}
+
+          {gnWasteChartUI && (
+            <Box sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              {gnWasteChartUI}
+            </Box>
+          )}
+
+          {gnRoofChartUI && (
+            <Box sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              {gnRoofChartUI}
+            </Box>
+          )}
+
+          {gnHouseholdChartUI && (
+            <Box sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              {gnHouseholdChartUI}
+            </Box>
+          )}
         </>
       )}
 

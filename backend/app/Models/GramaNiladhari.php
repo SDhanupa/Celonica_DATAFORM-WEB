@@ -85,4 +85,39 @@ class GramaNiladhari extends Model
     {
         return $this->hasOne(HousingUnitType::class, 'gn_id', 'id');
     }
+
+    public function toiletFacility()
+    {
+        return $this->hasOne(ToiletFacility::class, 'gn_id', 'id');
+    }
+
+    public function drinkingWaterSource()
+    {
+        return $this->hasOne(DrinkingWaterSource::class, 'gn_id', 'id');
+    }
+
+    public function solidWasteDisposal()
+    {
+        return $this->hasOne(SolidWasteDisposal::class, 'gn_id', 'id');
+    }
+
+    public function roomsInHousingUnit()
+    {
+        return $this->hasOne(RoomsInHousingUnit::class, 'grama_niladhari_id', 'id');
+    }
+
+    public function housingRoofType()
+    {
+        return $this->hasOne(HousingRoofType::class, 'grama_niladhari_id', 'id');
+    }
+
+    public function religiousAffiliation()
+    {
+        return $this->hasOne(ReligiousAffiliation::class, 'grama_niladhari_id', 'id');
+    }
+
+    public function householdHeadRelationship()
+    {
+        return $this->hasOne(HouseholdHeadRelationship::class, 'grama_niladhari_id', 'id');
+    }
 }

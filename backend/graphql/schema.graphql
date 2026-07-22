@@ -364,6 +364,85 @@ type GramaNiladhari {
     housingOwnershipStatus: HousingOwnershipStatus @hasOne
     housingWallType: HousingWallType @hasOne
     housingUnitType: HousingUnitType @hasOne
+    toiletFacility: ToiletFacility @hasOne
+    drinkingWaterSource: DrinkingWaterSource @hasOne
+    solidWasteDisposal: SolidWasteDisposal @hasOne
+    roomsInHousingUnit: RoomsInHousingUnit @hasOne
+    housingRoofType: HousingRoofType @hasOne
+    religiousAffiliation: ReligiousAffiliation @hasOne
+    householdHeadRelationship: HouseholdHeadRelationship @hasOne
+}
+
+type HouseholdHeadRelationship {
+    id: ID!
+    gn_id: ID @rename(attribute: "grama_niladhari_id")
+    gn_name: String
+    total_population: Int
+    head: Int
+    wife_husband: Int
+    son_daughter: Int
+    son_daughter_in_law: Int
+    grandchild_great_grandchild: Int
+    parent_of_head_or_spouse: Int
+    other_relative: Int
+    domestic_employee: Int
+    boarder: Int
+    non_relative: Int
+    clergy: Int
+    not_stated: Int
+}
+
+type SolidWasteDisposal {
+    id: ID!
+    gn_id: ID
+    gn_name: String
+    ds_division: String
+    district: String
+    province: String
+    total_households: Int
+    collected_by_local_authorities: Int
+    occupants_burn: Int
+    occupants_bury: Int
+    occupants_composting: Int
+    dispose_into_environment: Int
+    other: Int
+}
+
+type DrinkingWaterSource {
+    id: ID!
+    gn_id: ID
+    gn_name: String
+    ds_division: String
+    district: String
+    province: String
+    total_households: Int
+    protected_well_within: Int
+    protected_well_outside: Int
+    unprotected_well: Int
+    tap_within_unit: Int
+    tap_within_premises_outside: Int
+    tap_outside_premises: Int
+    rural_water_projects: Int
+    tube_well: Int
+    bowser: Int
+    river_tank_stream: Int
+    other: Int
+}
+
+type ToiletFacility {
+    id: ID!
+    gn_id: ID
+    gn_name: String
+    ds_division: String
+    district: String
+    province: String
+    total_households: Int
+    water_seal_piped_sewer: Int
+    water_seal_septic_tank: Int
+    pour_flush: Int
+    direct_pit: Int
+    other: Int
+    not_using: Int
 }
 
 type HousingUnitType {
@@ -396,6 +475,50 @@ type HousingWallType {
     cadjan_palmyrah: Int
     plank_metal_sheet: Int
     other: Int
+}
+
+type ReligiousAffiliation {
+    id: ID!
+    gn_id: ID @rename(attribute: "grama_niladhari_id")
+    gn_name: String
+    total_population: Int
+    buddhist: Int
+    hindu: Int
+    islam: Int
+    roman_catholic: Int
+    other_christian: Int
+    other: Int
+}
+
+type HousingRoofType {
+    id: ID!
+    gn_id: ID @rename(attribute: "grama_niladhari_id")
+    gn_name: String
+    total_housing_units: Int
+    tile: Int
+    asbestos: Int
+    concrete: Int
+    zink_aluminium_sheet: Int
+    metal_sheet: Int
+    cadjan_palmyrah_straw: Int
+    other: Int
+}
+
+type RoomsInHousingUnit {
+    id: ID!
+    gn_id: ID @rename(attribute: "grama_niladhari_id")
+    gn_name: String
+    total_housing_units: Int
+    room_1: Int
+    rooms_2: Int
+    rooms_3: Int
+    rooms_4: Int
+    rooms_5: Int
+    rooms_6: Int
+    rooms_7: Int
+    rooms_8: Int
+    rooms_9: Int
+    rooms_10_and_above: Int
 }
 
 type HousingOwnershipStatus {

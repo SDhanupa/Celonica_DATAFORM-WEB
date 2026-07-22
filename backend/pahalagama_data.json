@@ -1,0 +1,62 @@
+{
+  "Economy": "[Errno 2] No such file or directory: '../GN Division - Economic Activity.csv.xlsx'",
+  "Ownership": "[Errno 2] No such file or directory: '../GN Division - Housing Ownership Status.csv.xlsx'",
+  "Wall": "[Errno 2] No such file or directory: '../GN Division - Housing Wall Type.csv.xlsx'",
+  "Unit": {
+    "GN Division": "Pahalagama",
+    "DS Division": "Thambuttegama",
+    "District": "Anuradhapura",
+    "Province": "North Central",
+    "Total Housing units": 419,
+    "Permanent": 334,
+    "Semi-permanent": 85,
+    "Improvised": 0,
+    "Unclassified": 0
+  },
+  "Toilet": {
+    "GN Division": "Pahalagama",
+    "DS Division": "Thambuttegama",
+    "District": "Anuradhapura",
+    "Province": "North Central",
+    "Total Households": 425,
+    "Water seal and connected to a piped sewer system": 416,
+    "Water seal and connected to a septic tank": 2,
+    "Pour flush toilet (Not water seal)": 3,
+    "Direct pit": 4,
+    "Other": 0,
+    "Not using a toilet": 0
+  },
+  "Water": {
+    "GN Division": "Pahalagama",
+    "DS Division": "Thambuttegama",
+    "District": "Anuradhapura",
+    "Province": "North Central",
+    "Total Households": 425,
+    "Protected well within premises": 58,
+    "Protected well outside premises": 148,
+    "Unprotected well": 4,
+    "Tap within unit (main line)": 5,
+    "Tap within premises but outside unit (main line)": 18,
+    "Tap outside premises (main line)": 3,
+    "Rural water projects": 189,
+    "Tube well": 0,
+    "Bowser": 0,
+    "River/Tank/Strea": 0,
+    "Unnamed: 15": 0,
+    "Unnamed: 16": 0,
+    "Unnamed: 17": 0
+  },
+  "Waste": {
+    "GN Division": "Pahalagama",
+    "DS Division": "Thambuttegama",
+    "District": "Anuradhapura",
+    "Province": "North Central",
+    "Total Households": 425,
+    "Collected by local authorities": 6,
+    "Occupants burn": 377,
+    "Occupants bury": 31,
+    "Occupants composting solid waste": 9,
+    "Occupants dispose solid waste into Road/River/Canal/Sea/Creek/Forest etc": 0,
+    "Other": 2
+  }
+}
