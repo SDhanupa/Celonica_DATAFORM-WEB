@@ -20,6 +20,14 @@ Route::get('/health', fn() => response()->json(['status' => 'ok', 'service' => '
 // Image Upload
 Route::post('/upload-category-image', [ImageUploadController::class, 'upload']);
 
+// Logs
+Route::get('/logs', function () {
+    $logFile = storage_path('logs/laravel.log');
+    if (!file_exists($logFile)) return 'No log file found.';
+    $lines = file($logFile);
+    return implode('', array_slice($lines, -100));
+});
+
 // Serve images through PHP since frontend Nginx container doesn't share the volume
 Route::get('/uploads/{path}', function($path) {
     $file = public_path('uploads/' . $path);
