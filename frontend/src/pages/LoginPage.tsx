@@ -103,7 +103,7 @@ const LoginPage: React.FC = () => {
                     WebkitTextFillColor: 'transparent',
                   }}
                 >
-                  Celonica
+                  Ceylonica
                 </Typography>
               </Box>
 

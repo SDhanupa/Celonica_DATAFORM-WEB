@@ -84,7 +84,7 @@ export default function OnboardingModal({ open, onComplete }: OnboardingModalPro
     }}>
       <DialogTitle>
         <Typography variant="h5" sx={{ fontWeight: 600, color: '#4F46E5', mb: 1 }}>
-          Welcome to Celonica!
+          Welcome to Ceylonica!
         </Typography>
         <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
           Please complete your profile to continue. All fields are required.

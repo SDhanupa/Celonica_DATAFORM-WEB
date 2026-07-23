@@ -1,4 +1,4 @@
-# Celonica Admin Panel — Quick Start Guide
+# Ceylonica Admin Panel — Quick Start Guide
 
 ## Prerequisites
 - Docker Desktop (running)

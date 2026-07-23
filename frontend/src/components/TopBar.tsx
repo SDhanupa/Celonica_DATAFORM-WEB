@@ -61,7 +61,7 @@ const TopBar: React.FC = () => {
           {/* Removed dynamic page title, adding Nav Links instead for non-admins */}
           {!isAdmin && (
             <Typography variant="h6" sx={{ fontWeight: 600, color: '#fff', mr: 4 }}>
-              Celonica
+              Ceylonica
             </Typography>
           )}
           {!isAdmin && (

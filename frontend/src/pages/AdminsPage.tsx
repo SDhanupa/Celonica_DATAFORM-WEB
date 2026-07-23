@@ -41,9 +41,9 @@ import { REGISTER_ADMIN, UPDATE_ADMIN_ROLE, DEACTIVATE_ADMIN, ACTIVATE_ADMIN } f
 
 // Fallback mock data in case backend is not connected yet
 const MOCK_ADMINS = [
-  { id: '1', name: 'Super Admin', email: 'superadmin@celonica.com', role: 'SUPER_ADMIN', isActive: true, keycloakSub: 'kc-001', lastLoginAt: new Date().toISOString(), createdAt: new Date().toISOString() },
-  { id: '2', name: 'John Doe', email: 'john@celonica.com', role: 'ADMIN', isActive: true, keycloakSub: 'kc-002', lastLoginAt: null, createdAt: new Date().toISOString() },
-  { id: '3', name: 'Jane Smith', email: 'jane@celonica.com', role: 'MODERATOR', isActive: false, keycloakSub: 'kc-003', lastLoginAt: null, createdAt: new Date().toISOString() },
+  { id: '1', name: 'Super Admin', email: 'superadmin@ceylonica.com', role: 'SUPER_ADMIN', isActive: true, keycloakSub: 'kc-001', lastLoginAt: new Date().toISOString(), createdAt: new Date().toISOString() },
+  { id: '2', name: 'John Doe', email: 'john@ceylonica.com', role: 'ADMIN', isActive: true, keycloakSub: 'kc-002', lastLoginAt: null, createdAt: new Date().toISOString() },
+  { id: '3', name: 'Jane Smith', email: 'jane@ceylonica.com', role: 'MODERATOR', isActive: false, keycloakSub: 'kc-003', lastLoginAt: null, createdAt: new Date().toISOString() },
 ];
 
 const roleConfig: Record<string, { label: string; color: 'primary' | 'success' | 'warning' }> = {

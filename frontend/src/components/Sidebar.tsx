@@ -125,7 +125,7 @@ const Sidebar: React.FC = () => {
                 lineHeight: 1,
               }}
             >
-              Celonica
+              Ceylonica
             </Typography>
           </Box>
         )}

@@ -14,13 +14,13 @@ return [
     // Falls back to base_url if not set (for local dev)
     'public_url' => env('KEYCLOAK_PUBLIC_URL', env('KEYCLOAK_BASE_URL', 'http://localhost:8080')),
 
-    'realm'     => env('KEYCLOAK_REALM', 'celonica-admin'),
-    'client_id' => env('KEYCLOAK_CLIENT_ID', 'celonica-frontend'),
+    'realm'     => env('KEYCLOAK_REALM', 'ceylonica-admin'),
+    'client_id' => env('KEYCLOAK_CLIENT_ID', 'ceylonica-frontend'),
 
     // JWKS endpoint (uses internal URL for fetching)
     'jwks_url'  => env('KEYCLOAK_BASE_URL', 'http://localhost:8080')
         . '/realms/'
-        . env('KEYCLOAK_REALM', 'celonica-admin')
+        . env('KEYCLOAK_REALM', 'ceylonica-admin')
         . '/protocol/openid-connect/certs',
 
     // Admin API Credentials

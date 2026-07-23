@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ImageUploadController;
 
 // Health check
-Route::get('/health', fn() => response()->json(['status' => 'ok', 'service' => 'Celonica Admin API']));
+Route::get('/health', fn() => response()->json(['status' => 'ok', 'service' => 'Ceylonica Admin API']));
 
 // Image Upload
 Route::post('/upload-category-image', [ImageUploadController::class, 'upload']);

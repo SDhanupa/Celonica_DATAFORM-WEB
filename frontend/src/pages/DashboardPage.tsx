@@ -260,7 +260,7 @@ const DashboardPage: React.FC = () => {
                     Admin Account
                   </Typography>
                   <Typography variant="body2" color="text.primary" sx={{ fontFamily: 'monospace' }}>
-                    Email: admin@celonica.com
+                    Email: admin@ceylonica.com
                   </Typography>
                   <Typography variant="body2" color="text.primary" sx={{ fontFamily: 'monospace' }}>
                     Pass: Password@123
@@ -271,7 +271,7 @@ const DashboardPage: React.FC = () => {
                     Normal User Account
                   </Typography>
                   <Typography variant="body2" color="text.primary" sx={{ fontFamily: 'monospace' }}>
-                    Email: user@celonica.com
+                    Email: user@ceylonica.com
                   </Typography>
                   <Typography variant="body2" color="text.primary" sx={{ fontFamily: 'monospace' }}>
                     Pass: Password@123
