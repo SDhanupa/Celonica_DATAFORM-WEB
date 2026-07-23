@@ -25,8 +25,8 @@ class ImageUploadController extends Controller
             
             $image->move($destinationPath, $name);
 
-            // Construct full URL pointing to the backend
-            $imageUrl = url('/uploads/categories/' . $name);
+            // Construct full URL pointing to the backend's new API route
+            $imageUrl = url('/api/uploads/categories/' . $name);
 
             return response()->json([
                 'success' => true,

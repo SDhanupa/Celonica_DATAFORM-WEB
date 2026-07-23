@@ -19,3 +19,12 @@ Route::get('/health', fn() => response()->json(['status' => 'ok', 'service' => '
 
 // Image Upload
 Route::post('/upload-category-image', [ImageUploadController::class, 'upload']);
+
+// Serve images through PHP since frontend Nginx container doesn't share the volume
+Route::get('/uploads/{path}', function($path) {
+    $file = public_path('uploads/' . $path);
+    if (file_exists($file)) {
+        return response()->file($file);
+    }
+    abort(404);
+})->where('path', '.*');
