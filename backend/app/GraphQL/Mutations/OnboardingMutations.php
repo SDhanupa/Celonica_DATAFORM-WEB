@@ -14,9 +14,9 @@ class OnboardingMutations
      * @param  null  $_
      * @param  array<string, mixed>  $args
      */
-    public function completeUserOnboarding($_, array $args, array $context)
+    public function completeUserOnboarding($_, array $args)
     {
-        $request = $context['request'] ?? request();
+        $request = request();
         $sub = $request->get('keycloak_sub');
 
         if (!$sub) {
