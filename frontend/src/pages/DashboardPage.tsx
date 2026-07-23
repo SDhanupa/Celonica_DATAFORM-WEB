@@ -108,13 +108,25 @@ const DashboardPage: React.FC = () => {
   const needsOnboarding = data?.needsOnboarding === true;
   const adminName = data?.me?.name || userInfo?.name || 'User';
   const roles = userInfo?.realm_roles || [];
-  const isAdmin = roles.includes('super_admin') || roles.includes('admin');
+  const isAdmin = roles.includes('super_admin') || roles.includes('admin') || roles.includes('moderator');
+
+  // DEBUG: Show token info (can be removed later)
+  const debugBanner = userInfo ? (
+    <Box sx={{ background: '#1a1a2e', border: '1px solid #6c63ff', borderRadius: 2, p: 2, m: 2, fontFamily: 'monospace', fontSize: '12px', color: '#ccc', position: 'fixed', bottom: 10, right: 10, zIndex: 9999, maxWidth: 400, opacity: 0.95 }}>
+      <Box sx={{ color: '#6c63ff', fontWeight: 'bold', mb: 1 }}>🔍 DEBUG (Token Roles)</Box>
+      <Box>Name: {userInfo?.name || 'N/A'}</Box>
+      <Box>Email: {userInfo?.email || 'N/A'}</Box>
+      <Box>Roles: [{roles.join(', ')}]</Box>
+      <Box>isAdmin: {isAdmin ? '✅ YES' : '❌ NO'}</Box>
+    </Box>
+  ) : null;
 
   if (!isAdmin) {
     return (
       <Box>
         <TopNavbar />
         <UserDashboard user={data?.me || data?.meUser || userInfo} />
+        {debugBanner}
       </Box>
     );
   }
