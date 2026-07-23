@@ -41,7 +41,7 @@ class KeycloakAuthGuard
 
         try {
             $decoded = $this->decodeToken($token);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json(['error' => 'Unauthorized: ' . $e->getMessage()], 401);
         }
 
