@@ -8,7 +8,7 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class CategoryMutations
 {
-    public function createCategory($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    public function createCategory($_, array $args)
     {
         // Check for duplicate name
         $nameEn = $args['name_en'] ?? '';
@@ -24,14 +24,14 @@ class CategoryMutations
         return Category::create($args);
     }
 
-    public function updateCategory($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    public function updateCategory($_, array $args)
     {
         $category = Category::findOrFail($args['id']);
         $category->update($args);
         return $category;
     }
 
-    public function deleteCategory($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    public function deleteCategory($_, array $args)
     {
         $category = Category::findOrFail($args['id']);
         $category->delete();
