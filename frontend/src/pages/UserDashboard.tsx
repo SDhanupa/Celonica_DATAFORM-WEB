@@ -1357,7 +1357,34 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         PaperProps={{ sx: { borderRadius: 2, minWidth: { xs: '90%', sm: 400 }, position: 'relative' } }}
         slotProps={{ backdrop: { sx: { backdropFilter: 'blur(10px)', bgcolor: 'rgba(0,0,0,0.8)' } } }}
       >
-        <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold' }}>
+        <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold', position: 'relative' }}>
+          {/* Language Changer inside Modal */}
+          <Box
+            onClick={cycleLanguage}
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: 16,
+              transform: 'translateY(-50%)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 36,
+              height: 36,
+              borderRadius: '50%',
+              bgcolor: 'rgba(0,0,0,0.05)',
+              transition: 'background-color 0.2s',
+              fontFamily: "'Inter', sans-serif",
+              fontWeight: 700,
+              fontSize: '0.85rem',
+              color: themeColors.primary,
+              textTransform: 'uppercase',
+              '&:hover': { bgcolor: 'rgba(0,0,0,0.1)' }
+            }}
+          >
+            {language}
+          </Box>
           {!showManualForm
             ? (language === 'en' ? 'Your Location' : language === 'si' ? 'ඔබගේ ස්ථානය' : 'உங்கள் இடம்')
             : (language === 'en' ? 'Select Your Location' : language === 'si' ? 'ස්ථානය තෝරන්න' : 'உங்கள் இடத்தை தேர்வு செய்யவும்')
