@@ -25,8 +25,8 @@ class ImageUploadController extends Controller
             
             $image->move($destinationPath, $name);
 
-            // Construct full URL pointing to the backend's new API route
-            $imageUrl = url('/api/uploads/categories/' . $name);
+            // Construct relative URL so the browser automatically uses the correct domain
+            $imageUrl = '/api/uploads/categories/' . $name;
 
             return response()->json([
                 'success' => true,
