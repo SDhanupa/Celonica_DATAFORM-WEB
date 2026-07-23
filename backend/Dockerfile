@@ -36,4 +36,4 @@ RUN chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
 # Expose port 9000 and start php-fpm server
 EXPOSE 9000
-CMD ["sh", "-c", "composer install --optimize-autoloader --no-dev && php artisan optimize && php-fpm"]
+CMD ["sh", "-c", "echo 'memory_limit=512M' > /usr/local/etc/php/conf.d/memory-limit.ini && composer install --optimize-autoloader --no-dev && php artisan optimize && php-fpm"]
