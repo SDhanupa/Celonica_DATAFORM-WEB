@@ -70,11 +70,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const login = () => {
-    keycloak.login({ redirectUri: window.location.origin + '/' });
+    keycloak.login({ redirectUri: window.location.origin + '/', prompt: 'login' });
   };
 
   const register = () => {
-    keycloak.register({ redirectUri: window.location.origin + '/' });
+    keycloak.register({ redirectUri: window.location.origin + '/', prompt: 'login' });
   };
 
   return (

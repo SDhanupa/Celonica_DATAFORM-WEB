@@ -1430,8 +1430,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                 <Autocomplete
                   options={districtsData?.pDistricts || []}
                   getOptionLabel={(option: any) => {
+                    if (!option) return '';
                     const name = language === 'en' ? option.admin2NameEn : language === 'si' ? option.admin2NameSi : option.admin2NameTa;
-                    return name || option.admin2NameEn || '';
+                    return name || option.admin2NameEn || option.id || '';
                   }}
                   value={districtsData?.pDistricts?.find((d: any) => d.id === selectedDistrict) || null}
                   onChange={(event, newValue) => {
@@ -1462,6 +1463,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                 <Autocomplete
                   options={uniqueCities}
                   getOptionLabel={(option: any) => {
+                    if (!option) return '';
                     const name = language === 'en' ? option.dsEn : language === 'si' ? option.dsSi : option.dsTa;
                     return name || option.dsEn || option.divisionalSecretariatCode || '';
                   }}
@@ -1493,6 +1495,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                 <Autocomplete
                   options={filteredGNs}
                   getOptionLabel={(option: any) => {
+                    if (!option) return '';
                     const name = language === 'en' ? option.nameEn : language === 'si' ? option.nameSi : option.nameTa;
                     return name || option.nameEn || option.gnName || option.code || '';
                   }}
