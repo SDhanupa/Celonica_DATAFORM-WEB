@@ -31,8 +31,9 @@ COPY . /var/www
 RUN composer install --optimize-autoloader --no-dev
 
 # Ensure permissions
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
-RUN chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+RUN mkdir -p /var/www/public/uploads
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache /var/www/public/uploads
+RUN chmod -R 775 /var/www/storage /var/www/bootstrap/cache /var/www/public/uploads
 
 # Expose port 9000 and start php-fpm server
 EXPOSE 9000
