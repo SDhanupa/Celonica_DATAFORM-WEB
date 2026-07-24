@@ -192,6 +192,8 @@ export const CREATE_CATEGORY = gql`
     $slug: String!
     $nameEn: String!
     $nameSi: String!
+    $descriptionEn: String
+    $descriptionSi: String
     $imagePath: String
     $sortOrder: Int
   ) {
@@ -200,6 +202,8 @@ export const CREATE_CATEGORY = gql`
       slug: $slug
       nameEn: $nameEn
       nameSi: $nameSi
+      descriptionEn: $descriptionEn
+      descriptionSi: $descriptionSi
       imagePath: $imagePath
       sortOrder: $sortOrder
     ) {
@@ -219,6 +223,8 @@ export const UPDATE_CATEGORY = gql`
     $slug: String
     $nameEn: String
     $nameSi: String
+    $descriptionEn: String
+    $descriptionSi: String
     $imagePath: String
     $sortOrder: Int
   ) {
@@ -227,6 +233,8 @@ export const UPDATE_CATEGORY = gql`
       slug: $slug
       nameEn: $nameEn
       nameSi: $nameSi
+      descriptionEn: $descriptionEn
+      descriptionSi: $descriptionSi
       imagePath: $imagePath
       sortOrder: $sortOrder
     ) {

@@ -10,7 +10,8 @@ import {
   Button,
   IconButton,
   CircularProgress,
-  LinearProgress
+  LinearProgress,
+  Tooltip
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@apollo/client';
@@ -19,6 +20,7 @@ import { DELETE_CATEGORY } from '../graphql/mutations';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import CategoryDialog from '../components/CategoryDialog';
 import { useAuth } from '../auth/AuthProvider';
 
@@ -108,6 +110,19 @@ const CategoriesPage: React.FC = () => {
                 }
               }}
             >
+              {(cat.descriptionEn || cat.descriptionSi) && (
+                <Box sx={{ position: 'absolute', top: 8, left: 8, zIndex: 1 }}>
+                  <Tooltip 
+                    title={lang === 'en' ? (cat.descriptionEn || cat.descriptionSi) : (cat.descriptionSi || cat.descriptionEn)}
+                    arrow
+                    placement="top"
+                  >
+                    <IconButton size="small" sx={{ bgcolor: 'rgba(255,255,255,0.8)' }}>
+                      <HelpOutlineIcon fontSize="small" color="info" />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              )}
               {isSuperAdmin && (
                 <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1, display: 'flex', gap: 0.5 }}>
                   <IconButton size="small" sx={{ bgcolor: 'rgba(255,255,255,0.8)' }} onClick={(e) => handleEdit(cat, e)}>

@@ -133,6 +133,8 @@ export const GET_CATEGORIES = gql`
       slug
       nameEn
       nameSi
+      descriptionEn
+      descriptionSi
       imagePath
       sortOrder
       progress
@@ -173,6 +175,8 @@ export const GET_CATEGORY_BY_SLUG = gql`
         slug
         nameEn
         nameSi
+        descriptionEn
+        descriptionSi
         imagePath
         sortOrder
         progress
