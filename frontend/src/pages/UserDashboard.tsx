@@ -1471,7 +1471,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="District"
+                      label={language === 'en' ? 'District' : language === 'si' ? 'දිස්ත්‍රික්කය' : 'மாவட்டம்'}
                       InputProps={{
                         ...params.InputProps,
                         endAdornment: (
@@ -1534,7 +1534,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="Grama Niladhari (GN)"
+                      label={language === 'en' ? 'Grama Niladhari (GN)' : language === 'si' ? 'ග්‍රාම නිලධාරී (GN)' : 'கிராம உத்தியோகத்தர் (GN)'}
                       InputProps={{
                         ...params.InputProps,
                         endAdornment: (
