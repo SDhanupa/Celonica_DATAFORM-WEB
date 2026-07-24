@@ -11,6 +11,7 @@ interface HousingOwnershipChartProps {
     other?: number;
   };
   location_name?: string;
+  language?: 'en' | 'si' | 'ta';
 }
 
 // Colors for the 6 categories
@@ -32,7 +33,7 @@ const categoryLabels = [
   { key: 'other', label: 'Other' },
 ];
 
-export default function HousingOwnershipChart({ data, location_name }: HousingOwnershipChartProps) {
+export default function HousingOwnershipChart({ data, location_name, language = 'en' }: HousingOwnershipChartProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 

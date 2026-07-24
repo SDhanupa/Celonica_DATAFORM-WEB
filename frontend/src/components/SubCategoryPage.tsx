@@ -15,7 +15,11 @@ import {
   TableHead,
   TableRow,
   Paper,
-  LinearProgress
+  LinearProgress,
+  Card,
+  CardActionArea,
+  CardMedia,
+  CardContent
 } from '@mui/material';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useQuery, useMutation } from '@apollo/client';
@@ -298,57 +302,72 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
       <Grid container spacing={3} justifyContent="center">
         {categories.map((cat: any) => (
           <Grid item xs={12} sm={6} md={4} lg={3} key={cat.id}>
-            <Box sx={{ position: 'relative' }}>
-              {isSuperAdmin && (
-                <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1, display: 'flex', gap: 0.5 }}>
-                  <IconButton size="small" sx={{ bgcolor: 'rgba(255,255,255,0.8)' }} onClick={(e) => handleEdit(cat, e)}>
-                    <EditIcon fontSize="small" color="primary" />
-                  </IconButton>
-                  <IconButton size="small" sx={{ bgcolor: 'rgba(255,255,255,0.8)' }} onClick={(e) => handleDelete(cat.id, e)}>
-                    <DeleteIcon fontSize="small" color="error" />
-                  </IconButton>
-                </Box>
-              )}
-              <Button
-                variant="outlined"
-                fullWidth
-                onClick={() => {
-                   const currentPath = window.location.pathname;
-                   navigate(`${currentPath}/${cat.slug}`);
-                }}
-                sx={{
-                  height: 100,
+            <Card 
+                elevation={0}
+                sx={{ 
+                  height: '100%',
                   borderRadius: 4,
                   border: '1px solid #e0e0e0',
-                  backgroundColor: '#fff',
-                  color: 'text.primary',
-                  fontSize: '1rem',
-                  fontWeight: 500,
-                  display: 'flex',
-                  flexDirection: 'column',
                   transition: 'all 0.3s ease-in-out',
-                  overflow: 'hidden',
+                  position: 'relative',
                   '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: '0 8px 16px rgba(0,0,0,0.08)',
+                    transform: 'translateY(-6px)',
+                    boxShadow: '0 10px 20px rgba(0,0,0,0.08)',
                     borderColor: 'primary.main',
-                    backgroundColor: '#f8f9fa',
                   }
                 }}
               >
-                <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {lang === 'en' ? cat.nameEn : cat.nameSi}
-                </Box>
-                {/* Progress bar on category buttons */}
-                {cat.progress !== undefined && !isAdmin && (
-                  <LinearProgress 
-                    variant="determinate" 
-                    value={cat.progress} 
-                    sx={{ width: '100%', height: 6, '& .MuiLinearProgress-bar': { backgroundColor: '#FFD700' } }} 
-                  />
+                {isSuperAdmin && (
+                  <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1, display: 'flex', gap: 0.5 }}>
+                    <IconButton size="small" sx={{ bgcolor: 'rgba(255,255,255,0.8)' }} onClick={(e) => handleEdit(cat, e)}>
+                      <EditIcon fontSize="small" color="primary" />
+                    </IconButton>
+                    <IconButton size="small" sx={{ bgcolor: 'rgba(255,255,255,0.8)' }} onClick={(e) => handleDelete(cat.id, e)}>
+                      <DeleteIcon fontSize="small" color="error" />
+                    </IconButton>
+                  </Box>
                 )}
-              </Button>
-            </Box>
+                <CardActionArea 
+                  onClick={() => {
+                    const currentPath = window.location.pathname;
+                    navigate(`${currentPath}/${cat.slug}`);
+                  }}
+                  sx={{ 
+                    height: '100%', 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    alignItems: 'stretch',
+                    p: 1
+                  }}
+                >
+                  {cat.imagePath && (
+                    <CardMedia
+                      component="img"
+                      height="110"
+                      image={cat.imagePath}
+                      alt={lang === 'en' ? cat.nameEn : cat.nameSi}
+                      sx={{ 
+                        objectFit: 'contain', 
+                        borderRadius: 3,
+                        p: 1,
+                        backgroundColor: '#f8f9fa'
+                      }}
+                    />
+                  )}
+                  <CardContent sx={{ flexGrow: 1, textAlign: 'center', p: '12px !important', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Typography variant="subtitle1" component="div" sx={{ fontWeight: 600, lineHeight: 1.2 }}>
+                      {lang === 'en' ? cat.nameEn : cat.nameSi}
+                    </Typography>
+                  </CardContent>
+                  {!isAdmin && cat.progress !== undefined && (
+                    <LinearProgress 
+                      variant="determinate" 
+                      value={cat.progress} 
+                      sx={{ width: '100%', height: 6, mt: 'auto', '& .MuiLinearProgress-bar': { backgroundColor: '#FFD700' } }} 
+                    />
+                  )}
+                </CardActionArea>
+              </Card>
           </Grid>
         ))}
       </Grid>

@@ -27,6 +27,12 @@ class CategoryMutations
     public function updateCategory($_, array $args)
     {
         $category = Category::findOrFail($args['id']);
+        if (array_key_exists('name_en', $args) && is_null($args['name_en'])) {
+            $args['name_en'] = '';
+        }
+        if (array_key_exists('name_si', $args) && is_null($args['name_si'])) {
+            $args['name_si'] = '';
+        }
         $category->update($args);
         return $category;
     }

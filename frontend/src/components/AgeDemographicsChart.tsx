@@ -9,6 +9,7 @@ interface Age3DBarChartProps {
     age_65_above?: number;
   };
   location_name?: string;
+  language?: 'en' | 'si' | 'ta';
 }
 
 // 4 Colors for the 4 age bars
@@ -26,7 +27,7 @@ const categoryLabels = [
   { key: 'age_65_above', label: '65 & Above' },
 ];
 
-export default function Age3DBarChart({ data, location_name }: Age3DBarChartProps) {
+export default function Age3DBarChart({ data, location_name, language = 'en' }: Age3DBarChartProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 

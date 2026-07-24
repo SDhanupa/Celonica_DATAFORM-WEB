@@ -8,6 +8,7 @@ interface Custom3DBarChartProps {
   city_code?: string;
   gn_id?: string | number;
   location_name?: string;
+  language?: 'en' | 'si' | 'ta';
 }
 
 // 12 Colors for the 12 bars (generated from a palette)
@@ -49,7 +50,7 @@ const mobileCategoryLabels = [
   { key: 'group_2010s', label: '2010 & Newer', sumKeys: ['y_2010', 'y_2011'] },
 ];
 
-export default function Custom3DBarChart({ district_id, city_code, gn_id, location_name }: Custom3DBarChartProps) {
+export default function Custom3DBarChart({ district_id, city_code, gn_id, location_name, language = 'en' }: Custom3DBarChartProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -111,7 +112,7 @@ export default function Custom3DBarChart({ district_id, city_code, gn_id, locati
         {!isMobile && (
           <>
             <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: theme.palette.text.primary }}>
-              Housing Units by Construction Year
+              {language === 'en' ? 'Housing Units by Construction Year' : language === 'si' ? 'ඉදිකළ වර්ෂය අනුව නිවාස ඒකක' : 'கட்டப்பட்ட ஆண்டு வாரியாக வீட்டு அலகுகள்'}
             </Typography>
             <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary', mb: 8 }}>
               {displayLocation}
