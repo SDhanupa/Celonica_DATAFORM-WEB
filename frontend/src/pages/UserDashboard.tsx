@@ -13,6 +13,58 @@ import { useNavigate, useParams } from 'react-router-dom';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 
+
+const tChart = {
+  en: {
+    wallTitle: 'Housing Wall Type',
+    brick: 'Brick', cement_stone: 'Cement/Stone', cabook: 'Cabook', soil_bricks: 'Soil Bricks', mud: 'Mud', cadjan_palmyrah: 'Cadjan/Palmyrah', plank_metal: 'Plank/Metal', other: 'Other',
+    unitTitle: 'Housing Unit Type',
+    permanent: 'Permanent', semi_permanent: 'Semi-permanent', improvised: 'Improvised', unclassified: 'Unclassified',
+    toiletTitle: 'Toilet Facilities',
+    piped_sewer: 'Piped Sewer', septic_tank: 'Septic Tank', pour_flush: 'Pour Flush', direct_pit: 'Direct Pit', not_using: 'Not Using',
+    waterTitle: 'Source of Drinking Water',
+    well_within: 'Well (Within)', well_outside: 'Well (Outside)', unprotected_well: 'Unprotected Well', tap_within_unit: 'Tap (Within Unit)', tap_within_premises: 'Tap (Within Premises)', tap_outside: 'Tap (Outside)', rural_projects: 'Rural Projects', tube_well: 'Tube Well', bowser: 'Bowser', river_tank: 'River/Tank',
+    wasteTitle: 'Solid Waste Disposal',
+    local_auth: 'Local Auth.', burn: 'Burn', bury: 'Bury', compost: 'Compost', environment: 'Environment',
+    roomsTitle: 'Rooms in Housing Unit',
+    room_1: '1 Room', room_2: '2 Rooms', room_3: '3 Rooms', room_4: '4 Rooms', room_5: '5 Rooms', room_6: '6 Rooms', room_7: '7 Rooms', room_8: '8 Rooms', room_9: '9 Rooms', room_10: '10+ Rooms',
+    roofTitle: 'Housing Unit Roof Type',
+    tile: 'Tile', asbestos: 'Asbestos', concrete: 'Concrete', zink_alu: 'Zink Aluminium', metal_sheet: 'Metal Sheet', cadjan_straw: 'Cadjan/Straw'
+  },
+  si: {
+    wallTitle: 'නිවාස බිත්ති වර්ගය',
+    brick: 'ගඩොල්', cement_stone: 'සිමෙන්ති/ගල්', cabook: 'කබොක්', soil_bricks: 'මැටි ගඩොල්', mud: 'මැටි', cadjan_palmyrah: 'පොල් අතු/තල් අතු', plank_metal: 'ලෑලි/තහඩු', other: 'වෙනත්',
+    unitTitle: 'නිවාස ඒකක වර්ගය',
+    permanent: 'ස්ථිර', semi_permanent: 'අර්ධ ස්ථිර', improvised: 'තාවකාලික', unclassified: 'වර්ගීකරණය නොකළ',
+    toiletTitle: 'වැසිකිළි පහසුකම්',
+    piped_sewer: 'නළ මගින්', septic_tank: 'සෙප්ටික් ටැංකි', pour_flush: 'වත්කරන', direct_pit: 'වළ', not_using: 'නැත',
+    waterTitle: 'පානීය ජල මූලාශ්‍රය',
+    well_within: 'ළිඳ (ඇතුළත)', well_outside: 'ළිඳ (පිටත)', unprotected_well: 'අනාරක්ෂිත ළිඳ', tap_within_unit: 'කරාම (ඒකකය තුළ)', tap_within_premises: 'කරාම (පරිශ්‍රය තුළ)', tap_outside: 'කරාම (පිටත)', rural_projects: 'ග්‍රාමීය ව්‍යාපෘති', tube_well: 'නළ ළිඳ', bowser: 'බවුසර්', river_tank: 'ගඟ/වැව',
+    wasteTitle: 'ඝන අපද්‍රව්‍ය බැහැර කිරීම',
+    local_auth: 'පළාත් පාලන', burn: 'පිළිස්සීම', bury: 'වළදැමීම', compost: 'කොම්පෝස්ට්', environment: 'පරිසරය',
+    roomsTitle: 'නිවාස ඒකකයේ කාමර',
+    room_1: 'කාමර 1', room_2: 'කාමර 2', room_3: 'කාමර 3', room_4: 'කාමර 4', room_5: 'කාමර 5', room_6: 'කාමර 6', room_7: 'කාමර 7', room_8: 'කාමර 8', room_9: 'කාමර 9', room_10: 'කාමර 10+',
+    roofTitle: 'නිවාස ඒකකයේ වහලය',
+    tile: 'උළු', asbestos: 'ඇස්බැස්ටෝස්', concrete: 'කොන්ක්‍රීට්', zink_alu: 'සින්ක් ඇලුමිනියම්', metal_sheet: 'තහඩු', cadjan_straw: 'පොල් අතු/පිදුරු'
+  },
+  ta: {
+    wallTitle: 'வீட்டின் சுவர் வகை',
+    brick: 'செங்கல்', cement_stone: 'சிமெண்ட்/கல்', cabook: 'கபோக்', soil_bricks: 'மண் செங்கல்', mud: 'சேறு', cadjan_palmyrah: 'தென்னை/பனை ஓலை', plank_metal: 'பலகை/தகடு', other: 'மற்றவை',
+    unitTitle: 'வீட்டு அலகு வகை',
+    permanent: 'நிரந்தர', semi_permanent: 'அரை நிரந்தர', improvised: 'தற்காலிக', unclassified: 'வகைப்படுத்தப்படாத',
+    toiletTitle: 'கழிப்பறை வசதிகள்',
+    piped_sewer: 'குழாய் மூலம்', septic_tank: 'செப்டிக் டேங்க்', pour_flush: 'ஊற்றும்', direct_pit: 'குழி', not_using: 'இல்லை',
+    waterTitle: 'குடிநீர் ஆதாரம்',
+    well_within: 'கிணறு (உள்ளே)', well_outside: 'கிணறு (வெளியே)', unprotected_well: 'பாதுகாப்பற்ற கிணறு', tap_within_unit: 'குழாய் (அலகுக்குள்)', tap_within_premises: 'குழாய் (வளாகத்திற்குள்)', tap_outside: 'குழாய் (வெளியே)', rural_projects: 'கிராமிய திட்டங்கள்', tube_well: 'குழாய் கிணறு', bowser: 'பவுசர்', river_tank: 'ஆறு/குளம்',
+    wasteTitle: 'திடக்கழிவு அகற்றல்',
+    local_auth: 'உள்ளூராட்சி', burn: 'எரித்தல்', bury: 'புதைத்தல்', compost: 'உரம்', environment: 'சுற்றுச்சூழல்',
+    roomsTitle: 'வீட்டு அலகில் அறைகள்',
+    room_1: '1 அறை', room_2: '2 அறைகள்', room_3: '3 அறைகள்', room_4: '4 அறைகள்', room_5: '5 அறைகள்', room_6: '6 அறைகள்', room_7: '7 அறைகள்', room_8: '8 அறைகள்', room_9: '9 அறைகள்', room_10: '10+ அறைகள்',
+    roofTitle: 'வீட்டு அலகின் கூரை வகை',
+    tile: 'ஓடு', asbestos: 'அஸ்பெஸ்டாஸ்', concrete: 'கான்கிரீட்', zink_alu: 'துத்தநாக அலுமினியம்', metal_sheet: 'தகடு', cadjan_straw: 'தென்னை/வைக்கோல்'
+  }
+};
+
 const getThemeColors = (isDark: boolean) => ({
   primary: '#00A8FF',
   secondary: '#FF4E3A',
@@ -50,6 +102,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
 
   const [showLocationModal, setShowLocationModal] = useState<boolean>(!ccode);
   const [language, setLanguage] = useState<'en' | 'si' | 'ta'>('en');
+  const t = tChart[language] || tChart.en;
   const [showManualForm, setShowManualForm] = useState(!ccode && !window.matchMedia('(max-width: 600px)').matches);
   const canContinue = !showManualForm
     ? (location !== null || locationError !== null)
@@ -492,14 +545,14 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
 
 
   const wallPalette = [
-    { label: 'Brick', color: '#e74c3c', value: housingWallData?.brick || 0 },
-    { label: 'Cement/Stone', color: '#3498db', value: housingWallData?.cement_block_stone || 0 },
-    { label: 'Cabook', color: '#f1c40f', value: housingWallData?.cabook || 0 },
-    { label: 'Soil Bricks', color: '#e67e22', value: housingWallData?.soil_bricks || 0 },
-    { label: 'Mud', color: '#2ecc71', value: housingWallData?.mud || 0 },
-    { label: 'Cadjan/Palmyrah', color: '#1abc9c', value: housingWallData?.cadjan_palmyrah || 0 },
-    { label: 'Plank/Metal', color: '#9b59b6', value: housingWallData?.plank_metal_sheet || 0 },
-    { label: 'Other', color: '#95a5a6', value: housingWallData?.other || 0 },
+    { label: t.brick, color: '#e74c3c', value: housingWallData?.brick || 0 },
+    { label: t.cement_stone, color: '#3498db', value: housingWallData?.cement_block_stone || 0 },
+    { label: t.cabook, color: '#f1c40f', value: housingWallData?.cabook || 0 },
+    { label: t.soil_bricks, color: '#e67e22', value: housingWallData?.soil_bricks || 0 },
+    { label: t.mud, color: '#2ecc71', value: housingWallData?.mud || 0 },
+    { label: t.cadjan_palmyrah, color: '#1abc9c', value: housingWallData?.cadjan_palmyrah || 0 },
+    { label: t.plank_metal, color: '#9b59b6', value: housingWallData?.plank_metal_sheet || 0 },
+    { label: t.other, color: '#95a5a6', value: housingWallData?.other || 0 },
   ].filter(item => item.value > 0);
 
   const gnWallChartUI = hasWallData ? (
@@ -585,10 +638,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
 
 
   const unitPalette = [
-    { label: 'Permanent', color: '#2ecc71', value: housingUnitData?.permanent || 0 },
-    { label: 'Semi-permanent', color: '#f39c12', value: housingUnitData?.semi_permanent || 0 },
-    { label: 'Improvised', color: '#e74c3c', value: housingUnitData?.improvised || 0 },
-    { label: 'Unclassified', color: '#95a5a6', value: housingUnitData?.unclassified || 0 },
+    { label: t.permanent, color: '#2ecc71', value: housingUnitData?.permanent || 0 },
+    { label: t.semi_permanent, color: '#f39c12', value: housingUnitData?.semi_permanent || 0 },
+    { label: t.improvised, color: '#e74c3c', value: housingUnitData?.improvised || 0 },
+    { label: t.unclassified, color: '#95a5a6', value: housingUnitData?.unclassified || 0 },
   ].filter(item => item.value > 0);
 
   const gnUnitChartUI = hasUnitData ? (
@@ -674,12 +727,12 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
 
 
   const toiletPalette = [
-    { label: 'Piped Sewer', color: '#3498db', value: toiletFacilityData?.water_seal_piped_sewer || 0 },
-    { label: 'Septic Tank', color: '#9b59b6', value: toiletFacilityData?.water_seal_septic_tank || 0 },
-    { label: 'Pour Flush', color: '#e67e22', value: toiletFacilityData?.pour_flush || 0 },
-    { label: 'Direct Pit', color: '#f1c40f', value: toiletFacilityData?.direct_pit || 0 },
-    { label: 'Not Using', color: '#c0392b', value: toiletFacilityData?.not_using || 0 },
-    { label: 'Other', color: '#95a5a6', value: toiletFacilityData?.other || 0 },
+    { label: t.piped_sewer, color: '#3498db', value: toiletFacilityData?.water_seal_piped_sewer || 0 },
+    { label: t.septic_tank, color: '#9b59b6', value: toiletFacilityData?.water_seal_septic_tank || 0 },
+    { label: t.pour_flush, color: '#e67e22', value: toiletFacilityData?.pour_flush || 0 },
+    { label: t.direct_pit, color: '#f1c40f', value: toiletFacilityData?.direct_pit || 0 },
+    { label: t.not_using, color: '#c0392b', value: toiletFacilityData?.not_using || 0 },
+    { label: t.other, color: '#95a5a6', value: toiletFacilityData?.other || 0 },
   ].filter(item => item.value > 0);
 
   const gnToiletChartUI = hasToiletData ? (
@@ -765,17 +818,17 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
 
 
   const waterPalette = [
-    { label: 'Well (Within)', color: '#1abc9c', value: drinkingWaterData?.protected_well_within || 0 },
-    { label: 'Well (Outside)', color: '#16a085', value: drinkingWaterData?.protected_well_outside || 0 },
-    { label: 'Unprotected Well', color: '#f39c12', value: drinkingWaterData?.unprotected_well || 0 },
-    { label: 'Tap (Within Unit)', color: '#3498db', value: drinkingWaterData?.tap_within_unit || 0 },
-    { label: 'Tap (Within Premises)', color: '#2980b9', value: drinkingWaterData?.tap_within_premises_outside || 0 },
-    { label: 'Tap (Outside)', color: '#8e44ad', value: drinkingWaterData?.tap_outside_premises || 0 },
-    { label: 'Rural Projects', color: '#27ae60', value: drinkingWaterData?.rural_water_projects || 0 },
-    { label: 'Tube Well', color: '#f1c40f', value: drinkingWaterData?.tube_well || 0 },
-    { label: 'Bowser', color: '#e67e22', value: drinkingWaterData?.bowser || 0 },
-    { label: 'River/Tank', color: '#34495e', value: drinkingWaterData?.river_tank_stream || 0 },
-    { label: 'Other', color: '#95a5a6', value: drinkingWaterData?.other || 0 },
+    { label: t.well_within, color: '#1abc9c', value: drinkingWaterData?.protected_well_within || 0 },
+    { label: t.well_outside, color: '#16a085', value: drinkingWaterData?.protected_well_outside || 0 },
+    { label: t.unprotected_well, color: '#f39c12', value: drinkingWaterData?.unprotected_well || 0 },
+    { label: t.tap_within_unit, color: '#3498db', value: drinkingWaterData?.tap_within_unit || 0 },
+    { label: t.tap_within_premises, color: '#2980b9', value: drinkingWaterData?.tap_within_premises_outside || 0 },
+    { label: t.tap_outside, color: '#8e44ad', value: drinkingWaterData?.tap_outside_premises || 0 },
+    { label: t.rural_projects, color: '#27ae60', value: drinkingWaterData?.rural_water_projects || 0 },
+    { label: t.tube_well, color: '#f1c40f', value: drinkingWaterData?.tube_well || 0 },
+    { label: t.bowser, color: '#e67e22', value: drinkingWaterData?.bowser || 0 },
+    { label: t.river_tank, color: '#34495e', value: drinkingWaterData?.river_tank_stream || 0 },
+    { label: t.other, color: '#95a5a6', value: drinkingWaterData?.other || 0 },
   ].filter(item => item.value > 0);
 
   const gnWaterChartUI = hasWaterData ? (
@@ -861,12 +914,12 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
 
 
   const wastePalette = [
-    { label: 'Local Auth.', color: '#9b59b6', value: solidWasteData?.collected_by_local_authorities || 0 },
-    { label: 'Burn', color: '#e74c3c', value: solidWasteData?.occupants_burn || 0 },
-    { label: 'Bury', color: '#d35400', value: solidWasteData?.occupants_bury || 0 },
-    { label: 'Compost', color: '#27ae60', value: solidWasteData?.occupants_composting || 0 },
-    { label: 'Environment', color: '#7f8c8d', value: solidWasteData?.dispose_into_environment || 0 },
-    { label: 'Other', color: '#95a5a6', value: solidWasteData?.other || 0 },
+    { label: t.local_auth, color: '#9b59b6', value: solidWasteData?.collected_by_local_authorities || 0 },
+    { label: t.burn, color: '#e74c3c', value: solidWasteData?.occupants_burn || 0 },
+    { label: t.bury, color: '#d35400', value: solidWasteData?.occupants_bury || 0 },
+    { label: t.compost, color: '#27ae60', value: solidWasteData?.occupants_composting || 0 },
+    { label: t.environment, color: '#7f8c8d', value: solidWasteData?.dispose_into_environment || 0 },
+    { label: t.other, color: '#95a5a6', value: solidWasteData?.other || 0 },
   ].filter(item => item.value > 0);
 
   const gnWasteChartUI = hasWasteData ? (
@@ -950,16 +1003,16 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   ) : null;
 
   const roomsPalette = [
-    { label: '1 Room', color: '#1abc9c', value: roomsData?.room_1 || 0 },
-    { label: '2 Rooms', color: '#16a085', value: roomsData?.rooms_2 || 0 },
-    { label: '3 Rooms', color: '#2ecc71', value: roomsData?.rooms_3 || 0 },
-    { label: '4 Rooms', color: '#27ae60', value: roomsData?.rooms_4 || 0 },
-    { label: '5 Rooms', color: '#3498db', value: roomsData?.rooms_5 || 0 },
-    { label: '6 Rooms', color: '#2980b9', value: roomsData?.rooms_6 || 0 },
-    { label: '7 Rooms', color: '#9b59b6', value: roomsData?.rooms_7 || 0 },
-    { label: '8 Rooms', color: '#8e44ad', value: roomsData?.rooms_8 || 0 },
-    { label: '9 Rooms', color: '#f1c40f', value: roomsData?.rooms_9 || 0 },
-    { label: '10+ Rooms', color: '#e67e22', value: roomsData?.rooms_10_and_above || 0 },
+    { label: t.room_1, color: '#1abc9c', value: roomsData?.room_1 || 0 },
+    { label: t.room_2, color: '#16a085', value: roomsData?.rooms_2 || 0 },
+    { label: t.room_3, color: '#2ecc71', value: roomsData?.rooms_3 || 0 },
+    { label: t.room_4, color: '#27ae60', value: roomsData?.rooms_4 || 0 },
+    { label: t.room_5, color: '#3498db', value: roomsData?.rooms_5 || 0 },
+    { label: t.room_6, color: '#2980b9', value: roomsData?.rooms_6 || 0 },
+    { label: t.room_7, color: '#9b59b6', value: roomsData?.rooms_7 || 0 },
+    { label: t.room_8, color: '#8e44ad', value: roomsData?.rooms_8 || 0 },
+    { label: t.room_9, color: '#f1c40f', value: roomsData?.rooms_9 || 0 },
+    { label: t.room_10, color: '#e67e22', value: roomsData?.rooms_10_and_above || 0 },
   ].filter(item => item.value > 0);
 
   const gnRoomsChartUI = hasRoomsData ? (
@@ -1043,13 +1096,13 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   ) : null;
 
   const roofPalette = [
-    { label: 'Tile', color: '#d35400', value: roofData?.tile || 0 },
-    { label: 'Asbestos', color: '#7f8c8d', value: roofData?.asbestos || 0 },
-    { label: 'Concrete', color: '#95a5a6', value: roofData?.concrete || 0 },
-    { label: 'Zink Aluminium', color: '#3498db', value: roofData?.zink_aluminium_sheet || 0 },
-    { label: 'Metal Sheet', color: '#2980b9', value: roofData?.metal_sheet || 0 },
-    { label: 'Cadjan/Straw', color: '#f1c40f', value: roofData?.cadjan_palmyrah_straw || 0 },
-    { label: 'Other', color: '#e67e22', value: roofData?.other || 0 },
+    { label: t.tile, color: '#d35400', value: roofData?.tile || 0 },
+    { label: t.asbestos, color: '#7f8c8d', value: roofData?.asbestos || 0 },
+    { label: t.concrete, color: '#95a5a6', value: roofData?.concrete || 0 },
+    { label: t.zink_alu, color: '#3498db', value: roofData?.zink_aluminium_sheet || 0 },
+    { label: t.metal_sheet, color: '#2980b9', value: roofData?.metal_sheet || 0 },
+    { label: t.cadjan_straw, color: '#f1c40f', value: roofData?.cadjan_palmyrah_straw || 0 },
+    { label: t.other, color: '#e67e22', value: roofData?.other || 0 },
   ].filter(item => item.value > 0);
 
   const gnRoofChartUI = hasRoofData ? (
@@ -1138,7 +1191,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
     { label: 'Islam', color: '#2ecc71', value: religionData?.islam || 0 },
     { label: 'Roman Catholic', color: '#9b59b6', value: religionData?.roman_catholic || 0 },
     { label: 'Other Christian', color: '#3498db', value: religionData?.other_christian || 0 },
-    { label: 'Other', color: '#95a5a6', value: religionData?.other || 0 },
+    { label: t.other, color: '#95a5a6', value: religionData?.other || 0 },
   ].filter(item => item.value > 0);
 
   const gnReligionChartUI = hasReligionData ? (
