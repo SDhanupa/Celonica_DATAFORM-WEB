@@ -2035,7 +2035,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                     </Box>
                   )}
 
-                  {(!isMobileView || activeMobileChart === 'pie') && (
+                  {hasPopulationData && (!isMobileView || activeMobileChart === 'pie') && (
                     <PopulationInfographic populationData={populationData} language={language} />
                   )}
 
@@ -2137,10 +2137,12 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
       {/* Charts Section (Desktop Only) */}
       {!isMobileView && (selectedGN || selectedCity || selectedDistrict) && (
         <>
-          <AgeDemographicsChart
-            data={populationData || undefined}
-            location_name={displayGN || displayCity || displayDistrict}
-          />
+          {hasAgeData && (
+            <AgeDemographicsChart
+              data={populationData || undefined}
+              location_name={displayGN || displayCity || displayDistrict}
+            />
+          )}
 
           {gnReligionChartUI && (
             <Box sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -2148,12 +2150,14 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             </Box>
           )}
 
-          <Custom3DBarChart
-            gn_id={selectedGN}
-            city_code={selectedCity}
-            district_id={selectedDistrict}
-            location_name={displayGN || displayCity || displayDistrict}
-          />
+          {hasHousingData && (
+            <Custom3DBarChart
+              gn_id={selectedGN}
+              city_code={selectedCity}
+              district_id={selectedDistrict}
+              location_name={displayGN || displayCity || displayDistrict}
+            />
+          )}
 
           {gnEconomyChartUI && (
             <Box sx={{ pb: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -2161,10 +2165,12 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             </Box>
           )}
 
-          <HousingOwnershipChart
-            data={housingOwnershipData || undefined}
-            location_name={displayGN || displayCity || displayDistrict}
-          />
+          {hasOwnershipData && (
+            <HousingOwnershipChart
+              data={housingOwnershipData || undefined}
+              location_name={displayGN || displayCity || displayDistrict}
+            />
+          )}
 
           {gnWallChartUI && (
             <Box sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
