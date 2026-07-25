@@ -48,8 +48,8 @@ services:
       - SESSION_DRIVER=file
       - QUEUE_CONNECTION=sync
     volumes:
-      - backend_uploads:/var/www/html/public/uploads
-      - backend_storage:/var/www/html/storage
+      - backend_uploads:/var/www/public/uploads
+      - backend_storage:/var/www/storage
     networks:
       - celonica_net
 
