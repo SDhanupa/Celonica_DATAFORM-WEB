@@ -353,7 +353,12 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
     (populationData.age_65_above || 0) > 0
   );
 
-  const availableCharts = ['pie', 'bar'];
+  const hasPopulationData = populationData && (populationData.total_population || 0) > 0;
+  const hasHousingData = hasOwnershipData || hasWallData || hasUnitData || hasRoomsData || hasRoofData;
+
+  const availableCharts = [];
+  if (hasPopulationData) availableCharts.push('pie');
+  if (hasHousingData) availableCharts.push('bar');
   if (hasEconomyData) availableCharts.push('economy');
   if (hasAgeData) availableCharts.push('age');
   if (hasOwnershipData) availableCharts.push('ownership');
@@ -366,6 +371,12 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   if (hasRoofData) availableCharts.push('roof');
   if (hasReligionData) availableCharts.push('religion');
   if (hasHouseholdData) availableCharts.push('household');
+
+  useEffect(() => {
+    if (availableCharts.length > 0 && !availableCharts.includes(activeMobileChart)) {
+      setActiveMobileChart(availableCharts[0] as any);
+    }
+  }, [hasPopulationData, hasHousingData, hasEconomyData, hasAgeData, hasOwnershipData, hasWallData, hasUnitData, hasToiletData, hasWaterData, hasWasteData, hasRoomsData, hasRoofData, hasReligionData, hasHouseholdData]);
 
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => {
@@ -1777,35 +1788,59 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                 >
                   {/* Mobile Toggle Buttons */}
                   {isMobileView && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3, gap: 1, flexWrap: 'wrap' }}>
-                      <Button 
-                        variant={activeMobileChart === 'pie' ? 'contained' : 'outlined'} 
-                        onClick={() => setActiveMobileChart('pie')}
-                        size="small"
-                        sx={{ 
-                          borderRadius: '20px',
-                          color: activeMobileChart === 'pie' ? '#fff' : 'rgba(255,255,255,0.7)',
-                          borderColor: 'rgba(255,255,255,0.3)',
-                          bgcolor: activeMobileChart === 'pie' ? 'primary.main' : 'transparent',
-                          '&:hover': { bgcolor: activeMobileChart === 'pie' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
-                        }}
-                      >
-                        Population
-                      </Button>
-                      <Button 
-                        variant={activeMobileChart === 'bar' ? 'contained' : 'outlined'} 
-                        onClick={() => setActiveMobileChart('bar')}
-                        size="small"
-                        sx={{ 
-                          borderRadius: '20px',
-                          color: activeMobileChart === 'bar' ? '#fff' : 'rgba(255,255,255,0.7)',
-                          borderColor: 'rgba(255,255,255,0.3)',
-                          bgcolor: activeMobileChart === 'bar' ? 'primary.main' : 'transparent',
-                          '&:hover': { bgcolor: activeMobileChart === 'bar' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
-                        }}
-                      >
-                        Housing
-                      </Button>
+                    <Box sx={{ 
+                      display: 'grid', 
+                      gridTemplateColumns: 'repeat(3, 1fr)', 
+                      gap: 1, 
+                      mb: 3,
+                      alignItems: 'stretch',
+                      '& > button': {
+                        width: '100%',
+                        height: '100%',
+                        fontSize: '0.75rem',
+                        px: 0.5,
+                        py: 0.75,
+                        minWidth: 0,
+                        textTransform: 'none',
+                        lineHeight: 1.2,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        textAlign: 'center'
+                      }
+                    }}>
+                      {hasPopulationData && (
+                        <Button 
+                          variant={activeMobileChart === 'pie' ? 'contained' : 'outlined'} 
+                          onClick={() => setActiveMobileChart('pie')}
+                          size="small"
+                          sx={{ 
+                            borderRadius: '20px',
+                            color: activeMobileChart === 'pie' ? '#fff' : 'rgba(255,255,255,0.7)',
+                            borderColor: 'rgba(255,255,255,0.3)',
+                            bgcolor: activeMobileChart === 'pie' ? 'primary.main' : 'transparent',
+                            '&:hover': { bgcolor: activeMobileChart === 'pie' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
+                          }}
+                        >
+                          Population
+                        </Button>
+                      )}
+                      {hasHousingData && (
+                        <Button 
+                          variant={activeMobileChart === 'bar' ? 'contained' : 'outlined'} 
+                          onClick={() => setActiveMobileChart('bar')}
+                          size="small"
+                          sx={{ 
+                            borderRadius: '20px',
+                            color: activeMobileChart === 'bar' ? '#fff' : 'rgba(255,255,255,0.7)',
+                            borderColor: 'rgba(255,255,255,0.3)',
+                            bgcolor: activeMobileChart === 'bar' ? 'primary.main' : 'transparent',
+                            '&:hover': { bgcolor: activeMobileChart === 'bar' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
+                          }}
+                        >
+                          Housing
+                        </Button>
+                      )}
                       {hasEconomyData && (
                         <Button 
                           variant={activeMobileChart === 'economy' ? 'contained' : 'outlined'} 
