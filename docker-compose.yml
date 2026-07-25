@@ -47,6 +47,9 @@ services:
       - CACHE_DRIVER=file
       - SESSION_DRIVER=file
       - QUEUE_CONNECTION=sync
+    volumes:
+      - backend_uploads:/var/www/html/public/uploads
+      - backend_storage:/var/www/html/storage
     networks:
       - celonica_net
 
@@ -120,6 +123,10 @@ volumes:
     name: celonica-web-keycloak-db-data
   postgres_data:
     name: celonica-web-postgres-data
+  backend_uploads:
+    name: celonica-web-backend-uploads
+  backend_storage:
+    name: celonica-web-backend-storage
 
 networks:
   celonica_net:
