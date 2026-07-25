@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, Container, Grid, Card, CardContent, CardMedia, FormControl, useTheme, useMediaQuery, CircularProgress, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Autocomplete, TextField, IconButton, Divider } from '@mui/material';
 import { useSwipeable } from 'react-swipeable';
 import { useQuery } from '@apollo/client';
-import { GET_P_DISTRICTS, GET_P_DISTRICT_WITH_GNS, GET_GN_BY_COORDINATES } from '../graphql/queries';
+import { GET_P_DISTRICTS, GET_P_DISTRICT_WITH_GNS, GET_GN_BY_COORDINATES, GET_GN_BY_CCODE } from '../graphql/queries';
 import PopulationInfographic from '../components/PopulationInfographic';
 import Custom3DBarChart from '../components/Custom3DBarChart';
 import AgeDemographicsChart from '../components/AgeDemographicsChart';
 import HousingOwnershipChart from '../components/HousingOwnershipChart';
 import { PieChart } from '@mui/x-charts/PieChart';
 import { useAuth } from '../auth/AuthProvider';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 
@@ -36,6 +36,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const themeColors = getThemeColors(isDarkMode);
 
+  const { gnName, ccode } = useParams<{ gnName: string, ccode: string }>();
+
   // GPS State
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
@@ -46,9 +48,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const [selectedGN, setSelectedGN] = useState<string>('');
   const [selectedCity, setSelectedCity] = useState<string>('');
 
-  const [showLocationModal, setShowLocationModal] = useState<boolean>(true);
+  const [showLocationModal, setShowLocationModal] = useState<boolean>(!ccode);
   const [language, setLanguage] = useState<'en' | 'si' | 'ta'>('en');
-  const [showManualForm, setShowManualForm] = useState(!window.matchMedia('(max-width: 600px)').matches);
+  const [showManualForm, setShowManualForm] = useState(!ccode && !window.matchMedia('(max-width: 600px)').matches);
   const canContinue = !showManualForm
     ? (location !== null || locationError !== null)
     : (selectedDistrict !== '' && selectedCity !== '' && selectedGN !== '');
@@ -97,13 +99,21 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
 
   const { data: autoGnData, loading: autoGnLoading } = useQuery(GET_GN_BY_COORDINATES, {
     variables: { lat: location?.lat, lng: location?.lng },
-    skip: !location || showManualForm,
+    skip: !location || showManualForm || !!ccode,
     fetchPolicy: 'network-only',
   });
 
+  const { data: urlGnData, loading: urlGnLoading } = useQuery(GET_GN_BY_CCODE, {
+    variables: { CCODE: ccode },
+    skip: !ccode,
+    fetchPolicy: 'network-only',
+  });
+
+  const activeGn = urlGnData?.gnByCcode || autoGnData?.gnByCoordinates;
+
   // Geolocation Effect
   useEffect(() => {
-    if (!showManualForm && !location && !locationError) {
+    if (!ccode && !showManualForm && !location && !locationError) {
       setLocating(true);
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -127,12 +137,38 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   }, [showManualForm, location, locationError]);
 
   useEffect(() => {
-    if (autoGnData?.gnByCoordinates) {
-      setSelectedDistrict(autoGnData.gnByCoordinates.pDistrict?.id || '');
-      setSelectedCity(autoGnData.gnByCoordinates.divisionalSecretariatCode || '');
-      setSelectedGN(autoGnData.gnByCoordinates.id || '');
+    if (activeGn) {
+      setSelectedDistrict(activeGn.pDistrict?.id || '');
+      setSelectedCity(activeGn.divisionalSecretariatCode || '');
+      setSelectedGN(activeGn.id || '');
     }
-  }, [autoGnData]);
+  }, [activeGn]);
+
+  // Sync URL with loaded GN
+  useEffect(() => {
+    let loadedGn: any = null;
+    if (!showManualForm && activeGn) {
+      loadedGn = activeGn;
+    } else if (showManualForm && selectedGN && gnData?.pDistrict?.gramaNiladharis) {
+      loadedGn = gnData.pDistrict.gramaNiladharis.find((x: any) => x.id === selectedGN);
+    }
+
+    if (loadedGn && loadedGn.CCODE && loadedGn.nameEn) {
+      const currentUrl = window.location.pathname;
+      const targetUrl = `/${encodeURIComponent(loadedGn.nameEn.replace(/ /g, '-'))}/${encodeURIComponent(loadedGn.CCODE)}`;
+      if (currentUrl !== targetUrl) {
+        navigate(targetUrl, { replace: true });
+      }
+    }
+  }, [activeGn, selectedGN, gnData, showManualForm, navigate]);
+
+  // Ensure modals close when URL params are present
+  useEffect(() => {
+    if (ccode) {
+      setShowLocationModal(false);
+    }
+  }, [ccode]);
+
 
   // Compute display names for District, City, and GN Division
   let displayDistrict = '';
@@ -152,10 +188,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   let religionData: any = null;
   let householdHeadData: any = null;
 
-  if (!showManualForm && autoGnData?.gnByCoordinates) {
-    const d = autoGnData.gnByCoordinates.pDistrict;
+  if (!showManualForm && activeGn) {
+    const d = activeGn.pDistrict;
     displayDistrict = language === 'en' ? d?.admin2NameEn : language === 'si' ? d?.admin2NameSi : d?.admin2NameTa;
-    const g = autoGnData.gnByCoordinates;
+    const g = activeGn;
     displayCity = language === 'en' ? g?.dsEn : language === 'si' ? g?.dsSi : g?.dsTa;
     displayGN = language === 'en' ? g?.nameEn : language === 'si' ? g?.nameSi : g?.nameTa;
     displayCCODE = g?.CCODE || '';
@@ -1406,32 +1442,32 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                 <Box sx={{ p: 2, bgcolor: 'rgba(0, 168, 255, 0.1)', borderRadius: 2, position: 'relative' }}>
                   <Typography variant="body2" color="text.secondary">Coordinates: {location.lat.toFixed(4)}, {location.lng.toFixed(4)}</Typography>
 
-                  {autoGnLoading ? (
+                  {autoGnLoading || urlGnLoading ? (
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
                       <CircularProgress size={16} />
                       <Typography variant="body2">Identifying Location...</Typography>
                     </Box>
-                  ) : autoGnData?.gnByCoordinates ? (
+                  ) : activeGn ? (
                     <Box sx={{ mt: 1 }}>
                       <Typography variant="body1" fontWeight="bold">
                         {language === 'en' ? 'District' : language === 'si' ? 'දිස්ත්‍රික්කය' : 'மாவட்டம்'}: {
-                          language === 'en' ? autoGnData.gnByCoordinates.pDistrict?.admin2NameEn :
-                            language === 'si' ? autoGnData.gnByCoordinates.pDistrict?.admin2NameSi :
-                              autoGnData.gnByCoordinates.pDistrict?.admin2NameTa
+                          language === 'en' ? activeGn.pDistrict?.admin2NameEn :
+                            language === 'si' ? activeGn.pDistrict?.admin2NameSi :
+                              activeGn.pDistrict?.admin2NameTa
                         }
                       </Typography>
                       <Typography variant="body1" fontWeight="bold">
                         {language === 'en' ? 'City / DS Division' : language === 'si' ? 'නගරය / ප්‍රාදේශීය ලේකම් කොට්ඨාශය' : 'நகரம் / பிரதேச செயலகம்'}: {
-                          language === 'en' ? autoGnData.gnByCoordinates.dsEn :
-                            language === 'si' ? autoGnData.gnByCoordinates.dsSi :
-                              autoGnData.gnByCoordinates.dsTa
+                          language === 'en' ? activeGn.dsEn :
+                            language === 'si' ? activeGn.dsSi :
+                              activeGn.dsTa
                         }
                       </Typography>
                       <Typography variant="body1" fontWeight="bold">
                         {language === 'en' ? 'GN Division' : language === 'si' ? 'ග්‍රාම නිලධාරී වසම' : 'கிராம உத்தியோகத்தர் பிரிவு'}: {
-                          language === 'en' ? autoGnData.gnByCoordinates.nameEn :
-                            language === 'si' ? autoGnData.gnByCoordinates.nameSi :
-                              autoGnData.gnByCoordinates.nameTa
+                          language === 'en' ? activeGn.nameEn :
+                            language === 'si' ? activeGn.nameSi :
+                              activeGn.nameTa
                         }
                       </Typography>
                     </Box>

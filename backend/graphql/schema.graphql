@@ -79,6 +79,9 @@ type Query {
     me: Admin
         @field(resolver: "App\\GraphQL\\Queries\\AdminQueries@me")
 
+    "Get GN by CCODE directly"
+    gnByCcode(CCODE: String! @eq): GramaNiladhari @find
+
     "Get all admins"
     admins: [Admin!]!
         @field(resolver: "App\\GraphQL\\Queries\\AdminQueries@admins")

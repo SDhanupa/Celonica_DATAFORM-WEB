@@ -43,6 +43,11 @@ const App: React.FC = () => {
                 path="/"
                 element={<DashboardPage />}
               />
+              {/* Direct GN Link Route */}
+              <Route
+                path="/:gnName/:ccode"
+                element={<DashboardPage />}
+              />
               {/* Protected — wrapped in AdminLayout */}
               <Route
                 path="/admins"
