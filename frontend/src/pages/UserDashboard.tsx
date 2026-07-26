@@ -114,6 +114,21 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
     else setLanguage('en');
   };
 
+  useEffect(() => {
+    if (!ccode) {
+      setShowLocationModal(true);
+      setShowManualForm(!window.matchMedia('(max-width: 600px)').matches);
+      // Reset search fields so the user can do a fresh search
+      setSelectedDistrict('');
+      setSelectedCity('');
+      setSelectedGN('');
+      setLocation(null);
+      setLocationError(null);
+    } else {
+      setShowLocationModal(false);
+    }
+  }, [ccode]);
+
   // Mobile UI States
   const [activeMobileChart, setActiveMobileChart] = useState<'pie' | 'bar' | 'economy' | 'age' | 'ownership' | 'wall' | 'unit' | 'toilet' | 'water' | 'waste' | 'rooms' | 'roof' | 'religion' | 'household'>('pie');
 

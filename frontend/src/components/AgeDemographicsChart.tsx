@@ -20,11 +20,35 @@ const palette = [
   { color: '#3498db', gradient: 'linear-gradient(to right, #2980b9 0%, #3498db 40%, #3498db 60%, #2980b9 100%)', topColor: '#5dade2' },
 ];
 
-const categoryLabels = [
-  { key: 'age_0_14', label: '0 - 14 Years' },
-  { key: 'age_15_59', label: '15 - 59 Years' },
-  { key: 'age_60_64', label: '60 - 64 Years' },
-  { key: 'age_65_above', label: '65 & Above' },
+const translations = {
+  en: {
+    title: 'Population by Age Demographic',
+    age_0_14: '0 - 14 Years',
+    age_15_59: '15 - 59 Years',
+    age_60_64: '60 - 64 Years',
+    age_65_above: '65 & Above',
+  },
+  si: {
+    title: 'වයස් කාණ්ඩය අනුව ජනගහනය',
+    age_0_14: 'අවුරුදු 0 - 14',
+    age_15_59: 'අවුරුදු 15 - 59',
+    age_60_64: 'අවුරුදු 60 - 64',
+    age_65_above: 'අවුරුදු 65 සහ ඊට වැඩි',
+  },
+  ta: {
+    title: 'வயது அடிப்படையில் மக்கள் தொகை',
+    age_0_14: '0 - 14 வருடங்கள்',
+    age_15_59: '15 - 59 வருடங்கள்',
+    age_60_64: '60 - 64 வருடங்கள்',
+    age_65_above: '65 மற்றும் அதற்கு மேல்',
+  }
+};
+
+const categoryKeys = [
+  'age_0_14',
+  'age_15_59',
+  'age_60_64',
+  'age_65_above',
 ];
 
 export default function Age3DBarChart({ data, location_name, language = 'en' }: Age3DBarChartProps) {
@@ -37,13 +61,15 @@ export default function Age3DBarChart({ data, location_name, language = 'en' }: 
   if (total === 0) return null;
   const displayLocation = location_name || "Selected Location";
 
+  const t = translations[language] || translations.en;
+
   // Prepare chart data dynamically
-  const chartData = categoryLabels.map((cat, index) => {
-    const value = Number(data[cat.key as keyof typeof data] || 0);
+  const chartData = categoryKeys.map((key, index) => {
+    const value = Number(data[key as keyof typeof data] || 0);
     const percent = total > 0 ? Math.round((value / total) * 100) : 0;
     return {
-      id: cat.key,
-      title: cat.label,
+      id: key,
+      title: t[key as keyof typeof t],
       percent,
       value,
       ...palette[index]
@@ -68,7 +94,7 @@ export default function Age3DBarChart({ data, location_name, language = 'en' }: 
         {!isMobile && (
           <>
             <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: theme.palette.text.primary }}>
-              Population by Age Demographic
+              {t.title}
             </Typography>
             <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary', mb: 8 }}>
               {displayLocation}

@@ -60,13 +60,17 @@ const TopBar: React.FC = () => {
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           {/* Removed dynamic page title, adding Nav Links instead for non-admins */}
           {!isAdmin && (
-            <Typography variant="h6" sx={{ fontWeight: 600, color: '#fff', mr: 4 }}>
+            <Typography 
+              variant="h6" 
+              sx={{ fontWeight: 600, color: '#fff', mr: 4, cursor: 'pointer' }}
+              onClick={() => { window.location.href = '/'; }}
+            >
               Ceylonica
             </Typography>
           )}
           {!isAdmin && (
             <Box sx={{ display: 'flex', gap: 2 }}>
-              <Button color="inherit" onClick={() => navigate('/')} sx={{ fontWeight: 500, textTransform: 'none' }}>
+              <Button color="inherit" onClick={() => { window.location.href = '/'; }} sx={{ fontWeight: 500, textTransform: 'none' }}>
                 Home
               </Button>
               <Button color="inherit" onClick={() => navigate('/survey')} sx={{ fontWeight: 500, textTransform: 'none' }}>

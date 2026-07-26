@@ -24,13 +24,43 @@ const palette = [
   { color: '#95a5a6', gradient: 'linear-gradient(to right, #7f8c8d 0%, #95a5a6 40%, #95a5a6 60%, #7f8c8d 100%)', topColor: '#aab7b8' }, // Gray - Other
 ];
 
-const categoryLabels = [
-  { key: 'owned_by_member', label: 'Owned' },
-  { key: 'rent_gov', label: 'Rent (Gov)' },
-  { key: 'rent_private', label: 'Rent (Private)' },
-  { key: 'free_of_rent', label: 'Rent Free' },
-  { key: 'encroached', label: 'Encroached' },
-  { key: 'other', label: 'Other' },
+const translations = {
+  en: {
+    title: 'Housing Ownership Status',
+    owned_by_member: 'Owned',
+    rent_gov: 'Rent (Gov)',
+    rent_private: 'Rent (Private)',
+    free_of_rent: 'Rent Free',
+    encroached: 'Encroached',
+    other: 'Other',
+  },
+  si: {
+    title: 'නිවාස අයිතිය',
+    owned_by_member: 'අයිති',
+    rent_gov: 'කුලී (රජයේ)',
+    rent_private: 'කුලී (පෞද්ගලික)',
+    free_of_rent: 'නොමිලේ',
+    encroached: 'අනවසර',
+    other: 'වෙනත්',
+  },
+  ta: {
+    title: 'வீட்டின் உரிமை நிலை',
+    owned_by_member: 'சொந்தமானது',
+    rent_gov: 'வாடகை (அரசு)',
+    rent_private: 'வாடகை (தனியார்)',
+    free_of_rent: 'வாடகை இலவசம்',
+    encroached: 'ஆக்கிரமிக்கப்பட்டது',
+    other: 'மற்றவை',
+  }
+};
+
+const categoryKeys = [
+  'owned_by_member',
+  'rent_gov',
+  'rent_private',
+  'free_of_rent',
+  'encroached',
+  'other',
 ];
 
 export default function HousingOwnershipChart({ data, location_name, language = 'en' }: HousingOwnershipChartProps) {
@@ -51,13 +81,15 @@ export default function HousingOwnershipChart({ data, location_name, language = 
   if (total === 0) return null;
   const displayLocation = location_name || "Selected Location";
 
+  const t = translations[language] || translations.en;
+
   // Prepare chart data dynamically
-  const chartData = categoryLabels.map((cat, index) => {
-    const value = Number(data[cat.key as keyof typeof data] || 0);
+  const chartData = categoryKeys.map((key, index) => {
+    const value = Number(data[key as keyof typeof data] || 0);
     const percent = total > 0 ? Math.round((value / total) * 100) : 0;
     return {
-      id: cat.key,
-      title: cat.label,
+      id: key,
+      title: t[key as keyof typeof t],
       percent,
       value,
       ...palette[index]
@@ -82,7 +114,7 @@ export default function HousingOwnershipChart({ data, location_name, language = 
         {!isMobile && (
           <>
             <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: theme.palette.text.primary }}>
-              Housing Ownership Status
+              {t.title}
             </Typography>
             <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary', mb: 8 }}>
               {displayLocation}

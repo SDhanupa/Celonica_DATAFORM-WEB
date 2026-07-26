@@ -11,7 +11,11 @@ const TopNavbar: React.FC = () => {
   return (
     <AppBar position="absolute" sx={{ bgcolor: 'transparent', color: 'white', boxShadow: 'none', borderBottom: 'none', top: 0, left: 0, right: 0, zIndex: 10 }}>
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Typography variant="h6" component={Link} to="/" sx={{ textDecoration: 'none', color: 'inherit', fontWeight: 'bold', letterSpacing: '1px' }}>
+        <Typography 
+          variant="h6" 
+          onClick={() => { window.location.href = '/'; }}
+          sx={{ textDecoration: 'none', color: 'inherit', fontWeight: 'bold', letterSpacing: '1px', cursor: 'pointer' }}
+        >
           CEYLONICA
         </Typography>
       </Toolbar>
