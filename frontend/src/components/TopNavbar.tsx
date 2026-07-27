@@ -14,7 +14,14 @@ const TopNavbar: React.FC = () => {
         <Typography 
           variant="h6" 
           onClick={() => { window.location.href = '/'; }}
-          sx={{ textDecoration: 'none', color: 'inherit', fontWeight: 'bold', letterSpacing: '1px', cursor: 'pointer' }}
+          sx={{ 
+            textDecoration: 'none', 
+            color: '#fff', 
+            fontWeight: 'bold', 
+            letterSpacing: '1px', 
+            cursor: 'pointer',
+            textShadow: '0px 2px 10px rgba(0,0,0,0.8), 0px 0px 5px rgba(0,0,0,0.5)'
+          }}
         >
           CEYLONICA
         </Typography>

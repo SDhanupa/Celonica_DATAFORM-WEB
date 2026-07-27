@@ -75,10 +75,15 @@ export default function PopulationInfographic({ populationData, language = 'en' 
     const midPercent = cumulativePercent + (slice.percent / 100) / 2;
     const midPoint = getCoordinatesForPercent(midPercent, radius);
     
-    // Label endpoints
-    const lineStart = getCoordinatesForPercent(midPercent, radius - 5);
-    const lineEnd = getCoordinatesForPercent(midPercent, radius + 30);
-    const textPos = getCoordinatesForPercent(midPercent, radius + 75);
+    // Label endpoints - line starts well outside the slice
+    const lineStart = getCoordinatesForPercent(midPercent, radius + 15);
+    const lineEnd = getCoordinatesForPercent(midPercent, radius + 40);
+    const dotX = lineEnd.x > 0 ? lineEnd.x + 25 : lineEnd.x - 25;
+    const dotY = lineEnd.y;
+    const textPos = {
+      x: dotX + (lineEnd.x > 0 ? 50 : -50),
+      y: dotY
+    };
     
     cumulativePercent += slice.percent / 100;
     
@@ -99,7 +104,7 @@ export default function PopulationInfographic({ populationData, language = 'en' 
     const transformX = (midPoint.x / radius) * explodeOffset;
     const transformY = (midPoint.y / radius) * explodeOffset;
 
-    return { ...slice, pathData, midPoint, lineStart, lineEnd, textPos, transformX, transformY, midPercent, index };
+    return { ...slice, pathData, midPoint, lineStart, lineEnd, dotX, dotY, textPos, transformX, transformY, midPercent, index };
   });
 
   return (
@@ -142,8 +147,8 @@ export default function PopulationInfographic({ populationData, language = 'en' 
 
             {/* Count Text on Slice (Always Visible) */}
             <text
-              x={slice.midPoint.x * 0.70}
-              y={slice.midPoint.y * 0.70 + (isMobile ? 12 : 0)}
+              x={slice.midPoint.x * 0.65}
+              y={slice.midPoint.y * 0.65 + (isMobile ? 12 : 0)}
               fill="#fff"
               fontSize="18"
               fontWeight="bold"
@@ -160,22 +165,22 @@ export default function PopulationInfographic({ populationData, language = 'en' 
                 <circle cx={slice.lineStart.x} cy={slice.lineStart.y} r="4" fill="#fff" />
                 {/* Line connecting slice to text */}
                 <path
-                  d={`M ${slice.lineStart.x} ${slice.lineStart.y} L ${slice.lineEnd.x} ${slice.lineEnd.y} L ${slice.lineEnd.x > 0 ? slice.lineEnd.x + 20 : slice.lineEnd.x - 20} ${slice.lineEnd.y}`}
+                  d={`M ${slice.lineStart.x} ${slice.lineStart.y} L ${slice.lineEnd.x} ${slice.lineEnd.y} L ${slice.dotX} ${slice.dotY}`}
                   fill="none"
                   stroke="rgba(255,255,255,0.5)"
                   strokeWidth="1.5"
                 />
-                <circle cx={slice.lineEnd.x > 0 ? slice.lineEnd.x + 20 : slice.lineEnd.x - 20} cy={slice.lineEnd.y} r="3" fill={slice.color} />
+                <circle cx={slice.dotX} cy={slice.dotY} r="3" fill={slice.color} />
               </>
             )}
           </g>
         ))}
         
         {/* Center Donut Hole for Total Population */}
-        <circle cx="0" cy="0" r="42" fill="rgba(30, 30, 30, 0.8)" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-        <text x="0" y="-12" fill="#fff" fontSize="9" textAnchor="middle" opacity="0.8">{t.total}</text>
-        <text x="0" y="-2" fill="#fff" fontSize="9" textAnchor="middle" opacity="0.8">{t.population}</text>
-        <text x="0" y="15" fill="#fff" fontSize="14" fontWeight="bold" textAnchor="middle">{totalCount.toLocaleString()}</text>
+        <circle cx="0" cy="0" r="35" fill="rgba(30, 30, 30, 0.8)" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+        <text x="0" y="-10" fill="#fff" fontSize="8" textAnchor="middle" opacity="0.8">{t.total}</text>
+        <text x="0" y="0" fill="#fff" fontSize="8" textAnchor="middle" opacity="0.8">{t.population}</text>
+        <text x="0" y="14" fill="#fff" fontSize="12" fontWeight="bold" textAnchor="middle">{totalCount.toLocaleString()}</text>
       </svg>
 
       {/* HTML overlay for Icons and Text (Desktop Only) */}
@@ -188,9 +193,9 @@ export default function PopulationInfographic({ populationData, language = 'en' 
                 <Box 
                   sx={{ 
                     position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: `translate(calc(-50% + ${slice.textPos.x * 1.6}px), calc(-50% + ${slice.textPos.y * 1.6}px))`,
+                    top: `calc(50% + ${(slice.textPos.y / 220) * 50}%)`,
+                    left: `calc(50% + ${(slice.textPos.x / 220) * 50}%)`,
+                    transform: 'translate(-50%, -50%)',
                     display: 'flex',
                     alignItems: 'center',
                     flexDirection: isRight ? 'row' : 'row-reverse',
@@ -211,7 +216,7 @@ export default function PopulationInfographic({ populationData, language = 'en' 
                     {slice.icon}
                   </Box>
                   <Box sx={{ textAlign: isRight ? 'left' : 'right' }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold', fontSize: '1rem', letterSpacing: '0.5px' }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold', fontSize: '1rem', letterSpacing: '0.5px', textShadow: '0px 2px 10px rgba(0,0,0,0.8), 0px 0px 5px rgba(0,0,0,0.5)' }}>
                       {slice.label}
                     </Typography>
                   </Box>

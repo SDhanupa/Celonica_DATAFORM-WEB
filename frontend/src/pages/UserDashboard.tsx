@@ -521,10 +521,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           textAlign: 'center',
           pointerEvents: 'none'
         }}>
-          <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : 'text.secondary', display: 'block', lineHeight: 1 }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
             Total<br />Economy
           </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 800, color: isMobileView ? '#ffffff' : themeColors.textDark, mt: 0.5 }}>
+          <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
             {(gnEconomyData?.total || 0).toLocaleString()}
           </Typography>
         </Box>
@@ -532,24 +532,24 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         {/* Custom Legend */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mt: 2, px: isMobileView ? 0 : 2 }}>
           <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : themeColors.textDark, fontWeight: 'bold', display: 'block' }}>Employed</Typography>
+            <Typography variant="caption" sx={{ color: themeColors.textDark, fontWeight: 'bold', display: 'block' }}>Employed</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
               <span style={{ color: '#2ecc71', fontSize: '1rem' }}>●</span>
-              <Typography variant="body1" sx={{ color: isMobileView ? '#ffffff' : themeColors.textDark, fontWeight: 800 }}>{(gnEconomyData?.employed || 0).toLocaleString()}</Typography>
+              <Typography variant="body1" sx={{ color: themeColors.textDark, fontWeight: 800 }}>{(gnEconomyData?.employed || 0).toLocaleString()}</Typography>
             </Box>
           </Box>
           <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : themeColors.textDark, fontWeight: 'bold', display: 'block' }}>Unemployed</Typography>
+            <Typography variant="caption" sx={{ color: themeColors.textDark, fontWeight: 'bold', display: 'block' }}>Unemployed</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
               <span style={{ color: '#e74c3c', fontSize: '1rem' }}>●</span>
-              <Typography variant="body1" sx={{ color: isMobileView ? '#ffffff' : themeColors.textDark, fontWeight: 800 }}>{(gnEconomyData?.unemployed || 0).toLocaleString()}</Typography>
+              <Typography variant="body1" sx={{ color: themeColors.textDark, fontWeight: 800 }}>{(gnEconomyData?.unemployed || 0).toLocaleString()}</Typography>
             </Box>
           </Box>
           <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : themeColors.textDark, fontWeight: 'bold', display: 'block' }}>Not Active</Typography>
+            <Typography variant="caption" sx={{ color: themeColors.textDark, fontWeight: 'bold', display: 'block' }}>Not Active</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
               <span style={{ color: '#f1c40f', fontSize: '1rem' }}>●</span>
-              <Typography variant="body1" sx={{ color: isMobileView ? '#ffffff' : themeColors.textDark, fontWeight: 800 }}>{(gnEconomyData?.economically_not_active || 0).toLocaleString()}</Typography>
+              <Typography variant="body1" sx={{ color: themeColors.textDark, fontWeight: 800 }}>{(gnEconomyData?.economically_not_active || 0).toLocaleString()}</Typography>
             </Box>
           </Box>
         </Box>
@@ -626,10 +626,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           textAlign: 'center',
           pointerEvents: 'none'
         }}>
-          <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : 'text.secondary', display: 'block', lineHeight: 1 }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
             Total<br />Units
           </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 800, color: isMobileView ? '#ffffff' : themeColors.textDark, mt: 0.5 }}>
+          <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
             {(housingWallData?.total_units || 0).toLocaleString()}
           </Typography>
         </Box>
@@ -638,10 +638,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', width: '100%', mt: 2, px: isMobileView ? 0 : 2, gap: 2 }}>
           {wallPalette.map((item, index) => (
             <Box key={index} sx={{ textAlign: 'center', minWidth: '80px' }}>
-              <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
+              <Typography variant="caption" sx={{ color: themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
                 <span style={{ color: item.color, fontSize: '1rem' }}>●</span>
-                <Typography variant="body2" sx={{ color: isMobileView ? '#ffffff' : themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
+                <Typography variant="body2" sx={{ color: themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
               </Box>
             </Box>
           ))}
@@ -715,10 +715,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           textAlign: 'center',
           pointerEvents: 'none'
         }}>
-          <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : 'text.secondary', display: 'block', lineHeight: 1 }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
             Total<br />Units
           </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 800, color: isMobileView ? '#ffffff' : themeColors.textDark, mt: 0.5 }}>
+          <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
             {(housingUnitData?.total_units || 0).toLocaleString()}
           </Typography>
         </Box>
@@ -727,10 +727,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', width: '100%', mt: 2, px: isMobileView ? 0 : 2, gap: 2 }}>
           {unitPalette.map((item, index) => (
             <Box key={index} sx={{ textAlign: 'center', minWidth: '80px' }}>
-              <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
+              <Typography variant="caption" sx={{ color: themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
                 <span style={{ color: item.color, fontSize: '1rem' }}>●</span>
-                <Typography variant="body2" sx={{ color: isMobileView ? '#ffffff' : themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
+                <Typography variant="body2" sx={{ color: themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
               </Box>
             </Box>
           ))}
@@ -806,10 +806,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           textAlign: 'center',
           pointerEvents: 'none'
         }}>
-          <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : 'text.secondary', display: 'block', lineHeight: 1 }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
             Total<br />Households
           </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 800, color: isMobileView ? '#ffffff' : themeColors.textDark, mt: 0.5 }}>
+          <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
             {(toiletFacilityData?.total_households || 0).toLocaleString()}
           </Typography>
         </Box>
@@ -818,10 +818,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', width: '100%', mt: 2, px: isMobileView ? 0 : 2, gap: 2 }}>
           {toiletPalette.map((item, index) => (
             <Box key={index} sx={{ textAlign: 'center', minWidth: '80px' }}>
-              <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
+              <Typography variant="caption" sx={{ color: themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
                 <span style={{ color: item.color, fontSize: '1rem' }}>●</span>
-                <Typography variant="body2" sx={{ color: isMobileView ? '#ffffff' : themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
+                <Typography variant="body2" sx={{ color: themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
               </Box>
             </Box>
           ))}
@@ -902,10 +902,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           textAlign: 'center',
           pointerEvents: 'none'
         }}>
-          <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : 'text.secondary', display: 'block', lineHeight: 1 }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
             Total<br />Households
           </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 800, color: isMobileView ? '#ffffff' : themeColors.textDark, mt: 0.5 }}>
+          <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
             {(drinkingWaterData?.total_households || 0).toLocaleString()}
           </Typography>
         </Box>
@@ -914,10 +914,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', width: '100%', mt: 2, px: isMobileView ? 0 : 2, gap: 2 }}>
           {waterPalette.map((item, index) => (
             <Box key={index} sx={{ textAlign: 'center', minWidth: '80px', maxWidth: '120px' }}>
-              <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
+              <Typography variant="caption" sx={{ color: themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
                 <span style={{ color: item.color, fontSize: '1rem' }}>●</span>
-                <Typography variant="body2" sx={{ color: isMobileView ? '#ffffff' : themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
+                <Typography variant="body2" sx={{ color: themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
               </Box>
             </Box>
           ))}
@@ -993,10 +993,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           textAlign: 'center',
           pointerEvents: 'none'
         }}>
-          <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : 'text.secondary', display: 'block', lineHeight: 1 }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
             Total<br />Households
           </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 800, color: isMobileView ? '#ffffff' : themeColors.textDark, mt: 0.5 }}>
+          <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
             {(solidWasteData?.total_households || 0).toLocaleString()}
           </Typography>
         </Box>
@@ -1005,10 +1005,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', width: '100%', mt: 2, px: isMobileView ? 0 : 2, gap: 2 }}>
           {wastePalette.map((item, index) => (
             <Box key={index} sx={{ textAlign: 'center', minWidth: '80px', maxWidth: '120px' }}>
-              <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
+              <Typography variant="caption" sx={{ color: themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
                 <span style={{ color: item.color, fontSize: '1rem' }}>●</span>
-                <Typography variant="body2" sx={{ color: isMobileView ? '#ffffff' : themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
+                <Typography variant="body2" sx={{ color: themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
               </Box>
             </Box>
           ))}
@@ -1086,10 +1086,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           textAlign: 'center',
           pointerEvents: 'none'
         }}>
-          <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : 'text.secondary', display: 'block', lineHeight: 1 }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
             Total<br />Units
           </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 800, color: isMobileView ? '#ffffff' : themeColors.textDark, mt: 0.5 }}>
+          <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
             {(roomsData?.total_housing_units || 0).toLocaleString()}
           </Typography>
         </Box>
@@ -1098,10 +1098,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', width: '100%', mt: 2, px: isMobileView ? 0 : 2, gap: 2 }}>
           {roomsPalette.map((item, index) => (
             <Box key={index} sx={{ textAlign: 'center', minWidth: '80px', maxWidth: '120px' }}>
-              <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
+              <Typography variant="caption" sx={{ color: themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
                 <span style={{ color: item.color, fontSize: '1rem' }}>●</span>
-                <Typography variant="body2" sx={{ color: isMobileView ? '#ffffff' : themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
+                <Typography variant="body2" sx={{ color: themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
               </Box>
             </Box>
           ))}
@@ -1176,10 +1176,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           textAlign: 'center',
           pointerEvents: 'none'
         }}>
-          <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : 'text.secondary', display: 'block', lineHeight: 1 }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
             Total<br />Units
           </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 800, color: isMobileView ? '#ffffff' : themeColors.textDark, mt: 0.5 }}>
+          <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
             {(roofData?.total_housing_units || 0).toLocaleString()}
           </Typography>
         </Box>
@@ -1188,10 +1188,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', width: '100%', mt: 2, px: isMobileView ? 0 : 2, gap: 2 }}>
           {roofPalette.map((item, index) => (
             <Box key={index} sx={{ textAlign: 'center', minWidth: '80px', maxWidth: '120px' }}>
-              <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
+              <Typography variant="caption" sx={{ color: themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
                 <span style={{ color: item.color, fontSize: '1rem' }}>●</span>
-                <Typography variant="body2" sx={{ color: isMobileView ? '#ffffff' : themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
+                <Typography variant="body2" sx={{ color: themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
               </Box>
             </Box>
           ))}
@@ -1265,10 +1265,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           textAlign: 'center',
           pointerEvents: 'none'
         }}>
-          <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : 'text.secondary', display: 'block', lineHeight: 1 }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
             Total<br />Population
           </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 800, color: isMobileView ? '#ffffff' : themeColors.textDark, mt: 0.5 }}>
+          <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
             {(religionData?.total_population || 0).toLocaleString()}
           </Typography>
         </Box>
@@ -1277,10 +1277,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', width: '100%', mt: 2, px: isMobileView ? 0 : 2, gap: 2 }}>
           {religionPalette.map((item, index) => (
             <Box key={index} sx={{ textAlign: 'center', minWidth: '80px', maxWidth: '120px' }}>
-              <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
+              <Typography variant="caption" sx={{ color: themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
                 <span style={{ color: item.color, fontSize: '1rem' }}>●</span>
-                <Typography variant="body2" sx={{ color: isMobileView ? '#ffffff' : themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
+                <Typography variant="body2" sx={{ color: themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
               </Box>
             </Box>
           ))}
@@ -1351,10 +1351,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         />
         {/* Center Text */}
         <Box sx={{ position: 'absolute', top: '40%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', pointerEvents: 'none' }}>
-          <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : 'text.secondary', display: 'block', lineHeight: 1 }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
             Total<br />Population
           </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 800, color: isMobileView ? '#ffffff' : themeColors.textDark, mt: 0.5 }}>
+          <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
             {(householdHeadData?.total_population || 0).toLocaleString()}
           </Typography>
         </Box>
@@ -1362,10 +1362,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', width: '100%', mt: 2, px: isMobileView ? 0 : 2, gap: 2 }}>
           {householdPalette.map((item, index) => (
             <Box key={index} sx={{ textAlign: 'center', minWidth: '80px', maxWidth: '130px' }}>
-              <Typography variant="caption" sx={{ color: isMobileView ? 'rgba(255,255,255,0.7)' : themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
+              <Typography variant="caption" sx={{ color: themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{item.label}</Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
                 <span style={{ color: item.color, fontSize: '1rem' }}>●</span>
-                <Typography variant="body2" sx={{ color: isMobileView ? '#ffffff' : themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
+                <Typography variant="body2" sx={{ color: themeColors.textDark, fontWeight: 800 }}>{(item.value).toLocaleString()}</Typography>
               </Box>
             </Box>
           ))}
@@ -1698,7 +1698,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
       {/* Hero Section */}
       <Box
         sx={{
-          bgcolor: themeColors.darkCharcoal,
+          bgcolor: '#a2c8c4', // Match the left side gradient of the image somewhat just in case
           color: themeColors.textLight,
           minHeight: '100vh', // Full screen
           display: 'flex',
@@ -1716,10 +1716,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundImage: 'url(/hero-image.png)',
+            backgroundImage: 'url(/hero-image.jpeg)',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            opacity: 0.4,
+            opacity: 1, // Full opacity for the new bright image
             zIndex: 0,
           }}
         />
@@ -1741,13 +1741,13 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                     flexDirection: 'column',
                     alignItems: { xs: 'center', md: 'flex-start' },
                     textAlign: { xs: 'center', md: 'left' },
-                    bgcolor: { xs: isDarkMode ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.2)', md: 'transparent' },
-                    backdropFilter: { xs: 'blur(10px)', md: 'none' },
+                    bgcolor: 'transparent',
+                    backdropFilter: 'none',
                     borderRadius: '24px',
                     p: { xs: 3, md: 0 },
-                    border: { xs: '1px solid rgba(255, 255, 255, 0.1)', md: 'none' },
-                    boxShadow: { xs: '0 8px 32px rgba(0,0,0,0.3)', md: 'none' },
-                    mt: { xs: 0, md: -2 }
+                    border: 'none',
+                    boxShadow: 'none',
+                    mt: { xs: 2, md: 4 } // Moved further down as requested
                   }}
                 >
                   {/* CCODE - Above District */}
@@ -1755,12 +1755,13 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                     <Typography
                       variant="h3"
                       sx={{
-                        color: 'rgba(255, 255, 255, 0.9)',
+                        color: themeColors.textDark,
                         fontFamily: "'Playfair Display', serif",
-                        fontWeight: 500,
+                        fontWeight: 700,
                         fontSize: { xs: '1.5rem', sm: '2.25rem', md: '2.75rem', lg: '3.25rem' },
                         mb: { xs: 2, md: 3 },
                         textAlign: { xs: 'center', md: 'left' },
+                        textShadow: '0 0 20px rgba(255,255,255,0.9), 0 0 10px rgba(255,255,255,1)'
                       }}
                     >
                       {displayCCODE}
@@ -1787,10 +1788,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                       <Typography
                         variant="overline"
                         sx={{
-                          color: '#ffffff',
+                          color: themeColors.textDark,
                           letterSpacing: { xs: '1px', md: '2px' },
-                          fontWeight: 600,
-                          fontSize: { xs: '0.75rem', md: '0.9rem' },
+                          fontWeight: 700,
+                          fontSize: { xs: '1rem', md: '1.25rem' }, // Made slightly bigger
                           lineHeight: 1,
                           m: 0
                         }}
@@ -1804,12 +1805,13 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                   <Typography
                     variant="h1"
                     sx={{
-                      color: '#ffffff',
+                      color: themeColors.textDark,
                       fontFamily: "'Playfair Display', serif",
-                      fontWeight: 700,
-                      fontSize: { xs: '3rem', sm: '4.5rem', md: '5.5rem', lg: '6.5rem' },
+                      fontWeight: 800,
+                      fontSize: { xs: '2rem', sm: '2.75rem', md: '3.5rem', lg: '4.25rem' }, // Made even smaller
                       lineHeight: 1.1,
-                      mb: 1
+                      mb: 1,
+                      textShadow: '0 0 20px rgba(255,255,255,0.9), 0 0 10px rgba(255,255,255,1)'
                     }}
                   >
                     {displayGN || (language === 'en' ? 'Your Location' : language === 'si' ? 'ඔබගේ ස්ථානය' : 'உங்கள் இடம்')}
@@ -1820,11 +1822,12 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                     <Typography
                       variant="h3"
                       sx={{
-                        color: 'rgba(255, 255, 255, 0.9)',
+                        color: themeColors.textDark,
                         fontFamily: "'Playfair Display', serif",
-                        fontWeight: 500,
+                        fontWeight: 600,
                         fontSize: { xs: '1.5rem', sm: '2.25rem', md: '2.75rem', lg: '3.25rem' },
-                        mb: 1
+                        mb: 1,
+                        textShadow: '0 0 20px rgba(255,255,255,0.9), 0 0 10px rgba(255,255,255,1)'
                       }}
                     >
                       {displayCity}
@@ -1883,8 +1886,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                           size="small"
                           sx={{
                             borderRadius: '20px',
-                            color: activeMobileChart === 'pie' ? '#fff' : 'rgba(255,255,255,0.7)',
-                            borderColor: 'rgba(255,255,255,0.3)',
+                            color: activeMobileChart === 'pie' ? '#fff' : '#000000',
+                            borderColor: activeMobileChart === 'pie' ? 'transparent' : 'rgba(0,0,0,0.3)',
+                            fontWeight: 'bold',
                             bgcolor: activeMobileChart === 'pie' ? 'primary.main' : 'transparent',
                             '&:hover': { bgcolor: activeMobileChart === 'pie' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
                           }}
@@ -1899,8 +1903,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                           size="small"
                           sx={{
                             borderRadius: '20px',
-                            color: activeMobileChart === 'bar' ? '#fff' : 'rgba(255,255,255,0.7)',
-                            borderColor: 'rgba(255,255,255,0.3)',
+                            color: activeMobileChart === 'bar' ? '#fff' : '#000000',
+                            borderColor: activeMobileChart === 'bar' ? 'transparent' : 'rgba(0,0,0,0.3)',
+                            fontWeight: 'bold',
                             bgcolor: activeMobileChart === 'bar' ? 'primary.main' : 'transparent',
                             '&:hover': { bgcolor: activeMobileChart === 'bar' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
                           }}
@@ -1915,8 +1920,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                           size="small"
                           sx={{
                             borderRadius: '20px',
-                            color: activeMobileChart === 'economy' ? '#fff' : 'rgba(255,255,255,0.7)',
-                            borderColor: 'rgba(255,255,255,0.3)',
+                            color: activeMobileChart === 'economy' ? '#fff' : '#000000',
+                            borderColor: activeMobileChart === 'economy' ? 'transparent' : 'rgba(0,0,0,0.3)',
+                            fontWeight: 'bold',
                             bgcolor: activeMobileChart === 'economy' ? 'primary.main' : 'transparent',
                             '&:hover': { bgcolor: activeMobileChart === 'economy' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
                           }}
@@ -1931,8 +1937,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                           size="small"
                           sx={{
                             borderRadius: '20px',
-                            color: activeMobileChart === 'age' ? '#fff' : 'rgba(255,255,255,0.7)',
-                            borderColor: 'rgba(255,255,255,0.3)',
+                            color: activeMobileChart === 'age' ? '#fff' : '#000000',
+                            borderColor: activeMobileChart === 'age' ? 'transparent' : 'rgba(0,0,0,0.3)',
+                            fontWeight: 'bold',
                             bgcolor: activeMobileChart === 'age' ? 'primary.main' : 'transparent',
                             '&:hover': { bgcolor: activeMobileChart === 'age' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
                           }}
@@ -1947,8 +1954,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                           size="small"
                           sx={{
                             borderRadius: '20px',
-                            color: activeMobileChart === 'ownership' ? '#fff' : 'rgba(255,255,255,0.7)',
-                            borderColor: 'rgba(255,255,255,0.3)',
+                            color: activeMobileChart === 'ownership' ? '#fff' : '#000000',
+                            borderColor: activeMobileChart === 'ownership' ? 'transparent' : 'rgba(0,0,0,0.3)',
+                            fontWeight: 'bold',
                             bgcolor: activeMobileChart === 'ownership' ? 'primary.main' : 'transparent',
                             '&:hover': { bgcolor: activeMobileChart === 'ownership' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
                           }}
@@ -1963,8 +1971,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                           size="small"
                           sx={{
                             borderRadius: '20px',
-                            color: activeMobileChart === 'wall' ? '#fff' : 'rgba(255,255,255,0.7)',
-                            borderColor: 'rgba(255,255,255,0.3)',
+                            color: activeMobileChart === 'wall' ? '#fff' : '#000000',
+                            borderColor: activeMobileChart === 'wall' ? 'transparent' : 'rgba(0,0,0,0.3)',
+                            fontWeight: 'bold',
                             bgcolor: activeMobileChart === 'wall' ? 'primary.main' : 'transparent',
                             '&:hover': { bgcolor: activeMobileChart === 'wall' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
                           }}
@@ -1979,8 +1988,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                           size="small"
                           sx={{
                             borderRadius: '20px',
-                            color: activeMobileChart === 'unit' ? '#fff' : 'rgba(255,255,255,0.7)',
-                            borderColor: 'rgba(255,255,255,0.3)',
+                            color: activeMobileChart === 'unit' ? '#fff' : '#000000',
+                            borderColor: activeMobileChart === 'unit' ? 'transparent' : 'rgba(0,0,0,0.3)',
+                            fontWeight: 'bold',
                             bgcolor: activeMobileChart === 'unit' ? 'primary.main' : 'transparent',
                             '&:hover': { bgcolor: activeMobileChart === 'unit' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
                           }}
@@ -1995,8 +2005,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                           size="small"
                           sx={{
                             borderRadius: '20px',
-                            color: activeMobileChart === 'toilet' ? '#fff' : 'rgba(255,255,255,0.7)',
-                            borderColor: 'rgba(255,255,255,0.3)',
+                            color: activeMobileChart === 'toilet' ? '#fff' : '#000000',
+                            borderColor: activeMobileChart === 'toilet' ? 'transparent' : 'rgba(0,0,0,0.3)',
+                            fontWeight: 'bold',
                             bgcolor: activeMobileChart === 'toilet' ? 'primary.main' : 'transparent',
                             '&:hover': { bgcolor: activeMobileChart === 'toilet' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
                           }}
@@ -2011,8 +2022,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                           size="small"
                           sx={{
                             borderRadius: '20px',
-                            color: activeMobileChart === 'water' ? '#fff' : 'rgba(255,255,255,0.7)',
-                            borderColor: 'rgba(255,255,255,0.3)',
+                            color: activeMobileChart === 'water' ? '#fff' : '#000000',
+                            borderColor: activeMobileChart === 'water' ? 'transparent' : 'rgba(0,0,0,0.3)',
+                            fontWeight: 'bold',
                             bgcolor: activeMobileChart === 'water' ? 'primary.main' : 'transparent',
                             '&:hover': { bgcolor: activeMobileChart === 'water' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
                           }}
@@ -2027,8 +2039,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                           size="small"
                           sx={{
                             borderRadius: '20px',
-                            color: activeMobileChart === 'waste' ? '#fff' : 'rgba(255,255,255,0.7)',
-                            borderColor: 'rgba(255,255,255,0.3)',
+                            color: activeMobileChart === 'waste' ? '#fff' : '#000000',
+                            borderColor: activeMobileChart === 'waste' ? 'transparent' : 'rgba(0,0,0,0.3)',
+                            fontWeight: 'bold',
                             bgcolor: activeMobileChart === 'waste' ? 'primary.main' : 'transparent',
                             '&:hover': { bgcolor: activeMobileChart === 'waste' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
                           }}
@@ -2043,8 +2056,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                           size="small"
                           sx={{
                             borderRadius: '20px',
-                            color: activeMobileChart === 'rooms' ? '#fff' : 'rgba(255,255,255,0.7)',
-                            borderColor: 'rgba(255,255,255,0.3)',
+                            color: activeMobileChart === 'rooms' ? '#fff' : '#000000',
+                            borderColor: activeMobileChart === 'rooms' ? 'transparent' : 'rgba(0,0,0,0.3)',
+                            fontWeight: 'bold',
                             bgcolor: activeMobileChart === 'rooms' ? 'primary.main' : 'transparent',
                             '&:hover': { bgcolor: activeMobileChart === 'rooms' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
                           }}
@@ -2059,8 +2073,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                           size="small"
                           sx={{
                             borderRadius: '20px',
-                            color: activeMobileChart === 'roof' ? '#fff' : 'rgba(255,255,255,0.7)',
-                            borderColor: 'rgba(255,255,255,0.3)',
+                            color: activeMobileChart === 'roof' ? '#fff' : '#000000',
+                            borderColor: activeMobileChart === 'roof' ? 'transparent' : 'rgba(0,0,0,0.3)',
+                            fontWeight: 'bold',
                             bgcolor: activeMobileChart === 'roof' ? 'primary.main' : 'transparent',
                             '&:hover': { bgcolor: activeMobileChart === 'roof' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
                           }}
@@ -2075,8 +2090,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                           size="small"
                           sx={{
                             borderRadius: '20px',
-                            color: activeMobileChart === 'religion' ? '#fff' : 'rgba(255,255,255,0.7)',
-                            borderColor: 'rgba(255,255,255,0.3)',
+                            color: activeMobileChart === 'religion' ? '#fff' : '#000000',
+                            borderColor: activeMobileChart === 'religion' ? 'transparent' : 'rgba(0,0,0,0.3)',
+                            fontWeight: 'bold',
                             bgcolor: activeMobileChart === 'religion' ? 'primary.main' : 'transparent',
                             '&:hover': { bgcolor: activeMobileChart === 'religion' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
                           }}
@@ -2091,8 +2107,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                           size="small"
                           sx={{
                             borderRadius: '20px',
-                            color: activeMobileChart === 'household' ? '#fff' : 'rgba(255,255,255,0.7)',
-                            borderColor: 'rgba(255,255,255,0.3)',
+                            color: activeMobileChart === 'household' ? '#fff' : '#000000',
+                            borderColor: activeMobileChart === 'household' ? 'transparent' : 'rgba(0,0,0,0.3)',
+                            fontWeight: 'bold',
                             bgcolor: activeMobileChart === 'household' ? 'primary.main' : 'transparent',
                             '&:hover': { bgcolor: activeMobileChart === 'household' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
                           }}

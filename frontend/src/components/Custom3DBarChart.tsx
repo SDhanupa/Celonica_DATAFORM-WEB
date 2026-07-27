@@ -103,6 +103,9 @@ export default function Custom3DBarChart({ district_id, city_code, gn_id, locati
   return (
     <Box sx={{ 
       bgcolor: isMobile ? 'transparent' : '#eef2f3', 
+      backgroundImage: isMobile ? 'none' : 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/bg-bar-chart.png)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
       py: isMobile ? 2 : 8, 
       width: '100%', 
       overflowX: 'hidden', 
@@ -167,12 +170,13 @@ export default function Custom3DBarChart({ district_id, city_code, gn_id, locati
                   <Typography 
                     variant="h6" 
                     sx={{ 
-                      color: item.topColor, 
-                      fontWeight: 800, 
+                      color: '#1a1a1d', 
+                      fontWeight: 900, 
                       fontFamily: "'Oswald', sans-serif",
-                      fontSize: { xs: '0.65rem', sm: '0.75rem', md: '1rem' },
+                      fontSize: { xs: '0.8rem', sm: '1rem', md: '1.25rem' },
                       mb: 0.5,
-                      lineHeight: 1.1
+                      lineHeight: 1.1,
+                      textShadow: '0 0 15px rgba(255,255,255,1), 0 0 20px rgba(255,255,255,1), 0 0 30px rgba(255,255,255,0.9)'
                     }}
                   >
                     {item.title}
@@ -180,9 +184,10 @@ export default function Custom3DBarChart({ district_id, city_code, gn_id, locati
                   <Typography 
                     variant="body2" 
                     sx={{ 
-                      color: isMobile ? 'rgba(255,255,255,0.8)' : '#7f8c8d', 
-                      fontSize: { xs: '0.6rem', md: '0.75rem' }, 
-                      fontWeight: 'bold'
+                      color: '#1a1a1d', 
+                      fontSize: { xs: '0.7rem', md: '0.9rem' }, 
+                      fontWeight: 800,
+                      textShadow: '0 0 10px rgba(255,255,255,1), 0 0 15px rgba(255,255,255,1)'
                     }}
                   >
                     {item.value} units
@@ -229,14 +234,14 @@ export default function Custom3DBarChart({ district_id, city_code, gn_id, locati
                       top: -ellipseHeight - (isMobile ? 15 : 30),
                       left: '50%',
                       transform: 'translateX(-50%)',
-                      color: isMobile ? '#fff' : '#2c3e50',
-                      fontSize: { xs: '0.7rem', md: '1.2rem' },
+                      color: '#1a1a1d',
+                      fontSize: { xs: '0.9rem', md: '1.5rem' },
                       fontWeight: 900,
                       opacity: 0,
                       animation: 'fadeInUp 0.8s ease forwards',
                       animationDelay: `${index * 0.1 + 0.5}s`,
                       fontFamily: "'Oswald', sans-serif",
-                      textShadow: '0px 2px 10px rgba(0,0,0,0.2)',
+                      textShadow: '0 0 15px rgba(255,255,255,1), 0 0 20px rgba(255,255,255,1), 0 0 30px rgba(255,255,255,0.9)',
                       zIndex: 3
                     }}
                   >

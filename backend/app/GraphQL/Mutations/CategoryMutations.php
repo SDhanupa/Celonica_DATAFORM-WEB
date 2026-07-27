@@ -14,8 +14,17 @@ class CategoryMutations
         $nameEn = $args['name_en'] ?? '';
         $nameSi = $args['name_si'] ?? '';
         
-        if (Category::where('name_en', $nameEn)->orWhere('name_si', $nameSi)->exists()) {
-            throw new \Exception("Same button already added");
+        $parentId = $args['parent_id'] ?? null;
+        
+        $query = Category::where('parent_id', $parentId)->where(function($q) use ($nameEn, $nameSi) {
+            $q->where('name_en', $nameEn);
+            if (!empty($nameSi)) {
+                $q->orWhere('name_si', $nameSi);
+            }
+        });
+        
+        if ($query->exists()) {
+            throw new \GraphQL\Error\Error("Same category already added in this section");
         }
 
         // Auto generate unique slug tag

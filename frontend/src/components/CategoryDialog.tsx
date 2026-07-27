@@ -92,9 +92,10 @@ const CategoryDialog: React.FC<CategoryDialogProps> = ({ open, onClose, category
         });
       }
       onClose();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error saving category:', err);
-      alert('Failed to save category');
+      const errorMessage = err.graphQLErrors?.[0]?.message || err.message || 'Failed to save category';
+      alert(errorMessage);
     }
   };
 
