@@ -105,6 +105,9 @@ export default function HousingOwnershipChart({ data, location_name, language = 
   return (
     <Box sx={{ 
       bgcolor: isMobile ? 'transparent' : '#eef2f3', 
+      backgroundImage: isMobile ? 'none' : 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/Housing-Ownership-Status.png)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
       py: isMobile ? 2 : 8, 
       width: '100%', 
       overflowX: 'hidden', 

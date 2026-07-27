@@ -464,7 +464,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const gnEconomyChartUI = hasEconomyData ? (
     <>
       {!isMobileView && (
-        <Box sx={{ textAlign: 'center', mt: 8, mb: 4 }}>
+        <Box sx={{ textAlign: 'center', mb: 4 }}>
           <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
             Economy
           </Typography>
@@ -488,49 +488,52 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         maxWidth: 500,
         mx: 'auto'
       }}>
-        <PieChart
-          series={[
-            {
-              data: [
-                { id: 0, value: Number(gnEconomyData?.employed || 0), label: 'Employed', color: '#2ecc71' },
-                { id: 1, value: Number(gnEconomyData?.unemployed || 0), label: 'Unemployed', color: '#e74c3c' },
-                { id: 2, value: Number(gnEconomyData?.economically_not_active || 0), label: 'Not Active', color: '#f1c40f' },
-              ],
-              innerRadius: 80,
-              outerRadius: 130,
-              paddingAngle: 2,
-              cornerRadius: 4,
-              cx: '50%',
-              cy: '50%',
-              highlightScope: { faded: 'global', highlight: 'item' },
-              faded: { innerRadius: 75, additionalRadius: -20, color: 'gray' },
-            },
-          ]}
-          height={320}
-          margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          slotProps={{
-            legend: { hidden: true }
-          }}
-        />
-        {/* Center Text */}
-        <Box sx={{
-          position: 'absolute',
-          top: '43%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          textAlign: 'center',
-          pointerEvents: 'none'
-        }}>
-          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
-            Total<br />Economy
-          </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
-            {(gnEconomyData?.total || 0).toLocaleString()}
-          </Typography>
+        {/* Wrapper to perfectly center the text inside the pie chart */}
+        <Box sx={{ position: 'relative', width: '100%', zIndex: 1 }}>
+          <PieChart
+            series={[
+              {
+                data: [
+                  { id: 0, value: Number(gnEconomyData?.employed || 0), label: 'Employed', color: '#2ecc71' },
+                  { id: 1, value: Number(gnEconomyData?.unemployed || 0), label: 'Unemployed', color: '#e74c3c' },
+                  { id: 2, value: Number(gnEconomyData?.economically_not_active || 0), label: 'Not Active', color: '#f1c40f' },
+                ],
+                innerRadius: 90,
+                outerRadius: 130,
+                paddingAngle: 2,
+                cornerRadius: 4,
+                cx: '50%',
+                cy: '50%',
+                highlightScope: { faded: 'global', highlight: 'item' },
+                faded: { innerRadius: 85, additionalRadius: -10, color: 'gray' },
+              },
+            ]}
+            height={320}
+            margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            slotProps={{
+              legend: { hidden: true }
+            }}
+          />
+          {/* Center Text */}
+          <Box sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            textAlign: 'center',
+            pointerEvents: 'none'
+          }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1, fontWeight: 'bold' }}>
+              Total<br />Economy
+            </Typography>
+            <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
+              {(gnEconomyData?.total || 0).toLocaleString()}
+            </Typography>
+          </Box>
         </Box>
 
         {/* Custom Legend */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mt: 2, px: isMobileView ? 0 : 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mt: 2, px: isMobileView ? 0 : 2, zIndex: 1 }}>
           <Box sx={{ textAlign: 'center' }}>
             <Typography variant="caption" sx={{ color: themeColors.textDark, fontWeight: 'bold', display: 'block' }}>Employed</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
@@ -573,7 +576,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const gnWallChartUI = hasWallData ? (
     <>
       {!isMobileView && (
-        <Box sx={{ textAlign: 'center', mt: 8, mb: 4 }}>
+        <Box sx={{ textAlign: 'center', mb: 4 }}>
           <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
             Housing Wall Type
           </Typography>
@@ -597,41 +600,44 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         maxWidth: 500,
         mx: 'auto'
       }}>
-        <PieChart
-          series={[
-            {
-              data: wallPalette.map((item, idx) => ({ id: idx, value: Number(item.value), label: item.label, color: item.color })),
-              innerRadius: 80,
-              outerRadius: 130,
-              paddingAngle: 2,
-              cornerRadius: 4,
-              cx: '50%',
-              cy: '50%',
-              highlightScope: { faded: 'global', highlight: 'item' },
-              faded: { innerRadius: 75, additionalRadius: -20, color: 'gray' },
-            },
-          ]}
-          height={320}
-          margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          slotProps={{
-            legend: { hidden: true }
-          }}
-        />
-        {/* Center Text */}
-        <Box sx={{
-          position: 'absolute',
-          top: '40%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          textAlign: 'center',
-          pointerEvents: 'none'
-        }}>
-          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
-            Total<br />Units
-          </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
-            {(housingWallData?.total_units || 0).toLocaleString()}
-          </Typography>
+        {/* Wrapper to perfectly center the text inside the pie chart */}
+        <Box sx={{ position: 'relative', width: '100%', zIndex: 1 }}>
+          <PieChart
+            series={[
+              {
+                data: wallPalette.map((item, idx) => ({ id: idx, value: Number(item.value), label: item.label, color: item.color })),
+                innerRadius: 90,
+                outerRadius: 130,
+                paddingAngle: 2,
+                cornerRadius: 4,
+                cx: '50%',
+                cy: '50%',
+                highlightScope: { faded: 'global', highlight: 'item' },
+                faded: { innerRadius: 85, additionalRadius: -10, color: 'gray' },
+              },
+            ]}
+            height={320}
+            margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            slotProps={{
+              legend: { hidden: true }
+            }}
+          />
+          {/* Center Text */}
+          <Box sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            textAlign: 'center',
+            pointerEvents: 'none'
+          }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1, fontWeight: 'bold' }}>
+              Total<br />Units
+            </Typography>
+            <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
+              {(housingWallData?.total_units || 0).toLocaleString()}
+            </Typography>
+          </Box>
         </Box>
 
         {/* Custom Legend */}
@@ -662,7 +668,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const gnUnitChartUI = hasUnitData ? (
     <>
       {!isMobileView && (
-        <Box sx={{ textAlign: 'center', mt: 8, mb: 4 }}>
+        <Box sx={{ textAlign: 'center', mb: 4 }}>
           <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
             Housing Unit Type
           </Typography>
@@ -686,41 +692,44 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         maxWidth: 500,
         mx: 'auto'
       }}>
-        <PieChart
-          series={[
-            {
-              data: unitPalette.map((item, idx) => ({ id: idx, value: Number(item.value), label: item.label, color: item.color })),
-              innerRadius: 80,
-              outerRadius: 130,
-              paddingAngle: 2,
-              cornerRadius: 4,
-              cx: '50%',
-              cy: '50%',
-              highlightScope: { faded: 'global', highlight: 'item' },
-              faded: { innerRadius: 75, additionalRadius: -20, color: 'gray' },
-            },
-          ]}
-          height={320}
-          margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          slotProps={{
-            legend: { hidden: true }
-          }}
-        />
-        {/* Center Text */}
-        <Box sx={{
-          position: 'absolute',
-          top: '40%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          textAlign: 'center',
-          pointerEvents: 'none'
-        }}>
-          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
-            Total<br />Units
-          </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
-            {(housingUnitData?.total_units || 0).toLocaleString()}
-          </Typography>
+        {/* Wrapper to perfectly center the text inside the pie chart */}
+        <Box sx={{ position: 'relative', width: '100%', zIndex: 1 }}>
+          <PieChart
+            series={[
+              {
+                data: unitPalette.map((item, idx) => ({ id: idx, value: Number(item.value), label: item.label, color: item.color })),
+                innerRadius: 90,
+                outerRadius: 130,
+                paddingAngle: 2,
+                cornerRadius: 4,
+                cx: '50%',
+                cy: '50%',
+                highlightScope: { faded: 'global', highlight: 'item' },
+                faded: { innerRadius: 85, additionalRadius: -10, color: 'gray' },
+              },
+            ]}
+            height={320}
+            margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            slotProps={{
+              legend: { hidden: true }
+            }}
+          />
+          {/* Center Text */}
+          <Box sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            textAlign: 'center',
+            pointerEvents: 'none'
+          }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1, fontWeight: 'bold' }}>
+              Total<br />Units
+            </Typography>
+            <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
+              {(housingUnitData?.total_units || 0).toLocaleString()}
+            </Typography>
+          </Box>
         </Box>
 
         {/* Custom Legend */}
@@ -753,7 +762,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const gnToiletChartUI = hasToiletData ? (
     <>
       {!isMobileView && (
-        <Box sx={{ textAlign: 'center', mt: 8, mb: 4 }}>
+        <Box sx={{ textAlign: 'center', mb: 4 }}>
           <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
             Toilet Facilities
           </Typography>
@@ -777,41 +786,44 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         maxWidth: 500,
         mx: 'auto'
       }}>
-        <PieChart
-          series={[
-            {
-              data: toiletPalette.map((item, idx) => ({ id: idx, value: Number(item.value), label: item.label, color: item.color })),
-              innerRadius: 80,
-              outerRadius: 130,
-              paddingAngle: 2,
-              cornerRadius: 4,
-              cx: '50%',
-              cy: '50%',
-              highlightScope: { faded: 'global', highlight: 'item' },
-              faded: { innerRadius: 75, additionalRadius: -20, color: 'gray' },
-            },
-          ]}
-          height={320}
-          margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          slotProps={{
-            legend: { hidden: true }
-          }}
-        />
-        {/* Center Text */}
-        <Box sx={{
-          position: 'absolute',
-          top: '40%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          textAlign: 'center',
-          pointerEvents: 'none'
-        }}>
-          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
-            Total<br />Households
-          </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
-            {(toiletFacilityData?.total_households || 0).toLocaleString()}
-          </Typography>
+        {/* Wrapper to perfectly center the text inside the pie chart */}
+        <Box sx={{ position: 'relative', width: '100%', zIndex: 1 }}>
+          <PieChart
+            series={[
+              {
+                data: toiletPalette.map((item, idx) => ({ id: idx, value: Number(item.value), label: item.label, color: item.color })),
+                innerRadius: 90,
+                outerRadius: 130,
+                paddingAngle: 2,
+                cornerRadius: 4,
+                cx: '50%',
+                cy: '50%',
+                highlightScope: { faded: 'global', highlight: 'item' },
+                faded: { innerRadius: 85, additionalRadius: -10, color: 'gray' },
+              },
+            ]}
+            height={320}
+            margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            slotProps={{
+              legend: { hidden: true }
+            }}
+          />
+          {/* Center Text */}
+          <Box sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            textAlign: 'center',
+            pointerEvents: 'none'
+          }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1, fontWeight: 'bold' }}>
+              Total<br />Households
+            </Typography>
+            <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
+              {(toiletFacilityData?.total_households || 0).toLocaleString()}
+            </Typography>
+          </Box>
         </Box>
 
         {/* Custom Legend */}
@@ -849,7 +861,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const gnWaterChartUI = hasWaterData ? (
     <>
       {!isMobileView && (
-        <Box sx={{ textAlign: 'center', mt: 8, mb: 4 }}>
+        <Box sx={{ textAlign: 'center', mb: 4 }}>
           <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
             Source of Drinking Water
           </Typography>
@@ -873,41 +885,44 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         maxWidth: 500,
         mx: 'auto'
       }}>
-        <PieChart
-          series={[
-            {
-              data: waterPalette.map((item, idx) => ({ id: idx, value: Number(item.value), label: item.label, color: item.color })),
-              innerRadius: 80,
-              outerRadius: 130,
-              paddingAngle: 2,
-              cornerRadius: 4,
-              cx: '50%',
-              cy: '50%',
-              highlightScope: { faded: 'global', highlight: 'item' },
-              faded: { innerRadius: 75, additionalRadius: -20, color: 'gray' },
-            },
-          ]}
-          height={320}
-          margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          slotProps={{
-            legend: { hidden: true }
-          }}
-        />
-        {/* Center Text */}
-        <Box sx={{
-          position: 'absolute',
-          top: '40%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          textAlign: 'center',
-          pointerEvents: 'none'
-        }}>
-          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
-            Total<br />Households
-          </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
-            {(drinkingWaterData?.total_households || 0).toLocaleString()}
-          </Typography>
+        {/* Wrapper to perfectly center the text inside the pie chart */}
+        <Box sx={{ position: 'relative', width: '100%', zIndex: 1 }}>
+          <PieChart
+            series={[
+              {
+                data: waterPalette.map((item, idx) => ({ id: idx, value: Number(item.value), label: item.label, color: item.color })),
+                innerRadius: 90,
+                outerRadius: 130,
+                paddingAngle: 2,
+                cornerRadius: 4,
+                cx: '50%',
+                cy: '50%',
+                highlightScope: { faded: 'global', highlight: 'item' },
+                faded: { innerRadius: 85, additionalRadius: -10, color: 'gray' },
+              },
+            ]}
+            height={320}
+            margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            slotProps={{
+              legend: { hidden: true }
+            }}
+          />
+          {/* Center Text */}
+          <Box sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            textAlign: 'center',
+            pointerEvents: 'none'
+          }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1, fontWeight: 'bold' }}>
+              Total<br />Households
+            </Typography>
+            <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
+              {(drinkingWaterData?.total_households || 0).toLocaleString()}
+            </Typography>
+          </Box>
         </Box>
 
         {/* Custom Legend */}
@@ -1033,7 +1048,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const gnRoomsChartUI = hasRoomsData ? (
     <>
       {!isMobileView && (
-        <Box sx={{ textAlign: 'center', mt: 8, mb: 4 }}>
+        <Box sx={{ textAlign: 'center', mb: 4 }}>
           <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
             Rooms in Housing Unit
           </Typography>
@@ -1057,41 +1072,44 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         maxWidth: 500,
         mx: 'auto'
       }}>
-        <PieChart
-          series={[
-            {
-              data: roomsPalette.map((item, idx) => ({ id: idx, value: Number(item.value), label: item.label, color: item.color })),
-              innerRadius: 80,
-              outerRadius: 130,
-              paddingAngle: 2,
-              cornerRadius: 4,
-              cx: '50%',
-              cy: '50%',
-              highlightScope: { faded: 'global', highlight: 'item' },
-              faded: { innerRadius: 75, additionalRadius: -20, color: 'gray' },
-            },
-          ]}
-          height={320}
-          margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          slotProps={{
-            legend: { hidden: true }
-          }}
-        />
-        {/* Center Text */}
-        <Box sx={{
-          position: 'absolute',
-          top: '40%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          textAlign: 'center',
-          pointerEvents: 'none'
-        }}>
-          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
-            Total<br />Units
-          </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
-            {(roomsData?.total_housing_units || 0).toLocaleString()}
-          </Typography>
+        {/* Wrapper to perfectly center the text inside the pie chart */}
+        <Box sx={{ position: 'relative', width: '100%', zIndex: 1 }}>
+          <PieChart
+            series={[
+              {
+                data: roomsPalette.map((item, idx) => ({ id: idx, value: Number(item.value), label: item.label, color: item.color })),
+                innerRadius: 90,
+                outerRadius: 130,
+                paddingAngle: 2,
+                cornerRadius: 4,
+                cx: '50%',
+                cy: '50%',
+                highlightScope: { faded: 'global', highlight: 'item' },
+                faded: { innerRadius: 85, additionalRadius: -10, color: 'gray' },
+              },
+            ]}
+            height={320}
+            margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            slotProps={{
+              legend: { hidden: true }
+            }}
+          />
+          {/* Center Text */}
+          <Box sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            textAlign: 'center',
+            pointerEvents: 'none'
+          }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1, fontWeight: 'bold' }}>
+              Total<br />Units
+            </Typography>
+            <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
+              {(roomsData?.total_housing_units || 0).toLocaleString()}
+            </Typography>
+          </Box>
         </Box>
 
         {/* Custom Legend */}
@@ -2245,8 +2263,21 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           )}
 
           {gnEconomyChartUI && (
-            <Box sx={{ pb: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              {gnEconomyChartUI}
+            <Box sx={{ 
+              bgcolor: '#eef2f3',
+              backgroundImage: 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/Economy.png)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              width: '100%',
+              py: 8,
+              mb: 6,
+              mt: 4
+            }}>
+              <Container maxWidth="xl">
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  {gnEconomyChartUI}
+                </Box>
+              </Container>
             </Box>
           )}
 
@@ -2258,32 +2289,97 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           )}
 
           {gnWallChartUI && (
-            <Box sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              {gnWallChartUI}
+            <Box sx={{ 
+              bgcolor: '#eef2f3',
+              backgroundImage: 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/Housing-Wall-Type.png)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              width: '100%',
+              py: 8,
+              mb: 6,
+              mt: 4
+            }}>
+              <Container maxWidth="xl">
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  {gnWallChartUI}
+                </Box>
+              </Container>
             </Box>
           )}
 
           {gnUnitChartUI && (
-            <Box sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              {gnUnitChartUI}
+            <Box sx={{ 
+              bgcolor: '#eef2f3',
+              backgroundImage: 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/Housing-Unit-Type.png)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              width: '100%',
+              py: 8,
+              mb: 6,
+              mt: 4
+            }}>
+              <Container maxWidth="xl">
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  {gnUnitChartUI}
+                </Box>
+              </Container>
             </Box>
           )}
 
           {gnToiletChartUI && (
-            <Box sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              {gnToiletChartUI}
+            <Box sx={{ 
+              bgcolor: '#eef2f3',
+              backgroundImage: 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/Toilet-Facilities.png)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              width: '100%',
+              py: 8,
+              mb: 6,
+              mt: 4
+            }}>
+              <Container maxWidth="xl">
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  {gnToiletChartUI}
+                </Box>
+              </Container>
             </Box>
           )}
 
           {gnRoomsChartUI && (
-            <Box sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              {gnRoomsChartUI}
+            <Box sx={{ 
+              bgcolor: '#eef2f3',
+              backgroundImage: 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/Rooms-in-Housing-Unit.png)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              width: '100%',
+              py: 8,
+              mb: 6,
+              mt: 4
+            }}>
+              <Container maxWidth="xl">
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  {gnRoomsChartUI}
+                </Box>
+              </Container>
             </Box>
           )}
 
           {gnWaterChartUI && (
-            <Box sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              {gnWaterChartUI}
+            <Box sx={{ 
+              bgcolor: '#eef2f3',
+              backgroundImage: 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/Source-of-Drinking-Water.png)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              width: '100%',
+              py: 8,
+              mb: 6,
+              mt: 4
+            }}>
+              <Container maxWidth="xl">
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  {gnWaterChartUI}
+                </Box>
+              </Container>
             </Box>
           )}
 
