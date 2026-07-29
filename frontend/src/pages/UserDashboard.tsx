@@ -40,7 +40,18 @@ const tChart = {
     economyTitle: 'Economy',
     employed: 'Employed', unemployed: 'Unemployed', not_active: 'Not Active',
     religionTitle: 'Religious Affiliation',
-    buddhist: 'Buddhist', hindu: 'Hindu', islam: 'Islam', roman_catholic: 'Roman Catholic', other_christian: 'Other Christian'
+    buddhist: 'Buddhist', hindu: 'Hindu', islam: 'Islam', roman_catholic: 'Roman Catholic', other_christian: 'Other Christian',
+    footerDesc: 'A modern data intelligence platform delivering regional demographic insights and advanced analytics for the nation.',
+    footerInsights: 'Insights',
+    footerPlatform: 'Platform',
+    footerDemographics: 'Demographics',
+    footerHousing: 'Housing & Infrastructure',
+    footerEconomy: 'Economic Activity',
+    footerAbout: 'About Project',
+    footerMethodology: 'Methodology',
+    footerPrivacy: 'Privacy Policy',
+    footerRights: 'Ceylonica Data Platform. All rights reserved.',
+    footerDesigned: 'Designed with precision and care'
   },
   si: {
     wallTitle: 'නිවාස බිත්ති වර්ගය',
@@ -61,7 +72,18 @@ const tChart = {
     economyTitle: 'ආර්ථිකය',
     employed: 'රැකියාවක නියුතු', unemployed: 'රැකියා විරහිත', not_active: 'ක්‍රියාකාරී නොවන',
     religionTitle: 'ආගමික අනුපාතය',
-    buddhist: 'බෞද්ධ', hindu: 'හින්දු', islam: 'ඉස්ලාම්', roman_catholic: 'රෝමානු කතෝලික', other_christian: 'වෙනත් ක්‍රිස්තියානි'
+    buddhist: 'බෞද්ධ', hindu: 'හින්දු', islam: 'ඉස්ලාම්', roman_catholic: 'රෝමානු කතෝලික', other_christian: 'වෙනත් ක්‍රිස්තියානි',
+    footerDesc: 'ජාතිය සඳහා කලාපීය ජනවිකාස තොරතුරු සහ උසස් විශ්ලේෂණ ලබා දෙන නවීන දත්ත බුද්ධි වේදිකාවක්.',
+    footerInsights: 'තොරතුරු',
+    footerPlatform: 'වේදිකාව',
+    footerDemographics: 'ජනවිකාස',
+    footerHousing: 'නිවාස හා යටිතල පහසුකම්',
+    footerEconomy: 'ආර්ථික ක්‍රියාකාරකම්',
+    footerAbout: 'ව්‍යාපෘතිය ගැන',
+    footerMethodology: 'ක්‍රමවේදය',
+    footerPrivacy: 'පෞද්ගලිකත්ව ප්‍රතිපත්තිය',
+    footerRights: 'සෙලෝනිකා දත්ත වේදිකාව. සියලුම හිමිකම් ඇවිරිණි.',
+    footerDesigned: 'නිරවද්‍යතාවයෙන් සහ සැලකිල්ලෙන් නිර්මාණය කර ඇත'
   },
   ta: {
     wallTitle: 'வீட்டின் சுவர் வகை',
@@ -82,7 +104,18 @@ const tChart = {
     economyTitle: 'பொருளாதாரம்',
     employed: 'வேலையில் உள்ளோர்', unemployed: 'வேலையற்றோர்', not_active: 'செயல்படாதோர்',
     religionTitle: 'மதரீதியான இணைப்பு',
-    buddhist: 'பௌத்தர்', hindu: 'இந்து', islam: 'இஸ்லாம்', roman_catholic: 'ரோமன் கத்தோலிக்கர்', other_christian: 'பிற கிறிஸ்தவர்'
+    buddhist: 'பௌத்தர்', hindu: 'இந்து', islam: 'இஸ்லாம்', roman_catholic: 'ரோமன் கத்தோலிக்கர்', other_christian: 'பிற கிறிஸ்தவர்',
+    footerDesc: 'நாட்டிற்கான பிராந்திய மக்கள்தொகை நுண்ணறிவு மற்றும் மேம்பட்ட பகுப்பாய்வுகளை வழங்கும் நவீன தரவு தளம்.',
+    footerInsights: 'நுண்ணறிவு',
+    footerPlatform: 'தளம்',
+    footerDemographics: 'மக்கள்தொகை',
+    footerHousing: 'வீடமைப்பு மற்றும் உள்கட்டமைப்பு',
+    footerEconomy: 'பொருளாதார செயல்பாடு',
+    footerAbout: 'திட்டம் பற்றி',
+    footerMethodology: 'முறைமை',
+    footerPrivacy: 'தனியுரிமை கொள்கை',
+    footerRights: 'சிலோனிகா தரவு தளம். அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.',
+    footerDesigned: 'துல்லியத்துடனும் கவனத்துடனும் வடிவமைக்கப்பட்டுள்ளது'
   }
 };
 
@@ -656,7 +689,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             pointerEvents: 'none'
           }}>
             <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1, fontWeight: 'bold' }}>
-              {t.total}<br />{t.tabUnitType}
+              {t.total}
             </Typography>
             <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
               {(housingWallData?.total_units || 0).toLocaleString()}
@@ -747,7 +780,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             pointerEvents: 'none'
           }}>
             <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1, fontWeight: 'bold' }}>
-              {t.total}<br />{t.tabUnitType}
+              {t.total}
             </Typography>
             <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
               {(housingUnitData?.total_units || 0).toLocaleString()}
@@ -840,7 +873,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             pointerEvents: 'none'
           }}>
             <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1, fontWeight: 'bold' }}>
-              {t.total}<br />{t.tabHousehold}
+              {t.total}
             </Typography>
             <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
               {(toiletFacilityData?.total_households || 0).toLocaleString()}
@@ -938,7 +971,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             pointerEvents: 'none'
           }}>
             <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1, fontWeight: 'bold' }}>
-              {t.total}<br />{t.tabHousehold}
+              {t.total}
             </Typography>
             <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
               {(drinkingWaterData?.total_households || 0).toLocaleString()}
@@ -1029,7 +1062,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           pointerEvents: 'none'
         }}>
           <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
-            {t.total}<br />{t.tabHousehold}
+            {t.total}
           </Typography>
           <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
             {(solidWasteData?.total_households || 0).toLocaleString()}
@@ -1123,7 +1156,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             pointerEvents: 'none'
           }}>
             <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1, fontWeight: 'bold' }}>
-              {t.total}<br />{t.tabUnitType}
+              {t.total}
             </Typography>
             <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
               {(roomsData?.total_housing_units || 0).toLocaleString()}
@@ -1213,7 +1246,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           pointerEvents: 'none'
         }}>
           <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
-            {t.total}<br />{t.tabUnitType}
+            {t.total}
           </Typography>
           <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
             {(roofData?.total_housing_units || 0).toLocaleString()}
@@ -1301,7 +1334,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           pointerEvents: 'none'
         }}>
           <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
-            {t.total}<br />{t.tabPopulation}
+            {t.total}
           </Typography>
           <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
             {(religionData?.total_population || 0).toLocaleString()}
@@ -2445,22 +2478,61 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
       {!isMobileView && (selectedGN || selectedCity || selectedDistrict) && (
         <>
           {hasPopulationData && (
-            <Box id="chart-population" sx={{ pt: 4, pb: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <PopulationInfographic populationData={populationData} language={language} />
+            <Box id="chart-population" sx={{
+              bgcolor: '#eef2f3',
+              backgroundImage: 'linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.9)), url(/population-bg-new.jpg)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              width: '100%',
+              py: 8,
+              mb: 6,
+              mt: 4
+            }}>
+              <Container maxWidth="xl">
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <PopulationInfographic populationData={populationData} language={language} />
+                </Box>
+              </Container>
             </Box>
           )}
           {hasAgeData && (
-            <Box id="chart-age">
-              <AgeDemographicsChart
-                data={populationData || undefined}
-                location_name={displayGN || displayCity || displayDistrict}
-              />
+            <Box id="chart-age" sx={{
+              bgcolor: '#eef2f3',
+              backgroundImage: 'linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.9)), url(/Population-Age-bg.jpg)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              width: '100%',
+              py: 8,
+              mb: 6,
+              mt: 4
+            }}>
+              <Container maxWidth="xl">
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <AgeDemographicsChart
+                    data={populationData || undefined}
+                    location_name={displayGN || displayCity || displayDistrict}
+                  />
+                </Box>
+              </Container>
             </Box>
           )}
 
           {gnReligionChartUI && (
-            <Box id="chart-religion" sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              {gnReligionChartUI}
+            <Box id="chart-religion" sx={{
+              bgcolor: '#eef2f3',
+              backgroundImage: 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/Religious-Affiliation-bg.jpg)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              width: '100%',
+              py: 8,
+              mb: 6,
+              mt: 4
+            }}>
+              <Container maxWidth="xl">
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  {gnReligionChartUI}
+                </Box>
+              </Container>
             </Box>
           )}
 
@@ -2582,7 +2654,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           {gnWaterChartUI && (
             <Box id="chart-water" sx={{
               bgcolor: '#eef2f3',
-              backgroundImage: 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/Source-of-Drinking-Water.png)',
+              backgroundImage: 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/Source-of-Drinking-Water-new.png)',
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               width: '100%',
@@ -2599,24 +2671,124 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           )}
 
           {gnWasteChartUI && (
-            <Box id="chart-waste" sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              {gnWasteChartUI}
+            <Box id="chart-waste" sx={{
+              bgcolor: '#eef2f3',
+              backgroundImage: 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/Solid-Waste-Disposal-new.png)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              width: '100%',
+              py: 8,
+              mb: 6,
+              mt: 4
+            }}>
+              <Container maxWidth="xl">
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  {gnWasteChartUI}
+                </Box>
+              </Container>
             </Box>
           )}
 
           {gnRoofChartUI && (
-            <Box id="chart-roof" sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              {gnRoofChartUI}
+            <Box id="chart-roof" sx={{
+              bgcolor: '#eef2f3',
+              backgroundImage: 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/Housing-Unit-Roof-Type-bg.jpg)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              width: '100%',
+              py: 8,
+              mb: 6,
+              mt: 4
+            }}>
+              <Container maxWidth="xl">
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  {gnRoofChartUI}
+                </Box>
+              </Container>
             </Box>
           )}
 
           {gnHouseholdChartUI && (
-            <Box id="chart-household" sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              {gnHouseholdChartUI}
+            <Box id="chart-household" sx={{
+              bgcolor: '#eef2f3',
+              backgroundImage: 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/Relationship-Household-Head-bg.jpg)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              width: '100%',
+              py: 8,
+              mb: 6,
+              mt: 4
+            }}>
+              <Container maxWidth="xl">
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  {gnHouseholdChartUI}
+                </Box>
+              </Container>
             </Box>
           )}
         </>
       )}
+
+      {/* Footer */}
+      <Box sx={{
+        bgcolor: '#0f172a',
+        color: '#e2e8f0',
+        py: { xs: 6, md: 8 },
+        borderTop: '1px solid rgba(255,255,255,0.1)',
+        mt: 8,
+      }}>
+        <Container maxWidth="xl">
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'center', md: 'flex-start' }, gap: 6 }}>
+            {/* Branding */}
+            <Box sx={{ textAlign: { xs: 'center', md: 'left' }, maxWidth: 400 }}>
+              <Typography variant="h4" sx={{ fontWeight: 800, fontFamily: "'Playfair Display', serif", color: '#ffffff', mb: 2 }}>
+                Ceylonica
+              </Typography>
+              <Typography variant="body1" sx={{ color: '#94a3b8', lineHeight: 1.6 }}>
+                {t.footerDesc}
+              </Typography>
+            </Box>
+            
+            {/* Links / Info */}
+            <Box sx={{ display: 'flex', gap: { xs: 4, md: 10 }, textAlign: { xs: 'center', md: 'left' } }}>
+              <Box>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#ffffff', mb: 3, textTransform: 'uppercase', letterSpacing: 1.5 }}>
+                  {t.footerInsights}
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#94a3b8', mb: 1.5, cursor: 'pointer', transition: 'color 0.2s', '&:hover': { color: '#38bdf8' } }}>{t.footerDemographics}</Typography>
+                <Typography variant="body2" sx={{ color: '#94a3b8', mb: 1.5, cursor: 'pointer', transition: 'color 0.2s', '&:hover': { color: '#38bdf8' } }}>{t.footerHousing}</Typography>
+                <Typography variant="body2" sx={{ color: '#94a3b8', mb: 1.5, cursor: 'pointer', transition: 'color 0.2s', '&:hover': { color: '#38bdf8' } }}>{t.footerEconomy}</Typography>
+              </Box>
+              <Box>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#ffffff', mb: 3, textTransform: 'uppercase', letterSpacing: 1.5 }}>
+                  {t.footerPlatform}
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#94a3b8', mb: 1.5, cursor: 'pointer', transition: 'color 0.2s', '&:hover': { color: '#38bdf8' } }}>{t.footerAbout}</Typography>
+                <Typography variant="body2" sx={{ color: '#94a3b8', mb: 1.5, cursor: 'pointer', transition: 'color 0.2s', '&:hover': { color: '#38bdf8' } }}>{t.footerMethodology}</Typography>
+                <Typography variant="body2" sx={{ color: '#94a3b8', mb: 1.5, cursor: 'pointer', transition: 'color 0.2s', '&:hover': { color: '#38bdf8' } }}>{t.footerPrivacy}</Typography>
+              </Box>
+            </Box>
+          </Box>
+          
+          <Box sx={{ 
+            mt: 8, 
+            pt: 4, 
+            borderTop: '1px solid rgba(255,255,255,0.05)', 
+            display: 'flex', 
+            flexDirection: { xs: 'column', md: 'row' }, 
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 2
+          }}>
+            <Typography variant="body2" sx={{ color: '#64748b' }}>
+              &copy; {new Date().getFullYear()} {t.footerRights}
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#475569', fontSize: '0.8rem' }}>
+              {t.footerDesigned}
+            </Typography>
+          </Box>
+        </Container>
+      </Box>
 
       {/* Scroll to Top FAB */}
       <Fade in={trigger}>

@@ -84,7 +84,7 @@ export default function Age3DBarChart({ isDarkMode = false,  data, location_name
 
   return (
     <Box sx={{ 
-      bgcolor: isMobile ? 'transparent' : '#eef2f3', 
+      bgcolor: 'transparent', 
       py: isMobile ? 2 : 8, 
       width: '100%', 
       overflowX: 'hidden', 
