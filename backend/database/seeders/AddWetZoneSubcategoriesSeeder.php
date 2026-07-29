@@ -13,17 +13,26 @@ class AddWetZoneSubcategoriesSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Find the parent category: "Wet Zone"
-        $wetZone = Category::where('name_en', 'like', '%Wet Zone%')
-            ->orWhere('name_si', 'like', '%Wet Zone%')
-            ->first();
+        // 1. Strictly find the "Wet Zone" category that is under "Agro-Ecological Zones"
+        $wetZone = Category::where(function($query) {
+            $query->where('name_en', 'like', '%Wet Zone%')
+                  ->orWhere('name_si', 'like', '%Wet Zone%');
+        })->whereHas('parent', function($query) {
+            $query->where('name_en', 'like', '%Agro-Ecological%')
+                  ->orWhere('name_en', 'like', '%Agro Ecological%');
+        })->first();
+
+        // Fallback if strict search fails
+        if (!$wetZone) {
+            $wetZone = Category::where('name_en', 'like', '%Wet Zone%')->first();
+        }
 
         if (!$wetZone) {
             $this->command->error("Parent category 'Wet Zone' not found! Cannot insert subcategories.");
             return;
         }
 
-        $this->command->info("Found parent category: {$wetZone->name_en}");
+        $this->command->info("Found exact parent category: {$wetZone->name_en} (ID: {$wetZone->id})");
 
         $subcategories = [
             'WL1a' => 'WL1a කෘෂි- පාරිසරික කලාපය',
@@ -43,23 +52,26 @@ class AddWetZoneSubcategoriesSeeder extends Seeder
             'WU3'  => 'WU3 කෘෂි- පාරිසරික කලාපය'
         ];
 
+        $sortOrder = 1;
         foreach ($subcategories as $code => $nameSi) {
             $nameEn = "{$code} Agro-Ecological Zone";
             $slug = Str::slug($nameEn);
 
-            Category::firstOrCreate(
+            // Use updateOrCreate so if it was added to the wrong parent previously, it moves to the right one!
+            Category::updateOrCreate(
                 ['slug' => $slug],
                 [
                     'parent_id' => $wetZone->id,
                     'name_en' => $nameEn,
                     'name_si' => $nameSi,
-                    'description_en' => "{$nameEn} in the Wet Zone",
-                    'description_si' => $nameSi,
-                    'sort_order' => 0,
+                    'description_en' => "{$nameEn} located within the Wet Zone.",
+                    'description_si' => "තෙත් කලාපය තුළ පිහිටා ඇති {$code} කෘෂි-පාරිසරික කලාපය.",
+                    'sort_order' => $sortOrder,
                 ]
             );
+            $sortOrder++;
         }
 
-        $this->command->info('Successfully added 15 Wet Zone subcategories!');
+        $this->command->info('Successfully updated 15 Wet Zone subcategories to the correct parent!');
     }
 }
