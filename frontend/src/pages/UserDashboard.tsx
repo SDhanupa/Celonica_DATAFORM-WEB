@@ -16,6 +16,8 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import MenuIcon from '@mui/icons-material/Menu';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 
 const tChart = {
@@ -157,7 +159,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const handleMobileMenuClick = (event: React.MouseEvent<HTMLElement>) => { setMobileMenuAnchor(event.currentTarget); };
   const handleMobileMenuClose = () => { setMobileMenuAnchor(null); };
 
-
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   // Search Logic Queries
   const { data: districtsData, loading: districtsLoading, error: districtsError } = useQuery(GET_P_DISTRICTS, {
@@ -1322,27 +1324,53 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
     </>
   ) : null;
 
+  const householdLabels = {
+    en: {
+      head: 'Head', wife_husband: 'Wife/Husband', son_daughter: 'Son/Daughter',
+      son_daughter_in_law: 'Son/Daughter-in-law', grandchild: 'Grandchild',
+      parent_of_head: 'Parent of Head', other_relative: 'Other Relative',
+      domestic_employee: 'Domestic Employee', boarder: 'Boarder',
+      non_relative: 'Non Relative', clergy: 'Clergy', not_stated: 'Not Stated',
+    },
+    si: {
+      head: 'ප්‍රධානියා', wife_husband: 'භාර්යාව/ස්වාමිපුරුෂයා', son_daughter: 'පුත්‍රයා/දුව',
+      son_daughter_in_law: 'පුත්‍රයාගේ/දුවගේ කලත්‍රයා', grandchild: 'මුනුපුරා/මුනුපිළ',
+      parent_of_head: 'ප්‍රධානියාගේ දෙමාපිය', other_relative: 'වෙනත් ඥාතියෙක්',
+      domestic_employee: 'ගෘහ සේවකයා', boarder: 'නේවාසික',
+      non_relative: 'ඥාති නොවන', clergy: 'පූජකයා', not_stated: 'නොදක්වා',
+    },
+    ta: {
+      head: 'தலைவர்', wife_husband: 'மனைவி/கணவர்', son_daughter: 'மகன்/மகள்',
+      son_daughter_in_law: 'மருமகன்/மருமகள்', grandchild: 'பேரன்/பேத்தி',
+      parent_of_head: 'தலைவரின் பெற்றோர்', other_relative: 'மற்ற உறவினர்',
+      domestic_employee: 'வீட்டு ஊழியர்', boarder: 'தங்கியிருப்பவர்',
+      non_relative: 'உறவினர் அல்லாதவர்', clergy: 'மதகுரு', not_stated: 'கூறப்படவில்லை',
+    },
+  };
+  const hl = householdLabels[language] || householdLabels.en;
+
   const householdPalette = [
-    { label: 'Head', color: '#2c3e50', value: householdHeadData?.head || 0 },
-    { label: 'Wife/Husband', color: '#e74c3c', value: householdHeadData?.wife_husband || 0 },
-    { label: 'Son/Daughter', color: '#3498db', value: householdHeadData?.son_daughter || 0 },
-    { label: 'Son/Daughter-in-law', color: '#9b59b6', value: householdHeadData?.son_daughter_in_law || 0 },
-    { label: 'Grandchild', color: '#1abc9c', value: householdHeadData?.grandchild_great_grandchild || 0 },
-    { label: 'Parent of Head', color: '#f39c12', value: householdHeadData?.parent_of_head_or_spouse || 0 },
-    { label: 'Other Relative', color: '#27ae60', value: householdHeadData?.other_relative || 0 },
-    { label: 'Domestic Employee', color: '#e67e22', value: householdHeadData?.domestic_employee || 0 },
-    { label: 'Boarder', color: '#8e44ad', value: householdHeadData?.boarder || 0 },
-    { label: 'Non Relative', color: '#2980b9', value: householdHeadData?.non_relative || 0 },
-    { label: 'Clergy', color: '#c0392b', value: householdHeadData?.clergy || 0 },
-    { label: 'Not Stated', color: '#95a5a6', value: householdHeadData?.not_stated || 0 },
+    { label: hl.head, color: '#2c3e50', value: householdHeadData?.head || 0 },
+    { label: hl.wife_husband, color: '#e74c3c', value: householdHeadData?.wife_husband || 0 },
+    { label: hl.son_daughter, color: '#3498db', value: householdHeadData?.son_daughter || 0 },
+    { label: hl.son_daughter_in_law, color: '#9b59b6', value: householdHeadData?.son_daughter_in_law || 0 },
+    { label: hl.grandchild, color: '#1abc9c', value: householdHeadData?.grandchild_great_grandchild || 0 },
+    { label: hl.parent_of_head, color: '#f39c12', value: householdHeadData?.parent_of_head_or_spouse || 0 },
+    { label: hl.other_relative, color: '#27ae60', value: householdHeadData?.other_relative || 0 },
+    { label: hl.domestic_employee, color: '#e67e22', value: householdHeadData?.domestic_employee || 0 },
+    { label: hl.boarder, color: '#8e44ad', value: householdHeadData?.boarder || 0 },
+    { label: hl.non_relative, color: '#2980b9', value: householdHeadData?.non_relative || 0 },
+    { label: hl.clergy, color: '#c0392b', value: householdHeadData?.clergy || 0 },
+    { label: hl.not_stated, color: '#95a5a6', value: householdHeadData?.not_stated || 0 },
   ].filter(item => item.value > 0);
+
 
   const gnHouseholdChartUI = hasHouseholdData ? (
     <>
       {!isMobileView && (
         <Box sx={{ textAlign: 'center', mt: 8, mb: 4, mx: 'auto', width: 'fit-content', bgcolor: isDarkMode ? 'rgba(40,40,40,0.5)' : 'rgba(255,255,255,0.5)', backdropFilter: 'blur(10px)', borderRadius: '20px', p: 2, px: 4, boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)' }}>
           <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
-            Relationship to Household Head
+            {language === 'en' ? 'Relationship to Household Head' : language === 'si' ? 'ගෘහ මූලිකයාට ඇති සම්බන්ධය' : 'குடும்பத் தலைவருடனான உறவு'}
           </Typography>
           <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary' }}>
             {displayGN || displayCity || displayDistrict || "Selected Location"}
@@ -1373,25 +1401,28 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
               outerRadius: 130,
               paddingAngle: 2,
               cornerRadius: 4,
-              cx: '50%',
-              cy: '50%',
+              cx: 250,
+              cy: 150,
               highlightScope: { faded: 'global', highlight: 'item' },
               faded: { innerRadius: 75, additionalRadius: -20, color: 'gray' },
             },
           ]}
           height={320}
+          width={500}
           margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
           slotProps={{ legend: { hidden: true } }}
-        />
-        {/* Center Text */}
-        <Box sx={{ position: 'absolute', top: '40%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', pointerEvents: 'none' }}>
-          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
-            {t.total}<br />{t.tabPopulation}
-          </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
+        >
+          {/* Center label rendered as SVG at exact donut center */}
+          <text x={250} y={135} textAnchor="middle" dominantBaseline="central" style={{ fontSize: '11px', fill: '#888', fontFamily: "'Inter', sans-serif" }}>
+            {language === 'en' ? 'Total' : language === 'si' ? 'මුළු' : 'மொத்த'}
+          </text>
+          <text x={250} y={150} textAnchor="middle" dominantBaseline="central" style={{ fontSize: '11px', fill: '#888', fontFamily: "'Inter', sans-serif" }}>
+            {language === 'en' ? 'Population' : language === 'si' ? 'ජනගහනය' : 'மக்கள் தொகை'}
+          </text>
+          <text x={250} y={170} textAnchor="middle" dominantBaseline="central" style={{ fontSize: '20px', fontWeight: 'bold', fill: isDarkMode ? '#fff' : '#1a1a1a', fontFamily: "'Inter', sans-serif" }}>
             {(householdHeadData?.total_population || 0).toLocaleString()}
-          </Typography>
-        </Box>
+          </text>
+        </PieChart>
         {/* Custom Legend */}
         <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', width: '100%', mt: 2, px: isMobileView ? 0 : 2, gap: 2 }}>
           {householdPalette.map((item, index) => (
@@ -1480,43 +1511,97 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
       <Dialog
         open={showLocationModal}
         disableEscapeKeyDown
-        PaperProps={{ sx: { borderRadius: 2, minWidth: { xs: '90%', sm: 400 }, position: 'relative' } }}
-        slotProps={{ backdrop: { sx: { backdropFilter: 'blur(10px)', bgcolor: 'rgba(0,0,0,0.8)' } } }}
+        PaperProps={{
+          sx: {
+            borderRadius: '24px',
+            minWidth: { xs: '90%', sm: 420 },
+            position: 'relative',
+            overflow: 'hidden',
+            background: isDarkMode
+              ? 'linear-gradient(160deg, #1a1c2e 0%, #2a2c40 100%)'
+              : 'linear-gradient(160deg, #ffffff 0%, #f0f4ff 100%)',
+            boxShadow: '0 32px 80px rgba(0,0,0,0.35)',
+          }
+        }}
+        slotProps={{ backdrop: { sx: { backdropFilter: 'blur(14px)', bgcolor: 'rgba(0,0,0,0.6)' } } }}
       >
-        <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold', position: 'relative' }}>
-          {/* Language Changer inside Modal */}
+        {/* Modal Hero Header */}
+        <Box
+          sx={{
+            background: 'linear-gradient(135deg, #00A8FF 0%, #0070CC 100%)',
+            p: 3,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 1.5,
+            position: 'relative',
+          }}
+        >
+          {/* Language Toggle */}
           <Box
             onClick={cycleLanguage}
             sx={{
               position: 'absolute',
-              top: '50%',
-              left: 16,
-              transform: 'translateY(-50%)',
+              top: 14,
+              right: 14,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: 36,
-              height: 36,
+              width: 38,
+              height: 38,
               borderRadius: '50%',
-              bgcolor: 'rgba(0,0,0,0.05)',
-              transition: 'background-color 0.2s',
+              bgcolor: 'rgba(255,255,255,0.2)',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(255,255,255,0.4)',
               fontFamily: "'Inter', sans-serif",
               fontWeight: 700,
-              fontSize: '0.85rem',
-              color: themeColors.primary,
+              fontSize: '0.8rem',
+              color: '#ffffff',
               textTransform: 'uppercase',
-              '&:hover': { bgcolor: 'rgba(0,0,0,0.1)' }
+              transition: 'all 0.2s',
+              '&:hover': { bgcolor: 'rgba(255,255,255,0.35)' }
             }}
           >
             {language}
           </Box>
-          {!showManualForm
-            ? (language === 'en' ? 'Your Location' : language === 'si' ? 'ඔබගේ ස්ථානය' : 'உங்கள் இடம்')
-            : (language === 'en' ? 'Select Your Location' : language === 'si' ? 'ස්ථානය තෝරන්න' : 'உங்கள் இடத்தை தேர்வு செய்யவும்')
-          }
-        </DialogTitle>
-        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 2 }}>
+
+          {/* Logo */}
+          <Box
+            sx={{
+              width: 88,
+              height: 88,
+              borderRadius: '50%',
+              bgcolor: 'rgba(255,255,255,0.15)',
+              backdropFilter: 'blur(10px)',
+              border: '3px solid rgba(255,255,255,0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+            }}
+          >
+            <img
+              src="/logo.png"
+              alt="Ceylonica Logo"
+              style={{ height: '72px', width: '72px', objectFit: 'contain', borderRadius: '50%' }}
+            />
+          </Box>
+
+          <Typography
+            variant="h6"
+            sx={{ color: '#ffffff', fontWeight: 700, fontFamily: "'Inter', sans-serif", textAlign: 'center', textShadow: '0 1px 4px rgba(0,0,0,0.2)' }}
+          >
+            {!showManualForm
+              ? (language === 'en' ? 'Your Location' : language === 'si' ? 'ඔබගේ ස්ථානය' : 'உங்கள் இடம்')
+              : (language === 'en' ? 'Select Your Location' : language === 'si' ? 'ස්ථානය තෝරන්න' : 'உங்கள் இடத்தை தேர்வு செய்யவும்')
+            }
+          </Typography>
+          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.75)', fontFamily: "'Inter', sans-serif" }}>
+            {language === 'en' ? 'Census Data Explorer · Sri Lanka' : language === 'si' ? 'ජනලේඛන දත්ත · ශ්‍රී ලංකා' : 'மக்கள்தொகை கணக்கெடுப்பு · இலங்கை'}
+          </Typography>
+        </Box>
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 3, px: 3 }}>
           {!showManualForm ? (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {locating ? (
@@ -1675,34 +1760,50 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                 />
               </FormControl>
 
-              <Divider sx={{ my: 1 }}>OR</Divider>
+              <Divider sx={{ my: 1, '&::before, &::after': { borderColor: 'rgba(0,0,0,0.15)' } }}>
+                <Typography variant="caption" sx={{ color: themeColors.textMuted, fontWeight: 600, px: 1 }}>OR</Typography>
+              </Divider>
 
               <Button
                 variant="outlined"
                 onClick={() => setShowManualForm(false)}
-                sx={{ color: themeColors.primary, borderColor: themeColors.primary, alignSelf: 'center' }}
-                startIcon={<span style={{ fontSize: '1.2em' }}>📍</span>}
+                sx={{
+                  color: themeColors.primary,
+                  borderColor: themeColors.primary,
+                  alignSelf: 'center',
+                  borderRadius: '12px',
+                  px: 3,
+                  py: 1,
+                  fontWeight: 600,
+                  '&:hover': { bgcolor: 'rgba(0,168,255,0.08)', borderColor: themeColors.primary }
+                }}
+                startIcon={<span style={{ fontSize: '1.1em' }}>📍</span>}
               >
                 Use GPS Auto-Location
               </Button>
             </Box>
           )}
         </DialogContent>
-        <DialogActions sx={{ p: 3, pt: 0, justifyContent: 'center' }}>
+        <DialogActions sx={{ p: 3, pt: 1, justifyContent: 'center' }}>
           <Button
             variant="contained"
             onClick={() => setShowLocationModal(false)}
             disabled={!canContinue}
             sx={{
-              bgcolor: themeColors.primary,
+              background: canContinue ? 'linear-gradient(135deg, #00A8FF 0%, #0070CC 100%)' : undefined,
               color: 'white',
-              px: 4,
-              py: 1,
-              borderRadius: 8,
-              '&:hover': { bgcolor: '#0085CC' }
+              px: 5,
+              py: 1.2,
+              borderRadius: '12px',
+              fontWeight: 700,
+              fontFamily: "'Inter', sans-serif",
+              fontSize: '1rem',
+              boxShadow: canContinue ? '0 4px 20px rgba(0,168,255,0.4)' : undefined,
+              '&:hover': { background: 'linear-gradient(135deg, #0090E0 0%, #005AB0 100%)', boxShadow: '0 6px 24px rgba(0,168,255,0.5)' },
+              transition: 'all 0.25s',
             }}
           >
-            Continue
+            {language === 'en' ? 'Continue' : language === 'si' ? 'ඉදිරියට' : 'தொடரவும்'}
           </Button>
         </DialogActions>
       </Dialog>
@@ -2268,35 +2369,58 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
               right: { md: '10px', lg: '20px' },
               top: '50%',
               transform: 'translateY(-50%)',
-              zIndex: 10,
+              zIndex: 11,
               display: { xs: 'none', md: 'flex' },
               flexDirection: 'column',
-              gap: 1.2,
-              p: 2,
-              borderRadius: '24px',
-              bgcolor: 'rgba(255, 255, 255, 0.15)',
-              backdropFilter: 'blur(16px)',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-              maxHeight: '80vh',
-              overflowY: 'auto',
-              minWidth: '150px',
-              '&::-webkit-scrollbar': {
-                width: '6px',
-              },
-              '&::-webkit-scrollbar-track': {
-                background: 'rgba(255, 255, 255, 0.05)',
-                borderRadius: '10px',
-              },
-              '&::-webkit-scrollbar-thumb': {
-                background: 'rgba(0, 0, 0, 0.2)',
-                borderRadius: '10px',
-                '&:hover': {
-                  background: 'rgba(0, 0, 0, 0.3)',
-                },
-              }
+              alignItems: 'flex-end',
+              gap: 1
             }}
           >
+            <IconButton
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              sx={{
+                bgcolor: 'rgba(255, 255, 255, 0.15)',
+                backdropFilter: 'blur(16px)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                color: themeColors.textDark,
+                '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.3)' }
+              }}
+            >
+              {isSidebarOpen ? <VisibilityOffIcon /> : <VisibilityIcon />}
+            </IconButton>
+
+            <Fade in={isSidebarOpen} unmountOnExit>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1.2,
+                  p: 2,
+                  borderRadius: '24px',
+                  bgcolor: 'rgba(255, 255, 255, 0.15)',
+                  backdropFilter: 'blur(16px)',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                  maxHeight: 'calc(80vh - 60px)',
+                  overflowY: 'auto',
+                  minWidth: '150px',
+                  '&::-webkit-scrollbar': {
+                    width: '6px',
+                  },
+                  '&::-webkit-scrollbar-track': {
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    borderRadius: '10px',
+                  },
+                  '&::-webkit-scrollbar-thumb': {
+                    background: 'rgba(0, 0, 0, 0.2)',
+                    borderRadius: '10px',
+                    '&:hover': {
+                      background: 'rgba(0, 0, 0, 0.3)',
+                    },
+                  }
+                }}
+              >
             {hasPopulationData && <Button href="#chart-population" sx={{ justifyContent: 'flex-end', color: themeColors.textDark, textTransform: 'none', fontWeight: 'bold', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)', borderRadius: '12px' } }}>{t.tabPopulation}</Button>}
             {hasAgeData && <Button href="#chart-age" sx={{ justifyContent: 'flex-end', color: themeColors.textDark, textTransform: 'none', fontWeight: 'bold', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)', borderRadius: '12px' } }}>{t.tabAge}</Button>}
             {hasUnitData && <Button href="#chart-unit" sx={{ justifyContent: 'flex-end', color: themeColors.textDark, textTransform: 'none', fontWeight: 'bold', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)', borderRadius: '12px' } }}>{t.tabUnitType}</Button>}
@@ -2311,6 +2435,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             {hasRoofData && <Button href="#chart-roof" sx={{ justifyContent: 'flex-end', color: themeColors.textDark, textTransform: 'none', fontWeight: 'bold', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)', borderRadius: '12px' } }}>{t.tabRoofType}</Button>}
             {hasReligionData && <Button href="#chart-religion" sx={{ justifyContent: 'flex-end', color: themeColors.textDark, textTransform: 'none', fontWeight: 'bold', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)', borderRadius: '12px' } }}>{t.tabReligion}</Button>}
             {hasHouseholdData && <Button href="#chart-household" sx={{ justifyContent: 'flex-end', color: themeColors.textDark, textTransform: 'none', fontWeight: 'bold', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)', borderRadius: '12px' } }}>{t.tabHousehold}</Button>}
+              </Box>
+            </Fade>
           </Box>
         )}
       </Box>
