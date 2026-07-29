@@ -96,7 +96,9 @@ class AddFullLocationDatabaseSeeder extends Seeder
                     'parent_id' => $parentId,
                     'name_en' => $name,
                     'name_si' => $name,
-                    'slug' => 'location-' . str_replace('.', '-', $number), 
+                    // Generate a safe unique slug using the number + a short hash of the name
+                    // This prevents crashes if the Excel file has duplicate numbers!
+                    'slug' => 'location-' . str_replace('.', '-', $number) . '-' . substr(md5($name), 0, 6), 
                     'description_en' => $name,
                     'description_si' => $name,
                     'sort_order' => $count + 1,
