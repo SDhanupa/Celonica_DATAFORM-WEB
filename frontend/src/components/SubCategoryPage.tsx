@@ -268,9 +268,16 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
           <IconButton onClick={() => navigate(backUrl)} sx={{ bgcolor: 'rgba(0,0,0,0.04)' }}>
             <ArrowBackIcon />
           </IconButton>
-          <Typography variant="h4" sx={{ fontWeight: 600 }}>
-            {lang === 'en' ? parentCategory.nameEn : parentCategory.nameSi}
-          </Typography>
+          <Box>
+            <Typography variant="h4" sx={{ fontWeight: 600 }}>
+              {lang === 'en' ? parentCategory.nameEn : parentCategory.nameSi}
+            </Typography>
+            {(parentCategory.descriptionEn || parentCategory.descriptionSi) && (
+              <Typography variant="subtitle1" sx={{ color: 'text.secondary', mt: 0.5 }}>
+                {lang === 'en' ? (parentCategory.descriptionEn || parentCategory.descriptionSi) : (parentCategory.descriptionSi || parentCategory.descriptionEn)}
+              </Typography>
+            )}
+          </Box>
         </Box>
         <Box sx={{ display: 'flex', gap: 2 }}>
           {isSuperAdmin && (
@@ -417,6 +424,15 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
               </Grid>
             ))}
           </Grid>
+        </Box>
+      )}
+
+      {/* User Empty State / Go Back Button */}
+      {!isAdmin && steps.length === 0 && categories.length === 0 && (
+        <Box sx={{ mt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+          <Typography variant="h6" color="text.secondary">
+            {lang === 'en' ? 'No data or questions available for this category yet.' : 'මෙම කාණ්ඩය සඳහා මෙතෙක් දත්ත හෝ ප්‍රශ්න නොමැත.'}
+          </Typography>
         </Box>
       )}
 

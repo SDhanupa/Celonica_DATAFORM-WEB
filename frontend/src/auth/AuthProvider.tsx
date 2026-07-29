@@ -13,8 +13,8 @@ interface AuthContextType {
     realm_roles?: string[];
   } | null;
   logout: () => void;
-  login: () => void;
-  register: () => void;
+  login: (redirectUri?: string) => void;
+  register: (redirectUri?: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -69,12 +69,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     keycloak.logout({ redirectUri: window.location.origin + '/' });
   };
 
-  const login = () => {
-    keycloak.login({ redirectUri: window.location.origin + '/', prompt: 'login' });
+  const login = (redirectUri?: string) => {
+    keycloak.login({ redirectUri: redirectUri || window.location.origin + '/', prompt: 'login' });
   };
 
-  const register = () => {
-    keycloak.register({ redirectUri: window.location.origin + '/', prompt: 'login' });
+  const register = (redirectUri?: string) => {
+    keycloak.register({ redirectUri: redirectUri || window.location.origin + '/', prompt: 'login' });
   };
 
   return (

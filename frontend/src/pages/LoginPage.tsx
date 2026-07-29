@@ -224,7 +224,7 @@ const LoginPage: React.FC = () => {
                 variant="contained"
                 size="large"
                 fullWidth
-                onClick={login}
+                onClick={() => login(window.location.origin + '/user')}
                 sx={{
                   py: 1.8,
                   fontSize: '1rem',
@@ -248,7 +248,7 @@ const LoginPage: React.FC = () => {
                 variant="outlined"
                 size="large"
                 fullWidth
-                onClick={register}
+                onClick={() => register(window.location.origin + '/user')}
                 sx={{
                   py: 1.8,
                   fontSize: '1rem',

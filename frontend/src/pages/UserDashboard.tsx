@@ -1503,9 +1503,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 1.5, fontWeight: 600, fontSize: '0.95rem', letterSpacing: '0.5px' }}>
             <Typography onClick={() => navigate('/')} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: isDarkMode ? '#ffffff' : '#000000', '&:hover': { opacity: 0.7 } }}>Home</Typography>
             <Typography sx={{ opacity: 0.4, fontWeight: 300, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
-            <Typography onClick={login} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: isDarkMode ? '#ffffff' : '#000000', '&:hover': { opacity: 0.7 } }}>Login</Typography>
+            <Typography onClick={() => login(window.location.href)} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: isDarkMode ? '#ffffff' : '#000000', '&:hover': { opacity: 0.7 } }}>Login</Typography>
             <Typography sx={{ opacity: 0.4, fontWeight: 300, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
-            <Typography onClick={register} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: isDarkMode ? '#ffffff' : '#000000', '&:hover': { opacity: 0.7 } }}>Signup</Typography>
+            <Typography onClick={() => register(window.location.href)} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: isDarkMode ? '#ffffff' : '#000000', '&:hover': { opacity: 0.7 } }}>Signup</Typography>
             <Typography sx={{ opacity: 0.4, fontWeight: 300, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
             <Typography onClick={cycleLanguage} sx={{ cursor: 'pointer', textTransform: 'uppercase', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 700, color: themeColors.primary, '&:hover': { opacity: 0.7 } }}>{language}</Typography>
           </Box>
@@ -1529,8 +1529,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
               }}
             >
               <MenuItem onClick={() => { handleMobileMenuClose(); navigate('/'); }}>Home</MenuItem>
-              <MenuItem onClick={() => { handleMobileMenuClose(); login(); }}>Login</MenuItem>
-              <MenuItem onClick={() => { handleMobileMenuClose(); register(); }}>Signup</MenuItem>
+              <MenuItem onClick={() => { handleMobileMenuClose(); login(window.location.href); }}>Login</MenuItem>
+              <MenuItem onClick={() => { handleMobileMenuClose(); register(window.location.href); }}>Signup</MenuItem>
               <Divider />
               <MenuItem onClick={() => { handleMobileMenuClose(); cycleLanguage(); }} sx={{ fontWeight: 'bold', color: themeColors.primary }}>Language: {language.toUpperCase()}</MenuItem>
             </Menu>

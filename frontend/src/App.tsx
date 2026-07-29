@@ -13,6 +13,7 @@ import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import AdminsPage from './pages/AdminsPage';
+import UserPage from './pages/UserPage';
 
 import { UsersPage, ReportsPage } from './pages/PlaceholderPages';
 import RegistrationPage from './pages/RegistrationPage';
@@ -56,9 +57,25 @@ const App: React.FC = () => {
               />
               {/* Protected — wrapped in AdminLayout */}
               <Route
-                path="/admins"
+                path="/user"
                 element={
                   <ProtectedRoute>
+                    <UserPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/user/categories/*"
+                element={
+                  <ProtectedRoute>
+                    <DynamicCategoryWrapper />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admins"
+                element={
+                  <ProtectedRoute allowedRoles={['super_admin']}>
                     <AdminLayout>
                       <AdminsPage />
                     </AdminLayout>
@@ -68,7 +85,7 @@ const App: React.FC = () => {
               <Route
                 path="/users"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator']}>
                     <AdminLayout>
                       <UsersPage />
                     </AdminLayout>
@@ -78,7 +95,7 @@ const App: React.FC = () => {
               <Route
                 path="/registration"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator']}>
                     <AdminLayout>
                       <RegistrationPage />
                     </AdminLayout>
@@ -88,7 +105,7 @@ const App: React.FC = () => {
               <Route
                 path="/questions"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator']}>
                     <AdminLayout>
                       <QuestionsPage />
                     </AdminLayout>
@@ -98,7 +115,7 @@ const App: React.FC = () => {
               <Route
                 path="/survey"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator']}>
                     <AdminLayout>
                       <SurveyPage />
                     </AdminLayout>
@@ -108,7 +125,7 @@ const App: React.FC = () => {
               <Route
                 path="/reports"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator']}>
                     <AdminLayout>
                       <ReportsPage />
                     </AdminLayout>
@@ -118,7 +135,7 @@ const App: React.FC = () => {
               <Route
                 path="/categories"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator']}>
                     <AdminLayout>
                       <CategoriesPage />
                     </AdminLayout>
@@ -126,9 +143,9 @@ const App: React.FC = () => {
                 }
               />
               <Route
-                path="/gm-divisions"
+                path="/grama-niladharis"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator']}>
                     <AdminLayout>
                       <GramaNiladharisPage />
                     </AdminLayout>
@@ -136,9 +153,9 @@ const App: React.FC = () => {
                 }
               />
               <Route
-                path="/police-database-map"
+                path="/police-connections"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator']}>
                     <AdminLayout>
                       <PoliceConnectionsPage />
                     </AdminLayout>
@@ -146,9 +163,9 @@ const App: React.FC = () => {
                 }
               />
               <Route
-                path="/postoffice-database-map"
+                path="/post-office-connections"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator']}>
                     <AdminLayout>
                       <PostOfficeConnectionsPage />
                     </AdminLayout>
@@ -156,9 +173,9 @@ const App: React.FC = () => {
                 }
               />
               <Route
-                path="/health-database-map"
+                path="/phi-connections"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator']}>
                     <AdminLayout>
                       <PhiConnectionsPage />
                     </AdminLayout>
@@ -166,9 +183,9 @@ const App: React.FC = () => {
                 }
               />
               <Route
-                path="/trs-database-map"
+                path="/trs-connections"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator']}>
                     <AdminLayout>
                       <TrsConnectionsPage />
                     </AdminLayout>
@@ -176,9 +193,9 @@ const App: React.FC = () => {
                 }
               />
               <Route
-                path="/district-province-map"
+                path="/district-province-connections"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator']}>
                     <AdminLayout>
                       <DistrictProvinceConnectionsPage />
                     </AdminLayout>
@@ -188,7 +205,7 @@ const App: React.FC = () => {
               <Route
                 path="/categories/*"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator']}>
                     <AdminLayout>
                       <DynamicCategoryWrapper />
                     </AdminLayout>

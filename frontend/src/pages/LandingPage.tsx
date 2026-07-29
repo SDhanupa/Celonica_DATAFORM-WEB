@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { Box, Typography, Button, Container } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ExploreIcon from '@mui/icons-material/Explore';
+import { useAuth } from '../auth/AuthProvider';
 import homeBg from '../assets/ABC.png';
 import logoImg from '../assets/logo.png';
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   const handleEnterSystem = () => {
@@ -15,6 +17,10 @@ const LandingPage: React.FC = () => {
     setTimeout(() => {
       navigate('/gnpage');
     }, 2800); // 2.8 seconds
+  };
+
+  const handleLogin = () => {
+    login(window.location.origin + '/user');
   };
 
   return (
@@ -126,7 +132,7 @@ const LandingPage: React.FC = () => {
           <Button
             variant="outlined"
             size="large"
-            onClick={handleEnterSystem}
+            onClick={handleLogin}
             sx={{
               background: 'rgba(0, 0, 0, 0.4)',
               color: 'white',

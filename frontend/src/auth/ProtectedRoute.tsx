@@ -5,10 +5,11 @@ import { Box, CircularProgress, Typography } from '@mui/material';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  allowedRoles?: string[];
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth();
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles }) => {
+  const { isAuthenticated, isLoading, userInfo } = useAuth();
   const location = useLocation();
 
   if (isLoading) {
@@ -40,6 +41,16 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  if (allowedRoles && allowedRoles.length > 0) {
+    const userRoles = userInfo?.realm_roles || [];
+    const hasRole = allowedRoles.some((role) => userRoles.includes(role));
+    
+    if (!hasRole) {
+      // Redirect unauthorized users to their dashboard or home
+      return <Navigate to="/user" replace />;
+    }
   }
 
   return <>{children}</>;

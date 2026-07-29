@@ -18,7 +18,12 @@ const DynamicCategoryWrapper: React.FC = () => {
   
   // The back URL is the current path minus the last slug
   const backUrlParts = pathParts.slice(0, -1);
-  const backUrl = '/' + backUrlParts.join('/');
+  let backUrl = '/' + backUrlParts.join('/');
+  
+  // Custom fallback for user categories
+  if (backUrl === '/user/categories') {
+    backUrl = '/user';
+  }
   
   return <SubCategoryPage key={slug} slug={slug} backUrl={backUrl} />;
 };
