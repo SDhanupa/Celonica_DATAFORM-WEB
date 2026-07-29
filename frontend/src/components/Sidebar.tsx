@@ -81,6 +81,9 @@ const Sidebar: React.FC = () => {
           zIndex: 1000,
           display: 'flex',
           flexDirection: 'column',
+          backgroundColor: '#0f172a',
+          color: '#f8fafc',
+          borderRight: '1px solid #1e293b',
         },
       }}
     >
@@ -92,11 +95,11 @@ const Sidebar: React.FC = () => {
           alignItems: 'center',
           gap: 1,
           minHeight: 64, // AdminBite topbar height
-          borderBottom: '1px solid #e9ecef',
+          borderBottom: '1px solid #1e293b',
           justifyContent: collapsed ? 'center' : 'flex-start',
         }}
       >
-        <IconButton onClick={() => setCollapsed(!collapsed)} size="small" sx={{ color: 'text.secondary' }}>
+        <IconButton onClick={() => setCollapsed(!collapsed)} size="small" sx={{ color: '#94a3b8', '&:hover': { color: '#f8fafc' } }}>
           <MenuIcon />
         </IconButton>
         {!collapsed && (
@@ -121,7 +124,7 @@ const Sidebar: React.FC = () => {
               variant="h6"
               sx={{
                 fontWeight: 600,
-                color: 'text.primary',
+                color: '#f8fafc',
                 lineHeight: 1,
               }}
             >
@@ -139,7 +142,7 @@ const Sidebar: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             gap: 1.5,
-            borderBottom: '1px solid #e9ecef',
+            borderBottom: '1px solid #1e293b',
           }}
         >
           <Avatar
@@ -156,7 +159,7 @@ const Sidebar: React.FC = () => {
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <Typography
               variant="body2"
-              sx={{ fontWeight: 500, color: 'text.primary', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+              sx={{ fontWeight: 500, color: '#f8fafc', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
             >
               {userInfo?.name || 'Admin'}
             </Typography>
@@ -212,12 +215,27 @@ const Sidebar: React.FC = () => {
                   sx={{
                     justifyContent: collapsed ? 'center' : 'flex-start',
                     px: collapsed ? 2.5 : 2,
+                    mx: 2,
+                    mb: 0.5,
+                    borderRadius: 2,
+                    transition: 'all 0.2s ease-in-out',
+                    ...(isActive ? {
+                      background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important',
+                      boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
+                      '&:hover': {
+                        background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important',
+                      }
+                    } : {
+                      '&:hover': {
+                        background: 'rgba(255,255,255,0.05)',
+                      }
+                    })
                   }}
                 >
                   <ListItemIcon
                     sx={{
                       minWidth: collapsed ? 'auto' : 35,
-                      color: isActive ? 'primary.main' : 'text.secondary',
+                      color: isActive ? '#ffffff' : '#94a3b8',
                     }}
                   >
                     {React.cloneElement(item.icon as React.ReactElement, { fontSize: 'small' })}
@@ -227,8 +245,8 @@ const Sidebar: React.FC = () => {
                       primary={item.label}
                       primaryTypographyProps={{
                         fontSize: '0.875rem',
-                        fontWeight: isActive ? 500 : 300,
-                        color: isActive ? 'primary.main' : 'text.primary',
+                        fontWeight: isActive ? 600 : 400,
+                        color: isActive ? '#ffffff' : '#cbd5e1',
                       }}
                     />
                   )}

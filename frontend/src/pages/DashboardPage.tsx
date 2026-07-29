@@ -19,10 +19,15 @@ import {
   TrendingUp,
   CheckCircle,
   Warning,
+  Settings as SettingsIcon,
+  Assessment as AssessmentIcon,
+  PersonAdd as PersonAddIcon,
+  CloudUpload as CloudUploadIcon,
 } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import { useQuery } from '@apollo/client';
-import { GET_ME } from '../graphql/queries';
+import { GET_ME, GET_DASHBOARD_STATS } from '../graphql/queries';
 import UserDashboard from './UserDashboard';
 import TopNavbar from '../components/TopNavbar';
 import AdminLayout from '../components/AdminLayout';
@@ -37,24 +42,57 @@ interface StatCardProps {
 }
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, subtitle, icon, color, trend }) => (
-  <Card sx={{ height: '100%' }}>
-    <CardContent sx={{ p: 3 }}>
+  <Card sx={{ 
+    height: '100%', 
+    background: 'rgba(255, 255, 255, 0.95)',
+    backdropFilter: 'blur(10px)',
+    borderRadius: 4,
+    border: '1px solid rgba(255,255,255,0.4)',
+    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.04)',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    position: 'relative',
+    overflow: 'hidden',
+    '&:hover': {
+      transform: 'translateY(-6px)',
+      boxShadow: '0 12px 40px rgba(0, 0, 0, 0.08)',
+      '& .MuiAvatar-root': {
+        transform: 'scale(1.1)',
+      }
+    }
+  }}>
+    {/* Decorative blur blob */}
+    <Box sx={{
+      position: 'absolute',
+      top: -20,
+      right: -20,
+      width: 100,
+      height: 100,
+      borderRadius: '50%',
+      background: (theme) => `linear-gradient(135deg, ${theme.palette[color].light}40, ${theme.palette[color].main}20)`,
+      filter: 'blur(20px)',
+      zIndex: 0,
+      pointerEvents: 'none'
+    }} />
+    
+    <CardContent sx={{ p: 3, position: 'relative', zIndex: 1 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
         <Box>
-          <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 500, fontSize: '0.9rem', mb: 1 }}>
+          <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 600, fontSize: '0.85rem', mb: 1, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
             {title}
           </Typography>
-          <Typography variant="h3" color="text.primary" sx={{ fontWeight: 600, lineHeight: 1 }}>
+          <Typography variant="h3" color="text.primary" sx={{ fontWeight: 700, lineHeight: 1 }}>
             {value}
           </Typography>
         </Box>
         <Avatar
           sx={{
-            width: 50,
-            height: 50,
+            width: 54,
+            height: 54,
             bgcolor: `${color}.main`,
             color: '#fff',
-            borderRadius: '100%', // Circle avatars in stat cards
+            borderRadius: 3,
+            transition: 'transform 0.3s ease',
+            boxShadow: `0 8px 16px rgba(0,0,0,0.1)`
           }}
         >
           {icon}
@@ -71,11 +109,11 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, subtitle, icon, color
             sx={{
               height: 24,
               fontSize: '0.75rem',
-              fontWeight: 500,
+              fontWeight: 600,
             }}
           />
         )}
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
           {subtitle}
         </Typography>
       </Box>
@@ -83,27 +121,25 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, subtitle, icon, color
   </Card>
 );
 
-// Simulated stats
-const mockStats = {
-  totalAdmins: 5,
-  activeAdmins: 4,
-  totalUsers: 1248,
-  totalQuestions: 342,
-  totalReports: 28,
-  pendingReports: 7,
-};
 
-const recentActivity = [
-  { action: 'New admin registered', user: 'john@example.com', time: '2 min ago', type: 'success' },
-  { action: 'Question reported', user: 'user123', time: '15 min ago', type: 'warning' },
-  { action: 'User deactivated', user: 'spam_user', time: '1 hr ago', type: 'error' },
-  { action: 'New user registered', user: 'mary@mail.com', time: '2 hr ago', type: 'success' },
-  { action: 'Admin role updated', user: 'mike@admin.com', time: '3 hr ago', type: 'info' },
-];
 
 const DashboardPage: React.FC = () => {
   const { userInfo } = useAuth();
+  const navigate = useNavigate();
   const { data, refetch } = useQuery(GET_ME, { errorPolicy: 'ignore' });
+  const { data: statsData } = useQuery(GET_DASHBOARD_STATS, { 
+    errorPolicy: 'ignore', 
+    skip: !['super_admin', 'admin', 'moderator'].some(r => userInfo?.realm_roles?.includes(r)) 
+  });
+
+  const stats = statsData?.dashboardStats || {
+    totalAdmins: 0,
+    activeAdmins: 0,
+    totalUsers: 0,
+    totalQuestions: 0,
+    totalReports: 0,
+    pendingReports: 0,
+  };
 
   const needsOnboarding = data?.needsOnboarding === true;
   const adminName = data?.me?.name || userInfo?.name || 'User';
@@ -122,211 +158,93 @@ const DashboardPage: React.FC = () => {
   return (
     <AdminLayout>
       <Box>
-      {/* Header */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" color="text.primary" sx={{ fontWeight: 600, mb: 0.5 }}>
-          Welcome back, {adminName.split(' ')[0]}
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Here's what's happening on your platform today.
-        </Typography>
-      </Box>
 
-      {/* Welcome Card */}
-      <Card
-        sx={{
-          background: 'linear-gradient(135deg, rgba(108, 99, 255, 0.2) 0%, rgba(108, 99, 255, 0.05) 100%)',
-          border: '1px solid rgba(108, 99, 255, 0.2)',
-          mb: 3,
-          width: '100%',
-        }}
-      >
-        <CardContent sx={{ p: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 3 }}>
-          <Box>
-            <Typography variant="h4" sx={{ fontWeight: 700, color: '#E8E8FF', mb: 1 }}>
-              Welcome back, {data?.me?.name || data?.meUser?.firstName || 'User'}! 👋
-            </Typography>
-            <Typography variant="body1" sx={{ color: '#9898CC', maxWidth: 600 }}>
-              Here's what's happening on your platform today. You have {mockStats.pendingReports} pending reports that require your attention.
-            </Typography>
-          </Box>
-        </CardContent>
-      </Card>
 
       {/* Stats Grid */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <Grid container spacing={3} sx={{ mb: 6 }}>
         <Grid item xs={12} sm={6} lg={3}>
           <StatCard
             title="Total Admins"
-            value={mockStats.totalAdmins}
-            subtitle={`${mockStats.activeAdmins} active`}
-            icon={<AdminsIcon />}
+            value={stats.totalAdmins}
+            subtitle={`${stats.activeAdmins} active`}
+            icon={<AdminsIcon sx={{ fontSize: 28 }} />}
             color="primary"
-            trend="+1 this week"
           />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
           <StatCard
             title="Total Users"
-            value={mockStats.totalUsers.toLocaleString()}
+            value={stats.totalUsers.toLocaleString()}
             subtitle="Registered accounts"
-            icon={<UsersIcon />}
+            icon={<UsersIcon sx={{ fontSize: 28 }} />}
             color="success"
-            trend="+48 today"
           />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
           <StatCard
             title="Questions"
-            value={mockStats.totalQuestions}
+            value={stats.totalQuestions}
             subtitle="Published questions"
-            icon={<QuestionsIcon />}
+            icon={<QuestionsIcon sx={{ fontSize: 28 }} />}
             color="warning"
-            trend="+12 this week"
           />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
           <StatCard
             title="Reports"
-            value={mockStats.totalReports}
-            subtitle={`${mockStats.pendingReports} pending review`}
-            icon={<ReportsIcon />}
+            value={stats.totalReports}
+            subtitle={`${stats.pendingReports} pending review`}
+            icon={<ReportsIcon sx={{ fontSize: 28 }} />}
             color="error"
           />
         </Grid>
       </Grid>
 
-      {/* Bottom Row */}
+      {/* Quick Actions Toolkit */}
+      <Typography variant="h5" color="text.primary" sx={{ fontWeight: 700, mb: 3 }}>
+        Quick Actions
+      </Typography>
       <Grid container spacing={3}>
-        {/* Recent Activity */}
-        <Grid item xs={12} md={7}>
-          <Card>
-            <CardContent sx={{ p: 3 }}>
-              <Typography variant="h5" color="text.primary" sx={{ fontWeight: 500, mb: 3 }}>
-                Recent Activity
-              </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                {recentActivity.map((item, index) => (
-                  <Box key={index}>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 2,
-                        py: 2,
-                      }}
-                    >
-                      <Avatar
-                        sx={{
-                          width: 40,
-                          height: 40,
-                          bgcolor: `${item.type}.main`,
-                          color: '#fff',
-                        }}
-                      >
-                        {item.user.charAt(0).toUpperCase()}
-                      </Avatar>
-                      <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Typography variant="body1" color="text.primary" sx={{ fontWeight: 500 }}>
-                          {item.action}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {item.user}
-                        </Typography>
-                      </Box>
-                      <Typography variant="body2" color="text.secondary" sx={{ flexShrink: 0 }}>
-                        {item.time}
-                      </Typography>
-                    </Box>
-                    {index < recentActivity.length - 1 && <Divider />}
-                  </Box>
-                ))}
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Right Column: Test Accounts & System Health */}
-        <Grid item xs={12} md={5} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          {/* Test Accounts Card */}
-          <Card>
-            <CardContent sx={{ p: 3 }}>
-              <Typography variant="h5" color="text.primary" sx={{ fontWeight: 500, mb: 3 }}>
-                🔑 Test Credentials
-              </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Box sx={{ p: 2, borderRadius: 2, bgcolor: 'rgba(108, 99, 255, 0.1)', border: '1px solid rgba(108, 99, 255, 0.2)' }}>
-                  <Typography variant="subtitle2" color="primary.main" sx={{ mb: 1, fontWeight: 700 }}>
-                    Admin Account
-                  </Typography>
-                  <Typography variant="body2" color="text.primary" sx={{ fontFamily: 'monospace' }}>
-                    Email: admin@ceylonica.com
-                  </Typography>
-                  <Typography variant="body2" color="text.primary" sx={{ fontFamily: 'monospace' }}>
-                    Pass: Password@123
-                  </Typography>
+        {[
+          { title: 'Manage Admins', desc: 'Add or remove platform administrators', icon: <PersonAddIcon sx={{ fontSize: 32 }} />, color: '#3b82f6', link: '/admins' },
+          { title: 'Data Uploads', desc: 'Bulk import datasets and sync records', icon: <CloudUploadIcon sx={{ fontSize: 32 }} />, color: '#10b981', link: '/districts' },
+          { title: 'System Reports', desc: 'Generate platform usage analytics', icon: <AssessmentIcon sx={{ fontSize: 32 }} />, color: '#f59e0b', link: '/reports' },
+          { title: 'Global Settings', desc: 'Configure platform-wide preferences', icon: <SettingsIcon sx={{ fontSize: 32 }} />, color: '#6366f1', link: '#' },
+        ].map((action, idx) => (
+          <Grid item xs={12} sm={6} md={3} key={idx}>
+            <Card 
+              onClick={() => action.link !== '#' && navigate(action.link)}
+              sx={{ 
+                height: '100%', 
+                cursor: 'pointer',
+                borderRadius: 4,
+                border: '1px solid',
+                borderColor: 'divider',
+                boxShadow: 'none',
+                transition: 'all 0.2s',
+                '&:hover': {
+                  borderColor: action.color,
+                  boxShadow: `0 4px 20px ${action.color}20`,
+                  transform: 'translateY(-4px)'
+                }
+              }}
+            >
+              <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <Box sx={{ width: 56, height: 56, borderRadius: 3, bgcolor: `${action.color}15`, color: action.color, display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+                  {action.icon}
                 </Box>
-                <Box sx={{ p: 2, borderRadius: 2, bgcolor: 'rgba(0, 200, 83, 0.1)', border: '1px solid rgba(0, 200, 83, 0.2)' }}>
-                  <Typography variant="subtitle2" color="success.main" sx={{ mb: 1, fontWeight: 700 }}>
-                    Normal User Account
-                  </Typography>
-                  <Typography variant="body2" color="text.primary" sx={{ fontFamily: 'monospace' }}>
-                    Email: user@ceylonica.com
-                  </Typography>
-                  <Typography variant="body2" color="text.primary" sx={{ fontFamily: 'monospace' }}>
-                    Pass: Password@123
-                  </Typography>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-
-          {/* System Health */}
-          <Card sx={{ flex: 1 }}>
-            <CardContent sx={{ p: 3 }}>
-              <Typography variant="h5" color="text.primary" sx={{ fontWeight: 500, mb: 3 }}>
-                System Status
-              </Typography>
-              {[
-                { label: 'API Response', value: 98, color: 'success', status: 'Healthy' },
-                { label: 'Database', value: 87, color: 'primary', status: 'Normal' },
-                { label: 'Auth Service', value: 100, color: 'success', status: 'Online' },
-                { label: 'Storage', value: 64, color: 'warning', status: 'Moderate' },
-              ].map((metric) => (
-                <Box key={metric.label} sx={{ mb: 3 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                    <Typography variant="body1" color="text.primary" sx={{ fontWeight: 500 }}>
-                      {metric.label}
-                    </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Chip
-                        icon={metric.value >= 80 ? <CheckCircle sx={{ fontSize: '14px !important' }} /> : <Warning sx={{ fontSize: '14px !important' }} />}
-                        label={metric.status}
-                        size="small"
-                        color={metric.color as any}
-                        variant="outlined"
-                        sx={{ height: 22, fontWeight: 500 }}
-                      />
-                      <Typography variant="body2" color="text.secondary" sx={{ minWidth: 35, textAlign: 'right' }}>
-                        {metric.value}%
-                      </Typography>
-                    </Box>
-                  </Box>
-                  <LinearProgress
-                    variant="determinate"
-                    value={metric.value}
-                    color={metric.color as any}
-                    sx={{
-                      height: 8,
-                      borderRadius: 4,
-                    }}
-                  />
-                </Box>
-              ))}
-            </CardContent>
-          </Card>
-        </Grid>
+                <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, fontSize: '1.05rem' }}>
+                  {action.title}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ flexGrow: 1 }}>
+                  {action.desc}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
       </Grid>
+
       </Box>
     </AdminLayout>
   );

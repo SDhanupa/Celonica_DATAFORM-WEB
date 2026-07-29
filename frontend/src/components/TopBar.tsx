@@ -54,6 +54,9 @@ const TopBar: React.FC = () => {
       elevation={0}
       sx={{
         zIndex: 1100,
+        background: 'rgba(255, 255, 255, 0.8)',
+        backdropFilter: 'blur(12px)',
+        borderBottom: '1px solid rgba(0,0,0,0.05)',
       }}
     >
       <Toolbar sx={{ justifyContent: 'space-between', px: 3, minHeight: '64px' }}>
@@ -62,7 +65,7 @@ const TopBar: React.FC = () => {
           {!isAdmin && (
             <Typography 
               variant="h6" 
-              sx={{ fontWeight: 600, color: '#fff', mr: 4, cursor: 'pointer' }}
+              sx={{ fontWeight: 600, color: 'text.primary', mr: 4, cursor: 'pointer' }}
               onClick={() => { window.location.href = '/'; }}
             >
               Ceylonica
@@ -70,13 +73,13 @@ const TopBar: React.FC = () => {
           )}
           {!isAdmin && (
             <Box sx={{ display: 'flex', gap: 2 }}>
-              <Button color="inherit" onClick={() => { window.location.href = '/'; }} sx={{ fontWeight: 500, textTransform: 'none' }}>
+              <Button onClick={() => { window.location.href = '/'; }} sx={{ fontWeight: 500, textTransform: 'none', color: 'text.secondary' }}>
                 Home
               </Button>
-              <Button color="inherit" onClick={() => navigate('/survey')} sx={{ fontWeight: 500, textTransform: 'none' }}>
+              <Button onClick={() => navigate('/survey')} sx={{ fontWeight: 500, textTransform: 'none', color: 'text.secondary' }}>
                 Survey
               </Button>
-              <Button color="inherit" onClick={() => navigate('/categories')} sx={{ fontWeight: 500, textTransform: 'none' }}>
+              <Button onClick={() => navigate('/categories')} sx={{ fontWeight: 500, textTransform: 'none', color: 'text.secondary' }}>
                 Category
               </Button>
             </Box>
@@ -89,7 +92,7 @@ const TopBar: React.FC = () => {
           <Tooltip title="Notifications">
             <IconButton 
               onClick={(e) => setNotifAnchorEl(e.currentTarget)}
-              sx={{ color: 'rgba(255, 255, 255, 0.8)', '&:hover': { color: '#fff' } }}
+              sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary', background: 'rgba(0,0,0,0.05)' } }}
             >
               <Badge badgeContent={needsOnboarding ? 1 : 0} color="error">
                 <NotificationsIcon />
@@ -141,7 +144,7 @@ const TopBar: React.FC = () => {
               borderRadius: 1,
               transition: 'all 0.2s ease',
               '&:hover': {
-                background: 'rgba(255, 255, 255, 0.1)',
+                background: 'rgba(0, 0, 0, 0.04)',
               },
             }}
           >
@@ -149,8 +152,8 @@ const TopBar: React.FC = () => {
               sx={{
                 width: 35,
                 height: 35,
-                bgcolor: '#ffffff',
-                color: 'primary.main',
+                bgcolor: 'primary.main',
+                color: '#ffffff',
                 fontSize: '0.9rem',
                 fontWeight: 600,
               }}
@@ -158,11 +161,11 @@ const TopBar: React.FC = () => {
               {userInfo?.name?.charAt(0)?.toUpperCase() || 'A'}
             </Avatar>
             <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-              <Typography variant="body2" sx={{ fontWeight: 500, color: '#fff', lineHeight: 1.2 }}>
+              <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary', lineHeight: 1.2 }}>
                 {userInfo?.name || 'Admin'}
               </Typography>
             </Box>
-            <KeyboardArrowDown sx={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: 18 }} />
+            <KeyboardArrowDown sx={{ color: 'text.secondary', fontSize: 18 }} />
           </Box>
 
           {/* User Dropdown Menu */}
@@ -174,9 +177,9 @@ const TopBar: React.FC = () => {
               sx: {
                 mt: 1.5,
                 minWidth: 200,
-                boxShadow: '1px 0px 20px rgba(0, 0, 0, 0.08)',
+                boxShadow: '0px 10px 30px rgba(0, 0, 0, 0.08)',
                 border: '1px solid #e9ecef',
-                borderRadius: 0,
+                borderRadius: 3,
                 '& .MuiMenuItem-root': {
                   fontSize: '0.9rem',
                 },

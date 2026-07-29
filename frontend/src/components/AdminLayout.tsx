@@ -26,7 +26,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   return (
     <>
       <OnboardingModal open={needsOnboarding} onComplete={() => refetch()} />
-      <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+      <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f1f5f9' }}>
         {isAdmin && <Sidebar />}
       <Box
         sx={{
