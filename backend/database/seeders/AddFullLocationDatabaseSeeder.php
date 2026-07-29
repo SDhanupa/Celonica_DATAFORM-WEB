@@ -52,7 +52,7 @@ class AddFullLocationDatabaseSeeder extends Seeder
 
         foreach ($data as $item) {
             $number = $item['number'];
-            $name = $item['name'];
+            $name = mb_substr($item['name'], 0, 250);
             $fullName = $item['fullName'];
             $parentFullName = $item['parentFullName'];
 
