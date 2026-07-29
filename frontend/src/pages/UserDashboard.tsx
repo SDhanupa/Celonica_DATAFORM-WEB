@@ -1,7 +1,7 @@
 // Forced reload for Vite (Fixed pie chart background and translations)
 // Forced reload for Vite (Added title glassmorphism panels back)
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Button, Container, Grid, Card, CardContent, CardMedia, FormControl, useTheme, useMediaQuery, CircularProgress, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Autocomplete, TextField, IconButton, Divider, Menu, MenuItem } from '@mui/material';
+import { Box, Typography, Button, Container, Grid, Card, CardContent, CardMedia, FormControl, useTheme, useMediaQuery, CircularProgress, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Autocomplete, TextField, IconButton, Divider, Menu, MenuItem , Fab, Fade, useScrollTrigger } from '@mui/material';
 import { useSwipeable } from 'react-swipeable';
 import { useQuery } from '@apollo/client';
 import { GET_P_DISTRICTS, GET_P_DISTRICT_WITH_GNS, GET_GN_BY_COORDINATES, GET_GN_BY_CCODE } from '../graphql/queries';
@@ -15,6 +15,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import MenuIcon from '@mui/icons-material/Menu';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 
 const tChart = {
@@ -107,6 +108,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const themeColors = getThemeColors(isDarkMode);
 
   const { gnName, ccode } = useParams<{ gnName: string, ccode: string }>();
+  const trigger = useScrollTrigger({ disableHysteresis: true, threshold: 400 });
+  const handleScrollToTop = () => { window.scrollTo({ top: 0, behavior: 'smooth' }); };
 
   // GPS State
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -1408,7 +1411,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   return (
     <Box sx={{ fontFamily: "'Inter', sans-serif" }}>
       {/* Navigation Bar */}
-      <Box sx={{ position: 'absolute', top: { xs: '30px', sm: 0 }, left: 0, right: 0, p: 3, display: 'flex', justifyContent: { xs: 'flex-start', sm: 'center' }, alignItems: 'center', zIndex: 1000, pointerEvents: 'none' }}>
+      <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 3 }, display: 'flex', justifyContent: { xs: 'flex-end', sm: 'center' }, alignItems: 'center', zIndex: 1000, pointerEvents: 'none' }}>
         <Box sx={{
           display: 'flex',
           alignItems: 'center',
@@ -2256,35 +2259,84 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             </Grid>
           </Grid>
         </Container>
+
+        {/* Quick Links Sidebar (Desktop Only) */}
+        {!isMobileView && (displayGN || displayCity || displayDistrict) && (
+          <Box
+            sx={{
+              position: 'absolute',
+              right: { md: '10px', lg: '20px' },
+              top: '50%',
+              transform: 'translateY(-50%)',
+              zIndex: 10,
+              display: { xs: 'none', md: 'flex' },
+              flexDirection: 'column',
+              gap: 1.2,
+              p: 2,
+              borderRadius: '24px',
+              bgcolor: 'rgba(255, 255, 255, 0.15)',
+              backdropFilter: 'blur(16px)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+              maxHeight: '80vh',
+              overflowY: 'auto',
+              minWidth: '150px'
+            }}
+          >
+            {hasPopulationData && <Button href="#chart-population" sx={{ justifyContent: 'flex-end', color: themeColors.textDark, textTransform: 'none', fontWeight: 'bold', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)', borderRadius: '12px' } }}>{t.tabPopulation}</Button>}
+            {hasAgeData && <Button href="#chart-age" sx={{ justifyContent: 'flex-end', color: themeColors.textDark, textTransform: 'none', fontWeight: 'bold', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)', borderRadius: '12px' } }}>{t.tabAge}</Button>}
+            {hasUnitData && <Button href="#chart-unit" sx={{ justifyContent: 'flex-end', color: themeColors.textDark, textTransform: 'none', fontWeight: 'bold', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)', borderRadius: '12px' } }}>{t.tabUnitType}</Button>}
+            {hasWasteData && <Button href="#chart-waste" sx={{ justifyContent: 'flex-end', color: themeColors.textDark, textTransform: 'none', fontWeight: 'bold', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)', borderRadius: '12px' } }}>{t.tabWaste}</Button>}
+            {hasHousingData && <Button href="#chart-housing" sx={{ justifyContent: 'flex-end', color: themeColors.textDark, textTransform: 'none', fontWeight: 'bold', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)', borderRadius: '12px' } }}>{t.tabHousing}</Button>}
+            {hasOwnershipData && <Button href="#chart-ownership" sx={{ justifyContent: 'flex-end', color: themeColors.textDark, textTransform: 'none', fontWeight: 'bold', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)', borderRadius: '12px' } }}>{t.tabOwnership}</Button>}
+            {hasToiletData && <Button href="#chart-toilet" sx={{ justifyContent: 'flex-end', color: themeColors.textDark, textTransform: 'none', fontWeight: 'bold', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)', borderRadius: '12px' } }}>{t.tabToilet}</Button>}
+            {hasEconomyData && <Button href="#chart-economy" sx={{ justifyContent: 'flex-end', color: themeColors.textDark, textTransform: 'none', fontWeight: 'bold', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)', borderRadius: '12px' } }}>{t.tabEconomy}</Button>}
+            {hasWallData && <Button href="#chart-wall" sx={{ justifyContent: 'flex-end', color: themeColors.textDark, textTransform: 'none', fontWeight: 'bold', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)', borderRadius: '12px' } }}>{t.tabWallType}</Button>}
+            {hasWaterData && <Button href="#chart-water" sx={{ justifyContent: 'flex-end', color: themeColors.textDark, textTransform: 'none', fontWeight: 'bold', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)', borderRadius: '12px' } }}>{t.tabWater}</Button>}
+            {hasRoomsData && <Button href="#chart-rooms" sx={{ justifyContent: 'flex-end', color: themeColors.textDark, textTransform: 'none', fontWeight: 'bold', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)', borderRadius: '12px' } }}>{t.tabRooms}</Button>}
+            {hasRoofData && <Button href="#chart-roof" sx={{ justifyContent: 'flex-end', color: themeColors.textDark, textTransform: 'none', fontWeight: 'bold', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)', borderRadius: '12px' } }}>{t.tabRoofType}</Button>}
+            {hasReligionData && <Button href="#chart-religion" sx={{ justifyContent: 'flex-end', color: themeColors.textDark, textTransform: 'none', fontWeight: 'bold', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)', borderRadius: '12px' } }}>{t.tabReligion}</Button>}
+            {hasHouseholdData && <Button href="#chart-household" sx={{ justifyContent: 'flex-end', color: themeColors.textDark, textTransform: 'none', fontWeight: 'bold', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)', borderRadius: '12px' } }}>{t.tabHousehold}</Button>}
+          </Box>
+        )}
       </Box>
 
       {/* Charts Section (Desktop Only) */}
       {!isMobileView && (selectedGN || selectedCity || selectedDistrict) && (
         <>
+          {hasPopulationData && (
+            <Box id="chart-population" sx={{ pt: 4, pb: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <PopulationInfographic populationData={populationData} language={language} />
+            </Box>
+          )}
           {hasAgeData && (
-            <AgeDemographicsChart
-              data={populationData || undefined}
-              location_name={displayGN || displayCity || displayDistrict}
-            />
+            <Box id="chart-age">
+              <AgeDemographicsChart
+                data={populationData || undefined}
+                location_name={displayGN || displayCity || displayDistrict}
+              />
+            </Box>
           )}
 
           {gnReligionChartUI && (
-            <Box sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Box id="chart-religion" sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               {gnReligionChartUI}
             </Box>
           )}
 
           {hasHousingData && (
+            <Box id="chart-housing">
             <Custom3DBarChart
               gn_id={selectedGN}
               city_code={selectedCity}
               district_id={selectedDistrict}
               location_name={displayGN || displayCity || displayDistrict}
             />
+            </Box>
           )}
 
           {gnEconomyChartUI && (
-            <Box sx={{
+            <Box id="chart-economy" sx={{
               bgcolor: '#eef2f3',
               backgroundImage: 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/Economy.png)',
               backgroundSize: 'cover',
@@ -2303,14 +2355,16 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           )}
 
           {hasOwnershipData && (
+            <Box id="chart-ownership">
             <HousingOwnershipChart
               data={housingOwnershipData || undefined}
               location_name={displayGN || displayCity || displayDistrict}
             />
+            </Box>
           )}
 
           {gnWallChartUI && (
-            <Box sx={{
+            <Box id="chart-wall" sx={{
               bgcolor: '#eef2f3',
               backgroundImage: 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/Housing-Wall-Type.png)',
               backgroundSize: 'cover',
@@ -2329,7 +2383,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           )}
 
           {gnUnitChartUI && (
-            <Box sx={{
+            <Box id="chart-unit" sx={{
               bgcolor: '#eef2f3',
               backgroundImage: 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/Housing-Unit-Type.png)',
               backgroundSize: 'cover',
@@ -2348,7 +2402,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           )}
 
           {gnToiletChartUI && (
-            <Box sx={{
+            <Box id="chart-toilet" sx={{
               bgcolor: '#eef2f3',
               backgroundImage: 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/Toilet-Facilities.png)',
               backgroundSize: 'cover',
@@ -2367,7 +2421,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           )}
 
           {gnRoomsChartUI && (
-            <Box sx={{
+            <Box id="chart-rooms" sx={{
               bgcolor: '#eef2f3',
               backgroundImage: 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/Rooms-in-Housing-Unit.png)',
               backgroundSize: 'cover',
@@ -2386,7 +2440,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           )}
 
           {gnWaterChartUI && (
-            <Box sx={{
+            <Box id="chart-water" sx={{
               bgcolor: '#eef2f3',
               backgroundImage: 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/Source-of-Drinking-Water.png)',
               backgroundSize: 'cover',
@@ -2405,26 +2459,36 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           )}
 
           {gnWasteChartUI && (
-            <Box sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Box id="chart-waste" sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               {gnWasteChartUI}
             </Box>
           )}
 
           {gnRoofChartUI && (
-            <Box sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Box id="chart-roof" sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               {gnRoofChartUI}
             </Box>
           )}
 
           {gnHouseholdChartUI && (
-            <Box sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Box id="chart-household" sx={{ pb: 6, pt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               {gnHouseholdChartUI}
             </Box>
           )}
         </>
       )}
 
-
+      {/* Scroll to Top FAB */}
+      <Fade in={trigger}>
+        <Box
+          role="presentation"
+          sx={{ position: 'fixed', bottom: 32, right: 32, zIndex: 1000 }}
+        >
+          <Fab onClick={handleScrollToTop} color="primary" size="medium" aria-label="scroll back to top">
+            <KeyboardArrowUpIcon />
+          </Fab>
+        </Box>
+      </Fade>
     </Box>
   );
 };
