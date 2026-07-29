@@ -2264,7 +2264,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         {!isMobileView && (displayGN || displayCity || displayDistrict) && (
           <Box
             sx={{
-              position: 'absolute',
+              position: 'fixed',
               right: { md: '10px', lg: '20px' },
               top: '50%',
               transform: 'translateY(-50%)',
@@ -2280,7 +2280,21 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
               maxHeight: '80vh',
               overflowY: 'auto',
-              minWidth: '150px'
+              minWidth: '150px',
+              '&::-webkit-scrollbar': {
+                width: '6px',
+              },
+              '&::-webkit-scrollbar-track': {
+                background: 'rgba(255, 255, 255, 0.05)',
+                borderRadius: '10px',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                background: 'rgba(0, 0, 0, 0.2)',
+                borderRadius: '10px',
+                '&:hover': {
+                  background: 'rgba(0, 0, 0, 0.3)',
+                },
+              }
             }}
           >
             {hasPopulationData && <Button href="#chart-population" sx={{ justifyContent: 'flex-end', color: themeColors.textDark, textTransform: 'none', fontWeight: 'bold', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)', borderRadius: '12px' } }}>{t.tabPopulation}</Button>}
