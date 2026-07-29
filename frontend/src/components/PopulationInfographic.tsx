@@ -21,6 +21,7 @@ const data = [
 interface PopulationInfographicProps {
   populationData?: { male: number; female: number; both: number } | null;
   language?: 'en' | 'si' | 'ta';
+  isDarkMode?: boolean;
 }
 
 const translations = {
@@ -29,7 +30,7 @@ const translations = {
   ta: { male: 'ஆண்', female: 'பெண்', total: 'மொத்த', population: 'மக்கள் தொகை' }
 };
 
-export default function PopulationInfographic({ populationData, language = 'en' }: PopulationInfographicProps) {
+export default function PopulationInfographic({ populationData, language = 'en', isDarkMode = false }: PopulationInfographicProps) {
   const [mounted, setMounted] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -108,11 +109,11 @@ export default function PopulationInfographic({ populationData, language = 'en' 
   });
 
   return (
-    <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative', minHeight: isMobile ? '280px' : '350px' }}>
+    <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative', minHeight: isMobile ? '280px' : '450px' }}>
       
 
 
-      <svg viewBox="-220 -220 440 440" width="100%" height="100%" style={{ overflow: 'visible', filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.3))', transform: isMobile ? 'scale(1.35)' : 'none' }}>
+      <svg viewBox="-220 -220 440 440" width="100%" height="100%" style={{ maxWidth: '480px', maxHeight: '480px', overflow: 'visible', filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.3))', transform: isMobile ? 'scale(1.35)' : 'scale(1.15)' }}>
         {slices.map((slice) => (
           <g 
             key={slice.label} 
@@ -133,8 +134,8 @@ export default function PopulationInfographic({ populationData, language = 'en' 
             {/* Label Text on Slice (Mobile Only) */}
             {isMobile && (
               <text
-                x={slice.midPoint.x * 0.70}
-                y={slice.midPoint.y * 0.70 - 10}
+                x={slice.midPoint.x * 0.75}
+                y={slice.midPoint.y * 0.75 - 12}
                 fill="rgba(255,255,255,0.9)"
                 fontSize="14"
                 fontWeight="normal"
@@ -147,10 +148,10 @@ export default function PopulationInfographic({ populationData, language = 'en' 
 
             {/* Count Text on Slice (Always Visible) */}
             <text
-              x={slice.midPoint.x * 0.65}
-              y={slice.midPoint.y * 0.65 + (isMobile ? 12 : 0)}
+              x={slice.midPoint.x * (isMobile ? 0.75 : 0.72)}
+              y={slice.midPoint.y * (isMobile ? 0.75 : 0.72) + (isMobile ? 12 : 0)}
               fill="#fff"
-              fontSize="18"
+              fontSize={isMobile ? "14" : "18"}
               fontWeight="bold"
               textAnchor="middle"
               dominantBaseline="central"
@@ -162,12 +163,12 @@ export default function PopulationInfographic({ populationData, language = 'en' 
             {!isMobile && (
               <>
                 {/* Dot at start of line */}
-                <circle cx={slice.lineStart.x} cy={slice.lineStart.y} r="4" fill="#fff" />
+                <circle cx={slice.lineStart.x} cy={slice.lineStart.y} r="4" fill={isDarkMode ? "#fff" : "#000"} opacity={isDarkMode ? 1 : 0.6} />
                 {/* Line connecting slice to text */}
                 <path
                   d={`M ${slice.lineStart.x} ${slice.lineStart.y} L ${slice.lineEnd.x} ${slice.lineEnd.y} L ${slice.dotX} ${slice.dotY}`}
                   fill="none"
-                  stroke="rgba(255,255,255,0.5)"
+                  stroke={isDarkMode ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)"}
                   strokeWidth="1.5"
                 />
                 <circle cx={slice.dotX} cy={slice.dotY} r="3" fill={slice.color} />
@@ -177,46 +178,48 @@ export default function PopulationInfographic({ populationData, language = 'en' 
         ))}
         
         {/* Center Donut Hole for Total Population */}
-        <circle cx="0" cy="0" r="35" fill="rgba(30, 30, 30, 0.8)" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-        <text x="0" y="-10" fill="#fff" fontSize="8" textAnchor="middle" opacity="0.8">{t.total}</text>
-        <text x="0" y="0" fill="#fff" fontSize="8" textAnchor="middle" opacity="0.8">{t.population}</text>
-        <text x="0" y="14" fill="#fff" fontSize="12" fontWeight="bold" textAnchor="middle">{totalCount.toLocaleString()}</text>
+        <circle cx="0" cy="0" r="45" fill="rgba(30, 30, 30, 0.8)" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+        <text x="0" y="-12" fill="#fff" fontSize="10" textAnchor="middle" opacity="0.8">{t.total}</text>
+        <text x="0" y="2" fill="#fff" fontSize="10" textAnchor="middle" opacity="0.8">{t.population}</text>
+        <text x="0" y="18" fill="#fff" fontSize="16" fontWeight="bold" textAnchor="middle">{totalCount.toLocaleString()}</text>
       </svg>
 
       {/* HTML overlay for Icons and Text (Desktop Only) */}
       {!isMobile && (
-        <Box sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
-          {slices.map((slice) => {
-            const isRight = slice.midPercent < 0.5;
-            return (
-              <Fade in={mounted} style={{ transitionDelay: `${0.5 + slice.index * 0.1}s` }} key={slice.label}>
-                <Box 
-                  sx={{ 
-                    position: 'absolute',
-                    top: `calc(50% + ${(slice.textPos.y / 220) * 50}%)`,
-                    left: `calc(50% + ${(slice.textPos.x / 220) * 50}%)`,
+        <Box sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          {/* Inner container with same aspect ratio as SVG */}
+          <Box sx={{ position: 'relative', width: '100%', height: '100%', aspectRatio: '1 / 1', maxWidth: '480px', maxHeight: '480px', transform: 'scale(1.15)' }}>
+            {slices.map((slice) => {
+              const isRight = slice.midPercent < 0.5;
+              return (
+                <Fade in={mounted} style={{ transitionDelay: `${0.5 + slice.index * 0.1}s` }} key={slice.label}>
+                    <Box 
+                      sx={{ 
+                        position: 'absolute',
+                        top: `calc(50% + ${(slice.textPos.y / 220) * 50}%)`,
+                        left: `calc(50% + ${(slice.textPos.x / 220) * 50}%)`,
                     transform: 'translate(-50%, -50%)',
                     display: 'flex',
                     alignItems: 'center',
                     flexDirection: isRight ? 'row' : 'row-reverse',
                     gap: 1,
-                    color: '#fff',
+                    color: isDarkMode ? '#fff' : '#000',
                     width: '140px'
                   }}
                 >
                   <Box sx={{ 
-                    bgcolor: 'rgba(255,255,255,0.1)', 
+                    bgcolor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.8)', 
                     p: 0.5, 
                     borderRadius: '50%', 
                     display: 'flex', 
                     backdropFilter: 'blur(5px)',
                     color: slice.color,
-                    boxShadow: '0 4px 10px rgba(0,0,0,0.2)'
+                    boxShadow: isDarkMode ? '0 4px 10px rgba(0,0,0,0.2)' : '0 4px 10px rgba(0,0,0,0.1)'
                   }}>
                     {slice.icon}
                   </Box>
                   <Box sx={{ textAlign: isRight ? 'left' : 'right' }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold', fontSize: '1rem', letterSpacing: '0.5px', textShadow: '0px 2px 10px rgba(0,0,0,0.8), 0px 0px 5px rgba(0,0,0,0.5)' }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold', fontSize: '0.85rem', letterSpacing: '0.5px', textShadow: isDarkMode ? '0px 2px 10px rgba(0,0,0,0.8), 0px 0px 5px rgba(0,0,0,0.5)' : 'none' }}>
                       {slice.label}
                     </Typography>
                   </Box>
@@ -224,9 +227,11 @@ export default function PopulationInfographic({ populationData, language = 'en' 
               </Fade>
             );
           })}
+          </Box>
         </Box>
       )}
 
     </Box>
   );
 }
+

@@ -9,6 +9,7 @@ interface Custom3DBarChartProps {
   gn_id?: string | number;
   location_name?: string;
   language?: 'en' | 'si' | 'ta';
+  isDarkMode?: boolean;
 }
 
 // 12 Colors for the 12 bars (generated from a palette)
@@ -50,7 +51,7 @@ const mobileCategoryLabels = [
   { key: 'group_2010s', label: '2010 & Newer', sumKeys: ['y_2010', 'y_2011'] },
 ];
 
-export default function Custom3DBarChart({ district_id, city_code, gn_id, location_name, language = 'en' }: Custom3DBarChartProps) {
+export default function Custom3DBarChart({ isDarkMode = false,  district_id, city_code, gn_id, location_name, language = 'en' }: Custom3DBarChartProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -113,14 +114,25 @@ export default function Custom3DBarChart({ district_id, city_code, gn_id, locati
     }}>
       <Container maxWidth={isMobile ? false : "xl"} disableGutters={isMobile}>
         {!isMobile && (
-          <>
+          <Box sx={{ 
+            textAlign: 'center', 
+            mb: 4, 
+            mx: 'auto', 
+            width: 'fit-content', 
+            bgcolor: isDarkMode ? 'rgba(40,40,40,0.5)' : 'rgba(255,255,255,0.5)', 
+            backdropFilter: 'blur(10px)', 
+            borderRadius: '20px', 
+            p: 2, 
+            px: 4, 
+            boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)' 
+          }}>
             <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: theme.palette.text.primary }}>
               {language === 'en' ? 'Housing Units by Construction Year' : language === 'si' ? 'ඉදිකළ වර්ෂය අනුව නිවාස ඒකක' : 'கட்டப்பட்ட ஆண்டு வாரியாக வீட்டு அலகுகள்'}
             </Typography>
-            <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary', mb: 8 }}>
+            <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary', mb: 0 }}>
               {displayLocation}
             </Typography>
-          </>
+          </Box>
         )}
 
         <Box sx={{ 
@@ -170,13 +182,13 @@ export default function Custom3DBarChart({ district_id, city_code, gn_id, locati
                   <Typography 
                     variant="h6" 
                     sx={{ 
-                      color: '#1a1a1d', 
+                      color: isDarkMode ? '#ffffff' : '#1a1a1d', 
                       fontWeight: 900, 
                       fontFamily: "'Oswald', sans-serif",
                       fontSize: { xs: '0.8rem', sm: '1rem', md: '1.25rem' },
                       mb: 0.5,
                       lineHeight: 1.1,
-                      textShadow: '0 0 15px rgba(255,255,255,1), 0 0 20px rgba(255,255,255,1), 0 0 30px rgba(255,255,255,0.9)'
+                      textShadow: isDarkMode ? '0 0 10px rgba(0,0,0,0.8)' : '0 0 15px rgba(255,255,255,1), 0 0 20px rgba(255,255,255,1), 0 0 30px rgba(255,255,255,0.9)'
                     }}
                   >
                     {item.title}
@@ -184,10 +196,10 @@ export default function Custom3DBarChart({ district_id, city_code, gn_id, locati
                   <Typography 
                     variant="body2" 
                     sx={{ 
-                      color: '#1a1a1d', 
+                      color: isDarkMode ? '#ffffff' : '#1a1a1d', 
                       fontSize: { xs: '0.7rem', md: '0.9rem' }, 
                       fontWeight: 800,
-                      textShadow: '0 0 10px rgba(255,255,255,1), 0 0 15px rgba(255,255,255,1)'
+                      textShadow: isDarkMode ? '0 0 5px rgba(0,0,0,0.8)' : '0 0 10px rgba(255,255,255,1), 0 0 15px rgba(255,255,255,1)'
                     }}
                   >
                     {item.value} units
@@ -234,14 +246,14 @@ export default function Custom3DBarChart({ district_id, city_code, gn_id, locati
                       top: -ellipseHeight - (isMobile ? 15 : 30),
                       left: '50%',
                       transform: 'translateX(-50%)',
-                      color: '#1a1a1d',
+                      color: isDarkMode ? '#ffffff' : '#1a1a1d',
                       fontSize: { xs: '0.9rem', md: '1.5rem' },
                       fontWeight: 900,
                       opacity: 0,
                       animation: 'fadeInUp 0.8s ease forwards',
                       animationDelay: `${index * 0.1 + 0.5}s`,
                       fontFamily: "'Oswald', sans-serif",
-                      textShadow: '0 0 15px rgba(255,255,255,1), 0 0 20px rgba(255,255,255,1), 0 0 30px rgba(255,255,255,0.9)',
+                      textShadow: isDarkMode ? '0 0 10px rgba(0,0,0,0.8)' : '0 0 15px rgba(255,255,255,1), 0 0 20px rgba(255,255,255,1), 0 0 30px rgba(255,255,255,0.9)',
                       zIndex: 3
                     }}
                   >

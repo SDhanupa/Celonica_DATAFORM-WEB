@@ -51,7 +51,7 @@ const categoryKeys = [
   'age_65_above',
 ];
 
-export default function Age3DBarChart({ data, location_name, language = 'en' }: Age3DBarChartProps) {
+export default function Age3DBarChart({ isDarkMode = false,  data, location_name, language = 'en' }: Age3DBarChartProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -92,14 +92,25 @@ export default function Age3DBarChart({ data, location_name, language = 'en' }: 
     }}>
       <Container maxWidth={isMobile ? false : "xl"} disableGutters={isMobile}>
         {!isMobile && (
-          <>
+          <Box sx={{ 
+            textAlign: 'center', 
+            mb: 4, 
+            mx: 'auto', 
+            width: 'fit-content', 
+            bgcolor: isDarkMode ? 'rgba(40,40,40,0.5)' : 'rgba(255,255,255,0.5)', 
+            backdropFilter: 'blur(10px)', 
+            borderRadius: '20px', 
+            p: 2, 
+            px: 4, 
+            boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)' 
+          }}>
             <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: theme.palette.text.primary }}>
               {t.title}
             </Typography>
-            <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary', mb: 8 }}>
+            <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary', mb: 0 }}>
               {displayLocation}
             </Typography>
-          </>
+          </Box>
         )}
 
         <Box sx={{ 
@@ -150,8 +161,9 @@ export default function Age3DBarChart({ data, location_name, language = 'en' }: 
                   <Typography 
                     variant="h6" 
                     sx={{ 
-                      color: item.topColor, 
-                      fontWeight: 800, 
+                      color: isDarkMode ? '#ffffff' : '#111111', 
+                      textShadow: isDarkMode ? 'none' : '0px 0px 4px rgba(255,255,255,0.8)',
+                      fontWeight: 900, 
                       fontFamily: "'Oswald', sans-serif",
                       fontSize: { xs: '0.75rem', sm: '1rem', md: '1.25rem' },
                       mb: 0.5,
@@ -163,9 +175,9 @@ export default function Age3DBarChart({ data, location_name, language = 'en' }: 
                   <Typography 
                     variant="body2" 
                     sx={{ 
-                      color: isMobile ? 'rgba(255,255,255,0.8)' : '#7f8c8d', 
+                      color: isDarkMode ? '#dddddd' : '#333333', 
                       fontSize: { xs: '0.65rem', md: '0.85rem' }, 
-                      fontWeight: 'bold'
+                      fontWeight: '900'
                     }}
                   >
                     {item.value.toLocaleString()}
@@ -212,7 +224,7 @@ export default function Age3DBarChart({ data, location_name, language = 'en' }: 
                       top: -ellipseHeight - (isMobile ? 20 : 35),
                       left: '50%',
                       transform: 'translateX(-50%)',
-                      color: isMobile ? '#fff' : '#2c3e50',
+                      color: isDarkMode ? '#ffffff' : (isMobile ? '#fff' : '#2c3e50'),
                       fontSize: { xs: '0.8rem', md: '1.4rem' },
                       fontWeight: 900,
                       opacity: 0,

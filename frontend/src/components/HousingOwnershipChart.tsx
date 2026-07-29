@@ -63,7 +63,7 @@ const categoryKeys = [
   'other',
 ];
 
-export default function HousingOwnershipChart({ data, location_name, language = 'en' }: HousingOwnershipChartProps) {
+export default function HousingOwnershipChart({ isDarkMode = false,  data, location_name, language = 'en' }: HousingOwnershipChartProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -115,14 +115,25 @@ export default function HousingOwnershipChart({ data, location_name, language = 
     }}>
       <Container maxWidth={isMobile ? false : "xl"} disableGutters={isMobile}>
         {!isMobile && (
-          <>
+          <Box sx={{ 
+            textAlign: 'center', 
+            mb: 4, 
+            mx: 'auto', 
+            width: 'fit-content', 
+            bgcolor: isDarkMode ? 'rgba(40,40,40,0.5)' : 'rgba(255,255,255,0.5)', 
+            backdropFilter: 'blur(10px)', 
+            borderRadius: '20px', 
+            p: 2, 
+            px: 4, 
+            boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)' 
+          }}>
             <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: theme.palette.text.primary }}>
               {t.title}
             </Typography>
-            <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary', mb: 8 }}>
+            <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary', mb: 0 }}>
               {displayLocation}
             </Typography>
-          </>
+          </Box>
         )}
 
         <Box sx={{ 
@@ -130,7 +141,7 @@ export default function HousingOwnershipChart({ data, location_name, language = 
           justifyContent: isMobile ? 'space-between' : 'center', 
           alignItems: 'flex-end', 
           height: containerHeight,
-          gap: { xs: 1, sm: 2, md: 4 },
+          gap: { xs: 1, sm: 3, md: 8 },
           mt: isMobile ? 4 : 10,
           pb: isMobile ? 4 : 10,
           px: isMobile ? 1 : 4,
@@ -140,6 +151,7 @@ export default function HousingOwnershipChart({ data, location_name, language = 
           
           {chartData.map((item, index) => {
             const barHeight = Math.max((item.percent / maxPercent) * (containerHeight * 0.6), 10);
+            const staggerOffset = (!isMobile && index % 2 !== 0) ? 60 : 0;
             
             return (
               <Box 
@@ -157,8 +169,8 @@ export default function HousingOwnershipChart({ data, location_name, language = 
                 <Box 
                   sx={{ 
                     position: 'absolute', 
-                    bottom: barHeight + ellipseHeight + (isMobile ? 30 : 100), 
-                    width: cylinderWidth * 2.5,
+                    bottom: barHeight + ellipseHeight + (isMobile ? 30 : 100) + staggerOffset, 
+                    width: cylinderWidth * 3,
                     textAlign: 'center',
                     opacity: 0,
                     animation: 'fadeInUp 0.8s ease forwards',
@@ -169,26 +181,27 @@ export default function HousingOwnershipChart({ data, location_name, language = 
                     }
                   }}
                 >
-                  <Typography 
-                    variant="h6" 
-                    sx={{ 
-                      color: item.topColor, 
-                      fontWeight: 800, 
-                      fontFamily: "'Oswald', sans-serif",
-                      fontSize: { xs: '0.65rem', sm: '1rem', md: '1.25rem' },
-                      mb: 0.5,
-                      lineHeight: 1.1,
-                      whiteSpace: 'nowrap'
-                    }}
-                  >
+                    <Typography 
+                      variant="h6" 
+                      sx={{ 
+                        color: isDarkMode ? '#ffffff' : '#111111', 
+                        textShadow: isDarkMode ? 'none' : '0px 0px 4px rgba(255,255,255,0.8)',
+                        fontWeight: 900, 
+                        fontFamily: "'Oswald', sans-serif",
+                        fontSize: { xs: '0.65rem', sm: '1rem', md: '1.25rem' },
+                        mb: 0.5,
+                        lineHeight: 1.1,
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
                     {item.title}
                   </Typography>
                   <Typography 
                     variant="body2" 
                     sx={{ 
-                      color: isMobile ? 'rgba(255,255,255,0.8)' : '#7f8c8d', 
+                      color: isDarkMode ? '#dddddd' : '#333333', 
                       fontSize: { xs: '0.6rem', md: '0.85rem' }, 
-                      fontWeight: 'bold'
+                      fontWeight: '900'
                     }}
                   >
                     {item.value.toLocaleString()}
@@ -199,7 +212,7 @@ export default function HousingOwnershipChart({ data, location_name, language = 
                 <Box 
                   sx={{
                     width: '1px',
-                    height: isMobile ? 25 : 80,
+                    height: (isMobile ? 25 : 80) + staggerOffset,
                     bgcolor: item.topColor,
                     position: 'absolute',
                     bottom: barHeight + ellipseHeight + 2,
@@ -224,7 +237,7 @@ export default function HousingOwnershipChart({ data, location_name, language = 
                     position: 'absolute',
                     bottom: barHeight + ellipseHeight + 5,
                     fontWeight: 900,
-                    color: isMobile ? '#fff' : '#2c3e50',
+                    color: isDarkMode ? '#ffffff' : (isMobile ? '#fff' : '#2c3e50'),
                     textShadow: isMobile ? '0 1px 3px rgba(0,0,0,0.5)' : 'none',
                     zIndex: 2,
                     fontSize: { xs: '0.7rem', md: '1.1rem' }

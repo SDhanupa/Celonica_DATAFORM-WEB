@@ -1,5 +1,7 @@
+// Forced reload for Vite (Fixed pie chart background and translations)
+// Forced reload for Vite (Added title glassmorphism panels back)
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Button, Container, Grid, Card, CardContent, CardMedia, FormControl, useTheme, useMediaQuery, CircularProgress, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Autocomplete, TextField, IconButton, Divider } from '@mui/material';
+import { Box, Typography, Button, Container, Grid, Card, CardContent, CardMedia, FormControl, useTheme, useMediaQuery, CircularProgress, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Autocomplete, TextField, IconButton, Divider, Menu, MenuItem } from '@mui/material';
 import { useSwipeable } from 'react-swipeable';
 import { useQuery } from '@apollo/client';
 import { GET_P_DISTRICTS, GET_P_DISTRICT_WITH_GNS, GET_GN_BY_COORDINATES, GET_GN_BY_CCODE } from '../graphql/queries';
@@ -12,6 +14,7 @@ import { useAuth } from '../auth/AuthProvider';
 import { useNavigate, useParams } from 'react-router-dom';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
+import MenuIcon from '@mui/icons-material/Menu';
 
 
 const tChart = {
@@ -29,7 +32,12 @@ const tChart = {
     roomsTitle: 'Rooms in Housing Unit',
     room_1: '1 Room', room_2: '2 Rooms', room_3: '3 Rooms', room_4: '4 Rooms', room_5: '5 Rooms', room_6: '6 Rooms', room_7: '7 Rooms', room_8: '8 Rooms', room_9: '9 Rooms', room_10: '10+ Rooms',
     roofTitle: 'Housing Unit Roof Type',
-    tile: 'Tile', asbestos: 'Asbestos', concrete: 'Concrete', zink_alu: 'Zink Aluminium', metal_sheet: 'Metal Sheet', cadjan_straw: 'Cadjan/Straw'
+    tile: 'Tile', asbestos: 'Asbestos', concrete: 'Concrete', zink_alu: 'Zink Aluminium', metal_sheet: 'Metal Sheet', cadjan_straw: 'Cadjan/Straw',
+    tabHousehold: 'Household', total: 'Total', tabPopulation: 'Population', tabHousing: 'Housing', tabEconomy: 'Economy', tabAge: 'Age', tabOwnership: 'Ownership', tabWallType: 'Wall Type', tabUnitType: 'Unit Type', tabToilet: 'Toilet', tabWater: 'Water', tabWaste: 'Waste', tabRooms: 'Rooms', tabRoofType: 'Roof Type', tabReligion: 'Religion',
+    economyTitle: 'Economy',
+    employed: 'Employed', unemployed: 'Unemployed', not_active: 'Not Active',
+    religionTitle: 'Religious Affiliation',
+    buddhist: 'Buddhist', hindu: 'Hindu', islam: 'Islam', roman_catholic: 'Roman Catholic', other_christian: 'Other Christian'
   },
   si: {
     wallTitle: 'නිවාස බිත්ති වර්ගය',
@@ -45,7 +53,12 @@ const tChart = {
     roomsTitle: 'නිවාස ඒකකයේ කාමර',
     room_1: 'කාමර 1', room_2: 'කාමර 2', room_3: 'කාමර 3', room_4: 'කාමර 4', room_5: 'කාමර 5', room_6: 'කාමර 6', room_7: 'කාමර 7', room_8: 'කාමර 8', room_9: 'කාමර 9', room_10: 'කාමර 10+',
     roofTitle: 'නිවාස ඒකකයේ වහලය',
-    tile: 'උළු', asbestos: 'ඇස්බැස්ටෝස්', concrete: 'කොන්ක්‍රීට්', zink_alu: 'සින්ක් ඇලුමිනියම්', metal_sheet: 'තහඩු', cadjan_straw: 'පොල් අතු/පිදුරු'
+    tile: 'උළු', asbestos: 'ඇස්බැස්ටෝස්', concrete: 'කොන්ක්‍රීට්', zink_alu: 'සින්ක් ඇලුමිනියම්', metal_sheet: 'තහඩු', cadjan_straw: 'පොල් අතු/පිදුරු',
+    tabHousehold: 'ගෘහස්ථ', total: 'මුළු', tabPopulation: 'ජනගහනය', tabHousing: 'නිවාස', tabEconomy: 'ආර්ථිකය', tabAge: 'වයස', tabOwnership: 'අයිතිය', tabWallType: 'බිත්ති වර්ගය', tabUnitType: 'ඒකක වර්ගය', tabToilet: 'වැසිකිළි', tabWater: 'ජලය', tabWaste: 'අපද්‍රව්‍ය', tabRooms: 'කාමර', tabRoofType: 'වහල වර්ගය', tabReligion: 'ආගම',
+    economyTitle: 'ආර්ථිකය',
+    employed: 'රැකියාවක නියුතු', unemployed: 'රැකියා විරහිත', not_active: 'ක්‍රියාකාරී නොවන',
+    religionTitle: 'ආගමික අනුපාතය',
+    buddhist: 'බෞද්ධ', hindu: 'හින්දු', islam: 'ඉස්ලාම්', roman_catholic: 'රෝමානු කතෝලික', other_christian: 'වෙනත් ක්‍රිස්තියානි'
   },
   ta: {
     wallTitle: 'வீட்டின் சுவர் வகை',
@@ -61,7 +74,12 @@ const tChart = {
     roomsTitle: 'வீட்டு அலகில் அறைகள்',
     room_1: '1 அறை', room_2: '2 அறைகள்', room_3: '3 அறைகள்', room_4: '4 அறைகள்', room_5: '5 அறைகள்', room_6: '6 அறைகள்', room_7: '7 அறைகள்', room_8: '8 அறைகள்', room_9: '9 அறைகள்', room_10: '10+ அறைகள்',
     roofTitle: 'வீட்டு அலகின் கூரை வகை',
-    tile: 'ஓடு', asbestos: 'அஸ்பெஸ்டாஸ்', concrete: 'கான்கிரீட்', zink_alu: 'துத்தநாக அலுமினியம்', metal_sheet: 'தகடு', cadjan_straw: 'தென்னை/வைக்கோல்'
+    tile: 'ஓடு', asbestos: 'அஸ்பெஸ்டாஸ்', concrete: 'கான்கிரீட்', zink_alu: 'துத்தநாக அலுமினியம்', metal_sheet: 'தகடு', cadjan_straw: 'தென்னை/வைக்கோல்',
+    tabHousehold: 'குடியிருப்பு', total: 'மொத்த', tabPopulation: 'மக்கள்தொகை', tabHousing: 'வீடமைப்பு', tabEconomy: 'பொருளாதாரம்', tabAge: 'வயது', tabOwnership: 'உரிமை', tabWallType: 'சுவர் வகை', tabUnitType: 'அலகு வகை', tabToilet: 'கழிப்பறை', tabWater: 'நீர்', tabWaste: 'கழிவு', tabRooms: 'அறைகள்', tabRoofType: 'கூரை வகை', tabReligion: 'மதம்',
+    economyTitle: 'பொருளாதாரம்',
+    employed: 'வேலையில் உள்ளோர்', unemployed: 'வேலையற்றோர்', not_active: 'செயல்படாதோர்',
+    religionTitle: 'மதரீதியான இணைப்பு',
+    buddhist: 'பௌத்தர்', hindu: 'இந்து', islam: 'இஸ்லாம்', roman_catholic: 'ரோமன் கத்தோலிக்கர்', other_christian: 'பிற கிறிஸ்தவர்'
   }
 };
 
@@ -131,6 +149,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
 
   // Mobile UI States
   const [activeMobileChart, setActiveMobileChart] = useState<'pie' | 'bar' | 'economy' | 'age' | 'ownership' | 'wall' | 'unit' | 'toilet' | 'water' | 'waste' | 'rooms' | 'roof' | 'religion' | 'household'>('pie');
+  const [mobileMenuAnchor, setMobileMenuAnchor] = useState<null | HTMLElement>(null);
+  const isMobileMenuOpen = Boolean(mobileMenuAnchor);
+  const handleMobileMenuClick = (event: React.MouseEvent<HTMLElement>) => { setMobileMenuAnchor(event.currentTarget); };
+  const handleMobileMenuClose = () => { setMobileMenuAnchor(null); };
 
 
 
@@ -464,17 +486,16 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const gnEconomyChartUI = hasEconomyData ? (
     <>
       {!isMobileView && (
-        <Box sx={{ textAlign: 'center', mb: 4 }}>
-          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
-            Economy
-          </Typography>
+        <Box sx={{ textAlign: 'center', mb: 4, mx: 'auto', width: 'fit-content', bgcolor: isDarkMode ? 'rgba(40,40,40,0.5)' : 'rgba(255,255,255,0.5)', backdropFilter: 'blur(10px)', borderRadius: '20px', p: 2, px: 4, boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)' }}>
+          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>{t.economyTitle}</Typography>
           <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary' }}>
             {displayGN || displayCity || displayDistrict || "Selected Location"}
           </Typography>
         </Box>
       )}
       <Box sx={{
-        bgcolor: isMobileView ? 'transparent' : (themeColors.cardBg || '#ffffff'),
+        bgcolor: isMobileView ? 'transparent' : (isDarkMode ? 'rgba(40,40,40,0.5)' : 'rgba(255,255,255,0.4)'),
+        backdropFilter: isMobileView ? 'none' : 'blur(10px)',
         borderRadius: '24px',
         p: isMobileView ? 0 : 4,
         display: 'flex',
@@ -494,9 +515,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             series={[
               {
                 data: [
-                  { id: 0, value: Number(gnEconomyData?.employed || 0), label: 'Employed', color: '#2ecc71' },
-                  { id: 1, value: Number(gnEconomyData?.unemployed || 0), label: 'Unemployed', color: '#e74c3c' },
-                  { id: 2, value: Number(gnEconomyData?.economically_not_active || 0), label: 'Not Active', color: '#f1c40f' },
+                  { id: 0, value: Number(gnEconomyData?.employed || 0), label: t.employed, color: '#2ecc71' },
+                  { id: 1, value: Number(gnEconomyData?.unemployed || 0), label: t.unemployed, color: '#e74c3c' },
+                  { id: 2, value: Number(gnEconomyData?.economically_not_active || 0), label: t.not_active, color: '#f1c40f' },
                 ],
                 innerRadius: 90,
                 outerRadius: 130,
@@ -524,8 +545,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             pointerEvents: 'none'
           }}>
             <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1, fontWeight: 'bold' }}>
-              Total<br />Economy
-            </Typography>
+              Total<br />{t.economyTitle}</Typography>
             <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
               {(gnEconomyData?.total || 0).toLocaleString()}
             </Typography>
@@ -535,21 +555,21 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         {/* Custom Legend */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mt: 2, px: isMobileView ? 0 : 2, zIndex: 1 }}>
           <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="caption" sx={{ color: themeColors.textDark, fontWeight: 'bold', display: 'block' }}>Employed</Typography>
+            <Typography variant="caption" sx={{ color: themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{t.employed}</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
               <span style={{ color: '#2ecc71', fontSize: '1rem' }}>●</span>
               <Typography variant="body1" sx={{ color: themeColors.textDark, fontWeight: 800 }}>{(gnEconomyData?.employed || 0).toLocaleString()}</Typography>
             </Box>
           </Box>
           <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="caption" sx={{ color: themeColors.textDark, fontWeight: 'bold', display: 'block' }}>Unemployed</Typography>
+            <Typography variant="caption" sx={{ color: themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{t.unemployed}</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
               <span style={{ color: '#e74c3c', fontSize: '1rem' }}>●</span>
               <Typography variant="body1" sx={{ color: themeColors.textDark, fontWeight: 800 }}>{(gnEconomyData?.unemployed || 0).toLocaleString()}</Typography>
             </Box>
           </Box>
           <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="caption" sx={{ color: themeColors.textDark, fontWeight: 'bold', display: 'block' }}>Not Active</Typography>
+            <Typography variant="caption" sx={{ color: themeColors.textDark, fontWeight: 'bold', display: 'block' }}>{t.not_active}</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
               <span style={{ color: '#f1c40f', fontSize: '1rem' }}>●</span>
               <Typography variant="body1" sx={{ color: themeColors.textDark, fontWeight: 800 }}>{(gnEconomyData?.economically_not_active || 0).toLocaleString()}</Typography>
@@ -576,17 +596,16 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const gnWallChartUI = hasWallData ? (
     <>
       {!isMobileView && (
-        <Box sx={{ textAlign: 'center', mb: 4 }}>
-          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
-            Housing Wall Type
-          </Typography>
+        <Box sx={{ textAlign: 'center', mb: 4, mx: 'auto', width: 'fit-content', bgcolor: isDarkMode ? 'rgba(40,40,40,0.5)' : 'rgba(255,255,255,0.5)', backdropFilter: 'blur(10px)', borderRadius: '20px', p: 2, px: 4, boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)' }}>
+          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>{t.wallTitle}</Typography>
           <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary' }}>
             {displayGN || displayCity || displayDistrict || "Selected Location"}
           </Typography>
         </Box>
       )}
       <Box sx={{
-        bgcolor: isMobileView ? 'transparent' : (themeColors.cardBg || '#ffffff'),
+        bgcolor: isMobileView ? 'transparent' : (isDarkMode ? 'rgba(40,40,40,0.5)' : 'rgba(255,255,255,0.4)'),
+        backdropFilter: isMobileView ? 'none' : 'blur(10px)',
         borderRadius: '24px',
         p: isMobileView ? 0 : 4,
         display: 'flex',
@@ -632,7 +651,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             pointerEvents: 'none'
           }}>
             <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1, fontWeight: 'bold' }}>
-              Total<br />Units
+              {t.total}<br />{t.tabUnitType}
             </Typography>
             <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
               {(housingWallData?.total_units || 0).toLocaleString()}
@@ -668,17 +687,16 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const gnUnitChartUI = hasUnitData ? (
     <>
       {!isMobileView && (
-        <Box sx={{ textAlign: 'center', mb: 4 }}>
-          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
-            Housing Unit Type
-          </Typography>
+        <Box sx={{ textAlign: 'center', mb: 4, mx: 'auto', width: 'fit-content', bgcolor: isDarkMode ? 'rgba(40,40,40,0.5)' : 'rgba(255,255,255,0.5)', backdropFilter: 'blur(10px)', borderRadius: '20px', p: 2, px: 4, boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)' }}>
+          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>{t.unitTitle}</Typography>
           <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary' }}>
             {displayGN || displayCity || displayDistrict || "Selected Location"}
           </Typography>
         </Box>
       )}
       <Box sx={{
-        bgcolor: isMobileView ? 'transparent' : (themeColors.cardBg || '#ffffff'),
+        bgcolor: isMobileView ? 'transparent' : (isDarkMode ? 'rgba(40,40,40,0.5)' : 'rgba(255,255,255,0.4)'),
+        backdropFilter: isMobileView ? 'none' : 'blur(10px)',
         borderRadius: '24px',
         p: isMobileView ? 0 : 4,
         display: 'flex',
@@ -724,7 +742,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             pointerEvents: 'none'
           }}>
             <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1, fontWeight: 'bold' }}>
-              Total<br />Units
+              {t.total}<br />{t.tabUnitType}
             </Typography>
             <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
               {(housingUnitData?.total_units || 0).toLocaleString()}
@@ -762,17 +780,16 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const gnToiletChartUI = hasToiletData ? (
     <>
       {!isMobileView && (
-        <Box sx={{ textAlign: 'center', mb: 4 }}>
-          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
-            Toilet Facilities
-          </Typography>
+        <Box sx={{ textAlign: 'center', mb: 4, mx: 'auto', width: 'fit-content', bgcolor: isDarkMode ? 'rgba(40,40,40,0.5)' : 'rgba(255,255,255,0.5)', backdropFilter: 'blur(10px)', borderRadius: '20px', p: 2, px: 4, boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)' }}>
+          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>{t.toiletTitle}</Typography>
           <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary' }}>
             {displayGN || displayCity || displayDistrict || "Selected Location"}
           </Typography>
         </Box>
       )}
       <Box sx={{
-        bgcolor: isMobileView ? 'transparent' : (themeColors.cardBg || '#ffffff'),
+        bgcolor: isMobileView ? 'transparent' : (isDarkMode ? 'rgba(40,40,40,0.5)' : 'rgba(255,255,255,0.4)'),
+        backdropFilter: isMobileView ? 'none' : 'blur(10px)',
         borderRadius: '24px',
         p: isMobileView ? 0 : 4,
         display: 'flex',
@@ -818,7 +835,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             pointerEvents: 'none'
           }}>
             <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1, fontWeight: 'bold' }}>
-              Total<br />Households
+              {t.total}<br />{t.tabHousehold}
             </Typography>
             <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
               {(toiletFacilityData?.total_households || 0).toLocaleString()}
@@ -861,17 +878,16 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const gnWaterChartUI = hasWaterData ? (
     <>
       {!isMobileView && (
-        <Box sx={{ textAlign: 'center', mb: 4 }}>
-          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
-            Source of Drinking Water
-          </Typography>
+        <Box sx={{ textAlign: 'center', mb: 4, mx: 'auto', width: 'fit-content', bgcolor: isDarkMode ? 'rgba(40,40,40,0.5)' : 'rgba(255,255,255,0.5)', backdropFilter: 'blur(10px)', borderRadius: '20px', p: 2, px: 4, boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)' }}>
+          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>{t.waterTitle}</Typography>
           <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary' }}>
             {displayGN || displayCity || displayDistrict || "Selected Location"}
           </Typography>
         </Box>
       )}
       <Box sx={{
-        bgcolor: isMobileView ? 'transparent' : (themeColors.cardBg || '#ffffff'),
+        bgcolor: isMobileView ? 'transparent' : (isDarkMode ? 'rgba(40,40,40,0.5)' : 'rgba(255,255,255,0.4)'),
+        backdropFilter: isMobileView ? 'none' : 'blur(10px)',
         borderRadius: '24px',
         p: isMobileView ? 0 : 4,
         display: 'flex',
@@ -917,7 +933,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             pointerEvents: 'none'
           }}>
             <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1, fontWeight: 'bold' }}>
-              Total<br />Households
+              {t.total}<br />{t.tabHousehold}
             </Typography>
             <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
               {(drinkingWaterData?.total_households || 0).toLocaleString()}
@@ -955,17 +971,16 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const gnWasteChartUI = hasWasteData ? (
     <>
       {!isMobileView && (
-        <Box sx={{ textAlign: 'center', mt: 8, mb: 4 }}>
-          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
-            Solid Waste Disposal
-          </Typography>
+        <Box sx={{ textAlign: 'center', mt: 8, mb: 4, mx: 'auto', width: 'fit-content', bgcolor: isDarkMode ? 'rgba(40,40,40,0.5)' : 'rgba(255,255,255,0.5)', backdropFilter: 'blur(10px)', borderRadius: '20px', p: 2, px: 4, boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)' }}>
+          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>{t.wasteTitle}</Typography>
           <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary' }}>
             {displayGN || displayCity || displayDistrict || "Selected Location"}
           </Typography>
         </Box>
       )}
       <Box sx={{
-        bgcolor: isMobileView ? 'transparent' : (themeColors.cardBg || '#ffffff'),
+        bgcolor: isMobileView ? 'transparent' : (isDarkMode ? 'rgba(40,40,40,0.5)' : 'rgba(255,255,255,0.4)'),
+        backdropFilter: isMobileView ? 'none' : 'blur(10px)',
         borderRadius: '24px',
         p: isMobileView ? 0 : 4,
         display: 'flex',
@@ -1009,7 +1024,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           pointerEvents: 'none'
         }}>
           <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
-            Total<br />Households
+            {t.total}<br />{t.tabHousehold}
           </Typography>
           <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
             {(solidWasteData?.total_households || 0).toLocaleString()}
@@ -1048,17 +1063,16 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const gnRoomsChartUI = hasRoomsData ? (
     <>
       {!isMobileView && (
-        <Box sx={{ textAlign: 'center', mb: 4 }}>
-          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
-            Rooms in Housing Unit
-          </Typography>
+        <Box sx={{ textAlign: 'center', mb: 4, mx: 'auto', width: 'fit-content', bgcolor: isDarkMode ? 'rgba(40,40,40,0.5)' : 'rgba(255,255,255,0.5)', backdropFilter: 'blur(10px)', borderRadius: '20px', p: 2, px: 4, boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)' }}>
+          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>{t.roomsTitle}</Typography>
           <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary' }}>
             {displayGN || displayCity || displayDistrict || "Selected Location"}
           </Typography>
         </Box>
       )}
       <Box sx={{
-        bgcolor: isMobileView ? 'transparent' : (themeColors.cardBg || '#ffffff'),
+        bgcolor: isMobileView ? 'transparent' : (isDarkMode ? 'rgba(40,40,40,0.5)' : 'rgba(255,255,255,0.4)'),
+        backdropFilter: isMobileView ? 'none' : 'blur(10px)',
         borderRadius: '24px',
         p: isMobileView ? 0 : 4,
         display: 'flex',
@@ -1104,7 +1118,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             pointerEvents: 'none'
           }}>
             <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1, fontWeight: 'bold' }}>
-              Total<br />Units
+              {t.total}<br />{t.tabUnitType}
             </Typography>
             <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
               {(roomsData?.total_housing_units || 0).toLocaleString()}
@@ -1141,17 +1155,16 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const gnRoofChartUI = hasRoofData ? (
     <>
       {!isMobileView && (
-        <Box sx={{ textAlign: 'center', mt: 8, mb: 4 }}>
-          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
-            Housing Unit Roof Type
-          </Typography>
+        <Box sx={{ textAlign: 'center', mt: 8, mb: 4, mx: 'auto', width: 'fit-content', bgcolor: isDarkMode ? 'rgba(40,40,40,0.5)' : 'rgba(255,255,255,0.5)', backdropFilter: 'blur(10px)', borderRadius: '20px', p: 2, px: 4, boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)' }}>
+          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>{t.roofTitle}</Typography>
           <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary' }}>
             {displayGN || displayCity || displayDistrict || "Selected Location"}
           </Typography>
         </Box>
       )}
       <Box sx={{
-        bgcolor: isMobileView ? 'transparent' : (themeColors.cardBg || '#ffffff'),
+        bgcolor: isMobileView ? 'transparent' : (isDarkMode ? 'rgba(40,40,40,0.5)' : 'rgba(255,255,255,0.4)'),
+        backdropFilter: isMobileView ? 'none' : 'blur(10px)',
         borderRadius: '24px',
         p: isMobileView ? 0 : 4,
         display: 'flex',
@@ -1195,7 +1208,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           pointerEvents: 'none'
         }}>
           <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
-            Total<br />Units
+            {t.total}<br />{t.tabUnitType}
           </Typography>
           <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
             {(roofData?.total_housing_units || 0).toLocaleString()}
@@ -1219,28 +1232,27 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   ) : null;
 
   const religionPalette = [
-    { label: 'Buddhist', color: '#f1c40f', value: religionData?.buddhist || 0 },
-    { label: 'Hindu', color: '#e67e22', value: religionData?.hindu || 0 },
-    { label: 'Islam', color: '#2ecc71', value: religionData?.islam || 0 },
-    { label: 'Roman Catholic', color: '#9b59b6', value: religionData?.roman_catholic || 0 },
-    { label: 'Other Christian', color: '#3498db', value: religionData?.other_christian || 0 },
+    { label: t.buddhist, color: '#f1c40f', value: religionData?.buddhist || 0 },
+    { label: t.hindu, color: '#e67e22', value: religionData?.hindu || 0 },
+    { label: t.islam, color: '#2ecc71', value: religionData?.islam || 0 },
+    { label: t.roman_catholic, color: '#9b59b6', value: religionData?.roman_catholic || 0 },
+    { label: t.other_christian, color: '#3498db', value: religionData?.other_christian || 0 },
     { label: t.other, color: '#95a5a6', value: religionData?.other || 0 },
   ].filter(item => item.value > 0);
 
   const gnReligionChartUI = hasReligionData ? (
     <>
       {!isMobileView && (
-        <Box sx={{ textAlign: 'center', mt: 8, mb: 4 }}>
-          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
-            Religious Affiliation
-          </Typography>
+        <Box sx={{ textAlign: 'center', mt: 8, mb: 4, mx: 'auto', width: 'fit-content', bgcolor: isDarkMode ? 'rgba(40,40,40,0.5)' : 'rgba(255,255,255,0.5)', backdropFilter: 'blur(10px)', borderRadius: '20px', p: 2, px: 4, boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)' }}>
+          <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>{t.religionTitle}</Typography>
           <Typography variant="subtitle1" align="center" sx={{ color: 'text.secondary' }}>
             {displayGN || displayCity || displayDistrict || "Selected Location"}
           </Typography>
         </Box>
       )}
       <Box sx={{
-        bgcolor: isMobileView ? 'transparent' : (themeColors.cardBg || '#ffffff'),
+        bgcolor: isMobileView ? 'transparent' : (isDarkMode ? 'rgba(40,40,40,0.5)' : 'rgba(255,255,255,0.4)'),
+        backdropFilter: isMobileView ? 'none' : 'blur(10px)',
         borderRadius: '24px',
         p: isMobileView ? 0 : 4,
         display: 'flex',
@@ -1284,7 +1296,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           pointerEvents: 'none'
         }}>
           <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
-            Total<br />Population
+            {t.total}<br />{t.tabPopulation}
           </Typography>
           <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
             {(religionData?.total_population || 0).toLocaleString()}
@@ -1325,7 +1337,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const gnHouseholdChartUI = hasHouseholdData ? (
     <>
       {!isMobileView && (
-        <Box sx={{ textAlign: 'center', mt: 8, mb: 4 }}>
+        <Box sx={{ textAlign: 'center', mt: 8, mb: 4, mx: 'auto', width: 'fit-content', bgcolor: isDarkMode ? 'rgba(40,40,40,0.5)' : 'rgba(255,255,255,0.5)', backdropFilter: 'blur(10px)', borderRadius: '20px', p: 2, px: 4, boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)' }}>
           <Typography variant="h4" align="center" sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, mb: 2, color: themeColors.textDark }}>
             Relationship to Household Head
           </Typography>
@@ -1335,7 +1347,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         </Box>
       )}
       <Box sx={{
-        bgcolor: isMobileView ? 'transparent' : (themeColors.cardBg || '#ffffff'),
+        bgcolor: isMobileView ? 'transparent' : (isDarkMode ? 'rgba(40,40,40,0.5)' : 'rgba(255,255,255,0.4)'),
+        backdropFilter: isMobileView ? 'none' : 'blur(10px)',
         borderRadius: '24px',
         p: isMobileView ? 0 : 4,
         display: 'flex',
@@ -1370,7 +1383,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         {/* Center Text */}
         <Box sx={{ position: 'absolute', top: '40%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', pointerEvents: 'none' }}>
           <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1 }}>
-            Total<br />Population
+            {t.total}<br />{t.tabPopulation}
           </Typography>
           <Typography variant="h5" sx={{ fontWeight: 800, color: themeColors.textDark, mt: 0.5 }}>
             {(householdHeadData?.total_population || 0).toLocaleString()}
@@ -1395,7 +1408,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   return (
     <Box sx={{ fontFamily: "'Inter', sans-serif" }}>
       {/* Navigation Bar */}
-      <Box sx={{ position: 'absolute', top: { xs: '30px', sm: 0 }, left: 0, right: 0, p: 3, display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, pointerEvents: 'none' }}>
+      <Box sx={{ position: 'absolute', top: { xs: '30px', sm: 0 }, left: 0, right: 0, p: 3, display: 'flex', justifyContent: { xs: 'flex-start', sm: 'center' }, alignItems: 'center', zIndex: 1000, pointerEvents: 'none' }}>
         <Box sx={{
           display: 'flex',
           alignItems: 'center',
@@ -1416,68 +1429,46 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           <IconButton
             onClick={() => setIsDarkMode(!isDarkMode)}
             size="small"
-            sx={{ color: '#ffffff', p: 0, transition: 'transform 0.2s', '&:hover': { transform: 'scale(1.1)' } }}
+            sx={{ color: isDarkMode ? '#ffffff' : '#000000', p: 0, transition: 'transform 0.2s', '&:hover': { transform: 'scale(1.1)' } }}
           >
             {isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
           </IconButton>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, fontWeight: 600, fontSize: '0.95rem', letterSpacing: '0.5px' }}>
-            <Typography
-              onClick={() => navigate('/')}
-              sx={{
-                cursor: 'pointer',
-                transition: 'opacity 0.2s',
-                fontFamily: "'Inter', sans-serif",
-                fontWeight: 600,
-                color: '#ffffff',
-                '&:hover': { opacity: 0.7 }
-              }}
-            >
-              Home
-            </Typography>
+          {/* Desktop Nav */}
+          <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 1.5, fontWeight: 600, fontSize: '0.95rem', letterSpacing: '0.5px' }}>
+            <Typography onClick={() => navigate('/')} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: '#ffffff', '&:hover': { opacity: 0.7 } }}>Home</Typography>
             <Typography sx={{ opacity: 0.4, fontWeight: 300, color: '#ffffff' }}>|</Typography>
-            <Typography
-              onClick={login}
-              sx={{
-                cursor: 'pointer',
-                transition: 'opacity 0.2s',
-                fontFamily: "'Inter', sans-serif",
-                fontWeight: 600,
-                color: '#ffffff',
-                '&:hover': { opacity: 0.7 }
-              }}
-            >
-              Login
-            </Typography>
+            <Typography onClick={login} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: '#ffffff', '&:hover': { opacity: 0.7 } }}>Login</Typography>
             <Typography sx={{ opacity: 0.4, fontWeight: 300, color: '#ffffff' }}>|</Typography>
-            <Typography
-              onClick={register}
-              sx={{
-                cursor: 'pointer',
-                transition: 'opacity 0.2s',
-                fontFamily: "'Inter', sans-serif",
-                fontWeight: 600,
-                color: '#ffffff',
-                '&:hover': { opacity: 0.7 }
-              }}
-            >
-              Signup
-            </Typography>
+            <Typography onClick={register} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: '#ffffff', '&:hover': { opacity: 0.7 } }}>Signup</Typography>
             <Typography sx={{ opacity: 0.4, fontWeight: 300, color: '#ffffff' }}>|</Typography>
-            <Typography
-              onClick={cycleLanguage}
-              sx={{
-                cursor: 'pointer',
-                textTransform: 'uppercase',
-                transition: 'opacity 0.2s',
-                fontFamily: "'Inter', sans-serif",
-                fontWeight: 700,
-                color: themeColors.primary,
-                '&:hover': { opacity: 0.7 }
+            <Typography onClick={cycleLanguage} sx={{ cursor: 'pointer', textTransform: 'uppercase', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 700, color: themeColors.primary, '&:hover': { opacity: 0.7 } }}>{language}</Typography>
+          </Box>
+
+          {/* Mobile Nav */}
+          <Box sx={{ display: { xs: 'flex', sm: 'none' }, alignItems: 'center', gap: 1.5 }}>
+            <IconButton onClick={handleMobileMenuClick} size="small" sx={{ color: isDarkMode ? '#ffffff' : '#000000', p: 0 }}>
+              <MenuIcon />
+            </IconButton>
+            <Menu
+              anchorEl={mobileMenuAnchor}
+              open={isMobileMenuOpen}
+              onClose={handleMobileMenuClose}
+              PaperProps={{
+                sx: {
+                  bgcolor: isDarkMode ? 'rgba(30,30,30,0.9)' : 'rgba(255,255,255,0.9)',
+                  backdropFilter: 'blur(10px)',
+                  color: isDarkMode ? '#fff' : '#000',
+                  minWidth: 150
+                }
               }}
             >
-              {language}
-            </Typography>
+              <MenuItem onClick={() => { handleMobileMenuClose(); navigate('/'); }}>Home</MenuItem>
+              <MenuItem onClick={() => { handleMobileMenuClose(); login(); }}>Login</MenuItem>
+              <MenuItem onClick={() => { handleMobileMenuClose(); register(); }}>Signup</MenuItem>
+              <Divider />
+              <MenuItem onClick={() => { handleMobileMenuClose(); cycleLanguage(); }} sx={{ fontWeight: 'bold', color: themeColors.primary }}>Language: {language.toUpperCase()}</MenuItem>
+            </Menu>
           </Box>
         </Box>
       </Box>
@@ -1734,10 +1725,23 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundImage: 'url(/hero-image.jpeg)',
+            backgroundImage: 'url(/hero-background-generated.png)',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            opacity: 1, // Full opacity for the new bright image
+            opacity: 1,
+            zIndex: 0,
+          }}
+        />
+        {/* Transparent Overlay for Text Readability */}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            bgcolor: 'rgba(255, 255, 255, 0.6)', // Light transparent layer to contrast with dark text
+            backdropFilter: 'blur(3px)',
             zIndex: 0,
           }}
         />
@@ -1746,7 +1750,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, py: { xs: 8, md: 0 } }}>
           <Grid container spacing={4} alignItems="center">
             {/* Words / Text on the right side (order 2 on desktop, order 1 on mobile) */}
-            <Grid item xs={12} md={6} sx={{ order: { xs: 1, md: 2 } }}>
+            <Grid item xs={12} sx={{ order: { xs: 1, md: 2 } }}>
               {!showLocationModal && (
                 <Box
                   sx={{
@@ -1757,17 +1761,34 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                     },
                     display: 'flex',
                     flexDirection: 'column',
-                    alignItems: { xs: 'center', md: 'flex-start' },
-                    textAlign: { xs: 'center', md: 'left' },
+                    alignItems: 'center',
+                    textAlign: 'center',
                     bgcolor: 'transparent',
                     backdropFilter: 'none',
                     borderRadius: '24px',
                     p: { xs: 3, md: 0 },
                     border: 'none',
                     boxShadow: 'none',
-                    mt: { xs: 2, md: 4 } // Moved further down as requested
+                    mt: { xs: 0, md: -6 } // Moved up as requested
                   }}
                 >
+                  {/* "My Village" Header */}
+                  <Typography
+                    variant="h2"
+                    sx={{
+                      color: themeColors.textDark,
+                      fontFamily: "'Playfair Display', serif",
+                      fontWeight: 800,
+                      fontStyle: 'italic',
+                      fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4.5rem', lg: '5.5rem' },
+                      mb: { xs: 1, md: 2 },
+                      textAlign: 'center',
+                      textShadow: '0 0 20px rgba(255,255,255,0.9), 0 0 10px rgba(255,255,255,1)'
+                    }}
+                  >
+                    {language === 'en' ? 'MY Village' : language === 'si' ? 'මගේ ගම' : 'என் கிராமம்'}
+                  </Typography>
+
                   {/* CCODE - Above District */}
                   {displayCCODE && (
                     <Typography
@@ -1778,7 +1799,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                         fontWeight: 700,
                         fontSize: { xs: '1.5rem', sm: '2.25rem', md: '2.75rem', lg: '3.25rem' },
                         mb: { xs: 2, md: 3 },
-                        textAlign: { xs: 'center', md: 'left' },
+                        textAlign: 'center',
                         textShadow: '0 0 20px rgba(255,255,255,0.9), 0 0 10px rgba(255,255,255,1)'
                       }}
                     >
@@ -1856,7 +1877,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             </Grid>
 
             {/* Charts Section on the left side (order 1 on desktop, order 2 on mobile) */}
-            <Grid item xs={12} md={6} sx={{ order: { xs: 2, md: 1 } }}>
+            <Grid item xs={12} sx={{ order: { xs: 2, md: 1 } }}>
               {!showLocationModal && (displayGN || displayCity || displayDistrict) && (
                 <Box
                   {...swipeHandlers}
@@ -1876,10 +1897,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                 >
                   {/* Mobile Toggle Buttons */}
                   {isMobileView && (
-                    <Box sx={{ 
-                      display: 'grid', 
-                      gridTemplateColumns: 'repeat(3, 1fr)', 
-                      gap: 1, 
+                    <Box sx={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(3, 1fr)',
+                      gap: 1,
                       mb: 3,
                       alignItems: 'stretch',
                       '& > button': {
@@ -2138,7 +2159,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                     </Box>
                   )}
 
-                  {hasPopulationData && (!isMobileView || activeMobileChart === 'pie') && (
+                  {hasPopulationData && isMobileView && activeMobileChart === 'pie' && (
                     <PopulationInfographic populationData={populationData} language={language} />
                   )}
 
@@ -2263,7 +2284,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           )}
 
           {gnEconomyChartUI && (
-            <Box sx={{ 
+            <Box sx={{
               bgcolor: '#eef2f3',
               backgroundImage: 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/Economy.png)',
               backgroundSize: 'cover',
@@ -2289,7 +2310,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           )}
 
           {gnWallChartUI && (
-            <Box sx={{ 
+            <Box sx={{
               bgcolor: '#eef2f3',
               backgroundImage: 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/Housing-Wall-Type.png)',
               backgroundSize: 'cover',
@@ -2308,7 +2329,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           )}
 
           {gnUnitChartUI && (
-            <Box sx={{ 
+            <Box sx={{
               bgcolor: '#eef2f3',
               backgroundImage: 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/Housing-Unit-Type.png)',
               backgroundSize: 'cover',
@@ -2327,7 +2348,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           )}
 
           {gnToiletChartUI && (
-            <Box sx={{ 
+            <Box sx={{
               bgcolor: '#eef2f3',
               backgroundImage: 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/Toilet-Facilities.png)',
               backgroundSize: 'cover',
@@ -2346,7 +2367,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           )}
 
           {gnRoomsChartUI && (
-            <Box sx={{ 
+            <Box sx={{
               bgcolor: '#eef2f3',
               backgroundImage: 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/Rooms-in-Housing-Unit.png)',
               backgroundSize: 'cover',
@@ -2365,7 +2386,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           )}
 
           {gnWaterChartUI && (
-            <Box sx={{ 
+            <Box sx={{
               bgcolor: '#eef2f3',
               backgroundImage: 'linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.85)), url(/Source-of-Drinking-Water.png)',
               backgroundSize: 'cover',

@@ -1,0 +1,1677 @@
+{
+  "backend/analyze_household_head.py": {
+    "mtime": 1784616431.3805602,
+    "ast_hash": "48cda5ca81a8165b32e2a0ad0a65d0a7",
+    "semantic_hash": "48cda5ca81a8165b32e2a0ad0a65d0a7"
+  },
+  "backend/analyze_religion.py": {
+    "mtime": 1784614670.8525348,
+    "ast_hash": "397ccf2d3f93f3d8b563195a00e60d22",
+    "semantic_hash": "397ccf2d3f93f3d8b563195a00e60d22"
+  },
+  "backend/analyze_roof.py": {
+    "mtime": 1784611460.8256059,
+    "ast_hash": "4b3d4bd94683b8cc384b05ad6c442488",
+    "semantic_hash": "4b3d4bd94683b8cc384b05ad6c442488"
+  },
+  "backend/analyze_rooms.py": {
+    "mtime": 1784610584.5292597,
+    "ast_hash": "dcde462509882bd3565e1574b1f7ebd8",
+    "semantic_hash": "dcde462509882bd3565e1574b1f7ebd8"
+  },
+  "backend/app/Console/Commands/FixPGnMapping.php": {
+    "mtime": 1784149419.9271524,
+    "ast_hash": "437622857a889b0b7090dc9520aa85aa",
+    "semantic_hash": "437622857a889b0b7090dc9520aa85aa"
+  },
+  "backend/app/Console/Commands/ImportGramaNiladharis.php": {
+    "mtime": 1784030216.2471054,
+    "ast_hash": "2cb83ae1df29aefccb878b868d469f51",
+    "semantic_hash": "2cb83ae1df29aefccb878b868d469f51"
+  },
+  "backend/app/Console/Commands/ImportPhiAreas.php": {
+    "mtime": 1783651841.1905017,
+    "ast_hash": "6296e857900c194b1c7f0f5bf3f7886e",
+    "semantic_hash": "6296e857900c194b1c7f0f5bf3f7886e"
+  },
+  "backend/app/Console/Commands/ImportPostOffices.php": {
+    "mtime": 1783599870.6009955,
+    "ast_hash": "76d2a9e182204aaae101e01f1f7e1a2c",
+    "semantic_hash": "76d2a9e182204aaae101e01f1f7e1a2c"
+  },
+  "backend/app/Console/Commands/ImportTrsAreas.php": {
+    "mtime": 1783655755.5611143,
+    "ast_hash": "b68a8844e5f45a4e8e6cba09edac8bda",
+    "semantic_hash": "b68a8844e5f45a4e8e6cba09edac8bda"
+  },
+  "backend/app/Console/Commands/MapPGnsToGramaNiladharis.php": {
+    "mtime": 1784147479.804003,
+    "ast_hash": "e8c17d8686a023b2f20742057072f3ac",
+    "semantic_hash": "e8c17d8686a023b2f20742057072f3ac"
+  },
+  "backend/app/Console/Commands/SeedLeafQuestions.php": {
+    "mtime": 1783257306.6796665,
+    "ast_hash": "ff270dbd4f183959142942e15370116b",
+    "semantic_hash": "ff270dbd4f183959142942e15370116b"
+  },
+  "backend/app/Console/Commands/UpdateGramaNiladharis.php": {
+    "mtime": 1783601602.7993343,
+    "ast_hash": "1bd91f57b0353fe21ce9fc96f39c425a",
+    "semantic_hash": "1bd91f57b0353fe21ce9fc96f39c425a"
+  },
+  "backend/app/GraphQL/Mutations/AdminMutations.php": {
+    "mtime": 1782029456.351767,
+    "ast_hash": "50273e108f5772c50b2d5ac6fbb2d68b",
+    "semantic_hash": "50273e108f5772c50b2d5ac6fbb2d68b"
+  },
+  "backend/app/GraphQL/Mutations/CategoryMutations.php": {
+    "mtime": 1784866925.3157115,
+    "ast_hash": "83a54ab9e36824201a727db99115972e",
+    "semantic_hash": "83a54ab9e36824201a727db99115972e"
+  },
+  "backend/app/GraphQL/Mutations/OnboardingMutations.php": {
+    "mtime": 1784794528.0039163,
+    "ast_hash": "ac215ca1fb0a15f5700709f5a9408937",
+    "semantic_hash": "ac215ca1fb0a15f5700709f5a9408937"
+  },
+  "backend/app/GraphQL/Mutations/PoliceMutations.php": {
+    "mtime": 1783530602.2790332,
+    "ast_hash": "6bd60dc8dfd9961fe7d2bbaf8f4b8cf4",
+    "semantic_hash": "6bd60dc8dfd9961fe7d2bbaf8f4b8cf4"
+  },
+  "backend/app/GraphQL/Mutations/PostOfficeMutations.php": {
+    "mtime": 1783611223.719463,
+    "ast_hash": "0de01854ddf4a8d8d74e7e6ebc2f4b7c",
+    "semantic_hash": "0de01854ddf4a8d8d74e7e6ebc2f4b7c"
+  },
+  "backend/app/GraphQL/Mutations/QuestionMutations.php": {
+    "mtime": 1783259787.565454,
+    "ast_hash": "7268f575d85f8d521060d518c9bde92e",
+    "semantic_hash": "7268f575d85f8d521060d518c9bde92e"
+  },
+  "backend/app/GraphQL/Mutations/UserMutations.php": {
+    "mtime": 1782599705.036673,
+    "ast_hash": "f404de7e8e544e8b76a697857b02407d",
+    "semantic_hash": "f404de7e8e544e8b76a697857b02407d"
+  },
+  "backend/app/GraphQL/Queries/AdminQueries.php": {
+    "mtime": 1782600525.040033,
+    "ast_hash": "925327b177955ec6975b1093f2ed8484",
+    "semantic_hash": "925327b177955ec6975b1093f2ed8484"
+  },
+  "backend/app/GraphQL/Queries/CategoryQueries.php": {
+    "mtime": 1783259809.35051,
+    "ast_hash": "f330f21bf84fb3791d15df926971d0ec",
+    "semantic_hash": "f330f21bf84fb3791d15df926971d0ec"
+  },
+  "backend/app/GraphQL/Queries/DistrictQueries.php": {
+    "mtime": 1783648350.492594,
+    "ast_hash": "c384d62a6d4705c0a64afd366829172d",
+    "semantic_hash": "c384d62a6d4705c0a64afd366829172d"
+  },
+  "backend/app/GraphQL/Queries/GnByCoordinates.php": {
+    "mtime": 1784127376.156847,
+    "ast_hash": "d3d9ffd5c77aad90a12573bc3689063d",
+    "semantic_hash": "d3d9ffd5c77aad90a12573bc3689063d"
+  },
+  "backend/app/GraphQL/Queries/HousingDataQuery.php": {
+    "mtime": 1784200812.2963557,
+    "ast_hash": "f262813d9545f985f112685a3f92ca63",
+    "semantic_hash": "f262813d9545f985f112685a3f92ca63"
+  },
+  "backend/app/GraphQL/Queries/PhiAreaQueries.php": {
+    "mtime": 1783651887.6995368,
+    "ast_hash": "14adbae460f5ffe5fb90e10fb597c9e3",
+    "semantic_hash": "14adbae460f5ffe5fb90e10fb597c9e3"
+  },
+  "backend/app/GraphQL/Queries/PostOfficeQueries.php": {
+    "mtime": 1783608653.0147047,
+    "ast_hash": "75f8dd1f64be431c25fecc4d36b44476",
+    "semantic_hash": "75f8dd1f64be431c25fecc4d36b44476"
+  },
+  "backend/app/GraphQL/Queries/QuestionQueries.php": {
+    "mtime": 1783258241.4309747,
+    "ast_hash": "51c5f7753682dc4a186b90f6eebe9672",
+    "semantic_hash": "51c5f7753682dc4a186b90f6eebe9672"
+  },
+  "backend/app/GraphQL/Queries/TrsAreaQueries.php": {
+    "mtime": 1783655267.5760407,
+    "ast_hash": "cfcf15d7bab719218035bc18607989bf",
+    "semantic_hash": "cfcf15d7bab719218035bc18607989bf"
+  },
+  "backend/app/GraphQL/Queries/UserQueries.php": {
+    "mtime": 1782600518.4065142,
+    "ast_hash": "253cca56366791e386d3c9b5a8e69670",
+    "semantic_hash": "253cca56366791e386d3c9b5a8e69670"
+  },
+  "backend/app/Http/Controllers/Controller.php": {
+    "mtime": 1782027748.2572558,
+    "ast_hash": "25a307335c0719bc9a91b3f7babd186d",
+    "semantic_hash": "25a307335c0719bc9a91b3f7babd186d"
+  },
+  "backend/app/Http/Controllers/ImageUploadController.php": {
+    "mtime": 1784796355.7135003,
+    "ast_hash": "59914d8b03ba8cac6c4c11a6282951ef",
+    "semantic_hash": "59914d8b03ba8cac6c4c11a6282951ef"
+  },
+  "backend/app/Http/Middleware/KeycloakAuthGuard.php": {
+    "mtime": 1784793757.418819,
+    "ast_hash": "9c018b2d3410d6a0aa98bb222e470748",
+    "semantic_hash": "9c018b2d3410d6a0aa98bb222e470748"
+  },
+  "backend/app/Models/Admin.php": {
+    "mtime": 1782599732.4045417,
+    "ast_hash": "98ac71dd1f2028fd45c8f479b24aff64",
+    "semantic_hash": "98ac71dd1f2028fd45c8f479b24aff64"
+  },
+  "backend/app/Models/Category.php": {
+    "mtime": 1784870641.876104,
+    "ast_hash": "f7e23c53dced167d6cb254bdf0938e3c",
+    "semantic_hash": "f7e23c53dced167d6cb254bdf0938e3c"
+  },
+  "backend/app/Models/DrinkingWaterSource.php": {
+    "mtime": 1784603818.9533107,
+    "ast_hash": "e4b0a6cdaa7de3e1e47b4096f6ea660c",
+    "semantic_hash": "e4b0a6cdaa7de3e1e47b4096f6ea660c"
+  },
+  "backend/app/Models/GnDivisionHousing.php": {
+    "mtime": 1784157615.1386006,
+    "ast_hash": "88fff2c616c57bcb9e6be56f7265df93",
+    "semantic_hash": "88fff2c616c57bcb9e6be56f7265df93"
+  },
+  "backend/app/Models/GnEconomy.php": {
+    "mtime": 1784188723.9793048,
+    "ast_hash": "029efac2c3fd7a24dd21265a3de571d7",
+    "semantic_hash": "029efac2c3fd7a24dd21265a3de571d7"
+  },
+  "backend/app/Models/GramaNiladhari.php": {
+    "mtime": 1784616836.4789298,
+    "ast_hash": "f0630c0cf071fb2aed91912bb9202fcb",
+    "semantic_hash": "f0630c0cf071fb2aed91912bb9202fcb"
+  },
+  "backend/app/Models/HouseholdHeadRelationship.php": {
+    "mtime": 1784616503.4686692,
+    "ast_hash": "edf882a94eb08c6479264e7f9df263a8",
+    "semantic_hash": "edf882a94eb08c6479264e7f9df263a8"
+  },
+  "backend/app/Models/HousingOwnershipStatus.php": {
+    "mtime": 1784573097.1911254,
+    "ast_hash": "01bc78da326ce8721c6599c618481025",
+    "semantic_hash": "01bc78da326ce8721c6599c618481025"
+  },
+  "backend/app/Models/HousingRoofType.php": {
+    "mtime": 1784611536.6869857,
+    "ast_hash": "080d5292bfe85342211576eaae0f5029",
+    "semantic_hash": "080d5292bfe85342211576eaae0f5029"
+  },
+  "backend/app/Models/HousingUnitType.php": {
+    "mtime": 1784602114.2681642,
+    "ast_hash": "ce08826b8c01ab426587696e92a4dd79",
+    "semantic_hash": "ce08826b8c01ab426587696e92a4dd79"
+  },
+  "backend/app/Models/HousingWallType.php": {
+    "mtime": 1784574678.0675805,
+    "ast_hash": "a8143819c1bb2b7b405e771d61ebc022",
+    "semantic_hash": "a8143819c1bb2b7b405e771d61ebc022"
+  },
+  "backend/app/Models/PDistrict.php": {
+    "mtime": 1783703645.055444,
+    "ast_hash": "a577dc16931672e6e69e16ea53bff0e7",
+    "semantic_hash": "a577dc16931672e6e69e16ea53bff0e7"
+  },
+  "backend/app/Models/PGn.php": {
+    "mtime": 1783702647.1487286,
+    "ast_hash": "a51a99d35366f500d21a5b4e7c704071",
+    "semantic_hash": "a51a99d35366f500d21a5b4e7c704071"
+  },
+  "backend/app/Models/PProvince.php": {
+    "mtime": 1784147824.9364214,
+    "ast_hash": "c2b8ee759305e8d195914e30a81688d4",
+    "semantic_hash": "c2b8ee759305e8d195914e30a81688d4"
+  },
+  "backend/app/Models/PSrilanka.php": {
+    "mtime": 1783698694.1312077,
+    "ast_hash": "8b5e8e67cb1c7bcdd11b84f9c4397c70",
+    "semantic_hash": "8b5e8e67cb1c7bcdd11b84f9c4397c70"
+  },
+  "backend/app/Models/PhiArea.php": {
+    "mtime": 1783651818.7693777,
+    "ast_hash": "1527221ed00ff32a7d91d2423415ef95",
+    "semantic_hash": "1527221ed00ff32a7d91d2423415ef95"
+  },
+  "backend/app/Models/Police.php": {
+    "mtime": 1783530575.19596,
+    "ast_hash": "364abd48653306293780f3a6285b95b1",
+    "semantic_hash": "364abd48653306293780f3a6285b95b1"
+  },
+  "backend/app/Models/PostOffice.php": {
+    "mtime": 1783609110.7106876,
+    "ast_hash": "517eabc85421099d96ef87d98b813948",
+    "semantic_hash": "517eabc85421099d96ef87d98b813948"
+  },
+  "backend/app/Models/Question.php": {
+    "mtime": 1783259744.469759,
+    "ast_hash": "f2cc4ae549a445726126cdcaaebd83cb",
+    "semantic_hash": "f2cc4ae549a445726126cdcaaebd83cb"
+  },
+  "backend/app/Models/ReligiousAffiliation.php": {
+    "mtime": 1784614739.6789517,
+    "ast_hash": "8655e5e6cc56e32f7988432c0f4455a7",
+    "semantic_hash": "8655e5e6cc56e32f7988432c0f4455a7"
+  },
+  "backend/app/Models/RoomsInHousingUnit.php": {
+    "mtime": 1784610629.7635772,
+    "ast_hash": "4a98ab99c5285606ac9ed8704d51dd9f",
+    "semantic_hash": "4a98ab99c5285606ac9ed8704d51dd9f"
+  },
+  "backend/app/Models/SolidWasteDisposal.php": {
+    "mtime": 1784605128.073135,
+    "ast_hash": "676c225e4abc37e329a8fb643b8ddcfe",
+    "semantic_hash": "676c225e4abc37e329a8fb643b8ddcfe"
+  },
+  "backend/app/Models/ToiletFacility.php": {
+    "mtime": 1784603077.7241383,
+    "ast_hash": "87c5169f717912be4e1b2b50790da717",
+    "semantic_hash": "87c5169f717912be4e1b2b50790da717"
+  },
+  "backend/app/Models/TrsArea.php": {
+    "mtime": 1783655101.5348325,
+    "ast_hash": "543e993d627bcdb3668a097857caef2f",
+    "semantic_hash": "543e993d627bcdb3668a097857caef2f"
+  },
+  "backend/app/Models/User.php": {
+    "mtime": 1782559326.9460616,
+    "ast_hash": "087cbef73ac398887e5d773dc67dcec9",
+    "semantic_hash": "087cbef73ac398887e5d773dc67dcec9"
+  },
+  "backend/app/Models/UserAnswer.php": {
+    "mtime": 1783259756.803579,
+    "ast_hash": "2a5fbb890d3adea98768dd5975b1a2e7",
+    "semantic_hash": "2a5fbb890d3adea98768dd5975b1a2e7"
+  },
+  "backend/app/Providers/AppServiceProvider.php": {
+    "mtime": 1782027748.2681546,
+    "ast_hash": "c0094f35cad6bba7636002a62186dae4",
+    "semantic_hash": "c0094f35cad6bba7636002a62186dae4"
+  },
+  "backend/app/Services/KeycloakAdminService.php": {
+    "mtime": 1782555776.9747288,
+    "ast_hash": "79a8b52ee1a09f44e5525098c6e57c87",
+    "semantic_hash": "79a8b52ee1a09f44e5525098c6e57c87"
+  },
+  "backend/artisan": {
+    "mtime": 1782027748.2681546,
+    "ast_hash": "e66bb13691f6184c762c196427d8e685",
+    "semantic_hash": "e66bb13691f6184c762c196427d8e685"
+  },
+  "backend/bootstrap/app.php": {
+    "mtime": 1782559354.146335,
+    "ast_hash": "9502684fb30341c1da901984675a069e",
+    "semantic_hash": "9502684fb30341c1da901984675a069e"
+  },
+  "backend/bootstrap/providers.php": {
+    "mtime": 1782027748.2681546,
+    "ast_hash": "888c810b5a4720916f07aa05dd2c2dd3",
+    "semantic_hash": "888c810b5a4720916f07aa05dd2c2dd3"
+  },
+  "backend/check_ages.php": {
+    "mtime": 1784610189.8875275,
+    "ast_hash": "77da2472b1013d4df559d650c7c7d4fe",
+    "semantic_hash": "77da2472b1013d4df559d650c7c7d4fe"
+  },
+  "backend/check_db.php": {
+    "mtime": 1782600037.886516,
+    "ast_hash": "83b3875372b9883f5981509355a1502c",
+    "semantic_hash": "83b3875372b9883f5981509355a1502c"
+  },
+  "backend/check_district.php": {
+    "mtime": 1784609839.5615802,
+    "ast_hash": "eb2d70508fa6378f53509fbf3486fac9",
+    "semantic_hash": "eb2d70508fa6378f53509fbf3486fac9"
+  },
+  "backend/check_duplicates.php": {
+    "mtime": 1784987032.5207574,
+    "ast_hash": "58d4ea58053a69856ef128cf589b58ba",
+    "semantic_hash": "58d4ea58053a69856ef128cf589b58ba"
+  },
+  "backend/check_pahalagama.php": {
+    "mtime": 1784495256.4494672,
+    "ast_hash": "4acfd6c45d52e4ebc00d1cc6b0c6191c",
+    "semantic_hash": "4acfd6c45d52e4ebc00d1cc6b0c6191c"
+  },
+  "backend/check_pgn.php": {
+    "mtime": 1784609673.8870785,
+    "ast_hash": "61e1a6acbf0d9d4ce9cd99bb18894726",
+    "semantic_hash": "61e1a6acbf0d9d4ce9cd99bb18894726"
+  },
+  "backend/check_schema.php": {
+    "mtime": 1784987071.9762688,
+    "ast_hash": "d995e2d805602c5f6874db9b21da7082",
+    "semantic_hash": "d995e2d805602c5f6874db9b21da7082"
+  },
+  "backend/check_unlinked.php": {
+    "mtime": 1784606659.1178894,
+    "ast_hash": "e4b4217e7721939b3bd47e73db8c445e",
+    "semantic_hash": "e4b4217e7721939b3bd47e73db8c445e"
+  },
+  "backend/composer.json": {
+    "mtime": 1782029335.9820585,
+    "ast_hash": "8920d0a91215166104edd4a36a1d5945",
+    "semantic_hash": "8920d0a91215166104edd4a36a1d5945"
+  },
+  "backend/config/app.php": {
+    "mtime": 1782027748.2681546,
+    "ast_hash": "276578ad68424be59d0998379ae7d4cb",
+    "semantic_hash": "276578ad68424be59d0998379ae7d4cb"
+  },
+  "backend/config/auth.php": {
+    "mtime": 1782027748.2681546,
+    "ast_hash": "26354511ab860b301f2a3554bc388b91",
+    "semantic_hash": "26354511ab860b301f2a3554bc388b91"
+  },
+  "backend/config/cache.php": {
+    "mtime": 1782027748.2681546,
+    "ast_hash": "022fdf20e95ddb79949954243e367003",
+    "semantic_hash": "022fdf20e95ddb79949954243e367003"
+  },
+  "backend/config/cors.php": {
+    "mtime": 1782029254.9238718,
+    "ast_hash": "331988ba4e991df95b619f23cf028a3c",
+    "semantic_hash": "331988ba4e991df95b619f23cf028a3c"
+  },
+  "backend/config/database.php": {
+    "mtime": 1782027748.2681546,
+    "ast_hash": "3cd69c7ecc842e4552e44eade546d91f",
+    "semantic_hash": "3cd69c7ecc842e4552e44eade546d91f"
+  },
+  "backend/config/filesystems.php": {
+    "mtime": 1782027748.2681546,
+    "ast_hash": "bde1aa1027f0448f17348dbd93f3d7ea",
+    "semantic_hash": "bde1aa1027f0448f17348dbd93f3d7ea"
+  },
+  "backend/config/keycloak.php": {
+    "mtime": 1784784529.5564487,
+    "ast_hash": "d451ef168b5434bbfbdbab77b2249a81",
+    "semantic_hash": "d451ef168b5434bbfbdbab77b2249a81"
+  },
+  "backend/config/lighthouse.php": {
+    "mtime": 1782599327.6440065,
+    "ast_hash": "c2a20b617d3f3cbad753a2bf1e602e4e",
+    "semantic_hash": "c2a20b617d3f3cbad753a2bf1e602e4e"
+  },
+  "backend/config/logging.php": {
+    "mtime": 1782027748.2681546,
+    "ast_hash": "d8255a5c07d3da72c7c9363f0c44bddd",
+    "semantic_hash": "d8255a5c07d3da72c7c9363f0c44bddd"
+  },
+  "backend/config/mail.php": {
+    "mtime": 1782027748.2681546,
+    "ast_hash": "18601a927b48d38337ba2077426a7d60",
+    "semantic_hash": "18601a927b48d38337ba2077426a7d60"
+  },
+  "backend/config/queue.php": {
+    "mtime": 1782027748.2681546,
+    "ast_hash": "f98ce92e7bf51db1fabaf8a30e12fc5a",
+    "semantic_hash": "f98ce92e7bf51db1fabaf8a30e12fc5a"
+  },
+  "backend/config/services.php": {
+    "mtime": 1782027748.2681546,
+    "ast_hash": "534a1b7af7009c373ea4ebfa18823d57",
+    "semantic_hash": "534a1b7af7009c373ea4ebfa18823d57"
+  },
+  "backend/config/session.php": {
+    "mtime": 1782027748.2783709,
+    "ast_hash": "6d9336e9ca1183588abbce7ff7a6f29a",
+    "semantic_hash": "6d9336e9ca1183588abbce7ff7a6f29a"
+  },
+  "backend/create_accounts.php": {
+    "mtime": 1782558258.8584287,
+    "ast_hash": "18b2332f98140b4e9c6db8db5aaf3101",
+    "semantic_hash": "18b2332f98140b4e9c6db8db5aaf3101"
+  },
+  "backend/create_db.php": {
+    "mtime": 1782032380.0953038,
+    "ast_hash": "8d1e63976a456ef1eeb2261cf76a2073",
+    "semantic_hash": "8d1e63976a456ef1eeb2261cf76a2073"
+  },
+  "backend/database/data/gm_divisions.json": {
+    "mtime": 1783510472.4553072,
+    "ast_hash": "f669ee5e4c0be0e07a586ac145750376",
+    "semantic_hash": "f669ee5e4c0be0e07a586ac145750376"
+  },
+  "backend/database/data/gn_population.json": {
+    "mtime": 1783702587.8132482,
+    "ast_hash": "5011096337c9b91f7991c36eafe12ebd",
+    "semantic_hash": "5011096337c9b91f7991c36eafe12ebd"
+  },
+  "backend/database/data/gnd_police_mappings.json": {
+    "mtime": 1783350372.599849,
+    "ast_hash": "d0412e5bae45f5fb657f4fc8b28bdff5",
+    "semantic_hash": "d0412e5bae45f5fb657f4fc8b28bdff5"
+  },
+  "backend/database/data/police.json": {
+    "mtime": 1783520898.8854213,
+    "ast_hash": "0e26c33bac457ed9756fe7e30b9a84ff",
+    "semantic_hash": "0e26c33bac457ed9756fe7e30b9a84ff"
+  },
+  "backend/database/data/police_divisions.json": {
+    "mtime": 1783350368.6871848,
+    "ast_hash": "2fbdb64a91e0e74f3d5db58bb6a9744f",
+    "semantic_hash": "2fbdb64a91e0e74f3d5db58bb6a9744f"
+  },
+  "backend/database/data/police_station_contacts.json": {
+    "mtime": 1783350368.7454598,
+    "ast_hash": "89425e66a9b59deb401f513382afd6db",
+    "semantic_hash": "89425e66a9b59deb401f513382afd6db"
+  },
+  "backend/database/data/sinhala_police_stations.json": {
+    "mtime": 1783350368.8224266,
+    "ast_hash": "58520019e0672c0fda4a5ce21b020017",
+    "semantic_hash": "58520019e0672c0fda4a5ce21b020017"
+  },
+  "backend/database/factories/UserFactory.php": {
+    "mtime": 1782027748.2783709,
+    "ast_hash": "1c9f381f9c2bc3027971a3bfdbe99164",
+    "semantic_hash": "1c9f381f9c2bc3027971a3bfdbe99164"
+  },
+  "backend/database/migrations/0001_01_01_000000_create_users_table.php": {
+    "mtime": 1782027748.2783709,
+    "ast_hash": "138280095e9d19f2ba6fb830415602e2",
+    "semantic_hash": "138280095e9d19f2ba6fb830415602e2"
+  },
+  "backend/database/migrations/0001_01_01_000001_create_cache_table.php": {
+    "mtime": 1782027748.2783709,
+    "ast_hash": "f3f38b41650112a6282c8dd1f635afb0",
+    "semantic_hash": "f3f38b41650112a6282c8dd1f635afb0"
+  },
+  "backend/database/migrations/0001_01_01_000002_create_jobs_table.php": {
+    "mtime": 1782027748.2783709,
+    "ast_hash": "ead9cce2650b36345454f85e8c0214a0",
+    "semantic_hash": "ead9cce2650b36345454f85e8c0214a0"
+  },
+  "backend/database/migrations/2024_01_01_000001_create_admins_table.php": {
+    "mtime": 1782029276.5494163,
+    "ast_hash": "8818157b81d1ceb0969aa8d8223efe18",
+    "semantic_hash": "8818157b81d1ceb0969aa8d8223efe18"
+  },
+  "backend/database/migrations/2026_06_27_102121_add_details_to_users_table.php": {
+    "mtime": 1782555694.8098009,
+    "ast_hash": "7be6ff292c7d91095f2098a94cb1dd01",
+    "semantic_hash": "7be6ff292c7d91095f2098a94cb1dd01"
+  },
+  "backend/database/migrations/2026_06_27_112145_add_onboarding_fields_to_users_table.php": {
+    "mtime": 1782559312.6998756,
+    "ast_hash": "e1dc98441c204b7fe656402cf83c2496",
+    "semantic_hash": "e1dc98441c204b7fe656402cf83c2496"
+  },
+  "backend/database/migrations/2026_06_27_223403_add_profile_fields_to_admins_table.php": {
+    "mtime": 1782599653.5717776,
+    "ast_hash": "8afe3a644e23cba5a75526b23036b988",
+    "semantic_hash": "8afe3a644e23cba5a75526b23036b988"
+  },
+  "backend/database/migrations/2026_06_27_225539_create_questions_table.php": {
+    "mtime": 1782600948.3057582,
+    "ast_hash": "8549e8b3b3f98da5db861591ab85cfce",
+    "semantic_hash": "8549e8b3b3f98da5db861591ab85cfce"
+  },
+  "backend/database/migrations/2026_06_27_225539_create_user_answers_table.php": {
+    "mtime": 1782600955.7412496,
+    "ast_hash": "8610b9ff3d20fdf9057206f8931cb0f5",
+    "semantic_hash": "8610b9ff3d20fdf9057206f8931cb0f5"
+  },
+  "backend/database/migrations/2026_07_01_180947_create_categories_table.php": {
+    "mtime": 1782929438.8681178,
+    "ast_hash": "3d7041c188b548f96eb7047d47db43ce",
+    "semantic_hash": "3d7041c188b548f96eb7047d47db43ce"
+  },
+  "backend/database/migrations/2026_07_05_125658_update_questions_table_for_categories.php": {
+    "mtime": 1783256227.0350728,
+    "ast_hash": "7ec30a4daf758ccbe494efced567a403",
+    "semantic_hash": "7ec30a4daf758ccbe494efced567a403"
+  },
+  "backend/database/migrations/2026_07_05_135448_add_repeater_to_questions_and_answers.php": {
+    "mtime": 1783259696.84623,
+    "ast_hash": "65922911c4041b184534a5e29772eda5",
+    "semantic_hash": "65922911c4041b184534a5e29772eda5"
+  },
+  "backend/database/migrations/2026_07_06_133947_create_grama_niladharis_table.php": {
+    "mtime": 1783345195.6012585,
+    "ast_hash": "b64c91833ea37179f9ea1a0622ead7d0",
+    "semantic_hash": "b64c91833ea37179f9ea1a0622ead7d0"
+  },
+  "backend/database/migrations/2026_07_06_150751_create_police_divisions_table.php": {
+    "mtime": 1783350519.3148363,
+    "ast_hash": "cd200529c0338db54973eba38b85bdc6",
+    "semantic_hash": "cd200529c0338db54973eba38b85bdc6"
+  },
+  "backend/database/migrations/2026_07_06_150752_create_police_station_contacts_table.php": {
+    "mtime": 1783350530.11806,
+    "ast_hash": "e64428f640ac681b81dc585dd0c45fc7",
+    "semantic_hash": "e64428f640ac681b81dc585dd0c45fc7"
+  },
+  "backend/database/migrations/2026_07_06_150753_create_sinhala_police_stations_table.php": {
+    "mtime": 1783350532.1856463,
+    "ast_hash": "a94bcd72b27dc5d558f9806f07f6b842",
+    "semantic_hash": "a94bcd72b27dc5d558f9806f07f6b842"
+  },
+  "backend/database/migrations/2026_07_06_150754_create_gnd_police_mappings_table.php": {
+    "mtime": 1783350542.1540406,
+    "ast_hash": "83959b3049858ec4d42a035c6cb069f9",
+    "semantic_hash": "83959b3049858ec4d42a035c6cb069f9"
+  },
+  "backend/database/migrations/2026_07_08_142840_create_police_table.php": {
+    "mtime": 1783520936.7133327,
+    "ast_hash": "f4606b594fcd37bfefe1515d15453a44",
+    "semantic_hash": "f4606b594fcd37bfefe1515d15453a44"
+  },
+  "backend/database/migrations/2026_07_09_122214_create_post_offices_table.php": {
+    "mtime": 1783599770.5565116,
+    "ast_hash": "8902b78a17e9b3bbba4990259e919cb6",
+    "semantic_hash": "8902b78a17e9b3bbba4990259e919cb6"
+  },
+  "backend/database/migrations/2026_07_09_125154_add_name_columns_to_grama_niladharis_table.php": {
+    "mtime": 1783601522.8506548,
+    "ast_hash": "e9b7a01ab3bd926c6c5f58a0ffa4f41d",
+    "semantic_hash": "e9b7a01ab3bd926c6c5f58a0ffa4f41d"
+  },
+  "backend/database/migrations/2026_07_09_153223_add_post_office_id_to_grama_niladharis_table.php": {
+    "mtime": 1783611167.1833906,
+    "ast_hash": "6e9c068b32e6d085464a9848875421cc",
+    "semantic_hash": "6e9c068b32e6d085464a9848875421cc"
+  },
+  "backend/database/migrations/2026_07_10_024945_create_phi_areas_table.php": {
+    "mtime": 1783651793.9212694,
+    "ast_hash": "f39360ffcc43366fa43b571a6a081f1e",
+    "semantic_hash": "f39360ffcc43366fa43b571a6a081f1e"
+  },
+  "backend/database/migrations/2026_07_10_034439_create_trs_areas_table.php": {
+    "mtime": 1783655086.1075397,
+    "ast_hash": "c38f0b2140392ca217fa69ece5447695",
+    "semantic_hash": "c38f0b2140392ca217fa69ece5447695"
+  },
+  "backend/database/migrations/2026_07_10_155048_create_p_srilankas_table.php": {
+    "mtime": 1783698670.3347676,
+    "ast_hash": "3d4636324b755c397306a5abc1064b27",
+    "semantic_hash": "3d4636324b755c397306a5abc1064b27"
+  },
+  "backend/database/migrations/2026_07_10_155947_create_p_provinces_table.php": {
+    "mtime": 1783699210.755516,
+    "ast_hash": "232a58416b0dec332b569f95a938da2c",
+    "semantic_hash": "232a58416b0dec332b569f95a938da2c"
+  },
+  "backend/database/migrations/2026_07_10_160316_create_p_districts_table.php": {
+    "mtime": 1783699412.7250795,
+    "ast_hash": "38eb77c2317da4409d6323ffbceb1526",
+    "semantic_hash": "38eb77c2317da4409d6323ffbceb1526"
+  },
+  "backend/database/migrations/2026_07_10_161506_add_province_foreign_key_to_grama_niladharis_table.php": {
+    "mtime": 1783700123.750452,
+    "ast_hash": "a744f67a65dca287dcdb509f238f11c6",
+    "semantic_hash": "a744f67a65dca287dcdb509f238f11c6"
+  },
+  "backend/database/migrations/2026_07_10_162246_add_district_foreign_key_to_grama_niladharis_table.php": {
+    "mtime": 1783700575.2102885,
+    "ast_hash": "7aafb5a5d66a70c127bdea3905c8997e",
+    "semantic_hash": "7aafb5a5d66a70c127bdea3905c8997e"
+  },
+  "backend/database/migrations/2026_07_10_162759_add_province_foreign_key_to_p_district_table.php": {
+    "mtime": 1783700888.5952964,
+    "ast_hash": "bc3039ecfb992a77dac324773266b405",
+    "semantic_hash": "bc3039ecfb992a77dac324773266b405"
+  },
+  "backend/database/migrations/2026_07_10_165647_create_p_gns_table.php": {
+    "mtime": 1783702617.9276116,
+    "ast_hash": "cc2e3e35f54b8c8ac8acf2d6a77b1c3f",
+    "semantic_hash": "cc2e3e35f54b8c8ac8acf2d6a77b1c3f"
+  },
+  "backend/database/migrations/2026_07_14_115359_add_language_fields_to_grama_niladharis_table.php": {
+    "mtime": 1784030048.3178165,
+    "ast_hash": "fa6d9ea3d79f5e3212d788aaa7f4b627",
+    "semantic_hash": "fa6d9ea3d79f5e3212d788aaa7f4b627"
+  },
+  "backend/database/migrations/2026_07_15_202941_add_ccode_to_p_gns_table.php": {
+    "mtime": 1784147431.9650412,
+    "ast_hash": "953261aa7363bc78cc625e077d6f2cfa",
+    "semantic_hash": "953261aa7363bc78cc625e077d6f2cfa"
+  },
+  "backend/database/migrations/2026_07_15_230540_create_gn_division_housings_table.php": {
+    "mtime": 1784156748.9504552,
+    "ast_hash": "d5043a92d45cf28c1db1a7670a621fb7",
+    "semantic_hash": "d5043a92d45cf28c1db1a7670a621fb7"
+  },
+  "backend/database/migrations/2026_07_15_231941_add_grama_niladhari_id_and_ccode_to_gn_division_housings_table.php": {
+    "mtime": 1784157588.6944697,
+    "ast_hash": "ca7c61042f564969813ce5c52ebfcc36",
+    "semantic_hash": "ca7c61042f564969813ce5c52ebfcc36"
+  },
+  "backend/database/migrations/2026_07_16_080000_create_gn_economies_table.php": {
+    "mtime": 1784188717.3033888,
+    "ast_hash": "17319a5c8fdb226dfefb5c42a76ac2ff",
+    "semantic_hash": "17319a5c8fdb226dfefb5c42a76ac2ff"
+  },
+  "backend/database/migrations/2026_07_19_210146_add_age_groups_to_p_gns_table.php": {
+    "mtime": 1784494912.5799892,
+    "ast_hash": "bbea1aacc9f757216260a1d5f1f2d462",
+    "semantic_hash": "bbea1aacc9f757216260a1d5f1f2d462"
+  },
+  "backend/database/migrations/2026_07_19_215239_create_housing_ownership_statuses_table.php": {
+    "mtime": 1784497969.4771478,
+    "ast_hash": "4113a4122efa307e8e47aa1364165f89",
+    "semantic_hash": "4113a4122efa307e8e47aa1364165f89"
+  },
+  "backend/database/migrations/2026_07_20_184500_add_gn_id_to_housing_ownership_statuses_table.php": {
+    "mtime": 1784573074.4824703,
+    "ast_hash": "adabc8622baabfc4b89afb813f163494",
+    "semantic_hash": "adabc8622baabfc4b89afb813f163494"
+  },
+  "backend/database/migrations/2026_07_20_191200_create_housing_wall_types_table.php": {
+    "mtime": 1784574662.9275599,
+    "ast_hash": "6b73a0e64f225a9decba24961319e37e",
+    "semantic_hash": "6b73a0e64f225a9decba24961319e37e"
+  },
+  "backend/database/migrations/2026_07_21_024800_create_housing_unit_types_table.php": {
+    "mtime": 1784602094.8210576,
+    "ast_hash": "e88d60241512d4835c86670efd4054e4",
+    "semantic_hash": "e88d60241512d4835c86670efd4054e4"
+  },
+  "backend/database/migrations/2026_07_21_030400_create_toilet_facilities_table.php": {
+    "mtime": 1784603058.0573087,
+    "ast_hash": "b6ed38882411d255d8473f63c96388a2",
+    "semantic_hash": "b6ed38882411d255d8473f63c96388a2"
+  },
+  "backend/database/migrations/2026_07_21_031600_create_drinking_water_sources_table.php": {
+    "mtime": 1784603788.6091363,
+    "ast_hash": "ca4f40f9930dce4283ae92e1606d8520",
+    "semantic_hash": "ca4f40f9930dce4283ae92e1606d8520"
+  },
+  "backend/database/migrations/2026_07_21_033800_create_solid_waste_disposals_table.php": {
+    "mtime": 1784605109.6428592,
+    "ast_hash": "eae57132b8d2a3e3e9798988b842f5cd",
+    "semantic_hash": "eae57132b8d2a3e3e9798988b842f5cd"
+  },
+  "backend/database/migrations/2026_07_21_051011_create_rooms_in_housing_units_table.php": {
+    "mtime": 1784610620.9143336,
+    "ast_hash": "3ee6165238ac85e3f8c812f8cd9190ad",
+    "semantic_hash": "3ee6165238ac85e3f8c812f8cd9190ad"
+  },
+  "backend/database/migrations/2026_07_21_052443_create_housing_roof_types_table.php": {
+    "mtime": 1784611527.5827105,
+    "ast_hash": "08e4e6f2d692740cfccd300007bec796",
+    "semantic_hash": "08e4e6f2d692740cfccd300007bec796"
+  },
+  "backend/database/migrations/2026_07_21_061840_create_religious_affiliations_table.php": {
+    "mtime": 1784614728.0296955,
+    "ast_hash": "367a8b42599113a1b8d43a4784e4459a",
+    "semantic_hash": "367a8b42599113a1b8d43a4784e4459a"
+  },
+  "backend/database/migrations/2026_07_21_064755_create_household_head_relationships_table.php": {
+    "mtime": 1784616491.6632226,
+    "ast_hash": "be534bcd33eb7279bcade9ed945c05a8",
+    "semantic_hash": "be534bcd33eb7279bcade9ed945c05a8"
+  },
+  "backend/database/migrations/2026_07_24_052252_add_description_to_categories_table.php": {
+    "mtime": 1784870609.3357959,
+    "ast_hash": "f74beab41f7584ee2870dd7f06ef4099",
+    "semantic_hash": "f74beab41f7584ee2870dd7f06ef4099"
+  },
+  "backend/database/seeders/AdminSeeder.php": {
+    "mtime": 1782029963.440375,
+    "ast_hash": "60de96017715719c3078b7209d3c0cf4",
+    "semantic_hash": "60de96017715719c3078b7209d3c0cf4"
+  },
+  "backend/database/seeders/CategorySeeder.php": {
+    "mtime": 1782929889.6825583,
+    "ast_hash": "0ebb24c336b159414983ea214da38d0a",
+    "semantic_hash": "0ebb24c336b159414983ea214da38d0a"
+  },
+  "backend/database/seeders/DatabaseSeeder.php": {
+    "mtime": 1782601029.1770563,
+    "ast_hash": "0d8e6ae0a405c719d6b9df054d4f0abd",
+    "semantic_hash": "0d8e6ae0a405c719d6b9df054d4f0abd"
+  },
+  "backend/database/seeders/GnDivisionHousingSeeder.php": {
+    "mtime": 1784156815.3158128,
+    "ast_hash": "6d1f8714f2e5c36f923b4dc19f19e4df",
+    "semantic_hash": "6d1f8714f2e5c36f923b4dc19f19e4df"
+  },
+  "backend/database/seeders/GnEconomySeeder.php": {
+    "mtime": 1784188773.1673484,
+    "ast_hash": "5486aa11204ab6f65402e7b93bd74b55",
+    "semantic_hash": "5486aa11204ab6f65402e7b93bd74b55"
+  },
+  "backend/database/seeders/GramaNiladhariSeeder.php": {
+    "mtime": 1783510520.0955245,
+    "ast_hash": "b9712fc72a28347ff5a2fdbca0555cd1",
+    "semantic_hash": "b9712fc72a28347ff5a2fdbca0555cd1"
+  },
+  "backend/database/seeders/LocationCategoriesSeeder.php": {
+    "mtime": 1783254094.211537,
+    "ast_hash": "44e57e51a3a26b396614197d70a748d5",
+    "semantic_hash": "44e57e51a3a26b396614197d70a748d5"
+  },
+  "backend/database/seeders/PDistrictSeeder.php": {
+    "mtime": 1783699431.3685079,
+    "ast_hash": "6911e5ceea6856605260b6e3fceec370",
+    "semantic_hash": "6911e5ceea6856605260b6e3fceec370"
+  },
+  "backend/database/seeders/PGnSeeder.php": {
+    "mtime": 1784149043.8103273,
+    "ast_hash": "c363b86747959203ab493446d29e8d98",
+    "semantic_hash": "c363b86747959203ab493446d29e8d98"
+  },
+  "backend/database/seeders/PProvinceSeeder.php": {
+    "mtime": 1783699229.5281365,
+    "ast_hash": "7b68681a98aa180aebb1d681399603f9",
+    "semantic_hash": "7b68681a98aa180aebb1d681399603f9"
+  },
+  "backend/database/seeders/PSrilankaSeeder.php": {
+    "mtime": 1783698709.8584144,
+    "ast_hash": "142d0edcaa92ea3fdeebd19068d46d7c",
+    "semantic_hash": "142d0edcaa92ea3fdeebd19068d46d7c"
+  },
+  "backend/database/seeders/PoliceDataSeeder.php": {
+    "mtime": 1783350552.6029708,
+    "ast_hash": "41efaa2479f3bed901f81028a9cf2fdf",
+    "semantic_hash": "41efaa2479f3bed901f81028a9cf2fdf"
+  },
+  "backend/database/seeders/PoliceSeeder.php": {
+    "mtime": 1783520966.0532322,
+    "ast_hash": "efb0fad6b2338eb14f86f42fa5088471",
+    "semantic_hash": "efb0fad6b2338eb14f86f42fa5088471"
+  },
+  "backend/database/seeders/QuestionSeeder.php": {
+    "mtime": 1782601022.264658,
+    "ast_hash": "f487b582defd4b97ae64917123558b74",
+    "semantic_hash": "f487b582defd4b97ae64917123558b74"
+  },
+  "backend/drinking_water_data.json": {
+    "mtime": 1784603851.4100378,
+    "ast_hash": "462239235c783cdb24407d079b6aa832",
+    "semantic_hash": "462239235c783cdb24407d079b6aa832"
+  },
+  "backend/duplicates.json": {
+    "mtime": 1784157549.3228893,
+    "ast_hash": "c7b89a4bedb9f528a73272d643d0008e",
+    "semantic_hash": "c7b89a4bedb9f528a73272d643d0008e"
+  },
+  "backend/export_household_head_to_json.py": {
+    "mtime": 1784616543.2019331,
+    "ast_hash": "34c7f431de3a40ac9769aff0d0996e22",
+    "semantic_hash": "34c7f431de3a40ac9769aff0d0996e22"
+  },
+  "backend/export_religion_to_json.py": {
+    "mtime": 1784614718.5425785,
+    "ast_hash": "6219153f7784ea8ca8979de7c5e5ad67",
+    "semantic_hash": "6219153f7784ea8ca8979de7c5e5ad67"
+  },
+  "backend/export_roof_to_json.py": {
+    "mtime": 1784611583.744906,
+    "ast_hash": "eaea20df401c2911b29a54e51cd17e01",
+    "semantic_hash": "eaea20df401c2911b29a54e51cd17e01"
+  },
+  "backend/export_rooms_to_json.py": {
+    "mtime": 1784610679.6032798,
+    "ast_hash": "d6e5fa18d45c5530facdd23d2d07ed0e",
+    "semantic_hash": "d6e5fa18d45c5530facdd23d2d07ed0e"
+  },
+  "backend/extract_drinking_water.py": {
+    "mtime": 1784603836.2963564,
+    "ast_hash": "7e9a5844bf5d2e0cd228ddaf74f6e312",
+    "semantic_hash": "7e9a5844bf5d2e0cd228ddaf74f6e312"
+  },
+  "backend/extract_gn_data.php": {
+    "mtime": 1783811724.049839,
+    "ast_hash": "2916289c400fe71bd356ae4df78de29d",
+    "semantic_hash": "2916289c400fe71bd356ae4df78de29d"
+  },
+  "backend/extract_gn_population.py": {
+    "mtime": 1784494956.8529885,
+    "ast_hash": "ad88c53aadea1d96ac90703fde7e52e9",
+    "semantic_hash": "ad88c53aadea1d96ac90703fde7e52e9"
+  },
+  "backend/extract_gn_population2.py": {
+    "mtime": 1784495229.317257,
+    "ast_hash": "041e061352ac7d4ff49eb438597d496f",
+    "semantic_hash": "041e061352ac7d4ff49eb438597d496f"
+  },
+  "backend/extract_housing_ownership.py": {
+    "mtime": 1784498023.7542717,
+    "ast_hash": "2d8033622c1da669e9c9ce0325e10610",
+    "semantic_hash": "2d8033622c1da669e9c9ce0325e10610"
+  },
+  "backend/extract_pahalagama.py": {
+    "mtime": 1784606461.8299305,
+    "ast_hash": "e668d5f158e42166a61d01932978f3c9",
+    "semantic_hash": "e668d5f158e42166a61d01932978f3c9"
+  },
+  "backend/extract_solid_waste.py": {
+    "mtime": 1784605146.9927216,
+    "ast_hash": "c4a1a07d9c61322f7867c14e87bf42f8",
+    "semantic_hash": "c4a1a07d9c61322f7867c14e87bf42f8"
+  },
+  "backend/extract_toilet_facilities.py": {
+    "mtime": 1784603096.0675235,
+    "ast_hash": "11cbb4e1b84aa40b3619a75fab64e9c5",
+    "semantic_hash": "11cbb4e1b84aa40b3619a75fab64e9c5"
+  },
+  "backend/extract_unit_types.py": {
+    "mtime": 1784602133.3310592,
+    "ast_hash": "80c94075d86230883fbf67722fe03ac4",
+    "semantic_hash": "80c94075d86230883fbf67722fe03ac4"
+  },
+  "backend/extract_wall_types.py": {
+    "mtime": 1784574709.4442103,
+    "ast_hash": "3a8e996fec3df50e3868c0233401d577",
+    "semantic_hash": "3a8e996fec3df50e3868c0233401d577"
+  },
+  "backend/fast_fix.php": {
+    "mtime": 1784606885.4659476,
+    "ast_hash": "df10ff03a53b60484f7b9d5f042fa86f",
+    "semantic_hash": "df10ff03a53b60484f7b9d5f042fa86f"
+  },
+  "backend/fix_links.php": {
+    "mtime": 1784606705.4835112,
+    "ast_hash": "5e8aa96521eb0df7a2250a97c6b31080",
+    "semantic_hash": "5e8aa96521eb0df7a2250a97c6b31080"
+  },
+  "backend/generate_md.py": {
+    "mtime": 1784157559.7877457,
+    "ast_hash": "704caa6125bb80d689e4a2474134fa12",
+    "semantic_hash": "704caa6125bb80d689e4a2474134fa12"
+  },
+  "backend/gn_population_updates.json": {
+    "mtime": 1784494970.0892057,
+    "ast_hash": "59451e57c4ec771ffc53e82303f74f36",
+    "semantic_hash": "59451e57c4ec771ffc53e82303f74f36"
+  },
+  "backend/gn_population_updates2.json": {
+    "mtime": 1784495244.6493816,
+    "ast_hash": "52a00dc6065b9660389718c3699d23eb",
+    "semantic_hash": "52a00dc6065b9660389718c3699d23eb"
+  },
+  "backend/gql_out2.json": {
+    "mtime": 1784609806.9761322,
+    "ast_hash": "ff54c92efbfc17b3cc60a07aebe22e43",
+    "semantic_hash": "ff54c92efbfc17b3cc60a07aebe22e43"
+  },
+  "backend/gql_output.json": {
+    "mtime": 1784609751.923339,
+    "ast_hash": "12a7af03e3c30f3e87ea92e1e8b21aab",
+    "semantic_hash": "12a7af03e3c30f3e87ea92e1e8b21aab"
+  },
+  "backend/housing_ownership_data.json": {
+    "mtime": 1784498035.5848684,
+    "ast_hash": "17f45738e890aa3e869ea01e6a31874b",
+    "semantic_hash": "17f45738e890aa3e869ea01e6a31874b"
+  },
+  "backend/import_drinking_water.php": {
+    "mtime": 1784603860.3480191,
+    "ast_hash": "a4c269a6e2567cde235a11e30a4db8eb",
+    "semantic_hash": "a4c269a6e2567cde235a11e30a4db8eb"
+  },
+  "backend/import_household_head.php": {
+    "mtime": 1784616562.5240536,
+    "ast_hash": "16886a4a5e5627c35d185d89a622c740",
+    "semantic_hash": "16886a4a5e5627c35d185d89a622c740"
+  },
+  "backend/import_housing_ownership.php": {
+    "mtime": 1784498041.1154885,
+    "ast_hash": "f5468e0dd7cf57a0e621632c348f6b23",
+    "semantic_hash": "f5468e0dd7cf57a0e621632c348f6b23"
+  },
+  "backend/import_religion.php": {
+    "mtime": 1784614780.7818341,
+    "ast_hash": "4143755451a24b28b749bec1c7240915",
+    "semantic_hash": "4143755451a24b28b749bec1c7240915"
+  },
+  "backend/import_roof.php": {
+    "mtime": 1784611814.6226685,
+    "ast_hash": "d02d1e4ef66287579f79662f82f355d5",
+    "semantic_hash": "d02d1e4ef66287579f79662f82f355d5"
+  },
+  "backend/import_rooms.php": {
+    "mtime": 1784610702.8726785,
+    "ast_hash": "4c59e44187b46ae076a59601099a97bd",
+    "semantic_hash": "4c59e44187b46ae076a59601099a97bd"
+  },
+  "backend/import_solid_waste.php": {
+    "mtime": 1784605172.4773622,
+    "ast_hash": "7fcdabe5c72ca4d039b3d0e3165315b0",
+    "semantic_hash": "7fcdabe5c72ca4d039b3d0e3165315b0"
+  },
+  "backend/import_toilet_facilities.php": {
+    "mtime": 1784603118.7394867,
+    "ast_hash": "69a1de80d449e629f8eb3ab0304203bd",
+    "semantic_hash": "69a1de80d449e629f8eb3ab0304203bd"
+  },
+  "backend/import_unit_types.php": {
+    "mtime": 1784602163.332521,
+    "ast_hash": "e99fe3f0b7306e089b46ce64cad0a7dc",
+    "semantic_hash": "e99fe3f0b7306e089b46ce64cad0a7dc"
+  },
+  "backend/import_wall_types.php": {
+    "mtime": 1784574730.2887018,
+    "ast_hash": "068a839156c5624e74339621cc70982e",
+    "semantic_hash": "068a839156c5624e74339621cc70982e"
+  },
+  "backend/map_gn_ids.php": {
+    "mtime": 1784573116.7989464,
+    "ast_hash": "5bb110836ba7ad88c663093b0593444d",
+    "semantic_hash": "5bb110836ba7ad88c663093b0593444d"
+  },
+  "backend/map_police.php": {
+    "mtime": 1783530295.4264672,
+    "ast_hash": "28976d01b180e82ebe3ef02af7ae60a5",
+    "semantic_hash": "28976d01b180e82ebe3ef02af7ae60a5"
+  },
+  "backend/merge_dbs.php": {
+    "mtime": 1783765569.670809,
+    "ast_hash": "9481363a6735fd9719d95a4d5d9420a8",
+    "semantic_hash": "9481363a6735fd9719d95a4d5d9420a8"
+  },
+  "backend/merge_user_answers.php": {
+    "mtime": 1783765625.6388762,
+    "ast_hash": "55b155939ff922cda8d488278113be8c",
+    "semantic_hash": "55b155939ff922cda8d488278113be8c"
+  },
+  "backend/output.json": {
+    "mtime": 1783811708.7664938,
+    "ast_hash": "7727ae199ce6b2b90a035e59fbfcdc86",
+    "semantic_hash": "7727ae199ce6b2b90a035e59fbfcdc86"
+  },
+  "backend/output2.json": {
+    "mtime": 1783811737.91946,
+    "ast_hash": "ba076fda659b715be938c29b88bf4af5",
+    "semantic_hash": "ba076fda659b715be938c29b88bf4af5"
+  },
+  "backend/package.json": {
+    "mtime": 1782027748.2783709,
+    "ast_hash": "07d7440dc017382991f9a7bd0151005a",
+    "semantic_hash": "07d7440dc017382991f9a7bd0151005a"
+  },
+  "backend/pahalagama_data.json": {
+    "mtime": 1784606476.0133154,
+    "ast_hash": "c7af859798290ea1f358545b1107bc5c",
+    "semantic_hash": "c7af859798290ea1f358545b1107bc5c"
+  },
+  "backend/parse_gn.py": {
+    "mtime": 1783702572.2178652,
+    "ast_hash": "f6745f8ecd5c692405691041cade7cad",
+    "semantic_hash": "f6745f8ecd5c692405691041cade7cad"
+  },
+  "backend/public/index.php": {
+    "mtime": 1782027748.2840652,
+    "ast_hash": "d8eda274115af5fd2aaa8230af329ef7",
+    "semantic_hash": "d8eda274115af5fd2aaa8230af329ef7"
+  },
+  "backend/query_gn.php": {
+    "mtime": 1784606414.3278437,
+    "ast_hash": "73ba565199bcd108806c37651cd088b4",
+    "semantic_hash": "73ba565199bcd108806c37651cd088b4"
+  },
+  "backend/resources/js/app.js": {
+    "mtime": 1782027748.2840652,
+    "ast_hash": "1ccf2b9101110f40ecaab1608a6f91cf",
+    "semantic_hash": "1ccf2b9101110f40ecaab1608a6f91cf"
+  },
+  "backend/resources/js/bootstrap.js": {
+    "mtime": 1782027748.2840652,
+    "ast_hash": "78f909acc19aea4717eddca5a87c1ba3",
+    "semantic_hash": "78f909acc19aea4717eddca5a87c1ba3"
+  },
+  "backend/resources/views/welcome.blade.php": {
+    "mtime": 1782027748.2840652,
+    "ast_hash": "f9f90b3bab40fd1d366e9b54466deac7",
+    "semantic_hash": "f9f90b3bab40fd1d366e9b54466deac7"
+  },
+  "backend/routes/api.php": {
+    "mtime": 1784798577.773469,
+    "ast_hash": "bc915016948d3c37607e0c8c24cc068c",
+    "semantic_hash": "bc915016948d3c37607e0c8c24cc068c"
+  },
+  "backend/routes/console.php": {
+    "mtime": 1782027748.2840652,
+    "ast_hash": "3c6ce2e6d16444282b24a9aa63885563",
+    "semantic_hash": "3c6ce2e6d16444282b24a9aa63885563"
+  },
+  "backend/routes/web.php": {
+    "mtime": 1782027748.2840652,
+    "ast_hash": "84625c52e743b1a4178bb27b7afb3615",
+    "semantic_hash": "84625c52e743b1a4178bb27b7afb3615"
+  },
+  "backend/run_extracted.php": {
+    "mtime": 1784800936.0935502,
+    "ast_hash": "237ae5d8e69dc66b677073832c71b515",
+    "semantic_hash": "237ae5d8e69dc66b677073832c71b515"
+  },
+  "backend/solid_waste_data.json": {
+    "mtime": 1784605163.4754026,
+    "ast_hash": "cd224e41c50d72cd14e72ec8c6ff7305",
+    "semantic_hash": "cd224e41c50d72cd14e72ec8c6ff7305"
+  },
+  "backend/test.php": {
+    "mtime": 1783703597.737088,
+    "ast_hash": "1a34645eefa9dc4bfe0c33c5e14abd2a",
+    "semantic_hash": "1a34645eefa9dc4bfe0c33c5e14abd2a"
+  },
+  "backend/test_all_data.php": {
+    "mtime": 1783813777.9566505,
+    "ast_hash": "0d6b01790ba78884bde0b5fca1bed15e",
+    "semantic_hash": "0d6b01790ba78884bde0b5fca1bed15e"
+  },
+  "backend/test_all_districts.js": {
+    "mtime": 1783808316.474877,
+    "ast_hash": "6a494bc308965544dbd1eb25c111af6c",
+    "semantic_hash": "6a494bc308965544dbd1eb25c111af6c"
+  },
+  "backend/test_auto_loc.php": {
+    "mtime": 1784127316.4505801,
+    "ast_hash": "3138fe2e4c63f9e17fc9effe32d4d27d",
+    "semantic_hash": "3138fe2e4c63f9e17fc9effe32d4d27d"
+  },
+  "backend/test_bb.php": {
+    "mtime": 1783813446.0481164,
+    "ast_hash": "794a6980686d81e5b265e3d2677bff02",
+    "semantic_hash": "794a6980686d81e5b265e3d2677bff02"
+  },
+  "backend/test_coords.php": {
+    "mtime": 1783813367.6449728,
+    "ast_hash": "32721d74e6a7bb13db5ab05686fc7098",
+    "semantic_hash": "32721d74e6a7bb13db5ab05686fc7098"
+  },
+  "backend/test_cors.js": {
+    "mtime": 1783779795.4900875,
+    "ast_hash": "d0242bdf3f940e0c295a8c275c13c367",
+    "semantic_hash": "d0242bdf3f940e0c295a8c275c13c367"
+  },
+  "backend/test_counts.php": {
+    "mtime": 1784777001.3353682,
+    "ast_hash": "cf0107dfe2ff3e13506cce0978580c9f",
+    "semantic_hash": "cf0107dfe2ff3e13506cce0978580c9f"
+  },
+  "backend/test_dccode.php": {
+    "mtime": 1783618456.0590765,
+    "ast_hash": "fcaf9006cec4ffaf0623f5f7fc0a7a2f",
+    "semantic_hash": "fcaf9006cec4ffaf0623f5f7fc0a7a2f"
+  },
+  "backend/test_dccode2.php": {
+    "mtime": 1783618481.8166645,
+    "ast_hash": "339b29d84ab706dc30a91d806a114aae",
+    "semantic_hash": "339b29d84ab706dc30a91d806a114aae"
+  },
+  "backend/test_dccode_all.php": {
+    "mtime": 1783619126.654478,
+    "ast_hash": "b38535dd68c0fa9da05a819f80ab5b7e",
+    "semantic_hash": "b38535dd68c0fa9da05a819f80ab5b7e"
+  },
+  "backend/test_districts_count.php": {
+    "mtime": 1783618713.5924141,
+    "ast_hash": "ebf7b9bd31639dfb838ab1e6fa3ed803",
+    "semantic_hash": "ebf7b9bd31639dfb838ab1e6fa3ed803"
+  },
+  "backend/test_districts_output.php": {
+    "mtime": 1783618743.573232,
+    "ast_hash": "dd588650fbc2237f6deb4452306c16a4",
+    "semantic_hash": "dd588650fbc2237f6deb4452306c16a4"
+  },
+  "backend/test_exact_gn.js": {
+    "mtime": 1783808378.8419921,
+    "ast_hash": "7ce5cf31a47c8e0baf74650837c29de5",
+    "semantic_hash": "7ce5cf31a47c8e0baf74650837c29de5"
+  },
+  "backend/test_exact_gn_all.js": {
+    "mtime": 1783808465.4083414,
+    "ast_hash": "5802c38ba91aa9c72cfadbd96b2d3de1",
+    "semantic_hash": "5802c38ba91aa9c72cfadbd96b2d3de1"
+  },
+  "backend/test_gampaha.php": {
+    "mtime": 1784777078.359058,
+    "ast_hash": "0ec0797baecb0fb4a2eace22d3733da1",
+    "semantic_hash": "0ec0797baecb0fb4a2eace22d3733da1"
+  },
+  "backend/test_get_me.php": {
+    "mtime": 1782600412.2473276,
+    "ast_hash": "ea2a85e3eaa5bcdc030b3af9362319d7",
+    "semantic_hash": "ea2a85e3eaa5bcdc030b3af9362319d7"
+  },
+  "backend/test_gn.js": {
+    "mtime": 1783808218.522658,
+    "ast_hash": "9a12bc2dafaa371071e9127152694522",
+    "semantic_hash": "9a12bc2dafaa371071e9127152694522"
+  },
+  "backend/test_gn_district.php": {
+    "mtime": 1783808434.3093011,
+    "ast_hash": "4a65e263e4bb95f8d3e6b89b3c149b1f",
+    "semantic_hash": "4a65e263e4bb95f8d3e6b89b3c149b1f"
+  },
+  "backend/test_gql.php": {
+    "mtime": 1784609735.4514387,
+    "ast_hash": "b118b30bfd7fc2d8fd755b74bebeeca2",
+    "semantic_hash": "b118b30bfd7fc2d8fd755b74bebeeca2"
+  },
+  "backend/test_gql2.php": {
+    "mtime": 1784609786.0988302,
+    "ast_hash": "44a2ad424d76edcd33f25190a33da532",
+    "semantic_hash": "44a2ad424d76edcd33f25190a33da532"
+  },
+  "backend/test_gql3.php": {
+    "mtime": 1784609956.2151024,
+    "ast_hash": "7ca785e4c9a5994f60ecbb86fc1389bd",
+    "semantic_hash": "7ca785e4c9a5994f60ecbb86fc1389bd"
+  },
+  "backend/test_gql_pip.js": {
+    "mtime": 1783810744.6906896,
+    "ast_hash": "b015526f52170ea6282a6d73bec0bf76",
+    "semantic_hash": "b015526f52170ea6282a6d73bec0bf76"
+  },
+  "backend/test_graphql2.php": {
+    "mtime": 1783813619.0131564,
+    "ast_hash": "e962503632321a35769b0e00df7879e1",
+    "semantic_hash": "e962503632321a35769b0e00df7879e1"
+  },
+  "backend/test_graphql3.php": {
+    "mtime": 1783813657.8650677,
+    "ast_hash": "6a486a8e34dfb7a1e16fcf937e54128b",
+    "semantic_hash": "6a486a8e34dfb7a1e16fcf937e54128b"
+  },
+  "backend/test_graphql_api.py": {
+    "mtime": 1783813716.458384,
+    "ast_hash": "067ebff5e1642727ea44b5aab74d586f",
+    "semantic_hash": "067ebff5e1642727ea44b5aab74d586f"
+  },
+  "backend/test_graphql_api2.py": {
+    "mtime": 1783813744.367101,
+    "ast_hash": "f4a0d93791c7d9fc308b584ce10b6623",
+    "semantic_hash": "f4a0d93791c7d9fc308b584ce10b6623"
+  },
+  "backend/test_greedy_dccode.php": {
+    "mtime": 1783619155.7397275,
+    "ast_hash": "a1a86139cfc216710f9682324ecb9f10",
+    "semantic_hash": "a1a86139cfc216710f9682324ecb9f10"
+  },
+  "backend/test_introspection.js": {
+    "mtime": 1783810708.3705602,
+    "ast_hash": "a98915aa6f9f4baa00313286464c6b56",
+    "semantic_hash": "a98915aa6f9f4baa00313286464c6b56"
+  },
+  "backend/test_memory.php": {
+    "mtime": 1784789440.8663418,
+    "ast_hash": "31483ce3a619eb959a26f46f6c469460",
+    "semantic_hash": "31483ce3a619eb959a26f46f6c469460"
+  },
+  "backend/test_pip.php": {
+    "mtime": 1783813485.7018929,
+    "ast_hash": "4ebc25507afe5680afadf1cc1576dfed",
+    "semantic_hash": "4ebc25507afe5680afadf1cc1576dfed"
+  },
+  "backend/test_schema.php": {
+    "mtime": 1783813396.7986803,
+    "ast_hash": "c8b17e08fc9247ff18576263294a2095",
+    "semantic_hash": "c8b17e08fc9247ff18576263294a2095"
+  },
+  "backend/test_wgdk.php": {
+    "mtime": 1784987112.4131055,
+    "ast_hash": "1a634f8adfca0016c6347194b885dd3a",
+    "semantic_hash": "1a634f8adfca0016c6347194b885dd3a"
+  },
+  "backend/tests/Feature/ExampleTest.php": {
+    "mtime": 1782027748.2840652,
+    "ast_hash": "0f4d91c9c5bbcd4e2f46cf885acb7fb6",
+    "semantic_hash": "0f4d91c9c5bbcd4e2f46cf885acb7fb6"
+  },
+  "backend/tests/TestCase.php": {
+    "mtime": 1782027748.2840652,
+    "ast_hash": "7e567dc27e68d5b57bae16af07f68907",
+    "semantic_hash": "7e567dc27e68d5b57bae16af07f68907"
+  },
+  "backend/tests/Unit/ExampleTest.php": {
+    "mtime": 1782027748.2840652,
+    "ast_hash": "3f679e9508c834f0ad95943455fcd836",
+    "semantic_hash": "3f679e9508c834f0ad95943455fcd836"
+  },
+  "backend/toilet_facilities_data.json": {
+    "mtime": 1784603108.7559726,
+    "ast_hash": "3500e35974ddef80bc19299e0ba16217",
+    "semantic_hash": "3500e35974ddef80bc19299e0ba16217"
+  },
+  "backend/unit_types_data.json": {
+    "mtime": 1784602154.521593,
+    "ast_hash": "3e1dd0cbe482ed78ffcfeab6c240fcb6",
+    "semantic_hash": "3e1dd0cbe482ed78ffcfeab6c240fcb6"
+  },
+  "backend/update_ccodes.php": {
+    "mtime": 1784987158.7843933,
+    "ast_hash": "1a202145190f51c2621fb4ef1305fa64",
+    "semantic_hash": "1a202145190f51c2621fb4ef1305fa64"
+  },
+  "backend/update_p_gns.php": {
+    "mtime": 1784494979.6825619,
+    "ast_hash": "36d232497460a860b3c5f27cb2452e36",
+    "semantic_hash": "36d232497460a860b3c5f27cb2452e36"
+  },
+  "backend/update_p_gns2.php": {
+    "mtime": 1784495276.0262792,
+    "ast_hash": "f07d4acccaf78b760e79459bf24ec76a",
+    "semantic_hash": "f07d4acccaf78b760e79459bf24ec76a"
+  },
+  "backend/user_id_map.json": {
+    "mtime": 1783765580.3337958,
+    "ast_hash": "7c68a159090247c0a4225e36364919e8",
+    "semantic_hash": "7c68a159090247c0a4225e36364919e8"
+  },
+  "backend/vite.config.js": {
+    "mtime": 1782027748.2840652,
+    "ast_hash": "60c40741a9c5b915a5e5542cfb23bc25",
+    "semantic_hash": "60c40741a9c5b915a5e5542cfb23bc25"
+  },
+  "backend/wall_types_data.json": {
+    "mtime": 1784574721.7772326,
+    "ast_hash": "a64a7cd28f2e2bc68f9543e31e28e3ff",
+    "semantic_hash": "a64a7cd28f2e2bc68f9543e31e28e3ff"
+  },
+  "convert_phi.py": {
+    "mtime": 1783651761.9077027,
+    "ast_hash": "7322b44ee7559647516371d79a4a89bb",
+    "semantic_hash": "7322b44ee7559647516371d79a4a89bb"
+  },
+  "convert_trs.py": {
+    "mtime": 1783654951.5832677,
+    "ast_hash": "45f296bec255e0d5d45666360ecd15b9",
+    "semantic_hash": "45f296bec255e0d5d45666360ecd15b9"
+  },
+  "district_data.json": {
+    "mtime": 1783699377.7444718,
+    "ast_hash": "fc6d04b0272c2b75d9d9e27d7c1531a4",
+    "semantic_hash": "fc6d04b0272c2b75d9d9e27d7c1531a4"
+  },
+  "extract.js": {
+    "mtime": 1784789419.414572,
+    "ast_hash": "2cdc2b726d43ed0c02c0b23ebf8a78d2",
+    "semantic_hash": "2cdc2b726d43ed0c02c0b23ebf8a78d2"
+  },
+  "extracted_query_result.json": {
+    "mtime": 1784800981.5325005,
+    "ast_hash": "5219ff3c8e352d31b24ca9a158c01466",
+    "semantic_hash": "5219ff3c8e352d31b24ca9a158c01466"
+  },
+  "fix_ccodes.py": {
+    "mtime": 1784988930.6359477,
+    "ast_hash": "1aece71eb891ec33f03d840ad1b8f29c",
+    "semantic_hash": "1aece71eb891ec33f03d840ad1b8f29c"
+  },
+  "frontend/crop_image.py": {
+    "mtime": 1783812209.339735,
+    "ast_hash": "cbe6ee2834c4e5adff6c290bf9bcd06f",
+    "semantic_hash": "cbe6ee2834c4e5adff6c290bf9bcd06f"
+  },
+  "frontend/eslint.config.js": {
+    "mtime": 1778526044.228592,
+    "ast_hash": "0355276bc79439afe3c53e3a2470ca1e",
+    "semantic_hash": "0355276bc79439afe3c53e3a2470ca1e"
+  },
+  "frontend/package.json": {
+    "mtime": 1784491145.5790095,
+    "ast_hash": "219b62fc498bfe18e7b4260a86fbfd39",
+    "semantic_hash": "219b62fc498bfe18e7b4260a86fbfd39"
+  },
+  "frontend/src/App.tsx": {
+    "mtime": 1783776507.7366168,
+    "ast_hash": "1a13e4def1b65d8ddbfdd4c0c72c6676",
+    "semantic_hash": "1a13e4def1b65d8ddbfdd4c0c72c6676"
+  },
+  "frontend/src/api/apolloClient.ts": {
+    "mtime": 1783779857.4207356,
+    "ast_hash": "b0a1d14f74da3b974404d409f5049600",
+    "semantic_hash": "b0a1d14f74da3b974404d409f5049600"
+  },
+  "frontend/src/auth/AuthProvider.tsx": {
+    "mtime": 1784788580.0121784,
+    "ast_hash": "84a30bd6c59d034e138415b3270163e9",
+    "semantic_hash": "84a30bd6c59d034e138415b3270163e9"
+  },
+  "frontend/src/auth/ProtectedRoute.tsx": {
+    "mtime": 1782027908.7761383,
+    "ast_hash": "9685ea99c0d5e942de36850590390281",
+    "semantic_hash": "9685ea99c0d5e942de36850590390281"
+  },
+  "frontend/src/auth/keycloak.ts": {
+    "mtime": 1782027880.4288876,
+    "ast_hash": "35fe8280da602874d4f3ca4d5c18967f",
+    "semantic_hash": "35fe8280da602874d4f3ca4d5c18967f"
+  },
+  "frontend/src/components/AdminLayout.tsx": {
+    "mtime": 1782925112.8843384,
+    "ast_hash": "d227a2b4b49a5e766c5e6fd502618f59",
+    "semantic_hash": "d227a2b4b49a5e766c5e6fd502618f59"
+  },
+  "frontend/src/components/AgeDemographicsChart.tsx": {
+    "mtime": 1784865838.0658758,
+    "ast_hash": "8871f58524bd6376deb5b35fe07efd43",
+    "semantic_hash": "8871f58524bd6376deb5b35fe07efd43"
+  },
+  "frontend/src/components/CategoryDialog.tsx": {
+    "mtime": 1784870728.517608,
+    "ast_hash": "f39d69d4d0ef2f4484fb157e41f41cd7",
+    "semantic_hash": "f39d69d4d0ef2f4484fb157e41f41cd7"
+  },
+  "frontend/src/components/Custom3DBarChart.tsx": {
+    "mtime": 1784866214.13325,
+    "ast_hash": "03906ca65c9eb09e22f4415a3790dbfd",
+    "semantic_hash": "03906ca65c9eb09e22f4415a3790dbfd"
+  },
+  "frontend/src/components/DynamicCategoryWrapper.tsx": {
+    "mtime": 1782933179.991733,
+    "ast_hash": "e1b75fcf164c85ecc9762f44070741b9",
+    "semantic_hash": "e1b75fcf164c85ecc9762f44070741b9"
+  },
+  "frontend/src/components/HousingOwnershipChart.tsx": {
+    "mtime": 1784865838.0658758,
+    "ast_hash": "21465247790c06eb59eb133f5425dde9",
+    "semantic_hash": "21465247790c06eb59eb133f5425dde9"
+  },
+  "frontend/src/components/OnboardingModal.tsx": {
+    "mtime": 1784780941.2980494,
+    "ast_hash": "8791fd88b8bf4b5a7b9ba415832c4466",
+    "semantic_hash": "8791fd88b8bf4b5a7b9ba415832c4466"
+  },
+  "frontend/src/components/PopulationInfographic.tsx": {
+    "mtime": 1784156205.1986845,
+    "ast_hash": "2fecc5d584f01297bb1065b947c31032",
+    "semantic_hash": "2fecc5d584f01297bb1065b947c31032"
+  },
+  "frontend/src/components/QuestionDialog.tsx": {
+    "mtime": 1783259856.6277516,
+    "ast_hash": "923795db0927b08da42a9fe51fbba9df",
+    "semantic_hash": "923795db0927b08da42a9fe51fbba9df"
+  },
+  "frontend/src/components/Sidebar.tsx": {
+    "mtime": 1784780928.2868283,
+    "ast_hash": "094f11d9f32938e3c44dda15e825f3e8",
+    "semantic_hash": "094f11d9f32938e3c44dda15e825f3e8"
+  },
+  "frontend/src/components/SubCategoryPage.tsx": {
+    "mtime": 1784870772.2359455,
+    "ast_hash": "204bdeae1487abd05c45d25959bf7a0a",
+    "semantic_hash": "204bdeae1487abd05c45d25959bf7a0a"
+  },
+  "frontend/src/components/TopBar.tsx": {
+    "mtime": 1784780915.750326,
+    "ast_hash": "3790b785f2b9845b5ce89f74721b6e5f",
+    "semantic_hash": "3790b785f2b9845b5ce89f74721b6e5f"
+  },
+  "frontend/src/components/TopNavbar.tsx": {
+    "mtime": 1784780903.5991466,
+    "ast_hash": "5359ac337ba4dae64822a0b4f18b6e08",
+    "semantic_hash": "5359ac337ba4dae64822a0b4f18b6e08"
+  },
+  "frontend/src/graphql/mutations.ts": {
+    "mtime": 1784870711.267114,
+    "ast_hash": "00788bb4c99fb67dde44b50afe4e8639",
+    "semantic_hash": "00788bb4c99fb67dde44b50afe4e8639"
+  },
+  "frontend/src/graphql/queries.ts": {
+    "mtime": 1784870668.899818,
+    "ast_hash": "77ae5427a93a3271ef2ec5ce119e19c9",
+    "semantic_hash": "77ae5427a93a3271ef2ec5ce119e19c9"
+  },
+  "frontend/src/main.tsx": {
+    "mtime": 1784493867.6360607,
+    "ast_hash": "d4417bf74c0a0cc68daed1ae0aa36c79",
+    "semantic_hash": "d4417bf74c0a0cc68daed1ae0aa36c79"
+  },
+  "frontend/src/pages/AdminsPage.tsx": {
+    "mtime": 1784780880.620592,
+    "ast_hash": "9055ecfad408af245fdbd5dd63fb2ce3",
+    "semantic_hash": "9055ecfad408af245fdbd5dd63fb2ce3"
+  },
+  "frontend/src/pages/CategoriesPage.tsx": {
+    "mtime": 1784870754.6837451,
+    "ast_hash": "b9a85bc5f16e3fec5cb5657b3ef45998",
+    "semantic_hash": "b9a85bc5f16e3fec5cb5657b3ef45998"
+  },
+  "frontend/src/pages/DashboardPage.tsx": {
+    "mtime": 1784792728.375196,
+    "ast_hash": "f0e3e3d00c568c6931bfed678ef4dc92",
+    "semantic_hash": "f0e3e3d00c568c6931bfed678ef4dc92"
+  },
+  "frontend/src/pages/DistrictProvinceConnectionsPage.tsx": {
+    "mtime": 1783703671.063022,
+    "ast_hash": "c840890d465e85c80710686c0cee0b0d",
+    "semantic_hash": "c840890d465e85c80710686c0cee0b0d"
+  },
+  "frontend/src/pages/GramaNiladharisPage.tsx": {
+    "mtime": 1784029776.0630176,
+    "ast_hash": "7804e457f2132760d207efdff7b71fa0",
+    "semantic_hash": "7804e457f2132760d207efdff7b71fa0"
+  },
+  "frontend/src/pages/LoginPage.tsx": {
+    "mtime": 1784780847.7491221,
+    "ast_hash": "cd665b1eef058e14206418d12c8252e1",
+    "semantic_hash": "cd665b1eef058e14206418d12c8252e1"
+  },
+  "frontend/src/pages/PhiConnectionsPage.tsx": {
+    "mtime": 1783651953.0260308,
+    "ast_hash": "47ada95c96c8421de6b522a2c37dc16b",
+    "semantic_hash": "47ada95c96c8421de6b522a2c37dc16b"
+  },
+  "frontend/src/pages/PlaceholderPages.tsx": {
+    "mtime": 1782601106.6427114,
+    "ast_hash": "f1384033d5bb8b7becee77b0db6bffba",
+    "semantic_hash": "f1384033d5bb8b7becee77b0db6bffba"
+  },
+  "frontend/src/pages/PoliceConnectionsPage.tsx": {
+    "mtime": 1783609214.6316173,
+    "ast_hash": "a6dd4736688c485e997efe9c6d69f6f9",
+    "semantic_hash": "a6dd4736688c485e997efe9c6d69f6f9"
+  },
+  "frontend/src/pages/PostOfficeConnectionsPage.tsx": {
+    "mtime": 1783648521.3405375,
+    "ast_hash": "8ee796909f32cf934e55f5185ed39ec5",
+    "semantic_hash": "8ee796909f32cf934e55f5185ed39ec5"
+  },
+  "frontend/src/pages/ProfilePage.tsx": {
+    "mtime": 1782599187.4107583,
+    "ast_hash": "ea875f19a6de8e3ac64d581d6fee120f",
+    "semantic_hash": "ea875f19a6de8e3ac64d581d6fee120f"
+  },
+  "frontend/src/pages/QuestionsPage.tsx": {
+    "mtime": 1782601826.4262986,
+    "ast_hash": "406e86a3a0f8c405a2fa149b566bef45",
+    "semantic_hash": "406e86a3a0f8c405a2fa149b566bef45"
+  },
+  "frontend/src/pages/RegistrationPage.tsx": {
+    "mtime": 1782557995.2168362,
+    "ast_hash": "e4e18a1b13542973f72d17fd010aa549",
+    "semantic_hash": "e4e18a1b13542973f72d17fd010aa549"
+  },
+  "frontend/src/pages/SurveyPage.tsx": {
+    "mtime": 1782602861.6386814,
+    "ast_hash": "0297a6caaa1b27e0c2b6fc3b70f29247",
+    "semantic_hash": "0297a6caaa1b27e0c2b6fc3b70f29247"
+  },
+  "frontend/src/pages/TrsConnectionsPage.tsx": {
+    "mtime": 1783655800.0542226,
+    "ast_hash": "f1c5c26f39e9ba1955e7cd13d99ba247",
+    "semantic_hash": "f1c5c26f39e9ba1955e7cd13d99ba247"
+  },
+  "frontend/src/pages/UserDashboard.tsx": {
+    "mtime": 1784865838.1039956,
+    "ast_hash": "9ca5c0fb8f04e7c587f35a0be183b99c",
+    "semantic_hash": "9ca5c0fb8f04e7c587f35a0be183b99c"
+  },
+  "frontend/src/theme/theme.ts": {
+    "mtime": 1784493867.638061,
+    "ast_hash": "5d53a968dbabb89c3157c1165b3c6658",
+    "semantic_hash": "5d53a968dbabb89c3157c1165b3c6658"
+  },
+  "frontend/test_playwright.mjs": {
+    "mtime": 1783779771.9966195,
+    "ast_hash": "067448bf29ddbe2a8b53de34bc5ec18f",
+    "semantic_hash": "067448bf29ddbe2a8b53de34bc5ec18f"
+  },
+  "frontend/tsconfig.app.json": {
+    "mtime": 1782029081.7896307,
+    "ast_hash": "b931c2417f50492887af452ad3b256cc",
+    "semantic_hash": "b931c2417f50492887af452ad3b256cc"
+  },
+  "frontend/tsconfig.json": {
+    "mtime": 1782029095.711676,
+    "ast_hash": "7bbef11e7b0c4b6a3c3dfd3932cde8ce",
+    "semantic_hash": "7bbef11e7b0c4b6a3c3dfd3932cde8ce"
+  },
+  "frontend/tsconfig.node.json": {
+    "mtime": 1778526044.2764394,
+    "ast_hash": "70bdd0a673bcfc0e828080b306e7c680",
+    "semantic_hash": "70bdd0a673bcfc0e828080b306e7c680"
+  },
+  "frontend/vite.config.ts": {
+    "mtime": 1784170543.9597785,
+    "ast_hash": "be2fb7237ed314c3e726d239e95639b8",
+    "semantic_hash": "be2fb7237ed314c3e726d239e95639b8"
+  },
+  "generate_report.py": {
+    "mtime": 1784986698.789057,
+    "ast_hash": "d6e082b7a4440e2a0b501377fc6c9dbf",
+    "semantic_hash": "d6e082b7a4440e2a0b501377fc6c9dbf"
+  },
+  "grama_niladharis_update.json": {
+    "mtime": 1783601565.1950965,
+    "ast_hash": "68d32075421a8ab04e7652a997f53f13",
+    "semantic_hash": "68d32075421a8ab04e7652a997f53f13"
+  },
+  "inspect_police.py": {
+    "mtime": 1783520854.1627066,
+    "ast_hash": "672fe637dc7142a12051215b2a1a3ae0",
+    "semantic_hash": "672fe637dc7142a12051215b2a1a3ae0"
+  },
+  "keycloak/celonica-admin-realm.json": {
+    "mtime": 1782558133.4011323,
+    "ast_hash": "3950d5dd5022aa7fdcd1efe2054b1f78",
+    "semantic_hash": "3950d5dd5022aa7fdcd1efe2054b1f78"
+  },
+  "local_res.json": {
+    "mtime": 1784789375.1162758,
+    "ast_hash": "edf1bcce167a3bcbaf48794a1422ba00",
+    "semantic_hash": "edf1bcce167a3bcbaf48794a1422ba00"
+  },
+  "phi_areas.json": {
+    "mtime": 1783651774.213032,
+    "ast_hash": "ee83793a7107fab37bf92a13f7485009",
+    "semantic_hash": "ee83793a7107fab37bf92a13f7485009"
+  },
+  "police_meta.json": {
+    "mtime": 1783350000.9409425,
+    "ast_hash": "d9e0222e75c2161bf8e8f8e96fdae1a5",
+    "semantic_hash": "d9e0222e75c2161bf8e8f8e96fdae1a5"
+  },
+  "post_offices.json": {
+    "mtime": 1783599899.8411877,
+    "ast_hash": "1485c68f63ba300e46bf6ea070c12417",
+    "semantic_hash": "1485c68f63ba300e46bf6ea070c12417"
+  },
+  "process_police.py": {
+    "mtime": 1783350367.814685,
+    "ast_hash": "cfca0cb948b15c25e95e111b3517bdc0",
+    "semantic_hash": "cfca0cb948b15c25e95e111b3517bdc0"
+  },
+  "prod_res.json": {
+    "mtime": 1784789331.8302789,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "province_data.json": {
+    "mtime": 1783699169.815064,
+    "ast_hash": "5e62b567e48d567752ebf39b7e2913a5",
+    "semantic_hash": "5e62b567e48d567752ebf39b7e2913a5"
+  },
+  "restore_db.sh": {
+    "mtime": 1784687195.3551612,
+    "ast_hash": "a18cfa64561627232529ca5a7a1e2f7b",
+    "semantic_hash": "a18cfa64561627232529ca5a7a1e2f7b"
+  },
+  "setup_keycloak.sh": {
+    "mtime": 1782557583.1375537,
+    "ast_hash": "4441cb10630ad2c6e2a253f250347c91",
+    "semantic_hash": "4441cb10630ad2c6e2a253f250347c91"
+  },
+  "split_db.ps1": {
+    "mtime": 1784687364.0129452,
+    "ast_hash": "76d87d0447f89e18b88b2664c56cdfd5",
+    "semantic_hash": "76d87d0447f89e18b88b2664c56cdfd5"
+  },
+  "srilanka_data.json": {
+    "mtime": 1783698612.7667947,
+    "ast_hash": "72f940f09816059616896580f318b759",
+    "semantic_hash": "72f940f09816059616896580f318b759"
+  },
+  "start.ps1": {
+    "mtime": 1782030878.9796095,
+    "ast_hash": "6082ef112de57387e9f6c16b6b34ffd6",
+    "semantic_hash": "6082ef112de57387e9f6c16b6b34ffd6"
+  },
+  "test.py": {
+    "mtime": 1783349997.0598187,
+    "ast_hash": "6962ab639e3086b640d745adf930a082",
+    "semantic_hash": "6962ab639e3086b640d745adf930a082"
+  },
+  "test2.py": {
+    "mtime": 1783350028.2323017,
+    "ast_hash": "97fb59e7c1be563e91103c30b8e4d8dd",
+    "semantic_hash": "97fb59e7c1be563e91103c30b8e4d8dd"
+  },
+  "test_file_4.json": {
+    "mtime": 1783350029.0736237,
+    "ast_hash": "f85669529f4376e15d6a1a1dd58ca2af",
+    "semantic_hash": "f85669529f4376e15d6a1a1dd58ca2af"
+  },
+  "test_gnd.php": {
+    "mtime": 1783655675.3783135,
+    "ast_hash": "d10634a4507abd7c67f013fd1e29a15c",
+    "semantic_hash": "d10634a4507abd7c67f013fd1e29a15c"
+  },
+  "test_kc.js": {
+    "mtime": 1782557669.318025,
+    "ast_hash": "3edbfd270d9e42c9ec8f8ec8658c9d9d",
+    "semantic_hash": "3edbfd270d9e42c9ec8f8ec8658c9d9d"
+  },
+  "test_map.php": {
+    "mtime": 1783654863.7940342,
+    "ast_hash": "23f59d31cce75ca2a651fa3d97a739bd",
+    "semantic_hash": "23f59d31cce75ca2a651fa3d97a739bd"
+  },
+  "test_mapping.py": {
+    "mtime": 1783654914.1055267,
+    "ast_hash": "6179463c2173ee05c2b405aab23ef734",
+    "semantic_hash": "6179463c2173ee05c2b405aab23ef734"
+  },
+  "test_matches.php": {
+    "mtime": 1783655700.3450415,
+    "ast_hash": "4cdb507782b24f1360198d4ac54c1772",
+    "semantic_hash": "4cdb507782b24f1360198d4ac54c1772"
+  },
+  "test_query.js": {
+    "mtime": 1784789328.269519,
+    "ast_hash": "7bbd8a7a0c0e5af954ec0d169d83337c",
+    "semantic_hash": "7bbd8a7a0c0e5af954ec0d169d83337c"
+  },
+  "test_query_local.js": {
+    "mtime": 1784789370.680883,
+    "ast_hash": "4a1d5c003ff34b7d80bf315f67e92442",
+    "semantic_hash": "4a1d5c003ff34b7d80bf315f67e92442"
+  },
+  "test_unmapped.php": {
+    "mtime": 1783655175.6418655,
+    "ast_hash": "763c89de9bde8258ad5a9b34589bee1a",
+    "semantic_hash": "763c89de9bde8258ad5a9b34589bee1a"
+  },
+  "test_unmapped.py": {
+    "mtime": 1783655158.2643032,
+    "ast_hash": "71b8f4b1dfd11acaceaaa30cb4d3f3a7",
+    "semantic_hash": "71b8f4b1dfd11acaceaaa30cb4d3f3a7"
+  },
+  "trs_areas.json": {
+    "mtime": 1783654969.695854,
+    "ast_hash": "4c3b8f01dc8a7787b683a9e91b21d451",
+    "semantic_hash": "4c3b8f01dc8a7787b683a9e91b21d451"
+  }
+}
