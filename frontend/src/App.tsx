@@ -9,7 +9,7 @@ import ProtectedRoute from './auth/ProtectedRoute';
 import AdminLayout from './components/AdminLayout';
 import apolloClient from './api/apolloClient';
 
-// Pages
+import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import AdminsPage from './pages/AdminsPage';
@@ -38,14 +38,20 @@ const App: React.FC = () => {
               {/* Public */}
               <Route path="/login" element={<LoginPage />} />
 
-              {/* Public Home Page (Admin layout handled inside DashboardPage for admins) */}
+              {/* Public Landing Page */}
               <Route
                 path="/"
+                element={<LandingPage />}
+              />
+
+              {/* Public Home Page (Admin layout handled inside DashboardPage for admins) */}
+              <Route
+                path="/gnpage"
                 element={<DashboardPage />}
               />
               {/* Direct GN Link Route */}
               <Route
-                path="/:gnName/:ccode"
+                path="/gnpage/:gnName/:ccode"
                 element={<DashboardPage />}
               />
               {/* Protected — wrapped in AdminLayout */}

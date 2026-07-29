@@ -180,8 +180,6 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
       setSelectedGN('');
       setLocation(null);
       setLocationError(null);
-    } else {
-      setShowLocationModal(false);
     }
   }, [ccode]);
 
@@ -283,7 +281,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
 
     if (loadedGn && loadedGn.CCODE && loadedGn.nameEn) {
       const currentUrl = window.location.pathname;
-      const targetUrl = `/${encodeURIComponent(loadedGn.nameEn.replace(/ /g, '-'))}/${encodeURIComponent(loadedGn.CCODE)}`;
+      const targetUrl = `/gnpage/${encodeURIComponent(loadedGn.nameEn.replace(/ /g, '-'))}/${encodeURIComponent(loadedGn.CCODE)}`;
       if (currentUrl !== targetUrl) {
         navigate(targetUrl, { replace: true });
       }
@@ -1503,12 +1501,12 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
 
           {/* Desktop Nav */}
           <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 1.5, fontWeight: 600, fontSize: '0.95rem', letterSpacing: '0.5px' }}>
-            <Typography onClick={() => navigate('/')} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: '#ffffff', '&:hover': { opacity: 0.7 } }}>Home</Typography>
-            <Typography sx={{ opacity: 0.4, fontWeight: 300, color: '#ffffff' }}>|</Typography>
-            <Typography onClick={login} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: '#ffffff', '&:hover': { opacity: 0.7 } }}>Login</Typography>
-            <Typography sx={{ opacity: 0.4, fontWeight: 300, color: '#ffffff' }}>|</Typography>
-            <Typography onClick={register} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: '#ffffff', '&:hover': { opacity: 0.7 } }}>Signup</Typography>
-            <Typography sx={{ opacity: 0.4, fontWeight: 300, color: '#ffffff' }}>|</Typography>
+            <Typography onClick={() => navigate('/')} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: isDarkMode ? '#ffffff' : '#000000', '&:hover': { opacity: 0.7 } }}>Home</Typography>
+            <Typography sx={{ opacity: 0.4, fontWeight: 300, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
+            <Typography onClick={login} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: isDarkMode ? '#ffffff' : '#000000', '&:hover': { opacity: 0.7 } }}>Login</Typography>
+            <Typography sx={{ opacity: 0.4, fontWeight: 300, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
+            <Typography onClick={register} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: isDarkMode ? '#ffffff' : '#000000', '&:hover': { opacity: 0.7 } }}>Signup</Typography>
+            <Typography sx={{ opacity: 0.4, fontWeight: 300, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
             <Typography onClick={cycleLanguage} sx={{ cursor: 'pointer', textTransform: 'uppercase', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 700, color: themeColors.primary, '&:hover': { opacity: 0.7 } }}>{language}</Typography>
           </Box>
 
