@@ -14,8 +14,10 @@ class Category extends Model
         'slug',
         'name_en',
         'name_si',
+        'name_ta',
         'description_en',
         'description_si',
+        'description_ta',
         'image_path',
         'sort_order',
     ];

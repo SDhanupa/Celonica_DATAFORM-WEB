@@ -13,13 +13,17 @@ class CategoryMutations
         // Check for duplicate name
         $nameEn = $args['name_en'] ?? '';
         $nameSi = $args['name_si'] ?? '';
+        $nameTa = $args['name_ta'] ?? '';
         
         $parentId = $args['parent_id'] ?? null;
         
-        $query = Category::where('parent_id', $parentId)->where(function($q) use ($nameEn, $nameSi) {
+        $query = Category::where('parent_id', $parentId)->where(function($q) use ($nameEn, $nameSi, $nameTa) {
             $q->where('name_en', $nameEn);
             if (!empty($nameSi)) {
                 $q->orWhere('name_si', $nameSi);
+            }
+            if (!empty($nameTa)) {
+                $q->orWhere('name_ta', $nameTa);
             }
         });
         
@@ -41,6 +45,9 @@ class CategoryMutations
         }
         if (array_key_exists('name_si', $args) && is_null($args['name_si'])) {
             $args['name_si'] = '';
+        }
+        if (array_key_exists('name_ta', $args) && is_null($args['name_ta'])) {
+            $args['name_ta'] = '';
         }
         $category->update($args);
         return $category;

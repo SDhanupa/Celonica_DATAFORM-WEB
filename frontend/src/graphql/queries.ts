@@ -133,8 +133,10 @@ export const GET_CATEGORIES = gql`
       slug
       nameEn
       nameSi
+      nameTa
       descriptionEn
       descriptionSi
+      descriptionTa
       imagePath
       sortOrder
       progress
@@ -152,6 +154,7 @@ export const GET_CATEGORY_BY_SLUG = gql`
       slug
       nameEn
       nameSi
+      nameTa
       imagePath
       sortOrder
       progress
@@ -160,6 +163,7 @@ export const GET_CATEGORY_BY_SLUG = gql`
         slug
         nameEn
         nameSi
+        nameTa
       }
       questions {
         id
@@ -175,8 +179,10 @@ export const GET_CATEGORY_BY_SLUG = gql`
         slug
         nameEn
         nameSi
+        nameTa
         descriptionEn
         descriptionSi
+        descriptionTa
         imagePath
         sortOrder
         progress

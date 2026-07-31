@@ -27,8 +27,10 @@ const CategoryDialog: React.FC<CategoryDialogProps> = ({ open, onClose, category
   const [slug, setSlug] = useState('');
   const [nameEn, setNameEn] = useState('');
   const [nameSi, setNameSi] = useState('');
+  const [nameTa, setNameTa] = useState('');
   const [descriptionEn, setDescriptionEn] = useState('');
   const [descriptionSi, setDescriptionSi] = useState('');
+  const [descriptionTa, setDescriptionTa] = useState('');
   const [imagePath, setImagePath] = useState('');
   const [sortOrder, setSortOrder] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
@@ -41,16 +43,20 @@ const CategoryDialog: React.FC<CategoryDialogProps> = ({ open, onClose, category
       setSlug(category.slug || '');
       setNameEn(category.nameEn || '');
       setNameSi(category.nameSi || '');
+      setNameTa(category.nameTa || '');
       setDescriptionEn(category.descriptionEn || '');
       setDescriptionSi(category.descriptionSi || '');
+      setDescriptionTa(category.descriptionTa || '');
       setImagePath(category.imagePath || '');
       setSortOrder(category.sortOrder || 0);
     } else {
       setSlug('');
       setNameEn('');
       setNameSi('');
+      setNameTa('');
       setDescriptionEn('');
       setDescriptionSi('');
+      setDescriptionTa('');
       setImagePath('');
       setSortOrder(0);
     }
@@ -69,8 +75,10 @@ const CategoryDialog: React.FC<CategoryDialogProps> = ({ open, onClose, category
             slug,
             nameEn,
             nameSi,
+            nameTa,
             descriptionEn,
             descriptionSi,
+            descriptionTa,
             imagePath,
             sortOrder: parseInt(sortOrder.toString()),
           },
@@ -83,8 +91,10 @@ const CategoryDialog: React.FC<CategoryDialogProps> = ({ open, onClose, category
             slug,
             nameEn,
             nameSi,
+            nameTa,
             descriptionEn,
             descriptionSi,
+            descriptionTa,
             imagePath,
             sortOrder: parseInt(sortOrder.toString()),
           },
@@ -150,6 +160,12 @@ const CategoryDialog: React.FC<CategoryDialogProps> = ({ open, onClose, category
           fullWidth
         />
         <TextField
+          label="Name (Tamil)"
+          value={nameTa}
+          onChange={(e) => setNameTa(e.target.value)}
+          fullWidth
+        />
+        <TextField
           label="Description / Instructions (English)"
           value={descriptionEn}
           onChange={(e) => setDescriptionEn(e.target.value)}
@@ -161,6 +177,14 @@ const CategoryDialog: React.FC<CategoryDialogProps> = ({ open, onClose, category
           label="Description / Instructions (Sinhala)"
           value={descriptionSi}
           onChange={(e) => setDescriptionSi(e.target.value)}
+          fullWidth
+          multiline
+          rows={3}
+        />
+        <TextField
+          label="Description / Instructions (Tamil)"
+          value={descriptionTa}
+          onChange={(e) => setDescriptionTa(e.target.value)}
           fullWidth
           multiline
           rows={3}

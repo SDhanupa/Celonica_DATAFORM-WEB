@@ -25,7 +25,7 @@ import CategoryDialog from '../components/CategoryDialog';
 import { useAuth } from '../auth/AuthProvider';
 
 const CategoriesPage: React.FC = () => {
-  const [lang, setLang] = useState<'en' | 'si'>('en');
+  const [lang, setLang] = useState<'en' | 'si' | 'ta'>('en');
   const navigate = useNavigate();
   const { userInfo } = useAuth();
   
@@ -66,7 +66,7 @@ const CategoriesPage: React.FC = () => {
     <Box sx={{ p: 4, maxWidth: 1200, mx: 'auto' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Typography variant="h4" sx={{ fontWeight: 600 }}>
-          {lang === 'en' ? 'Categories' : 'වර්ග'}
+          {lang === 'en' ? 'Categories' : lang === 'si' ? 'වර්ග' : 'வகைகள்'}
         </Typography>
         <Box sx={{ display: 'flex', gap: 2 }}>
           {isSuperAdmin && (
@@ -85,8 +85,15 @@ const CategoriesPage: React.FC = () => {
             <Button 
               variant={lang === 'si' ? 'contained' : 'outlined'} 
               onClick={() => setLang('si')}
+              sx={{ mr: 1 }}
             >
               සිංහල
+            </Button>
+            <Button 
+              variant={lang === 'ta' ? 'contained' : 'outlined'} 
+              onClick={() => setLang('ta')}
+            >
+              தமிழ்
             </Button>
           </Box>
         </Box>
@@ -113,7 +120,7 @@ const CategoriesPage: React.FC = () => {
               {(cat.descriptionEn || cat.descriptionSi) && (
                 <Box sx={{ position: 'absolute', top: 8, left: 8, zIndex: 1 }}>
                   <Tooltip 
-                    title={lang === 'en' ? (cat.descriptionEn || cat.descriptionSi) : (cat.descriptionSi || cat.descriptionEn)}
+                    title={lang === 'en' ? (cat.descriptionEn || cat.descriptionSi) : lang === 'si' ? (cat.descriptionSi || cat.descriptionEn) : (cat.descriptionTa || cat.descriptionEn)}
                     arrow
                     placement="top"
                   >
@@ -150,7 +157,7 @@ const CategoriesPage: React.FC = () => {
                     component="img"
                     height="110"
                     image={cat.imagePath}
-                    alt={lang === 'en' ? cat.nameEn : cat.nameSi}
+                    alt={lang === 'en' ? cat.nameEn : lang === 'si' ? cat.nameSi : cat.nameTa}
                     sx={{ 
                       objectFit: 'contain', 
                       borderRadius: 3,
@@ -161,7 +168,7 @@ const CategoriesPage: React.FC = () => {
                 )}
                 <CardContent sx={{ flexGrow: 1, textAlign: 'center', p: '12px !important', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Typography variant="subtitle1" component="div" sx={{ fontWeight: 600, lineHeight: 1.2 }}>
-                    {lang === 'en' ? cat.nameEn : cat.nameSi}
+                    {lang === 'en' ? cat.nameEn : lang === 'si' ? (cat.nameSi || cat.nameEn) : (cat.nameTa || cat.nameEn)}
                   </Typography>
                 </CardContent>
                 {!isSuperAdmin && cat.progress !== undefined && (
