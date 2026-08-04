@@ -14,6 +14,7 @@ class Question extends Model
         'section',
         'question_text_en',
         'question_text_si',
+        'question_text_ta',
         'input_type',
         'is_repeater',
         'sort_order',

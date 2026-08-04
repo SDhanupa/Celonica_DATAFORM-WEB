@@ -109,6 +109,7 @@ export const CREATE_QUESTION = gql`
     $section: String
     $questionTextEn: String!
     $questionTextSi: String
+    $questionTextTa: String
     $inputType: String!
     $isRepeater: Boolean
     $sortOrder: Int!
@@ -118,6 +119,7 @@ export const CREATE_QUESTION = gql`
       section: $section
       questionTextEn: $questionTextEn
       questionTextSi: $questionTextSi
+      questionTextTa: $questionTextTa
       inputType: $inputType
       isRepeater: $isRepeater
       sortOrder: $sortOrder
@@ -136,6 +138,7 @@ export const UPDATE_QUESTION = gql`
     $section: String
     $questionTextEn: String!
     $questionTextSi: String
+    $questionTextTa: String
     $inputType: String!
     $isRepeater: Boolean
     $sortOrder: Int!
@@ -147,6 +150,7 @@ export const UPDATE_QUESTION = gql`
       section: $section
       questionTextEn: $questionTextEn
       questionTextSi: $questionTextSi
+      questionTextTa: $questionTextTa
       inputType: $inputType
       isRepeater: $isRepeater
       sortOrder: $sortOrder

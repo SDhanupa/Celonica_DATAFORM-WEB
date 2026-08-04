@@ -20,6 +20,7 @@ final class QuestionMutations
             'section' => $args['section'] ?? null,
             'question_text_en' => $args['question_text_en'],
             'question_text_si' => $args['question_text_si'] ?? null,
+            'question_text_ta' => $args['question_text_ta'] ?? null,
             'input_type' => $args['input_type'],
             'is_repeater' => $args['is_repeater'] ?? false,
             'sort_order' => $args['sort_order'],

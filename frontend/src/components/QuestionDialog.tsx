@@ -28,6 +28,7 @@ interface QuestionDialogProps {
 const QuestionDialog: React.FC<QuestionDialogProps> = ({ open, onClose, question, categoryId, parentSlug }) => {
   const [questionTextEn, setQuestionTextEn] = useState('');
   const [questionTextSi, setQuestionTextSi] = useState('');
+  const [questionTextTa, setQuestionTextTa] = useState('');
   const [inputType, setInputType] = useState('text');
   const [isRepeater, setIsRepeater] = useState(false);
   const [sortOrder, setSortOrder] = useState(0);
@@ -39,12 +40,14 @@ const QuestionDialog: React.FC<QuestionDialogProps> = ({ open, onClose, question
     if (question) {
       setQuestionTextEn(question.questionTextEn || '');
       setQuestionTextSi(question.questionTextSi || '');
+      setQuestionTextTa(question.questionTextTa || '');
       setInputType(question.inputType || 'text');
       setIsRepeater(question.isRepeater || false);
       setSortOrder(question.sortOrder || 0);
     } else {
       setQuestionTextEn('');
       setQuestionTextSi('');
+      setQuestionTextTa('');
       setInputType('text');
       setIsRepeater(false);
       setSortOrder(0);
@@ -64,6 +67,7 @@ const QuestionDialog: React.FC<QuestionDialogProps> = ({ open, onClose, question
             categoryId,
             questionTextEn,
             questionTextSi,
+            questionTextTa,
             inputType,
             isRepeater,
             sortOrder: parseInt(sortOrder.toString()),
@@ -76,6 +80,7 @@ const QuestionDialog: React.FC<QuestionDialogProps> = ({ open, onClose, question
             categoryId,
             questionTextEn,
             questionTextSi,
+            questionTextTa,
             inputType,
             isRepeater,
             sortOrder: parseInt(sortOrder.toString()),
@@ -106,6 +111,14 @@ const QuestionDialog: React.FC<QuestionDialogProps> = ({ open, onClose, question
           label="Question Text (Sinhala)"
           value={questionTextSi}
           onChange={(e) => setQuestionTextSi(e.target.value)}
+          fullWidth
+          multiline
+          rows={2}
+        />
+        <TextField
+          label="Question Text (Tamil)"
+          value={questionTextTa}
+          onChange={(e) => setQuestionTextTa(e.target.value)}
           fullWidth
           multiline
           rows={2}

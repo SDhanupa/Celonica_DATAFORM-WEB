@@ -55,6 +55,7 @@ type Question {
     section: String
     questionTextEn: String! @rename(attribute: "question_text_en")
     questionTextSi: String @rename(attribute: "question_text_si")
+    questionTextTa: String @rename(attribute: "question_text_ta")
     inputType: String! @rename(attribute: "input_type")
     isRepeater: Boolean! @rename(attribute: "is_repeater")
     sortOrder: Int! @rename(attribute: "sort_order")
@@ -250,6 +251,7 @@ type Mutation {
         section: String
         questionTextEn: String! @rename(attribute: "question_text_en")
         questionTextSi: String @rename(attribute: "question_text_si")
+        questionTextTa: String @rename(attribute: "question_text_ta")
         inputType: String! @rename(attribute: "input_type")
         isRepeater: Boolean @rename(attribute: "is_repeater")
         sortOrder: Int! @rename(attribute: "sort_order")
@@ -263,6 +265,7 @@ type Mutation {
         section: String
         questionTextEn: String @rename(attribute: "question_text_en")
         questionTextSi: String @rename(attribute: "question_text_si")
+        questionTextTa: String @rename(attribute: "question_text_ta")
         inputType: String @rename(attribute: "input_type")
         isRepeater: Boolean @rename(attribute: "is_repeater")
         sortOrder: Int @rename(attribute: "sort_order")

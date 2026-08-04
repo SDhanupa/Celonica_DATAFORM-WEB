@@ -411,7 +411,7 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
                 <Paper sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <Box>
                     <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
-                      {q.questionTextEn} {q.isRepeater ? '(Multiplier)' : ''}
+                      {lang === 'en' ? q.questionTextEn : lang === 'si' ? (q.questionTextSi || q.questionTextEn) : (q.questionTextTa || q.questionTextEn)} {q.isRepeater ? '(Multiplier)' : ''}
                     </Typography>
                   </Box>
                   <Box sx={{ display: 'flex', gap: 1 }}>
@@ -470,7 +470,7 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
                 return (
                   <Box sx={{ my: 4 }}>
                     <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-                      {lang === 'en' ? q.questionTextEn : (q.questionTextSi || q.questionTextEn)}
+                      {lang === 'en' ? q.questionTextEn : lang === 'si' ? (q.questionTextSi || q.questionTextEn) : (q.questionTextTa || q.questionTextEn)}
                     </Typography>
                     
                     {isAfterRepeater && (

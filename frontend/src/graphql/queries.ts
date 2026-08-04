@@ -103,7 +103,9 @@ export const GET_QUESTIONS = gql`
     questions {
       id
       section
-      questionText
+      questionTextEn
+      questionTextSi
+      questionTextTa
       inputType
       sortOrder
       isActive
@@ -169,6 +171,7 @@ export const GET_CATEGORY_BY_SLUG = gql`
         id
         questionTextEn
         questionTextSi
+        questionTextTa
         inputType
         isRepeater
         sortOrder
