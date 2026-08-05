@@ -918,7 +918,8 @@ class ProductionCategoryCodeSeeder extends Seeder
 
         $updatedCount = 0;
         foreach ($mappings as $name => $code) {
-            $updated = Category::where('name_en', $name)->update(['code' => $code]);
+            $updated = Category::whereRaw('LOWER(TRIM(name_en)) = ?', [strtolower(trim($name))])
+                               ->update(['code' => $code]);
             $updatedCount += $updated;
         }
 
