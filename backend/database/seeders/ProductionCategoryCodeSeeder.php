@@ -917,12 +917,39 @@ class ProductionCategoryCodeSeeder extends Seeder
         ];
 
         $updatedCount = 0;
+        
+        // Step 1: Exact case-insensitive matches
         foreach ($mappings as $name => $code) {
             $updated = Category::whereRaw('LOWER(TRIM(name_en)) = ?', [strtolower(trim($name))])
                                ->update(['code' => $code]);
             $updatedCount += $updated;
         }
 
-        $this->command->info("Successfully updated $updatedCount categories with codes!");
+        // Step 2: Fuzzy matching for plurals and typos (like "Public Space" vs "Public spaces")
+        $missingCategories = Category::whereNull('code')->get();
+        $fuzzyCount = 0;
+
+        foreach ($missingCategories as $cat) {
+            $bestMatchCode = null;
+            $bestScore = 0;
+
+            foreach ($mappings as $name => $code) {
+                similar_text(strtolower(trim($cat->name_en)), strtolower(trim($name)), $percent);
+                if ($percent > $bestScore) {
+                    $bestScore = $percent;
+                    $bestMatchCode = $code;
+                }
+            }
+
+            // If the names are at least 85% similar (e.g. just missing an 's' or a slight typo)
+            if ($bestScore > 85 && $bestMatchCode) {
+                $cat->code = $bestMatchCode;
+                $cat->save();
+                $fuzzyCount++;
+            }
+        }
+
+        $total = $updatedCount + $fuzzyCount;
+        $this->command->info("Successfully updated $updatedCount categories exactly, and $fuzzyCount with fuzzy matching. Total: $total");
     }
 }
