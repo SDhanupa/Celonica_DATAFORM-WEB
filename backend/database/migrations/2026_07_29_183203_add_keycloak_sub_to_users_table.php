@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('keycloak_sub')->nullable()->unique()->after('id');
-        });
+        if (!Schema::hasColumn('users', 'keycloak_sub')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->string('keycloak_sub')->nullable()->unique()->after('id');
+            });
+        }
     }
 
     /**
