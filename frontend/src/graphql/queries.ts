@@ -133,6 +133,7 @@ export const GET_CATEGORIES = gql`
     categories {
       id
       slug
+      code
       nameEn
       nameSi
       nameTa
@@ -154,6 +155,7 @@ export const GET_CATEGORY_BY_SLUG = gql`
     categoryBySlug(slug: $slug) {
       id
       slug
+      code
       nameEn
       nameSi
       nameTa
@@ -163,6 +165,7 @@ export const GET_CATEGORY_BY_SLUG = gql`
       ancestors {
         id
         slug
+        code
         nameEn
         nameSi
         nameTa
@@ -180,6 +183,7 @@ export const GET_CATEGORY_BY_SLUG = gql`
       children {
         id
         slug
+        code
         nameEn
         nameSi
         nameTa

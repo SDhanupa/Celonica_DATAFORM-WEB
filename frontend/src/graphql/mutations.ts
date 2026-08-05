@@ -194,6 +194,7 @@ export const CREATE_CATEGORY = gql`
   mutation CreateCategory(
     $parentId: ID
     $slug: String!
+    $code: String
     $nameEn: String!
     $nameSi: String!
     $nameTa: String
@@ -206,6 +207,7 @@ export const CREATE_CATEGORY = gql`
     createCategory(
       parentId: $parentId
       slug: $slug
+      code: $code
       nameEn: $nameEn
       nameSi: $nameSi
       nameTa: $nameTa
@@ -217,6 +219,7 @@ export const CREATE_CATEGORY = gql`
     ) {
       id
       slug
+      code
       nameEn
       nameSi
       nameTa
@@ -230,6 +233,7 @@ export const UPDATE_CATEGORY = gql`
   mutation UpdateCategory(
     $id: ID!
     $slug: String
+    $code: String
     $nameEn: String
     $nameSi: String
     $nameTa: String
@@ -242,6 +246,7 @@ export const UPDATE_CATEGORY = gql`
     updateCategory(
       id: $id
       slug: $slug
+      code: $code
       nameEn: $nameEn
       nameSi: $nameSi
       nameTa: $nameTa
@@ -253,6 +258,7 @@ export const UPDATE_CATEGORY = gql`
     ) {
       id
       slug
+      code
       nameEn
       nameSi
       nameTa

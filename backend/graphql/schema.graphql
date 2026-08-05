@@ -176,6 +176,7 @@ type Category {
     ancestors: [Category!]!
     questions: [Question!]
     slug: String!
+    code: String
     nameEn: String! @rename(attribute: "name_en")
     nameSi: String! @rename(attribute: "name_si")
     nameTa: String @rename(attribute: "name_ta")
@@ -290,6 +291,7 @@ type Mutation {
     createCategory(
         parentId: ID @rename(attribute: "parent_id")
         slug: String!
+        code: String
         nameEn: String! @rename(attribute: "name_en")
         nameSi: String! @rename(attribute: "name_si")
         nameTa: String @rename(attribute: "name_ta")
@@ -305,6 +307,7 @@ type Mutation {
     updateCategory(
         id: ID!
         slug: String
+        code: String
         nameEn: String @rename(attribute: "name_en")
         nameSi: String @rename(attribute: "name_si")
         nameTa: String @rename(attribute: "name_ta")

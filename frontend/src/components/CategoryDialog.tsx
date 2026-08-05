@@ -25,6 +25,7 @@ interface CategoryDialogProps {
 
 const CategoryDialog: React.FC<CategoryDialogProps> = ({ open, onClose, category, parentId, parentSlug }) => {
   const [slug, setSlug] = useState('');
+  const [code, setCode] = useState('');
   const [nameEn, setNameEn] = useState('');
   const [nameSi, setNameSi] = useState('');
   const [nameTa, setNameTa] = useState('');
@@ -41,6 +42,7 @@ const CategoryDialog: React.FC<CategoryDialogProps> = ({ open, onClose, category
   useEffect(() => {
     if (category) {
       setSlug(category.slug || '');
+      setCode(category.code || '');
       setNameEn(category.nameEn || '');
       setNameSi(category.nameSi || '');
       setNameTa(category.nameTa || '');
@@ -51,6 +53,7 @@ const CategoryDialog: React.FC<CategoryDialogProps> = ({ open, onClose, category
       setSortOrder(category.sortOrder || 0);
     } else {
       setSlug('');
+      setCode('');
       setNameEn('');
       setNameSi('');
       setNameTa('');
@@ -73,6 +76,7 @@ const CategoryDialog: React.FC<CategoryDialogProps> = ({ open, onClose, category
           variables: {
             id: category.id,
             slug,
+            code,
             nameEn,
             nameSi,
             nameTa,
@@ -89,6 +93,7 @@ const CategoryDialog: React.FC<CategoryDialogProps> = ({ open, onClose, category
           variables: {
             parentId,
             slug,
+            code,
             nameEn,
             nameSi,
             nameTa,
@@ -145,6 +150,12 @@ const CategoryDialog: React.FC<CategoryDialogProps> = ({ open, onClose, category
           label="Slug (Unique Identifier)"
           value={slug}
           onChange={(e) => setSlug(e.target.value)}
+          fullWidth
+        />
+        <TextField
+          label="Code (Optional)"
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
           fullWidth
         />
         <TextField
