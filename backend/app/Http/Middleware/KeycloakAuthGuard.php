@@ -71,7 +71,13 @@ class KeycloakAuthGuard
         // 2. Check Users
         $user = User::where('keycloak_sub', $sub)->first();
         if ($user) {
-            $request->merge(['current_user' => $user]);
+            $request->merge([
+                'current_user' => $user,
+                'keycloak_sub' => $sub,
+                'keycloak_email' => $decoded->email ?? $user->email,
+                'keycloak_first_name' => $decoded->given_name ?? null,
+                'keycloak_last_name' => $decoded->family_name ?? null,
+            ]);
             return $next($request);
         }
 
