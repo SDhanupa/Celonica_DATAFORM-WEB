@@ -58,7 +58,13 @@ class KeycloakAuthGuard
                 return response()->json(['error' => 'Forbidden: Admin account is deactivated'], 403);
             }
             $admin->update(['last_login_at' => now()]);
-            $request->merge(['current_admin' => $admin]);
+            $request->merge([
+                'current_admin' => $admin,
+                'keycloak_sub' => $sub,
+                'keycloak_email' => $decoded->email ?? $admin->email,
+                'keycloak_first_name' => $decoded->given_name ?? null,
+                'keycloak_last_name' => $decoded->family_name ?? null,
+            ]);
             return $next($request);
         }
 

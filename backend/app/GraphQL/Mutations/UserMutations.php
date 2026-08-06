@@ -26,12 +26,26 @@ class UserMutations
         $request = request();
         $sub = $request->get('keycloak_sub');
         $user = $request->get('current_user');
+        $admin = $request->get('current_admin');
 
-        Log::info('syncUser called', ['sub' => $sub, 'user_exists' => !!$user]);
+        Log::info('syncUser called', ['sub' => $sub, 'user_exists' => !!$user, 'admin_exists' => !!$admin]);
 
         // If KeycloakAuthGuard already matched a user, return it
         if ($user) {
             return $user;
+        }
+
+        if ($admin) {
+            $existingUser = User::where('keycloak_sub', $admin->keycloak_sub)->orWhere('email', $admin->email)->first();
+            if ($existingUser) {
+                return $existingUser;
+            }
+            return User::create([
+                'name' => $admin->name ?? 'Admin User',
+                'email' => $admin->email,
+                'password' => bcrypt(\Illuminate\Support\Str::random(16)),
+                'keycloak_sub' => $admin->keycloak_sub,
+            ]);
         }
 
         if (!$sub) {
@@ -39,15 +53,20 @@ class UserMutations
         }
 
         $email = $request->get('keycloak_email');
+        if (!$email) {
+            // Fallback email if Keycloak didn't include email claim
+            $email = "user_{$sub}@celonica.local";
+        }
+
         $firstName = $request->get('keycloak_first_name') ?? 'User';
         $lastName = $request->get('keycloak_last_name') ?? '';
 
         $newUser = User::updateOrCreate(
-            ['email' => $email],
+            ['keycloak_sub' => $sub],
             [
+                'email' => $email,
                 'name' => trim("$firstName $lastName"),
                 'password' => bcrypt(\Illuminate\Support\Str::random(16)),
-                'keycloak_sub' => $sub,
             ]
         );
 
