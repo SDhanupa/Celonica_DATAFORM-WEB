@@ -33,14 +33,7 @@ const FloatingEditButton: React.FC = () => {
       // parts[2] = ccode
       // parts[3] = categorySlug
       if (parts.length >= 4) {
-        let slug = parts[3];
-        
-        // If normal user (not super_admin), prepend 's-' to the slug
-        const isSuperAdmin = userInfo?.realm_roles?.includes('super_admin');
-        if (!isSuperAdmin && !slug.startsWith('s-')) {
-          slug = `s-${slug}`;
-        }
-        
+        const slug = parts[3];
         navigate(`/user/categories/${slug}`);
         return;
       }
