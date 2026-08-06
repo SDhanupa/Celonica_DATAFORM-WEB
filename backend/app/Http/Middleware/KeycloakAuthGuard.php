@@ -29,70 +29,78 @@ class KeycloakAuthGuard
             $content = json_decode($request->getContent(), true) ?: [];
             $query = $content['query'] ?? '';
 
-            // Allow any query to pass through (getting data out).
-            // Block all mutations (putting data in) if no token is provided.
             if (preg_match('/^\s*mutation\b/i', $query)) {
                 return response()->json(['error' => 'Unauthorized: Mutations require a token'], 401);
             }
 
-            // For queries, proceed without injecting a user
             return $next($request);
         }
 
         try {
             $decoded = $this->decodeToken($token);
         } catch (\Throwable $e) {
+            error_log('[KeycloakAuthGuard] decodeToken failed: ' . $e->getMessage());
             return response()->json(['error' => 'Unauthorized: ' . $e->getMessage()], 401);
         }
 
         $sub = $decoded->sub ?? null;
 
         if (!$sub) {
+            error_log('[KeycloakAuthGuard] Token has no sub claim');
             return response()->json(['error' => 'Unauthorized: Invalid token payload'], 401);
         }
 
-        // 1. Check Admins
-        $admin = Admin::findByKeycloakSub($sub);
-        if ($admin) {
-            if (!$admin->is_active) {
-                return response()->json(['error' => 'Forbidden: Admin account is deactivated'], 403);
+        error_log('[KeycloakAuthGuard] Looking up sub: ' . $sub);
+
+        try {
+            // 1. Check Admins
+            $admin = Admin::findByKeycloakSub($sub);
+            if ($admin) {
+                error_log('[KeycloakAuthGuard] Found admin: ' . $admin->email);
+                if (!$admin->is_active) {
+                    return response()->json(['error' => 'Forbidden: Admin account is deactivated'], 403);
+                }
+                $admin->update(['last_login_at' => now()]);
+                $request->merge([
+                    'current_admin' => $admin,
+                    'keycloak_sub' => $sub,
+                    'keycloak_email' => $decoded->email ?? $admin->email,
+                    'keycloak_first_name' => $decoded->given_name ?? null,
+                    'keycloak_last_name' => $decoded->family_name ?? null,
+                ]);
+                return $next($request);
             }
-            $admin->update(['last_login_at' => now()]);
+
+            // 2. Check Users
+            $user = User::where('keycloak_sub', $sub)->first();
+            if ($user) {
+                error_log('[KeycloakAuthGuard] Found user: ' . $user->email);
+                $request->merge([
+                    'current_user' => $user,
+                    'keycloak_sub' => $sub,
+                    'keycloak_email' => $decoded->email ?? $user->email,
+                    'keycloak_first_name' => $decoded->given_name ?? null,
+                    'keycloak_last_name' => $decoded->family_name ?? null,
+                ]);
+                return $next($request);
+            }
+
+            // 3. User not in DB (Needs Onboarding)
+            error_log('[KeycloakAuthGuard] User not found in DB — needs onboarding');
             $request->merge([
-                'current_admin' => $admin,
+                'needs_onboarding' => true,
                 'keycloak_sub' => $sub,
-                'keycloak_email' => $decoded->email ?? $admin->email,
+                'keycloak_email' => $decoded->email ?? null,
                 'keycloak_first_name' => $decoded->given_name ?? null,
                 'keycloak_last_name' => $decoded->family_name ?? null,
             ]);
+
             return $next($request);
+
+        } catch (\Throwable $e) {
+            error_log('[KeycloakAuthGuard] DB lookup failed: ' . $e->getMessage() . ' | ' . $e->getTraceAsString());
+            return response()->json(['error' => 'Server error during authentication'], 500);
         }
-
-        // 2. Check Users
-        $user = User::where('keycloak_sub', $sub)->first();
-        if ($user) {
-            $request->merge([
-                'current_user' => $user,
-                'keycloak_sub' => $sub,
-                'keycloak_email' => $decoded->email ?? $user->email,
-                'keycloak_first_name' => $decoded->given_name ?? null,
-                'keycloak_last_name' => $decoded->family_name ?? null,
-            ]);
-            return $next($request);
-        }
-
-        // 3. User not in DB (Needs Onboarding)
-        // We pass them through so they can hit the onboarding GraphQL mutation.
-        // The individual GraphQL resolvers will block them from accessing sensitive data.
-        $request->merge([
-            'needs_onboarding' => true,
-            'keycloak_sub' => $sub,
-            'keycloak_email' => $decoded->email ?? null,
-            'keycloak_first_name' => $decoded->given_name ?? null,
-            'keycloak_last_name' => $decoded->family_name ?? null,
-        ]);
-
-        return $next($request);
     }
 
     /**
