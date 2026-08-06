@@ -27,6 +27,8 @@ import PostOfficeConnectionsPage from './pages/PostOfficeConnectionsPage';
 import PhiConnectionsPage from './pages/PhiConnectionsPage';
 import TrsConnectionsPage from './pages/TrsConnectionsPage';
 import DistrictProvinceConnectionsPage from './pages/DistrictProvinceConnectionsPage';
+import CategoryDetailPage from './pages/CategoryDetailPage';
+import FloatingEditButton from './components/FloatingEditButton';
 
 const App: React.FC = () => {
   return (
@@ -35,6 +37,7 @@ const App: React.FC = () => {
         <CssBaseline />
         <Router>
           <AuthProvider>
+            <FloatingEditButton />
             <Routes>
               {/* Public */}
               <Route path="/login" element={<LoginPage />} />
@@ -54,6 +57,11 @@ const App: React.FC = () => {
               <Route
                 path="/gnpage/:gnName/:ccode"
                 element={<DashboardPage />}
+              />
+              {/* Category detail pages — accessible by super admin */}
+              <Route
+                path="/gnpage/:gnName/:ccode/:categorySlug"
+                element={<CategoryDetailPage />}
               />
               {/* Protected — wrapped in AdminLayout */}
               <Route

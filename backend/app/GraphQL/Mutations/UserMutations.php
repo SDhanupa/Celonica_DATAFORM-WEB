@@ -21,6 +21,41 @@ class UserMutations
      * @param  null  $_
      * @param  array<string, mixed>  $args
      */
+    public function syncUser($_, array $args)
+    {
+        $request = request();
+        $sub = $request->get('keycloak_sub');
+        $user = $request->get('current_user');
+
+        // If KeycloakAuthGuard already matched a user, return it
+        if ($user) {
+            return $user;
+        }
+
+        if (!$sub) {
+            throw new Exception('Unauthorized or no valid Keycloak token provided.');
+        }
+
+        $email = $request->get('keycloak_email');
+        $firstName = $request->get('keycloak_first_name') ?? 'User';
+        $lastName = $request->get('keycloak_last_name') ?? '';
+
+        $newUser = User::create([
+            'name' => trim("$firstName $lastName"),
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'email' => $email,
+            'password' => bcrypt(\Illuminate\Support\Str::random(16)),
+            'keycloak_sub' => $sub,
+        ]);
+
+        return $newUser;
+    }
+
+    /**
+     * @param  null  $_
+     * @param  array<string, mixed>  $args
+     */
     public function registerUser($_, array $args)
     {
         // 1. Authorization check: Only SUPER_ADMIN can do this

@@ -289,6 +289,42 @@ export const GET_POST_OFFICES_BY_DISTRICT = gql`
       placeNameEnglish
       district
       postalCode
+      sinhala
+      tamil
+      dsAga
+      latitude
+      longitude
+    }
+  }
+`;
+
+export const GET_POLICE_BY_GN_CCODE = gql`
+  query GetPoliceByGnCcode($ccode: String!) {
+    policeByGnCcode(ccode: $ccode) {
+      id
+      psName
+      psNameSi
+      psNameTa
+      psId
+      distanceToThePoliceStation
+      lat
+      lng
+    }
+  }
+`;
+
+export const GET_POST_OFFICES_BY_DS_CODE = gql`
+  query GetPostOfficesByDsCode($gnName: String, $dsName: String, $dsCode: String, $district: String) {
+    postOfficesByDsCode(gnName: $gnName, dsName: $dsName, dsCode: $dsCode, district: $district) {
+      id
+      placeNameEnglish
+      sinhala
+      tamil
+      postalCode
+      district
+      dsAga
+      latitude
+      longitude
     }
   }
 `;
@@ -689,6 +725,27 @@ export const GET_GN_BY_CCODE = gql`
         admin2NameSi
         admin2NameTa
       }
+      police {
+        id
+        psName
+        psNameSi
+        psNameTa
+        psId
+        distanceToThePoliceStation
+        lat
+        lng
+      }
+      postOffice {
+        id
+        placeNameEnglish
+        sinhala
+        tamil
+        postalCode
+        district
+        dsAga
+        latitude
+        longitude
+      }
       pGn {
         id
         gnName
@@ -826,3 +883,5 @@ export const GET_GN_BY_CCODE = gql`
     }
   }
 `;
+
+

@@ -14,10 +14,13 @@ import { useAuth } from '../auth/AuthProvider';
 import { useNavigate, useParams } from 'react-router-dom';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
+import SearchIcon from '@mui/icons-material/Search';
 import MenuIcon from '@mui/icons-material/Menu';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { CATEGORIES } from './CategoryDetailPage';
+import GnPageFooter from '../components/GnPageFooter';
 
 
 const tChart = {
@@ -137,7 +140,7 @@ interface UserDashboardProps {
 const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const theme = useTheme();
   const isMobileView = useMediaQuery(theme.breakpoints.down('sm'));
-  const { login, register } = useAuth();
+  const { login, register, userInfo, isAuthenticated, logout, isLoading } = useAuth();
   const navigate = useNavigate();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const themeColors = getThemeColors(isDarkMode);
@@ -180,8 +183,11 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
       setSelectedGN('');
       setLocation(null);
       setLocationError(null);
+    } else if (gnName && ccode) {
+      // Save last visited GN URL so admin sidebar "Home" can navigate back to it
+      localStorage.setItem('last_gn_url', `/gnpage/${encodeURIComponent(gnName)}/${encodeURIComponent(ccode)}`);
     }
-  }, [ccode]);
+  }, [ccode, gnName]);
 
   // Mobile UI States
   const [activeMobileChart, setActiveMobileChart] = useState<'pie' | 'bar' | 'economy' | 'age' | 'ownership' | 'wall' | 'unit' | 'toilet' | 'water' | 'waste' | 'rooms' | 'roof' | 'religion' | 'household'>('pie');
@@ -191,6 +197,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const handleMobileMenuClose = () => { setMobileMenuAnchor(null); };
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const isSuperAdmin = userInfo?.realm_roles?.includes('super_admin');
+  const [catMenuAnchor, setCatMenuAnchor] = useState<null | HTMLElement>(null);
 
   // Search Logic Queries
   const { data: districtsData, loading: districtsLoading, error: districtsError } = useQuery(GET_P_DISTRICTS, {
@@ -1491,22 +1499,97 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           maxWidth: '90vw'
         }}>
 
-          <IconButton
-            onClick={() => setIsDarkMode(!isDarkMode)}
-            size="small"
-            sx={{ color: isDarkMode ? '#ffffff' : '#000000', p: 0, transition: 'transform 0.2s', '&:hover': { transform: 'scale(1.1)' } }}
-          >
-            {isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
-          </IconButton>
+          <Box sx={{ display: 'flex', gap: 0.5 }}>
+            <IconButton
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              size="small"
+              sx={{ color: isDarkMode ? '#ffffff' : '#000000', p: 0.5, transition: 'transform 0.2s', '&:hover': { transform: 'scale(1.1)' } }}
+            >
+              {isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
+            </IconButton>
+            <IconButton
+              onClick={() => navigate('/gnpage')}
+              size="small"
+              sx={{ color: isDarkMode ? '#ffffff' : '#000000', p: 0.5, transition: 'transform 0.2s', '&:hover': { transform: 'scale(1.1)' } }}
+            >
+              <SearchIcon fontSize="small" />
+            </IconButton>
+          </Box>
 
           {/* Desktop Nav */}
           <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 1.5, fontWeight: 600, fontSize: '0.95rem', letterSpacing: '0.5px' }}>
-            <Typography onClick={() => navigate('/')} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: isDarkMode ? '#ffffff' : '#000000', '&:hover': { opacity: 0.7 } }}>Home</Typography>
+            <Typography onClick={() => navigate(gnName && ccode ? `/gnpage/${gnName}/${ccode}` : '/gnpage')} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: isDarkMode ? '#ffffff' : '#000000', '&:hover': { opacity: 0.7 } }}>Home</Typography>
             <Typography sx={{ opacity: 0.4, fontWeight: 300, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
-            <Typography onClick={() => login(window.location.href)} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: isDarkMode ? '#ffffff' : '#000000', '&:hover': { opacity: 0.7 } }}>Login</Typography>
-            <Typography sx={{ opacity: 0.4, fontWeight: 300, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
-            <Typography onClick={() => register(window.location.href)} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: isDarkMode ? '#ffffff' : '#000000', '&:hover': { opacity: 0.7 } }}>Signup</Typography>
-            <Typography sx={{ opacity: 0.4, fontWeight: 300, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
+
+            {isAuthenticated ? (
+              <>
+                <Typography onClick={() => {
+                  if (userInfo?.realm_roles?.includes('super_admin')) {
+                    navigate('/admins');
+                  } else {
+                    navigate('/user');
+                  }
+                }} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: isDarkMode ? '#ffffff' : '#000000', '&:hover': { opacity: 0.7 } }}>Dashboard</Typography>
+                <Typography sx={{ opacity: 0.4, fontWeight: 300, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
+              </>
+            ) : null}
+
+            {/* Categories dropdown */}
+            {gnName && ccode && (
+              <>
+                <Typography
+                  onClick={(e) => setCatMenuAnchor(e.currentTarget as HTMLElement)}
+                  sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: isDarkMode ? '#ffffff' : '#000000', '&:hover': { opacity: 0.7 } }}
+                >
+                  Categories ▾
+                </Typography>
+                <Menu
+                  anchorEl={catMenuAnchor}
+                  open={Boolean(catMenuAnchor)}
+                  onClose={() => setCatMenuAnchor(null)}
+                  PaperProps={{
+                    sx: {
+                      bgcolor: isDarkMode ? 'rgba(15,23,42,0.97)' : 'rgba(255,255,255,0.97)',
+                      backdropFilter: 'blur(12px)',
+                      borderRadius: 3,
+                      minWidth: 230,
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+                      mt: 1,
+                    },
+                  }}
+                >
+                  {CATEGORIES.map((cat) => (
+                    <MenuItem
+                      key={cat.slug}
+                      onClick={() => { setCatMenuAnchor(null); navigate(`/gnpage/${gnName}/${ccode}/${cat.slug}`); }}
+                      sx={{ fontWeight: 500, color: isDarkMode ? '#e2e8f0' : '#1e293b', gap: 1.2, borderRadius: 2, mx: 0.5, my: 0.2 }}
+                    >
+                      {cat.name}
+                    </MenuItem>
+                  ))}
+                </Menu>
+                <Typography sx={{ opacity: 0.4, fontWeight: 300, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
+              </>
+            )}
+
+            {isAuthenticated ? (
+              <>
+                <Typography onClick={() => logout()} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: '#ef4444', '&:hover': { opacity: 0.7 } }}>Logout</Typography>
+                <Typography sx={{ opacity: 0.4, fontWeight: 300, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
+                <Typography sx={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, color: isDarkMode ? '#ffffff' : '#000000' }}>
+                  {userInfo?.preferred_username || userInfo?.name || 'User'}
+                </Typography>
+                <Typography sx={{ opacity: 0.4, fontWeight: 300, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
+              </>
+            ) : !isLoading ? (
+              <>
+                <Typography onClick={() => login(window.location.href)} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: isDarkMode ? '#ffffff' : '#000000', '&:hover': { opacity: 0.7 } }}>Login</Typography>
+                <Typography sx={{ opacity: 0.4, fontWeight: 300, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
+                <Typography onClick={() => register(window.location.href)} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: isDarkMode ? '#ffffff' : '#000000', '&:hover': { opacity: 0.7 } }}>Signup</Typography>
+                <Typography sx={{ opacity: 0.4, fontWeight: 300, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
+              </>
+            ) : null}
+
             <Typography onClick={cycleLanguage} sx={{ cursor: 'pointer', textTransform: 'uppercase', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 700, color: themeColors.primary, '&:hover': { opacity: 0.7 } }}>{language}</Typography>
           </Box>
 
@@ -1528,9 +1611,37 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                 }
               }}
             >
-              <MenuItem onClick={() => { handleMobileMenuClose(); navigate('/'); }}>Home</MenuItem>
-              <MenuItem onClick={() => { handleMobileMenuClose(); login(window.location.href); }}>Login</MenuItem>
-              <MenuItem onClick={() => { handleMobileMenuClose(); register(window.location.href); }}>Signup</MenuItem>
+              <MenuItem onClick={() => { handleMobileMenuClose(); navigate(gnName && ccode ? `/gnpage/${gnName}/${ccode}` : '/gnpage'); }}>Home</MenuItem>
+              {isAuthenticated ? (
+                [
+                  <MenuItem key="user" disabled sx={{ color: isDarkMode ? '#ffffff' : '#000000', fontWeight: 'bold' }}>
+                    Welcome, {userInfo?.preferred_username || userInfo?.name || 'User'}
+                  </MenuItem>,
+                  <MenuItem key="dash" onClick={() => { 
+                    handleMobileMenuClose(); 
+                    if (userInfo?.realm_roles?.includes('super_admin')) {
+                      navigate('/admins');
+                    } else {
+                      navigate('/user');
+                    }
+                  }}>Dashboard</MenuItem>,
+                  <MenuItem key="logout" onClick={() => { handleMobileMenuClose(); logout(); }} sx={{ color: '#ef4444' }}>Logout</MenuItem>,
+                  ...(gnName && ccode ? [
+                    <Divider key="cat-divider" />,
+                    <MenuItem key="cat-header" disabled sx={{ fontWeight: 700, fontSize: '0.8rem', opacity: 0.6 }}>Categories</MenuItem>,
+                    ...CATEGORIES.map((cat) => (
+                      <MenuItem key={cat.slug} onClick={() => { handleMobileMenuClose(); navigate(`/gnpage/${gnName}/${ccode}/${cat.slug}`); }}>
+                        {cat.name}
+                      </MenuItem>
+                    ))
+                  ] : [])
+                ]
+              ) : !isLoading ? (
+                [
+                  <MenuItem key="login" onClick={() => { handleMobileMenuClose(); login(window.location.href); }}>Login</MenuItem>,
+                  <MenuItem key="signup" onClick={() => { handleMobileMenuClose(); register(window.location.href); }}>Signup</MenuItem>
+                ]
+              ) : null}
               <Divider />
               <MenuItem onClick={() => { handleMobileMenuClose(); cycleLanguage(); }} sx={{ fontWeight: 'bold', color: themeColors.primary }}>Language: {language.toUpperCase()}</MenuItem>
             </Menu>
@@ -2563,8 +2674,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
               </Container>
             </Box>
           )}
-
-          {hasOwnershipData && (
+                  {hasOwnershipData && (
             <Box id="chart-ownership">
             <HousingOwnershipChart
               data={housingOwnershipData || undefined}
@@ -2727,68 +2837,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         </>
       )}
 
-      {/* Footer */}
-      <Box sx={{
-        bgcolor: '#0f172a',
-        color: '#e2e8f0',
-        py: { xs: 6, md: 8 },
-        borderTop: '1px solid rgba(255,255,255,0.1)',
-        mt: 8,
-      }}>
-        <Container maxWidth="xl">
-          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'center', md: 'flex-start' }, gap: 6 }}>
-            {/* Branding */}
-            <Box sx={{ textAlign: { xs: 'center', md: 'left' }, maxWidth: 400 }}>
-              <Typography variant="h4" sx={{ fontWeight: 800, fontFamily: "'Playfair Display', serif", color: '#ffffff', mb: 2 }}>
-                Ceylonica
-              </Typography>
-              <Typography variant="body1" sx={{ color: '#94a3b8', lineHeight: 1.6 }}>
-                {t.footerDesc}
-              </Typography>
-            </Box>
-            
-            {/* Links / Info */}
-            <Box sx={{ display: 'flex', gap: { xs: 4, md: 10 }, textAlign: { xs: 'center', md: 'left' } }}>
-              <Box>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#ffffff', mb: 3, textTransform: 'uppercase', letterSpacing: 1.5 }}>
-                  {t.footerInsights}
-                </Typography>
-                <Typography variant="body2" sx={{ color: '#94a3b8', mb: 1.5, cursor: 'pointer', transition: 'color 0.2s', '&:hover': { color: '#38bdf8' } }}>{t.footerDemographics}</Typography>
-                <Typography variant="body2" sx={{ color: '#94a3b8', mb: 1.5, cursor: 'pointer', transition: 'color 0.2s', '&:hover': { color: '#38bdf8' } }}>{t.footerHousing}</Typography>
-                <Typography variant="body2" sx={{ color: '#94a3b8', mb: 1.5, cursor: 'pointer', transition: 'color 0.2s', '&:hover': { color: '#38bdf8' } }}>{t.footerEconomy}</Typography>
-              </Box>
-              <Box>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#ffffff', mb: 3, textTransform: 'uppercase', letterSpacing: 1.5 }}>
-                  {t.footerPlatform}
-                </Typography>
-                <Typography variant="body2" sx={{ color: '#94a3b8', mb: 1.5, cursor: 'pointer', transition: 'color 0.2s', '&:hover': { color: '#38bdf8' } }}>{t.footerAbout}</Typography>
-                <Typography variant="body2" sx={{ color: '#94a3b8', mb: 1.5, cursor: 'pointer', transition: 'color 0.2s', '&:hover': { color: '#38bdf8' } }}>{t.footerMethodology}</Typography>
-                <Typography variant="body2" sx={{ color: '#94a3b8', mb: 1.5, cursor: 'pointer', transition: 'color 0.2s', '&:hover': { color: '#38bdf8' } }}>{t.footerPrivacy}</Typography>
-              </Box>
-            </Box>
-          </Box>
-          
-          <Box sx={{ 
-            mt: 8, 
-            pt: 4, 
-            borderTop: '1px solid rgba(255,255,255,0.05)', 
-            display: 'flex', 
-            flexDirection: { xs: 'column', md: 'row' }, 
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: 2
-          }}>
-            <Typography variant="body2" sx={{ color: '#64748b' }}>
-              &copy; {new Date().getFullYear()} {t.footerRights}
-            </Typography>
-            <Typography variant="body2" sx={{ color: '#475569', fontSize: '0.8rem' }}>
-              {t.footerDesigned}
-            </Typography>
-          </Box>
-        </Container>
-      </Box>
+      {/* ── Footer ─────────────────────────────────────────────────────── */}
+      <GnPageFooter isDarkMode={isDarkMode} />
 
-      {/* Scroll to Top FAB */}
       <Fade in={trigger}>
         <Box
           role="presentation"

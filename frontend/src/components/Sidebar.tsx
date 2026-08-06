@@ -13,6 +13,7 @@ import {
   Chip,
   Tooltip,
   IconButton,
+  useTheme,
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
@@ -35,8 +36,8 @@ const DRAWER_WIDTH = 280;
 const COLLAPSED_WIDTH = 70;
 
 const navItems = [
-  { label: 'Dashboard', icon: <DashboardIcon />, path: '/' },
-  { label: 'Admins', icon: <AdminsIcon />, path: '/admins', roles: ['super_admin', 'admin'] },
+  { label: 'Home', icon: <DashboardIcon />, path: '/gnpage' },
+  { label: 'sdashbord', icon: <AdminsIcon />, path: '/admins', roles: ['super_admin', 'admin'] },
   { label: 'Users', icon: <UsersIcon />, path: '/users', roles: ['super_admin', 'admin', 'moderator'] },
   { label: 'Questions', icon: <QuestionsIcon />, path: '/questions', roles: ['super_admin', 'admin', 'moderator'] },
   { label: 'Reports', icon: <ReportsIcon />, path: '/reports', roles: ['super_admin', 'admin', 'moderator'] },
@@ -58,9 +59,22 @@ const roleColors: Record<string, 'primary' | 'success' | 'warning'> = {
 };
 
 const Sidebar: React.FC = () => {
+  const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const { userInfo } = useAuth();
+  
+  const handleNavigation = (itemPath: string) => {
+    if (itemPath === '/gnpage') {
+      // Read the last visited GN URL saved when user was on a GN page
+      const lastGnUrl = localStorage.getItem('last_gn_url');
+      if (lastGnUrl) {
+        navigate(lastGnUrl);
+        return;
+      }
+    }
+    navigate(itemPath);
+  };
   const [collapsed, setCollapsed] = useState(false);
 
   const role = userInfo?.realm_roles?.find((r) =>
@@ -211,7 +225,7 @@ const Sidebar: React.FC = () => {
               <Tooltip title={collapsed ? item.label : ''} placement="right">
                 <ListItemButton
                   selected={isActive}
-                  onClick={() => navigate(item.path)}
+                  onClick={() => handleNavigation(item.path)}
                   sx={{
                     justifyContent: collapsed ? 'center' : 'flex-start',
                     px: collapsed ? 2.5 : 2,

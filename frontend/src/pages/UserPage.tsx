@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Container, Button, Grid, Card, CardActionArea, CardMedia, CardContent, CircularProgress, Chip, Avatar, Fade, Stack, Paper } from '@mui/material';
+import { Box, Typography, Container, Button, Grid, Card, CardActionArea, CardMedia, CardContent, CircularProgress, Chip, Avatar, Fade, Stack, Paper, IconButton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import LocationSelectorModal from '../components/LocationSelectorModal';
@@ -16,11 +16,11 @@ const UserPage: React.FC = () => {
   const { userInfo, logout } = useAuth();
   const navigate = useNavigate();
   const [selectedLocation, setSelectedLocation] = useState<any>(() => {
-    const saved = sessionStorage.getItem('user_selected_location');
+    const saved = sessionStorage.getItem('user_selected_location') || localStorage.getItem('user_selected_location');
     return saved ? JSON.parse(saved) : null;
   });
   const [showLocationModal, setShowLocationModal] = useState<boolean>(() => {
-    const saved = sessionStorage.getItem('user_selected_location');
+    const saved = sessionStorage.getItem('user_selected_location') || localStorage.getItem('user_selected_location');
     return !saved;
   });
 
@@ -29,6 +29,7 @@ const UserPage: React.FC = () => {
   const handleLocationSelected = (gn: any) => {
     setSelectedLocation(gn);
     sessionStorage.setItem('user_selected_location', JSON.stringify(gn));
+    localStorage.setItem('user_selected_location', JSON.stringify(gn)); // persist across sessions
     setShowLocationModal(false);
   };
 
@@ -50,12 +51,73 @@ const UserPage: React.FC = () => {
         flexDirection: 'column', 
         alignItems: 'center', 
         justifyContent: 'flex-start',
-        pt: 8,
+        pt: 12,
         pb: 12,
         background: 'linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%)', // Premium modern slate-blue gradient
         fontFamily: "'Inter', sans-serif"
       }}
     >
+      <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 3 }, display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, pointerEvents: 'none' }}>
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexWrap: 'wrap',
+          gap: { xs: 1.5, sm: 3 },
+          pointerEvents: 'auto',
+          bgcolor: 'rgba(255,255,255,0.6)',
+          backdropFilter: 'blur(10px)',
+          px: { xs: 2, sm: 3 },
+          py: { xs: 1, sm: 1.5 },
+          borderRadius: 30,
+          color: '#000000',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+          maxWidth: '90vw'
+        }}>
+          <Box sx={{ display: 'flex', gap: 0.5 }}>
+            <IconButton
+              onClick={() => {
+                if (selectedLocation) {
+                  navigate(`/gnpage/${encodeURIComponent(selectedLocation.nameEn.replace(/ /g, '-'))}/${encodeURIComponent(selectedLocation.CCODE)}`);
+                } else {
+                  navigate('/gnpage');
+                }
+              }}
+              size="small"
+              sx={{ color: '#000000', p: 0.5, transition: 'transform 0.2s', '&:hover': { transform: 'scale(1.1)' } }}
+            >
+              <ExploreIcon fontSize="small" />
+            </IconButton>
+          </Box>
+          <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 1.5, fontWeight: 600, fontSize: '0.95rem' }}>
+            <Typography 
+              onClick={() => {
+                if (selectedLocation) {
+                  navigate(`/gnpage/${encodeURIComponent(selectedLocation.nameEn.replace(/ /g, '-'))}/${encodeURIComponent(selectedLocation.CCODE)}`);
+                } else {
+                  navigate('/gnpage');
+                }
+              }} 
+              sx={{ cursor: 'pointer', transition: 'opacity 0.2s', '&:hover': { opacity: 0.7 } }}
+            >
+              Home
+            </Typography>
+            <Typography sx={{ opacity: 0.4, fontWeight: 300 }}>|</Typography>
+            <Typography onClick={() => navigate('/user')} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', '&:hover': { opacity: 0.7 } }}>
+              Dashboard
+            </Typography>
+            <Typography sx={{ opacity: 0.4, fontWeight: 300 }}>|</Typography>
+            <Typography onClick={() => logout()} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', color: '#ef4444', '&:hover': { opacity: 0.7 } }}>
+              Logout
+            </Typography>
+            <Typography sx={{ opacity: 0.4, fontWeight: 300 }}>|</Typography>
+            <Typography sx={{ fontWeight: 600 }}>
+              {userInfo?.preferred_username || userInfo?.name || 'User'}
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
+
       <Container maxWidth="md">
         <Fade in timeout={800}>
           <Paper 

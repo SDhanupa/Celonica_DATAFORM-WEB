@@ -46,6 +46,20 @@ class CommonQuestionsSeeder extends Seeder
                 'is_repeater' => false,
                 'sort_order' => 2,
             ]);
+
+            // Third common question: Address
+            Question::updateOrCreate([
+                'category_id' => $category->id,
+                'question_text_en' => 'Address',
+            ], [
+                'section' => 'General',
+                'question_text_si' => 'ලිපිනය',
+                'question_text_ta' => 'முகவரி',
+                'input_type' => 'textarea',
+                'is_active' => true,
+                'is_repeater' => false,
+                'sort_order' => 3,
+            ]);
         }
     }
 }

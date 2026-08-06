@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import keycloak from './keycloak';
+import { useApolloClient, gql } from '@apollo/client';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -23,11 +24,22 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
+const SYNC_USER_MUTATION = gql`
+  mutation SyncUser {
+    syncUser {
+      id
+      keycloak_sub
+      name
+    }
+  }
+`;
+
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userInfo, setUserInfo] = useState<AuthContextType['userInfo']>(null);
   const isRun = React.useRef(false);
+  const apolloClient = useApolloClient();
 
   useEffect(() => {
     if (isRun.current) return;
@@ -50,6 +62,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             preferred_username: keycloak.tokenParsed['preferred_username'],
             realm_roles: keycloak.tokenParsed['realm_access']?.roles || [],
           });
+
+          // Automatically sync user to local database
+          apolloClient.mutate({
+            mutation: SYNC_USER_MUTATION,
+          }).catch((err) => console.error('Failed to sync user with DB:', err));
         }
         setIsLoading(false);
       })

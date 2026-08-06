@@ -127,6 +127,14 @@ type Query {
     postOfficesByDistrict(district: String!): [PostOffice!]!
         @field(resolver: "App\\GraphQL\\Queries\\PostOfficeQueries@postOfficesByDistrict")
 
+    "Get police station for a GN division by its CCODE"
+    policeByGnCcode(ccode: String!): Police
+        @field(resolver: "App\\GraphQL\\Queries\\PoliceQueries@policeByGnCcode")
+
+    "Get post offices by DS division code or district name"
+    postOfficesByDsCode(gnName: String, dsName: String, dsCode: String, district: String): [PostOffice!]!
+        @field(resolver: "App\\GraphQL\\Queries\\PoliceQueries@postOfficesByDsCode")
+
     "Get PHI areas filtered by district"
     phiAreasByDistrict(district: String!): [PhiArea!]!
         @field(resolver: "App\\GraphQL\\Queries\\PhiAreaQueries@phiAreasByDistrict")
@@ -223,6 +231,10 @@ type Mutation {
         role: String! # USER, ADMIN, SUPER_ADMIN
     ): Boolean!
         @field(resolver: "App\\GraphQL\\Mutations\\UserMutations@registerUser")
+
+    "Sync a Keycloak user to the local database"
+    syncUser: User!
+        @field(resolver: "App\\GraphQL\\Mutations\\UserMutations@syncUser")
 
     "Complete onboarding for a first-time Keycloak user"
     completeUserOnboarding(

@@ -24,7 +24,7 @@ import {
   PersonAdd as PersonAddIcon,
   CloudUpload as CloudUploadIcon,
 } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import { useQuery } from '@apollo/client';
 import { GET_ME, GET_DASHBOARD_STATS } from '../graphql/queries';
@@ -126,6 +126,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, subtitle, icon, color
 const DashboardPage: React.FC = () => {
   const { userInfo } = useAuth();
   const navigate = useNavigate();
+  const { gnName, ccode } = useParams<{ gnName: string; ccode: string }>();
   const { data, refetch } = useQuery(GET_ME, { errorPolicy: 'ignore' });
   const { data: statsData } = useQuery(GET_DASHBOARD_STATS, { 
     errorPolicy: 'ignore', 
@@ -146,10 +147,11 @@ const DashboardPage: React.FC = () => {
   const roles = userInfo?.realm_roles || [];
   const isAdmin = roles.includes('super_admin') || roles.includes('admin') || roles.includes('moderator');
 
-  if (!isAdmin) {
+  // If visiting a specific GN page (e.g. /gnpage/Pahalagama/RATPA), ALWAYS show the GN data page
+  // regardless of admin status - admins should be able to view any GN page too
+  if (!isAdmin || (gnName && ccode)) {
     return (
       <Box>
-        <TopNavbar />
         <UserDashboard user={data?.me || data?.meUser || userInfo} />
       </Box>
     );

@@ -8,7 +8,7 @@ import logoImg from '../assets/logo.png';
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isAuthenticated, userInfo, logout } = useAuth();
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   const handleEnterSystem = () => {
@@ -21,6 +21,14 @@ const LandingPage: React.FC = () => {
 
   const handleLogin = () => {
     login(window.location.origin + '/user');
+  };
+
+  const handleDashboardClick = () => {
+    if (userInfo?.realm_roles?.includes('super_admin')) {
+      navigate('/admins');
+    } else {
+      navigate('/user');
+    }
   };
 
   return (
@@ -144,34 +152,94 @@ const LandingPage: React.FC = () => {
             Your Own Village Community Information Platform <br/> ඔබේම ගමේ ප්‍රජා තොරතුරු වේදිකාව
           </Button>
 
-          <Button
-            variant="outlined"
-            size="large"
-            onClick={handleLogin}
-            sx={{
-              background: 'rgba(0, 0, 0, 0.4)',
-              color: 'white',
-              backdropFilter: 'blur(5px)',
-              px: { xs: 2, sm: 4, md: 6 },
-              py: { xs: 1, md: 1.5 },
-              borderRadius: '50px',
-              fontSize: { xs: '0.95rem', sm: '1.1rem', md: '1.3rem' },
-              fontWeight: 700,
-              textTransform: 'none',
-              border: '2px solid rgba(255,255,255,0.5)',
-              transition: 'all 0.3s ease',
-              width: { xs: '100%', sm: 'auto' },
-              maxWidth: '400px',
-              '&:hover': {
-                background: 'rgba(0, 0, 0, 0.6)',
-                border: '2px solid #FBBF24',
-                color: '#FBBF24',
-                transform: 'translateY(-3px) scale(1.02)',
-              },
-            }}
-          >
-            එන්න අපි ගම ගොඩනගමු
-          </Button>
+          {isAuthenticated ? (
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
+              <Typography sx={{ color: 'white', fontWeight: 600, fontSize: { xs: '1rem', md: '1.2rem' }, textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}>
+                Welcome, {userInfo?.preferred_username || userInfo?.name || 'User'}!
+              </Typography>
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={handleDashboardClick}
+                sx={{
+                  background: 'rgba(0, 0, 0, 0.4)',
+                  color: 'white',
+                  backdropFilter: 'blur(5px)',
+                  px: { xs: 2, sm: 3, md: 4 },
+                  py: { xs: 1, md: 1.2 },
+                  borderRadius: '50px',
+                  fontSize: { xs: '0.95rem', sm: '1rem', md: '1.1rem' },
+                  fontWeight: 700,
+                  textTransform: 'none',
+                  border: '2px solid rgba(255,255,255,0.5)',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    background: 'rgba(0, 0, 0, 0.6)',
+                    border: '2px solid #FBBF24',
+                    color: '#FBBF24',
+                    transform: 'translateY(-3px) scale(1.02)',
+                  },
+                }}
+              >
+                Dashboard
+              </Button>
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={() => logout()}
+                sx={{
+                  background: 'rgba(220, 38, 38, 0.4)',
+                  color: 'white',
+                  backdropFilter: 'blur(5px)',
+                  px: { xs: 2, sm: 3, md: 4 },
+                  py: { xs: 1, md: 1.2 },
+                  borderRadius: '50px',
+                  fontSize: { xs: '0.95rem', sm: '1rem', md: '1.1rem' },
+                  fontWeight: 700,
+                  textTransform: 'none',
+                  border: '2px solid rgba(255,255,255,0.5)',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    background: 'rgba(220, 38, 38, 0.6)',
+                    borderColor: '#fca5a5',
+                    color: '#fca5a5',
+                    transform: 'translateY(-3px) scale(1.02)',
+                  },
+                }}
+              >
+                Logout
+              </Button>
+            </Box>
+          ) : (
+            <Button
+              variant="outlined"
+              size="large"
+              onClick={handleLogin}
+              sx={{
+                background: 'rgba(0, 0, 0, 0.4)',
+                color: 'white',
+                backdropFilter: 'blur(5px)',
+                px: { xs: 2, sm: 4, md: 6 },
+                py: { xs: 1, md: 1.5 },
+                borderRadius: '50px',
+                fontSize: { xs: '0.95rem', sm: '1.1rem', md: '1.3rem' },
+                fontWeight: 700,
+                textTransform: 'none',
+                border: '2px solid rgba(255,255,255,0.5)',
+                transition: 'all 0.3s ease',
+                width: { xs: '100%', sm: 'auto' },
+                maxWidth: '400px',
+                '&:hover': {
+                  background: 'rgba(0, 0, 0, 0.6)',
+                  border: '2px solid #FBBF24',
+                  color: '#FBBF24',
+                  transform: 'translateY(-3px) scale(1.02)',
+                },
+              }}
+            >
+              එන්න අපි ගම ගොඩනගමු
+            </Button>
+          )}
         </Box>
 
       </Container>
