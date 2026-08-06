@@ -15,9 +15,26 @@ class CategorySubmissionMutations
     public function submit($_, array $args)
     {
         $user = request()->get('current_user');
+        $admin = request()->get('current_admin');
         
-        if (!$user) {
+        if (!$user && !$admin) {
             throw new Exception("Unauthorized. Please log in to submit data.");
+        }
+
+        $userId = null;
+        if ($user) {
+            $userId = $user->id;
+        } else if ($admin) {
+            $matchedUser = User::where('keycloak_sub', $admin->keycloak_sub)->orWhere('email', $admin->email)->first();
+            if (!$matchedUser) {
+                $matchedUser = User::create([
+                    'name' => $admin->name ?? 'Admin',
+                    'email' => $admin->email,
+                    'password' => bcrypt(\Illuminate\Support\Str::random(16)),
+                    'keycloak_sub' => $admin->keycloak_sub,
+                ]);
+            }
+            $userId = $matchedUser->id;
         }
 
         $category = Category::find($args['category_id']);
@@ -33,7 +50,7 @@ class CategorySubmissionMutations
         
         $submission = CategorySubmission::create([
             'category_id' => $args['category_id'],
-            'user_id' => $user->id,
+            'user_id' => $userId,
             'district' => $args['district'] ?? null,
             'ds_division' => $args['ds_division'] ?? null,
             'gn_name' => $args['gn_name'] ?? null,
