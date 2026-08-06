@@ -35,17 +35,17 @@ type DashboardStats {
 
 type User {
     id: ID!
-    keycloakSub: String! @rename(attribute: "keycloak_sub")
-    email: String!
-    name: String!
-    firstName: String! @rename(attribute: "first_name")
-    lastName: String! @rename(attribute: "last_name")
+    keycloakSub: String @rename(attribute: "keycloak_sub")
+    email: String
+    name: String
+    firstName: String @rename(attribute: "first_name")
+    lastName: String @rename(attribute: "last_name")
     nic: String
     mobileNumber: String @rename(attribute: "mobile_number")
     address: String
     dob: String
     gender: String
-    createdAt: DateTime! @rename(attribute: "created_at")
+    createdAt: DateTime @rename(attribute: "created_at")
     updatedAt: DateTime @rename(attribute: "updated_at")
 }
 
