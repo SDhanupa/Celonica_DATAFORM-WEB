@@ -12,11 +12,21 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('keycloak_sub')->unique()->nullable()->after('id')->comment('Keycloak user subject ID');
-            $table->string('first_name')->after('name');
-            $table->string('last_name')->after('first_name');
-            $table->string('nic')->unique()->after('last_name');
-            $table->string('mobile_number')->after('nic');
+            if (!Schema::hasColumn('users', 'keycloak_sub')) {
+                $table->string('keycloak_sub')->unique()->nullable()->after('id')->comment('Keycloak user subject ID');
+            }
+            if (!Schema::hasColumn('users', 'first_name')) {
+                $table->string('first_name')->nullable()->after('name');
+            }
+            if (!Schema::hasColumn('users', 'last_name')) {
+                $table->string('last_name')->nullable()->after('first_name');
+            }
+            if (!Schema::hasColumn('users', 'nic')) {
+                $table->string('nic')->unique()->nullable()->after('last_name');
+            }
+            if (!Schema::hasColumn('users', 'mobile_number')) {
+                $table->string('mobile_number')->nullable()->after('nic');
+            }
         });
     }
 
