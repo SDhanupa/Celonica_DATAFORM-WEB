@@ -52,14 +52,19 @@ class UserMutations
                 }
                 return User::create([
                     'name' => $admin->name ?? 'Admin User',
+                    'first_name' => $admin->first_name ?? ($admin->name ?? 'Admin'),
+                    'last_name' => $admin->last_name ?? 'User',
                     'email' => $admin->email ?? ('admin_' . uniqid() . '@celonica.local'),
                     'password' => bcrypt(\Illuminate\Support\Str::random(16)),
                     'keycloak_sub' => $admin->keycloak_sub ?? null,
+                    'nic' => null,
+                    'mobile_number' => null,
                 ]);
             }
 
             if (!$sub) {
-                return User::first() ?? new User();
+                Log::warning('syncUser: no sub or user found, returning null');
+                return null;
             }
 
             $email = $request->get('keycloak_email');
@@ -86,12 +91,19 @@ class UserMutations
             return User::create([
                 'email' => $email,
                 'name' => trim("$firstName $lastName"),
+                'first_name' => $firstName,
+                'last_name' => $lastName,
                 'password' => bcrypt(\Illuminate\Support\Str::random(16)),
                 'keycloak_sub' => $sub,
+                'nic' => null,
+                'mobile_number' => null,
             ]);
         } catch (\Throwable $e) {
-            Log::error('syncUser error caught', ['exception' => $e->getMessage()]);
-            return User::first() ?? new User(['name' => 'Guest']);
+            Log::error('syncUser error caught: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            // Return null safely - schema is now nullable (syncUser: User)
+            return null;
         }
     }
 

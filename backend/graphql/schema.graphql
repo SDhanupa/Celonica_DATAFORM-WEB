@@ -262,7 +262,7 @@ type Mutation {
         @field(resolver: "App\\GraphQL\\Mutations\\UserMutations@registerUser")
 
     "Sync a Keycloak user to the local database"
-    syncUser: User!
+    syncUser: User
         @field(resolver: "App\\GraphQL\\Mutations\\UserMutations@syncUser")
 
     "Submit new data to a category with GPS"
