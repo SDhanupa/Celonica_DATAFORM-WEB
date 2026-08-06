@@ -75,6 +75,23 @@ type UserAnswer {
     updatedAt: DateTime @rename(attribute: "updated_at")
 }
 
+type CategorySubmission {
+    id: ID!
+    category: Category! @belongsTo
+    user: User! @belongsTo
+    district: String
+    ds_division: String
+    gn_name: String
+    gn_code: String
+    latitude: Float
+    longitude: Float
+    generated_code: String
+    answers_data: String # We'll return the JSON as a string
+    status: String!
+    created_at: String!
+    updated_at: String!
+}
+
 type Query {
     "Get the currently authenticated admin"
     me: Admin
@@ -122,6 +139,18 @@ type Query {
     "Get all answers for questions in a specific category"
     categoryAnswers(categoryId: ID!): [UserAnswer!]!
         @field(resolver: "App\\GraphQL\\Queries\\QuestionQueries@categoryAnswers")
+
+    "Get pending submissions for a category (Admin)"
+    pendingSubmissionsByCategory(category_id: ID!): [CategorySubmission!]! 
+        @field(resolver: "App\\GraphQL\\Queries\\CategorySubmissionQueries@pending")
+
+    "Get all submissions for a category with optional status filter (Admin)"
+    allSubmissionsByCategory(category_id: ID!, status: String): [CategorySubmission!]! 
+        @field(resolver: "App\\GraphQL\\Queries\\CategorySubmissionQueries@all")
+
+    "Get approved submissions for a specific GN and Category (Public)"
+    approvedSubmissions(gn_code: String!, category_id: ID!): [CategorySubmission!]! 
+        @field(resolver: "App\\GraphQL\\Queries\\CategorySubmissionQueries@approved")
 
     "Get post offices filtered by district"
     postOfficesByDistrict(district: String!): [PostOffice!]!
@@ -235,6 +264,26 @@ type Mutation {
     "Sync a Keycloak user to the local database"
     syncUser: User!
         @field(resolver: "App\\GraphQL\\Mutations\\UserMutations@syncUser")
+
+    "Submit new data to a category with GPS"
+    submitCategoryData(
+        category_id: ID!
+        district: String
+        ds_division: String
+        gn_name: String
+        gn_code: String
+        latitude: Float
+        longitude: Float
+        answers_data: String
+    ): CategorySubmission!
+        @field(resolver: "App\\GraphQL\\Mutations\\CategorySubmissionMutations@submit")
+    
+    "Approve or reject a category submission (Super Admin)"
+    approveCategorySubmission(
+        id: ID!
+        status: String! # approved or rejected
+    ): CategorySubmission!
+        @field(resolver: "App\\GraphQL\\Mutations\\CategorySubmissionMutations@approve")
 
     "Complete onboarding for a first-time Keycloak user"
     completeUserOnboarding(

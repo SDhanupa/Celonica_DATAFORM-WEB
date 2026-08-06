@@ -147,109 +147,17 @@ const DashboardPage: React.FC = () => {
   const roles = userInfo?.realm_roles || [];
   const isAdmin = roles.includes('super_admin') || roles.includes('admin') || roles.includes('moderator');
 
-  // If visiting a specific GN page (e.g. /gnpage/Pahalagama/RATPA), ALWAYS show the GN data page
-  // regardless of admin status - admins should be able to view any GN page too
-  if (!isAdmin || (gnName && ccode)) {
-    return (
-      <Box>
-        <UserDashboard user={data?.me || data?.meUser || userInfo} />
-      </Box>
-    );
-  }
-
+  // /gnpage is the public census data explorer - ALWAYS show UserDashboard here.
+  // Admins can visit their admin panel via /admins, /users, /approvals, etc.
+  // We only show the admin panel when gnName AND ccode are both missing AND the user
+  // navigated here via an admin route (handled by separate admin-only routes).
+  // On the /gnpage route, always show UserDashboard regardless of role.
   return (
-    <AdminLayout>
-      <Box>
-
-
-      {/* Stats Grid */}
-      <Grid container spacing={3} sx={{ mb: 6 }}>
-        <Grid item xs={12} sm={6} lg={3}>
-          <StatCard
-            title="Total Admins"
-            value={stats.totalAdmins}
-            subtitle={`${stats.activeAdmins} active`}
-            icon={<AdminsIcon sx={{ fontSize: 28 }} />}
-            color="primary"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} lg={3}>
-          <StatCard
-            title="Total Users"
-            value={stats.totalUsers.toLocaleString()}
-            subtitle="Registered accounts"
-            icon={<UsersIcon sx={{ fontSize: 28 }} />}
-            color="success"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} lg={3}>
-          <StatCard
-            title="Questions"
-            value={stats.totalQuestions}
-            subtitle="Published questions"
-            icon={<QuestionsIcon sx={{ fontSize: 28 }} />}
-            color="warning"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} lg={3}>
-          <StatCard
-            title="Reports"
-            value={stats.totalReports}
-            subtitle={`${stats.pendingReports} pending review`}
-            icon={<ReportsIcon sx={{ fontSize: 28 }} />}
-            color="error"
-          />
-        </Grid>
-      </Grid>
-
-      {/* Quick Actions Toolkit */}
-      <Typography variant="h5" color="text.primary" sx={{ fontWeight: 700, mb: 3 }}>
-        Quick Actions
-      </Typography>
-      <Grid container spacing={3}>
-        {[
-          { title: 'Manage Admins', desc: 'Add or remove platform administrators', icon: <PersonAddIcon sx={{ fontSize: 32 }} />, color: '#3b82f6', link: '/admins' },
-          { title: 'Data Uploads', desc: 'Bulk import datasets and sync records', icon: <CloudUploadIcon sx={{ fontSize: 32 }} />, color: '#10b981', link: '/districts' },
-          { title: 'System Reports', desc: 'Generate platform usage analytics', icon: <AssessmentIcon sx={{ fontSize: 32 }} />, color: '#f59e0b', link: '/reports' },
-          { title: 'Global Settings', desc: 'Configure platform-wide preferences', icon: <SettingsIcon sx={{ fontSize: 32 }} />, color: '#6366f1', link: '#' },
-        ].map((action, idx) => (
-          <Grid item xs={12} sm={6} md={3} key={idx}>
-            <Card 
-              onClick={() => action.link !== '#' && navigate(action.link)}
-              sx={{ 
-                height: '100%', 
-                cursor: 'pointer',
-                borderRadius: 4,
-                border: '1px solid',
-                borderColor: 'divider',
-                boxShadow: 'none',
-                transition: 'all 0.2s',
-                '&:hover': {
-                  borderColor: action.color,
-                  boxShadow: `0 4px 20px ${action.color}20`,
-                  transform: 'translateY(-4px)'
-                }
-              }}
-            >
-              <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
-                <Box sx={{ width: 56, height: 56, borderRadius: 3, bgcolor: `${action.color}15`, color: action.color, display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-                  {action.icon}
-                </Box>
-                <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, fontSize: '1.05rem' }}>
-                  {action.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ flexGrow: 1 }}>
-                  {action.desc}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-
-      </Box>
-    </AdminLayout>
+    <Box>
+      <UserDashboard user={data?.me || data?.meUser || userInfo} />
+    </Box>
   );
+
 };
 
 export default DashboardPage;

@@ -28,7 +28,7 @@ const SYNC_USER_MUTATION = gql`
   mutation SyncUser {
     syncUser {
       id
-      keycloak_sub
+      keycloakSub
       name
     }
   }

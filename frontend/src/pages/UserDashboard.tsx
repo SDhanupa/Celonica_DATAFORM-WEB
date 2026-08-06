@@ -21,6 +21,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { CATEGORIES } from './CategoryDetailPage';
 import GnPageFooter from '../components/GnPageFooter';
+import LocationSelectorModal from '../components/LocationSelectorModal';
 
 
 const tChart = {
@@ -1508,7 +1509,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
               {isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
             </IconButton>
             <IconButton
-              onClick={() => navigate('/gnpage')}
+              onClick={() => setShowLocationModal(true)}
               size="small"
               sx={{ color: isDarkMode ? '#ffffff' : '#000000', p: 0.5, transition: 'transform 0.2s', '&:hover': { transform: 'scale(1.1)' } }}
             >
@@ -1929,7 +1930,19 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         <DialogActions sx={{ p: 3, pt: 1, justifyContent: 'center' }}>
           <Button
             variant="contained"
-            onClick={() => setShowLocationModal(false)}
+            onClick={() => {
+              // Determine which GN was selected
+              let loadedGn: any = null;
+              if (!showManualForm && activeGn) {
+                loadedGn = activeGn;
+              } else if (showManualForm && selectedGN && gnData?.pDistrict?.gramaNiladharis) {
+                loadedGn = gnData.pDistrict.gramaNiladharis.find((x: any) => x.id === selectedGN);
+              }
+              setShowLocationModal(false);
+              if (loadedGn && loadedGn.CCODE && loadedGn.nameEn) {
+                navigate(`/gnpage/${encodeURIComponent(loadedGn.nameEn.replace(/ /g, '-'))}/${encodeURIComponent(loadedGn.CCODE)}`);
+              }
+            }}
             disabled={!canContinue}
             sx={{
               background: canContinue ? 'linear-gradient(135deg, #00A8FF 0%, #0070CC 100%)' : undefined,

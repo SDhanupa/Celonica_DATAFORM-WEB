@@ -884,4 +884,139 @@ export const GET_GN_BY_CCODE = gql`
   }
 `;
 
+export const SUBMIT_CATEGORY_DATA = gql`
+  mutation SubmitCategoryData(
+    $categoryId: ID!
+    $district: String
+    $dsDivision: String
+    $gnName: String
+    $gnCode: String
+    $latitude: Float
+    $longitude: Float
+    $answersData: String
+  ) {
+    submitCategoryData(
+      category_id: $categoryId
+      district: $district
+      ds_division: $dsDivision
+      gn_name: $gnName
+      gn_code: $gnCode
+      latitude: $latitude
+      longitude: $longitude
+      answers_data: $answersData
+    ) {
+      id
+      generated_code
+      status
+    }
+  }
+`;
 
+export const APPROVE_CATEGORY_SUBMISSION = gql`
+  mutation ApproveCategorySubmission($id: ID!, $status: String!) {
+    approveCategorySubmission(id: $id, status: $status) {
+      id
+      status
+    }
+  }
+`;
+
+export const GET_PENDING_SUBMISSIONS = gql`
+  query GetPendingSubmissions($categoryId: ID!) {
+    pendingSubmissionsByCategory(category_id: $categoryId) {
+      id
+      category {
+        id
+        nameEn
+        questions {
+          id
+          questionTextEn
+          questionTextSi
+          questionTextTa
+        }
+      }
+      user {
+        id
+        name
+        email
+      }
+      district
+      ds_division
+      gn_name
+      gn_code
+      latitude
+      longitude
+      generated_code
+      answers_data
+      status
+      created_at
+    }
+  }
+`;
+
+export const GET_ALL_SUBMISSIONS_BY_CATEGORY = gql`
+  query GetAllSubmissionsByCategory($categoryId: ID!, $status: String) {
+    allSubmissionsByCategory(category_id: $categoryId, status: $status) {
+      id
+      category {
+        id
+        nameEn
+        questions {
+          id
+          questionTextEn
+          questionTextSi
+          questionTextTa
+        }
+      }
+      user {
+        id
+        name
+        email
+      }
+      district
+      ds_division
+      gn_name
+      gn_code
+      latitude
+      longitude
+      generated_code
+      answers_data
+      status
+      created_at
+    }
+  }
+`;
+
+export const GET_APPROVED_SUBMISSIONS = gql`
+  query GetApprovedSubmissions($categoryId: ID!, $gnCode: String!) {
+    approvedSubmissions(category_id: $categoryId, gn_code: $gnCode) {
+      id
+      user {
+        id
+        name
+      }
+      category {
+        id
+        nameEn
+        nameSi
+        nameTa
+        questions {
+          id
+          questionTextEn
+          questionTextSi
+          questionTextTa
+          sortOrder
+        }
+      }
+      generated_code
+      answers_data
+      district
+      ds_division
+      gn_name
+      gn_code
+      latitude
+      longitude
+      created_at
+    }
+  }
+`;

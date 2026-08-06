@@ -18,7 +18,7 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 import { useAuth } from '../auth/AuthProvider';
-import { GET_GN_BY_CCODE, GET_POLICE_BY_GN_CCODE, GET_POST_OFFICES_BY_DS_CODE } from '../graphql/queries';
+import { GET_GN_BY_CCODE, GET_POLICE_BY_GN_CCODE, GET_POST_OFFICES_BY_DS_CODE, GET_APPROVED_SUBMISSIONS } from '../graphql/queries';
 import GnPageFooter from '../components/GnPageFooter';
 import { CATEGORIES } from './CategoryDetailPage';
 
@@ -146,6 +146,47 @@ const BoundariesPage: React.FC = () => {
   });
   const postOffices: any[] = postData?.postOfficesByDsCode ?? [];
 
+
+  // ─── Fetch Approved Submissions for Boundaries (root category ID 2) ──────
+  const boundariesDbId = CATEGORIES.find(c => c.slug === 'boundaries')?.dbId || '2';
+  const { data: approvedData, loading: approvedLoading } = useQuery(GET_APPROVED_SUBMISSIONS, {
+    variables: { categoryId: boundariesDbId, gnCode: ccode },
+    skip: !ccode,
+    fetchPolicy: 'cache-and-network',
+  });
+  const approvedSubmissions = approvedData?.approvedSubmissions || [];
+
+  // Parse answers and map question IDs to labels
+  const parseAnswers = (submission: any) => {
+    try {
+      const answersRaw = typeof submission.answers_data === 'string'
+        ? JSON.parse(submission.answers_data)
+        : submission.answers_data;
+      const questions = submission.category?.questions || [];
+      const qMap: Record<string, string> = {};
+      questions.forEach((q: any) => {
+        qMap[String(q.id)] = q.questionTextEn || `Question ${q.id}`;
+      });
+      const parsed: { question: string; answer: string }[] = [];
+      Object.entries(answersRaw).forEach(([key, value]) => {
+        const parts = key.split('_');
+        const qId = parts[0];
+        const iter = parts[1];
+        let label = qMap[qId] || `Question #${qId}`;
+        if (iter && iter !== '1') label += ` (Item #${iter})`;
+        parsed.push({ question: label, answer: String(value) });
+      });
+      return parsed;
+    } catch { return []; }
+  };
+
+  // Group submissions by sub-category
+  const groupedSubs: Record<string, any[]> = {};
+  approvedSubmissions.forEach((sub: any) => {
+    const subCatName = sub.category?.nameEn || 'General';
+    if (!groupedSubs[subCatName]) groupedSubs[subCatName] = [];
+    groupedSubs[subCatName].push(sub);
+  });
 
   // ─── Nav helpers ──────────────────────────────────────────────────────────
   const navTypo = (color?: string) => ({
@@ -540,7 +581,71 @@ const BoundariesPage: React.FC = () => {
                   </Typography>
                 )}
               </SectionCard>
-            </Grid>
+              {/* ── Approved User Submissions ─────────────────────────────── */}
+            {approvedLoading && (
+              <Grid item xs={12}>
+                <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                  <CircularProgress size={28} sx={{ color: isDarkMode ? '#ffffff' : '#000000' }} />
+                </Box>
+              </Grid>
+            )}
+
+            {Object.entries(groupedSubs).map(([subCatName, subs]) => (
+              <Grid item xs={12} key={subCatName}>
+                <SectionCard
+                  icon={<AccountBalanceIcon />}
+                  title={subCatName}
+                  subtitle={`${subs.length} approved record${subs.length !== 1 ? 's' : ''}`}
+                  accentColor={isDarkMode ? '#ffffff' : '#000000'}
+                  card={tc.card}
+                  border={tc.border}
+                >
+                  <Grid container spacing={2}>
+                    {subs.map((sub: any, idx: number) => {
+                      const answers = parseAnswers(sub);
+                      return (
+                        <Grid item xs={12} sm={6} key={sub.id}>
+                          <Paper
+                            elevation={0}
+                            sx={{
+                              bgcolor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                              border: `1px solid ${tc.border}`,
+                              borderRadius: 3,
+                              overflow: 'hidden',
+                              transition: 'all 0.2s',
+                              '&:hover': { boxShadow: '0 8px 24px rgba(0,0,0,0.06)', transform: 'translateY(-2px)' },
+                            }}
+                          >
+                            <Box sx={{ px: 2, py: 1, borderBottom: `1px solid ${tc.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <Typography sx={{ fontSize: '0.78rem', fontWeight: 700, color: isDarkMode ? '#a78bfa' : '#6366f1' }}>#{idx + 1}</Typography>
+                              <Typography sx={{ fontSize: '0.72rem', color: tc.muted }}>{sub.created_at ? new Date(sub.created_at).toLocaleDateString() : ''}</Typography>
+                            </Box>
+                            <TableContainer>
+                              <Table size="small">
+                                <TableBody>
+                                  {answers.map((a, aIdx) => (
+                                    <TableRow key={aIdx} sx={{ '&:last-child td': { borderBottom: 0 } }}>
+                                      <TableCell sx={{ fontWeight: 600, fontSize: '0.8rem', color: tc.muted, width: '40%', borderBottom: `1px solid ${tc.border}`, py: 1.2 }}>
+                                        {a.question}
+                                      </TableCell>
+                                      <TableCell sx={{ fontSize: '0.85rem', color: tc.text, fontWeight: 500, borderBottom: `1px solid ${tc.border}`, py: 1.2, wordBreak: 'break-word' }}>
+                                        {a.answer}
+                                      </TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </TableContainer>
+                          </Paper>
+                        </Grid>
+                      );
+                    })}
+                  </Grid>
+                </SectionCard>
+              </Grid>
+            ))}
+
+          </Grid>
 
 
 

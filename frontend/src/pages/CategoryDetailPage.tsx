@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import {
   Box, Typography, IconButton, Menu, MenuItem, Divider,
-  useTheme, useMediaQuery
+  useTheme, useMediaQuery, CircularProgress, Alert, Paper,
+  Table, TableBody, TableRow, TableCell, TableContainer,
+  Chip, Grid
 } from '@mui/material';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
@@ -9,23 +11,25 @@ import SearchIcon from '@mui/icons-material/Search';
 import MenuIcon from '@mui/icons-material/Menu';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useQuery } from '@apollo/client';
 import { useAuth } from '../auth/AuthProvider';
+import { GET_APPROVED_SUBMISSIONS } from '../graphql/queries';
 import GnPageFooter from '../components/GnPageFooter';
 import BoundariesPage from './BoundariesPage';
 
 // ─── Category Config ─────────────────────────────────────────────────────────
 
 export const CATEGORIES = [
-  { name: 'Boundaries',             slug: 'boundaries',            emoji: '🗺️',  color: '#6366f1' },
-  { name: 'Geographical location',  slug: 'geographical-location', emoji: '🌍',  color: '#0ea5e9' },
-  { name: 'Space',                  slug: 'space',                 emoji: '📐',  color: '#8b5cf6' },
-  { name: 'Land',                   slug: 'land',                  emoji: '🌾',  color: '#22c55e' },
-  { name: 'Building/Land',          slug: 'building-land',         emoji: '🏠',  color: '#f59e0b' },
-  { name: 'Water base spaces',      slug: 'water-base-spaces',     emoji: '💧',  color: '#38bdf8' },
-  { name: 'Road',                   slug: 'road',                  emoji: '🛣️',  color: '#94a3b8' },
-  { name: 'Natural location',       slug: 'natural-location',      emoji: '🏔️',  color: '#10b981' },
-  { name: 'Lines',                  slug: 'lines',                 emoji: '⚡',  color: '#f97316' },
-  { name: 'Flora',                  slug: 'flora',                 emoji: '🌿',  color: '#84cc16' },
+  { name: 'Boundaries',             slug: 'boundaries',            emoji: '🗺️',  color: '#6366f1', dbId: '2' },
+  { name: 'Geographical location',  slug: 'geographical-location', emoji: '🌍',  color: '#0ea5e9', dbId: '2004' },
+  { name: 'Space',                  slug: 'space',                 emoji: '📐',  color: '#8b5cf6', dbId: '230' },
+  { name: 'Land',                   slug: 'land',                  emoji: '🌾',  color: '#22c55e', dbId: '306' },
+  { name: 'Building/Land',          slug: 'building-land',         emoji: '🏠',  color: '#f59e0b', dbId: '1353' },
+  { name: 'Water base spaces',      slug: 'water-base-spaces',     emoji: '💧',  color: '#38bdf8', dbId: '2026' },
+  { name: 'Road',                   slug: 'road',                  emoji: '🛣️',  color: '#94a3b8', dbId: '1877' },
+  { name: 'Natural location',       slug: 'natural-location',      emoji: '🏔️',  color: '#10b981', dbId: '2018' },
+  { name: 'Lines',                  slug: 'lines',                 emoji: '⚡',  color: '#f97316', dbId: '2113' },
+  { name: 'Flora',                  slug: 'flora',                 emoji: '🌿',  color: '#84cc16', dbId: '2122' },
 ];
 
 // ─── Helper ────────────────────────────────────────────────────────────────
@@ -67,8 +71,58 @@ const CategoryDetailPage: React.FC = () => {
   const catName = category?.name ?? categorySlug ?? 'Category';
   const catEmoji = category?.emoji ?? '📋';
   const catColor = category?.color ?? '#4f46e5';
+  const catDbId = category?.dbId ?? '0';
 
   const gnPageUrl = `/gnpage/${gnName}/${ccode}`;
+
+  // Fetch approved submissions for this category + GN
+  const { data: approvedData, loading: approvedLoading, error: approvedError } = useQuery(GET_APPROVED_SUBMISSIONS, {
+    variables: { categoryId: catDbId, gnCode: ccode },
+    skip: !ccode || !catDbId || catDbId === '0',
+    fetchPolicy: 'cache-and-network',
+  });
+
+  const submissions = approvedData?.approvedSubmissions || [];
+
+  // Parse answers and map question IDs to labels
+  const parseAnswers = (submission: any) => {
+    try {
+      const answersRaw = typeof submission.answers_data === 'string'
+        ? JSON.parse(submission.answers_data)
+        : submission.answers_data;
+      const questions = submission.category?.questions || [];
+
+      // Build a map of questionId -> question text
+      const qMap: Record<string, string> = {};
+      questions.forEach((q: any) => {
+        qMap[String(q.id)] = q.questionTextEn || `Question ${q.id}`;
+      });
+
+      // Parse answer keys like "5401_1" -> questionId=5401, index=1
+      Object.entries(answersRaw).forEach(([key, value]) => {
+        const parts = key.split('_');
+        const qId = parts[0];
+        const iter = parts[1];
+        let questionLabel = qMap[qId] || `Question #${qId}`;
+        if (iter && iter !== '1') {
+          questionLabel += ` (Item #${iter})`;
+        }
+        parsed.push({ question: questionLabel, answer: String(value) });
+      });
+
+      return parsed;
+    } catch {
+      return [];
+    }
+  };
+
+  // Group submissions by sub-category name
+  const groupedSubmissions: Record<string, any[]> = {};
+  submissions.forEach((sub: any) => {
+    const subCatName = sub.category?.nameEn || 'General';
+    if (!groupedSubmissions[subCatName]) groupedSubmissions[subCatName] = [];
+    groupedSubmissions[subCatName].push(sub);
+  });
 
   const navTypoSx = (color?: string) => ({
     cursor: 'pointer',
@@ -112,171 +166,68 @@ const CategoryDetailPage: React.FC = () => {
             maxWidth: 'max-content'
           }}
         >
-          {/* Dark mode & Search toggle */}
+          {/* Dark mode & Search */}
           <Box sx={{ display: 'flex', gap: 0.5 }}>
-            <IconButton
-              onClick={() => setIsDarkMode(!isDarkMode)}
-              size="small"
-              sx={{ color: isDarkMode ? '#ffffff' : '#000000', p: 0.5 }}
-            >
+            <IconButton onClick={() => setIsDarkMode(d => !d)} size="small" sx={{ color: isDarkMode ? '#fff' : '#000', p: 0.5 }}>
               {isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
             </IconButton>
-            <IconButton
-              onClick={() => navigate('/gnpage')}
-              size="small"
-              sx={{ color: isDarkMode ? '#ffffff' : '#000000', p: 0.5 }}
-            >
+            <IconButton onClick={() => navigate('/gnpage')} size="small" sx={{ color: isDarkMode ? '#fff' : '#000', p: 0.5 }}>
               <SearchIcon fontSize="small" />
             </IconButton>
           </Box>
 
-          {/* Desktop nav */}
-          {!isMobile && (
+          {!isMobile ? (
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1.5, flex: 1, flexWrap: 'wrap' }}>
-              {/* Home */}
-              <Typography onClick={() => navigate(gnPageUrl)} sx={navTypoSx()}>
-                Home
-              </Typography>
+              <Typography onClick={() => navigate(gnPageUrl)} sx={navTypoSx()}>Home</Typography>
               <Typography sx={sepSx}>|</Typography>
 
-              {/* Dashboard */}
               {isAuthenticated && (
                 <>
-                  <Typography
-                    onClick={() => navigate(isSuperAdmin ? '/admins' : '/user')}
-                    sx={navTypoSx()}
-                  >
-                    Dashboard
+                  <Typography onClick={() => isSuperAdmin ? navigate('/admins') : navigate('/user')} sx={navTypoSx()}>
+                    {isSuperAdmin ? 'Dashboard' : 'My Account'}
                   </Typography>
+                  <Typography sx={sepSx}>|</Typography>
+                  <Typography onClick={() => { logout(); navigate('/gnpage'); }} sx={navTypoSx()}>Logout</Typography>
                   <Typography sx={sepSx}>|</Typography>
                 </>
               )}
 
-              {/* Categories dropdown */}
-              <>
-                <Typography
-                  onClick={(e) => setCatMenuAnchor(e.currentTarget as HTMLElement)}
-                  sx={{ ...navTypoSx(), display: 'flex', alignItems: 'center', gap: 0.3 }}
-                >
-                  {catName} ▾
+              {/* Categories Dropdown */}
+              <Typography onClick={(e) => setCatMenuAnchor(e.currentTarget)} sx={{ ...navTypoSx(), display: 'flex', alignItems: 'center', gap: 0.3 }}>
+                Categories ▾
+              </Typography>
+              <Menu anchorEl={catMenuAnchor} open={Boolean(catMenuAnchor)} onClose={() => setCatMenuAnchor(null)} PaperProps={{ sx: { borderRadius: 3, mt: 1, boxShadow: '0 8px 32px rgba(0,0,0,0.12)' } }}>
+                {CATEGORIES.map((cat) => (
+                  <MenuItem key={cat.slug} selected={cat.slug === categorySlug} onClick={() => { setCatMenuAnchor(null); navigate(`/gnpage/${gnName}/${ccode}/${cat.slug}`); }}>
+                    {cat.emoji} {cat.name}
+                  </MenuItem>
+                ))}
+              </Menu>
+
+              {/* Back arrow + GN Name */}
+              <Typography sx={sepSx}>|</Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <IconButton onClick={() => navigate(gnPageUrl)} size="small" sx={{ color: catColor, p: 0.3 }}>
+                  <ArrowBackIcon fontSize="small" />
+                </IconButton>
+                <Typography sx={{ ...navTypoSx(catColor), fontSize: '0.9rem' }}>
+                  {decodeURIComponent(gnName ?? '').replace(/-/g, ' ')}
                 </Typography>
-                <Menu
-                  anchorEl={catMenuAnchor}
-                  open={Boolean(catMenuAnchor)}
-                  onClose={() => setCatMenuAnchor(null)}
-                  PaperProps={{
-                    sx: {
-                      bgcolor: isDarkMode ? 'rgba(15,23,42,0.97)' : 'rgba(255,255,255,0.97)',
-                      backdropFilter: 'blur(12px)',
-                      borderRadius: 3,
-                      minWidth: 220,
-                      boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
-                      mt: 1,
-                    },
-                  }}
-                >
-                  {CATEGORIES.map((cat) => (
-                    <MenuItem
-                      key={cat.slug}
-                      selected={cat.slug === categorySlug}
-                      onClick={() => {
-                        setCatMenuAnchor(null);
-                        navigate(`/gnpage/${gnName}/${ccode}/${cat.slug}`);
-                      }}
-                      sx={{
-                        fontWeight: cat.slug === categorySlug ? 700 : 500,
-                        color: isDarkMode ? '#e2e8f0' : '#1e293b',
-                        gap: 1.2,
-                        borderRadius: 2,
-                        mx: 0.5,
-                        my: 0.2,
-                      }}
-                    >
-                      {cat.name}
-                    </MenuItem>
-                  ))}
-                </Menu>
-                <Typography sx={sepSx}>|</Typography>
-              </>
-
-              {/* Auth / User */}
-              {isAuthenticated ? (
-                <>
-                  <Typography onClick={() => logout()} sx={navTypoSx()}>
-                    Logout
-                  </Typography>
-                  <Typography sx={sepSx}>|</Typography>
-                  <Typography sx={{ ...navTypoSx(), fontWeight: 600 }}>
-                    {userInfo?.preferred_username || userInfo?.name || 'User'}
-                  </Typography>
-                  <Typography sx={sepSx}>|</Typography>
-                </>
-              ) : !isLoading ? (
-                <>
-                  <Typography onClick={() => login(window.location.href)} sx={navTypoSx()}>
-                    Login
-                  </Typography>
-                  <Typography sx={sepSx}>|</Typography>
-                  <Typography onClick={() => register(window.location.href)} sx={navTypoSx()}>
-                    Signup
-                  </Typography>
-                  <Typography sx={sepSx}>|</Typography>
-                </>
-              ) : null}
-
-              {/* Back to GN page */}
-              <Typography onClick={() => navigate(gnPageUrl)} sx={navTypoSx()}>
-                <ArrowBackIcon sx={{ fontSize: 14, mr: 0.3, verticalAlign: 'middle' }} />
-                {decodeURIComponent(gnName ?? '').replace(/-/g, ' ')}
-              </Typography>
+              </Box>
             </Box>
-          )}
-
-          {/* Mobile nav */}
-          {isMobile && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 'auto' }}>
-              <Typography sx={{ fontWeight: 700, fontSize: '0.9rem', color: isDarkMode ? '#fff' : '#000' }}>
-                {catName}
-              </Typography>
-              <IconButton onClick={(e) => setMobileMenuAnchor(e.currentTarget)} size="small" sx={{ color: isDarkMode ? '#fff' : '#000' }}>
-                <MenuIcon />
+          ) : (
+            <Box>
+              <IconButton onClick={(e) => setMobileMenuAnchor(e.currentTarget)} size="small" sx={{ color: isDarkMode ? '#fff' : '#000', p: 0.5 }}>
+                <MenuIcon fontSize="small" />
               </IconButton>
-              <Menu
-                anchorEl={mobileMenuAnchor}
-                open={Boolean(mobileMenuAnchor)}
-                onClose={() => setMobileMenuAnchor(null)}
-                PaperProps={{
-                  sx: {
-                    bgcolor: isDarkMode ? 'rgba(15,23,42,0.95)' : 'rgba(255,255,255,0.95)',
-                    backdropFilter: 'blur(10px)',
-                    minWidth: 200,
-                    borderRadius: 2,
-                  },
-                }}
-              >
-                <MenuItem onClick={() => { setMobileMenuAnchor(null); navigate(gnPageUrl); }}>
-                  ← Back to GN page
-                </MenuItem>
+              <Menu anchorEl={mobileMenuAnchor} open={Boolean(mobileMenuAnchor)} onClose={() => setMobileMenuAnchor(null)} PaperProps={{ sx: { borderRadius: 3, minWidth: 200 } }}>
                 <MenuItem onClick={() => { setMobileMenuAnchor(null); navigate(gnPageUrl); }}>Home</MenuItem>
                 {isAuthenticated && (
                   <>
-                    <Divider />
-                    <MenuItem disabled sx={{ fontWeight: 'bold' }}>
-                      Welcome, {userInfo?.preferred_username || 'User'}
+                    <MenuItem onClick={() => { setMobileMenuAnchor(null); isSuperAdmin ? navigate('/admins') : navigate('/user'); }}>
+                      {isSuperAdmin ? 'Dashboard' : 'My Account'}
                     </MenuItem>
-                    <MenuItem onClick={() => { setMobileMenuAnchor(null); navigate(isSuperAdmin ? '/admins' : '/user'); }}>
-                      Dashboard
-                    </MenuItem>
-                    <MenuItem onClick={() => { setMobileMenuAnchor(null); logout(); }} sx={{ color: '#ef4444' }}>
-                      Logout
-                    </MenuItem>
-                  </>
-                )}
-                {!isAuthenticated && !isLoading && (
-                  <>
-                    <Divider />
-                    <MenuItem onClick={() => { setMobileMenuAnchor(null); login(window.location.href); }}>Login</MenuItem>
-                    <MenuItem onClick={() => { setMobileMenuAnchor(null); register(window.location.href); }}>Signup</MenuItem>
+                    <MenuItem onClick={() => { setMobileMenuAnchor(null); logout(); navigate('/gnpage'); }}>Logout</MenuItem>
                   </>
                 )}
                 <>
@@ -298,42 +249,32 @@ const CategoryDetailPage: React.FC = () => {
         </Box>
       </Box>
 
-      {/* ── Main Content ─────────────────────────────────────────────────── */}
+      {/* ── Hero Header ─────────────────────────────────────────────────── */}
       <Box
         sx={{
-          flex: 1,
+          pt: 12,
+          pb: 5,
+          px: 3,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center',
-          py: 10,
-          px: 3,
-          gap: 3,
+          gap: 2,
+          background: `linear-gradient(180deg, ${catColor}15 0%, transparent 100%)`,
         }}
       >
-        {/* GN breadcrumb */}
-        <Typography
-          sx={{
-            fontSize: '0.85rem',
-            color: tc.muted,
-            letterSpacing: '0.5px',
-            textTransform: 'uppercase',
-          }}
-        >
+        <Typography sx={{ fontSize: '0.85rem', color: tc.muted, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
           {decodeURIComponent(gnName ?? '').replace(/-/g, ' ')} / {ccode}
         </Typography>
 
-        {/* Giant emoji */}
-        <Typography sx={{ fontSize: { xs: '5rem', sm: '7rem' }, lineHeight: 1 }}>
+        <Typography sx={{ fontSize: { xs: '3rem', sm: '4rem' }, lineHeight: 1 }}>
           {catEmoji}
         </Typography>
 
-        {/* Category name — test data placeholder */}
         <Typography
           sx={{
             fontFamily: "'Inter', sans-serif",
             fontWeight: 900,
-            fontSize: { xs: '2.5rem', sm: '4rem', md: '5rem' },
+            fontSize: { xs: '2rem', sm: '3rem' },
             background: `linear-gradient(135deg, ${catColor}, ${catColor}99)`,
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
@@ -345,62 +286,136 @@ const CategoryDetailPage: React.FC = () => {
           {catName}
         </Typography>
 
-        {/* Placeholder note */}
-        <Box
+        <Chip
+          label={`${submissions.length} record${submissions.length !== 1 ? 's' : ''}`}
           sx={{
-            mt: 2,
-            px: 3,
-            py: 1.5,
-            borderRadius: 3,
-            bgcolor: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
-            border: `1px solid ${tc.border}`,
+            bgcolor: `${catColor}20`,
+            color: catColor,
+            fontWeight: 700,
+            fontSize: '0.85rem',
+            border: `1px solid ${catColor}30`,
           }}
-        >
-          <Typography sx={{ fontSize: '0.9rem', color: tc.muted, textAlign: 'center' }}>
-            📋 This is a placeholder page for the <strong>{catName}</strong> category.
-            <br />
-            Data for <strong>{decodeURIComponent(ccode ?? '')}</strong> will be shown here once available.
-          </Typography>
-        </Box>
+        />
+      </Box>
 
-        {/* Navigate to other categories (super admin only) */}
-        {isSuperAdmin && (
-          <Box
-            sx={{
-              mt: 4,
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 1.5,
-              justifyContent: 'center',
-              maxWidth: 700,
-            }}
-          >
-            {CATEGORIES.filter((c) => c.slug !== categorySlug).map((cat) => (
-              <Box
-                key={cat.slug}
-                onClick={() => navigate(`/gnpage/${gnName}/${ccode}/${cat.slug}`)}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.8,
-                  px: 2,
-                  py: 1,
-                  borderRadius: 20,
-                  border: `1.5px solid ${cat.color}33`,
-                  bgcolor: `${cat.color}11`,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  '&:hover': { bgcolor: `${cat.color}22`, transform: 'translateY(-1px)' },
-                }}
-              >
-                <Typography sx={{ fontSize: '1rem' }}>{cat.emoji}</Typography>
-                <Typography sx={{ fontSize: '0.83rem', fontWeight: 600, color: cat.color }}>
-                  {cat.name}
-                </Typography>
-              </Box>
-            ))}
+      {/* ── Main Content ─────────────────────────────────────────────────── */}
+      <Box sx={{ flex: 1, px: { xs: 2, sm: 4, md: 6 }, pb: 6, maxWidth: 1200, mx: 'auto', width: '100%' }}>
+
+        {approvedLoading && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+            <CircularProgress sx={{ color: catColor }} />
           </Box>
         )}
+
+        {approvedError && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            Failed to load data. Please try again later.
+          </Alert>
+        )}
+
+        {!approvedLoading && submissions.length === 0 && (
+          <Box sx={{ textAlign: 'center', py: 8 }}>
+            <Typography sx={{ fontSize: '3rem', mb: 2 }}>📭</Typography>
+            <Typography sx={{ fontSize: '1.1rem', color: tc.muted, fontWeight: 500 }}>
+              No approved data yet for <strong>{catName}</strong> in this GN division.
+            </Typography>
+          </Box>
+        )}
+
+        {/* Render grouped submissions */}
+        {Object.entries(groupedSubmissions).map(([subCatName, subs]) => (
+          <Box key={subCatName} sx={{ mb: 5 }}>
+            {/* Sub-category header */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+              <Box sx={{ width: 4, height: 28, borderRadius: 2, bgcolor: catColor }} />
+              <Typography sx={{ fontWeight: 800, fontSize: '1.2rem', color: tc.text, fontFamily: "'Inter', sans-serif" }}>
+                {subCatName}
+              </Typography>
+              <Chip label={`${subs.length}`} size="small" sx={{ bgcolor: `${catColor}15`, color: catColor, fontWeight: 700, fontSize: '0.75rem' }} />
+            </Box>
+
+            {/* Each submission as a card */}
+            <Grid container spacing={3}>
+              {subs.map((sub: any, idx: number) => {
+                const answers = parseAnswers(sub);
+                return (
+                  <Grid item xs={12} md={6} key={sub.id}>
+                    <Paper
+                      elevation={0}
+                      sx={{
+                        bgcolor: tc.card,
+                        border: `1.5px solid ${tc.border}`,
+                        borderRadius: 4,
+                        overflow: 'hidden',
+                        transition: 'all 0.3s',
+                        position: 'relative',
+                        '&::before': {
+                          content: '""',
+                          position: 'absolute',
+                          top: 0, left: 0, width: 4, height: '100%',
+                          bgcolor: catColor,
+                        },
+                        '&:hover': {
+                          boxShadow: '0 12px 32px rgba(0,0,0,0.08)',
+                          transform: 'translateY(-2px)',
+                        },
+                      }}
+                    >
+                      {/* Card header */}
+                      <Box sx={{ px: 3, py: 1.5, borderBottom: `1px solid ${tc.border}`, bgcolor: `${catColor}06`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: catColor }}>
+                          #{idx + 1}
+                        </Typography>
+                        <Typography sx={{ fontSize: '0.75rem', color: tc.muted }}>
+                          {sub.created_at ? new Date(sub.created_at).toLocaleDateString() : ''}
+                        </Typography>
+                      </Box>
+
+                      {/* Answers table */}
+                      <TableContainer>
+                        <Table size="small">
+                          <TableBody>
+                            {answers.map((a, aIdx) => (
+                              <TableRow key={aIdx} sx={{ '&:last-child td': { borderBottom: 0 } }}>
+                                <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: tc.muted, width: '40%', borderBottom: `1px solid ${tc.border}`, py: 1.5 }}>
+                                  {a.question}
+                                </TableCell>
+                                <TableCell sx={{ fontSize: '0.88rem', color: tc.text, fontWeight: 500, borderBottom: `1px solid ${tc.border}`, py: 1.5, wordBreak: 'break-word' }}>
+                                  {a.answer}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    </Paper>
+                  </Grid>
+                );
+              })}
+            </Grid>
+          </Box>
+        ))}
+
+        {/* Navigate to other categories */}
+        <Box sx={{ mt: 6, display: 'flex', flexWrap: 'wrap', gap: 1.5, justifyContent: 'center', maxWidth: 700, mx: 'auto' }}>
+          {CATEGORIES.filter((c) => c.slug !== categorySlug).map((cat) => (
+            <Box
+              key={cat.slug}
+              onClick={() => navigate(`/gnpage/${gnName}/${ccode}/${cat.slug}`)}
+              sx={{
+                display: 'flex', alignItems: 'center', gap: 0.8,
+                px: 2, py: 1, borderRadius: 20,
+                border: `1.5px solid ${cat.color}33`,
+                bgcolor: `${cat.color}11`,
+                cursor: 'pointer', transition: 'all 0.2s',
+                '&:hover': { bgcolor: `${cat.color}22`, transform: 'translateY(-1px)' },
+              }}
+            >
+              <Typography sx={{ fontSize: '1rem' }}>{cat.emoji}</Typography>
+              <Typography sx={{ fontSize: '0.83rem', fontWeight: 600, color: cat.color }}>{cat.name}</Typography>
+            </Box>
+          ))}
+        </Box>
       </Box>
 
       {/* ── Footer ────────────────────────────────────────────────────────── */}

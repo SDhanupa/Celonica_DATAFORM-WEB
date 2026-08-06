@@ -29,6 +29,7 @@ import TrsConnectionsPage from './pages/TrsConnectionsPage';
 import DistrictProvinceConnectionsPage from './pages/DistrictProvinceConnectionsPage';
 import CategoryDetailPage from './pages/CategoryDetailPage';
 import FloatingEditButton from './components/FloatingEditButton';
+import ApprovalsPage from './pages/ApprovalsPage';
 
 const App: React.FC = () => {
   return (
@@ -136,6 +137,16 @@ const App: React.FC = () => {
                   <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator']}>
                     <AdminLayout>
                       <ReportsPage />
+                    </AdminLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/approvals"
+                element={
+                  <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator']}>
+                    <AdminLayout>
+                      <ApprovalsPage />
                     </AdminLayout>
                   </ProtectedRoute>
                 }

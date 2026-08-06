@@ -27,6 +27,8 @@ class UserMutations
         $sub = $request->get('keycloak_sub');
         $user = $request->get('current_user');
 
+        Log::info('syncUser called', ['sub' => $sub, 'user_exists' => !!$user]);
+
         // If KeycloakAuthGuard already matched a user, return it
         if ($user) {
             return $user;
@@ -40,14 +42,14 @@ class UserMutations
         $firstName = $request->get('keycloak_first_name') ?? 'User';
         $lastName = $request->get('keycloak_last_name') ?? '';
 
-        $newUser = User::create([
-            'name' => trim("$firstName $lastName"),
-            'first_name' => $firstName,
-            'last_name' => $lastName,
-            'email' => $email,
-            'password' => bcrypt(\Illuminate\Support\Str::random(16)),
-            'keycloak_sub' => $sub,
-        ]);
+        $newUser = User::updateOrCreate(
+            ['email' => $email],
+            [
+                'name' => trim("$firstName $lastName"),
+                'password' => bcrypt(\Illuminate\Support\Str::random(16)),
+                'keycloak_sub' => $sub,
+            ]
+        );
 
         return $newUser;
     }
@@ -85,8 +87,6 @@ class UserMutations
             if ($role === 'USER') {
                 DB::table('users')->insert([
                     'name' => $firstName . ' ' . $lastName,
-                    'first_name' => $firstName,
-                    'last_name' => $lastName,
                     'email' => $email,
                     'password' => bcrypt($password), // Fallback local password
                     'nic' => $nic,

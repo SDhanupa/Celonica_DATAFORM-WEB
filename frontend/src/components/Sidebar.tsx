@@ -39,6 +39,7 @@ const navItems = [
   { label: 'Home', icon: <DashboardIcon />, path: '/gnpage' },
   { label: 'sdashbord', icon: <AdminsIcon />, path: '/admins', roles: ['super_admin', 'admin'] },
   { label: 'Users', icon: <UsersIcon />, path: '/users', roles: ['super_admin', 'admin', 'moderator'] },
+  { label: 'Approvals', icon: <ReportsIcon />, path: '/approvals', roles: ['super_admin', 'admin', 'moderator'] },
   { label: 'Questions', icon: <QuestionsIcon />, path: '/questions', roles: ['super_admin', 'admin', 'moderator'] },
   { label: 'Reports', icon: <ReportsIcon />, path: '/reports', roles: ['super_admin', 'admin', 'moderator'] },
   { label: 'Categories', icon: <CategoryIcon />, path: '/categories', roles: ['super_admin'] },

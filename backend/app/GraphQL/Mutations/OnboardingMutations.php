@@ -51,9 +51,7 @@ class OnboardingMutations
             } else {
                 // Insert new user
                 DB::table('users')->insert([
-                    'name' => trim("$firstName $lastName"),
-                    'first_name' => $firstName,
-                    'last_name' => $lastName,
+                    'name' => $firstName . ' ' . $lastName,
                     'email' => $email,
                     'password' => bcrypt(Str::random(16)),
                     'nic' => $nic,

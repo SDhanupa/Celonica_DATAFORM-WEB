@@ -24,7 +24,7 @@ import {
 } from '@mui/material';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useQuery, useMutation } from '@apollo/client';
-import { GET_CATEGORY_BY_SLUG, GET_CATEGORY_ANSWERS } from '../graphql/queries';
+import { GET_CATEGORY_BY_SLUG, GET_CATEGORY_ANSWERS, SUBMIT_CATEGORY_DATA, GET_APPROVED_SUBMISSIONS } from '../graphql/queries';
 import { DELETE_CATEGORY, DELETE_QUESTION, ANSWER_QUESTION } from '../graphql/mutations';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
@@ -63,6 +63,14 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
     skip: !parentCategory?.id,
   });
 
+  const selectedLocation = JSON.parse(localStorage.getItem('user_selected_location') || sessionStorage.getItem('user_selected_location') || 'null');
+  
+  const { data: approvedSubmissionsData } = useQuery(GET_APPROVED_SUBMISSIONS, {
+    variables: { categoryId: parentCategory?.id, gnCode: selectedLocation?.CCODE || selectedLocation?.ccode || selectedLocation?.code || '' },
+    skip: !parentCategory?.id || !(selectedLocation?.CCODE || selectedLocation?.ccode || selectedLocation?.code),
+    fetchPolicy: 'cache-and-network'
+  });
+
   const [deleteCategory] = useMutation(DELETE_CATEGORY, {
     refetchQueries: [{ query: GET_CATEGORY_BY_SLUG, variables: { slug } }],
   });
@@ -72,6 +80,7 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
   });
 
   const [answerQuestion] = useMutation(ANSWER_QUESTION);
+  const [submitCategoryData] = useMutation(SUBMIT_CATEGORY_DATA);
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<any>(null);
@@ -124,92 +133,85 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
     return result;
   }, [questions, userAnswersForm]);
 
-  // Load existing answers into form
+  // We intentionally do not load previous answers from the database globally
+  // so that when a user switches GN, they start with a completely fresh form.
   useEffect(() => {
-    if (answersData?.categoryAnswers && !isAdmin) {
-      const initialForm: Record<string, string> = {};
-      answersData.categoryAnswers.forEach((ans: any) => {
-        if (ans.question && ans.answerValue) {
-          initialForm[`${ans.question.id}_${ans.iteration || 1}`] = ans.answerValue;
-        }
-      });
-      setUserAnswersForm(initialForm);
+    if (isAdmin) {
       setInitialLoadComplete(true);
-    } else if (isAdmin) {
+    } else {
       setInitialLoadComplete(true);
     }
-  }, [answersData, isAdmin]);
+  }, [isAdmin]);
 
-  // Auto-resume to first unanswered question
+  // Start from step 0 always
   useEffect(() => {
     if (initialLoadComplete && !hasAutoResumed.current && steps.length > 0 && !isAdmin) {
-         let firstUnanswered = 0;
-         for (let i = 0; i < steps.length; i++) {
-             const step = steps[i];
-             if (!userAnswersForm[`${step.question.id}_${step.iteration}`]) {
-                 firstUnanswered = i;
-                 break;
-             }
-         }
-         setCurrentStep(firstUnanswered);
+         setCurrentStep(0);
          hasAutoResumed.current = true;
     }
-  }, [initialLoadComplete, steps, userAnswersForm, isAdmin]);
+  }, [initialLoadComplete, steps, isAdmin]);
 
   const handleNext = async () => {
-    const step = steps[currentStep];
-    const answerValue = userAnswersForm[`${step.question.id}_${step.iteration}`] || '';
-    
-    setSavingAnswers(true);
-    try {
-        await answerQuestion({
-            variables: {
-                questionId: step.question.id,
-                iteration: step.iteration,
-                answerValue: answerValue,
-                isSkipped: !answerValue
-            }
-        });
-        
-        await refetchAnswers();
-
-        if (currentStep < steps.length - 1) {
-            setCurrentStep(c => c + 1);
-        } else {
-            setToast({ open: true, message: lang === 'en' ? 'Survey completed!' : 'සමීක්ෂණය අවසන්!', severity: 'success' });
-            setTimeout(() => navigate(backUrl), 1500);
-        }
-    } catch (err) {
-        console.error('Failed to save answers', err);
-        setToast({ open: true, message: lang === 'en' ? 'Failed to save answer.' : 'පිළිතුර සුරැකීමට අසමත් විය.', severity: 'error' });
-    } finally {
-        setSavingAnswers(false);
+    // We only update the local state. No more saving to database per step.
+    if (currentStep < steps.length - 1) {
+        setCurrentStep(c => c + 1);
+    } else {
+        // Final step! Submit Category Data with GPS
+        submitFinalData();
     }
   };
 
-  const handleSkip = async () => {
-    const step = steps[currentStep];
-    setSavingAnswers(true);
-    try {
-        await answerQuestion({
-            variables: {
-                questionId: step.question.id,
-                iteration: step.iteration,
-                answerValue: null,
-                isSkipped: true
-            }
-        });
-        
-        if (currentStep < steps.length - 1) {
-            setCurrentStep(c => c + 1);
-        } else {
-            setToast({ open: true, message: lang === 'en' ? 'Survey completed!' : 'සමීක්ෂණය අවසන්!', severity: 'success' });
+  const submitFinalData = async () => {
+    // Get stored location
+    const savedLocation = localStorage.getItem('user_selected_location') || sessionStorage.getItem('user_selected_location');
+    const locationData = savedLocation ? JSON.parse(savedLocation) : null;
+    
+    const district = locationData?.pDistrict?.admin2NameEn || null;
+    const dsDivision = locationData?.dsEn || null;
+    const gnName = locationData?.nameEn || locationData?.nameSi || locationData?.nameTa || 'Unknown';
+    const gnCode = locationData?.CCODE || locationData?.ccode || locationData?.code || null;
+    
+    const categoryId = parentCategory?.id;
+    const answersData = JSON.stringify(userAnswersForm);
+    
+    setToast({ open: true, message: lang === 'en' ? 'Requesting Location...' : 'ස්ථානය ඉල්ලමින් පවතී...', severity: 'success' });
+    
+    const sendData = async (lat: number | null, lng: number | null) => {
+        try {
+            await submitCategoryData({
+                variables: {
+                    categoryId, district, dsDivision, gnName, gnCode,
+                    latitude: lat, longitude: lng, answersData
+                }
+            });
+            setToast({ open: true, message: lang === 'en' ? 'Data submitted successfully!' : 'දත්ත සාර්ථකව යවන ලදී!', severity: 'success' });
             setTimeout(() => navigate(backUrl), 1500);
+        } catch (err) {
+            console.error('Final submit error', err);
+            setToast({ open: true, message: lang === 'en' ? 'Error submitting data.' : 'දත්ත යැවීමේ දෝෂයක්.', severity: 'error' });
+        } finally {
+            setSavingAnswers(false);
         }
-    } catch (err) {
-        setToast({ open: true, message: lang === 'en' ? 'Failed to skip.' : 'මඟ හැරීමට අසමත් විය.', severity: 'error' });
-    } finally {
-        setSavingAnswers(false);
+    };
+
+    if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+            (pos) => sendData(pos.coords.latitude, pos.coords.longitude),
+            (err) => sendData(null, null), // user denied or error
+            { timeout: 10000 }
+        );
+    } else {
+        sendData(null, null);
+    }
+  };
+
+
+  const handleSkip = async () => {
+    // We only update the local state. No more saving to database per step.
+    if (currentStep < steps.length - 1) {
+        setCurrentStep(c => c + 1);
+    } else {
+        submitFinalData();
     }
   };
 
@@ -569,6 +571,55 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
                 );
              })()}
           </Paper>
+        </Box>
+      )}
+
+      {/* Approved Submissions Section */}
+      {!isAdmin && approvedSubmissionsData?.approvedSubmissions?.length > 0 && (
+        <Box sx={{ mt: 6, maxWidth: 800, mx: 'auto' }}>
+          <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
+             {lang === 'en' ? 'Approved Data' : 'අනුමත දත්ත'}
+          </Typography>
+          <Grid container spacing={2}>
+            {approvedSubmissionsData.approvedSubmissions.map((sub: any, index: number) => {
+               let answers: any = {};
+               try {
+                 answers = typeof sub.answers_data === 'string' ? JSON.parse(sub.answers_data) : (sub.answers_data || {});
+               } catch { answers = {}; }
+               return (
+                 <Grid item xs={12} key={sub.id}>
+                   <Paper sx={{ p: 3, borderRadius: 3, borderLeft: '4px solid #10b981' }}>
+                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                       <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#10b981' }}>
+                         #{index + 1}
+                       </Typography>
+                       <Typography variant="subtitle2" color="text.secondary">
+                         {sub.created_at ? new Date(sub.created_at).toLocaleDateString() : ''}
+                       </Typography>
+                     </Box>
+                     {/* Parse the answers object and display */}
+                     <Grid container spacing={1}>
+                       {Object.entries(answers).map(([key, val]: any) => {
+                         // try to find the question text
+                         const parts = key.split('_');
+                         const qIdStr = parts[0];
+                         const iter = parts[1];
+                         const q = questions.find((x: any) => String(x.id) === String(qIdStr));
+                         let qLabel = q ? (lang === 'en' ? q.questionTextEn : lang === 'si' ? (q.questionTextSi || q.questionTextEn) : (q.questionTextTa || q.questionTextEn)) : `Question #${qIdStr}`;
+                         if (iter && iter !== '1') qLabel += ` (Item #${iter})`;
+                         return (
+                           <Grid item xs={12} sm={6} key={key}>
+                             <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontWeight: 600 }}>{qLabel}</Typography>
+                             <Typography variant="body2" sx={{ fontWeight: 600 }}>{val || '-'}</Typography>
+                           </Grid>
+                         );
+                       })}
+                     </Grid>
+                   </Paper>
+                 </Grid>
+               );
+            })}
+          </Grid>
         </Box>
       )}
 
