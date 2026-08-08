@@ -23,6 +23,9 @@ import { CATEGORIES } from './CategoryDetailPage';
 import GnPageFooter from '../components/GnPageFooter';
 import LocationSelectorModal from '../components/LocationSelectorModal';
 import { VillageMap } from '../components/VillageMap';
+import { GnTopHeaderBar } from '../components/GnTopHeaderBar';
+import { DemographicCards } from '../components/DemographicCards';
+import { WeatherInfoCard } from '../components/WeatherInfoCard';
 
 
 const tChart = {
@@ -202,17 +205,16 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const isSuperAdmin = userInfo?.realm_roles?.includes('super_admin');
   const [catMenuAnchor, setCatMenuAnchor] = useState<null | HTMLElement>(null);
 
-  // Search Logic Queries
+  // Search Logic Queries (Always active so dropdowns are always populated)
   const { data: districtsData, loading: districtsLoading, error: districtsError } = useQuery(GET_P_DISTRICTS, {
-    skip: !showManualForm,
-    fetchPolicy: 'network-only',
+    fetchPolicy: 'cache-first',
   });
   console.log('Districts query:', { districtsData, districtsLoading, districtsError });
 
   const { data: gnData, loading: gnLoading, error: gnError } = useQuery(GET_P_DISTRICT_WITH_GNS, {
     variables: { id: selectedDistrict },
-    skip: !selectedDistrict || !showManualForm,
-    fetchPolicy: 'network-only',
+    skip: !selectedDistrict,
+    fetchPolicy: 'cache-first',
   });
   console.log('GN Data query:', { gnData, gnLoading, gnError });
 
@@ -220,8 +222,14 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
     if (!gnData?.pDistrict?.gramaNiladharis) return [];
     const citiesMap = new Map();
     gnData.pDistrict.gramaNiladharis.forEach((gn: any) => {
-      if (gn.divisionalSecretariatCode && !citiesMap.has(gn.divisionalSecretariatCode)) {
-        citiesMap.set(gn.divisionalSecretariatCode, gn);
+      const code = gn.divisionalSecretariatCode || gn.dsEn;
+      if (code && !citiesMap.has(code)) {
+        citiesMap.set(code, {
+          divisionalSecretariatCode: code,
+          dsEn: gn.dsEn || gn.divisionalSecretariatCode,
+          dsSi: gn.dsSi,
+          dsTa: gn.dsTa,
+        });
       }
     });
     return Array.from(citiesMap.values());
@@ -230,12 +238,14 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const filteredGNs = React.useMemo(() => {
     if (!gnData?.pDistrict?.gramaNiladharis) return [];
     if (!selectedCity) return gnData.pDistrict.gramaNiladharis;
-    return gnData.pDistrict.gramaNiladharis.filter((gn: any) => gn.divisionalSecretariatCode === selectedCity);
+    return gnData.pDistrict.gramaNiladharis.filter(
+      (gn: any) => gn.divisionalSecretariatCode === selectedCity || gn.dsEn === selectedCity
+    );
   }, [gnData, selectedCity]);
 
   const { data: autoGnData, loading: autoGnLoading } = useQuery(GET_GN_BY_COORDINATES, {
     variables: { lat: location?.lat, lng: location?.lng },
-    skip: !location || showManualForm || !!ccode,
+    skip: !location || !!ccode,
     fetchPolicy: 'network-only',
   });
 
@@ -249,7 +259,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
 
   // Geolocation Effect
   useEffect(() => {
-    if (!ccode && !showManualForm && !location && !locationError) {
+    if (!ccode && !location && !locationError) {
       setLocating(true);
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -270,23 +280,34 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         setLocating(false);
       }
     }
-  }, [showManualForm, location, locationError]);
+  }, [ccode, location, locationError]);
 
+  // Sync active GN with District, DS, and Village dropdown selectors
   useEffect(() => {
     if (activeGn) {
-      setSelectedDistrict(activeGn.pDistrict?.id || '');
-      setSelectedCity(activeGn.divisionalSecretariatCode || '');
-      setSelectedGN(activeGn.id || '');
+      const distId = activeGn.pDistrict?.id ||
+        districtsData?.pDistricts?.find((d: any) =>
+          d.admin2NameEn === activeGn.pDistrict?.admin2NameEn ||
+          d.nameEn === activeGn.pDistrict?.admin2NameEn ||
+          d.id === activeGn.pDistrict?.id
+        )?.id || '';
+      if (distId) setSelectedDistrict(distId);
+      if (activeGn.divisionalSecretariatCode || activeGn.dsEn) {
+        setSelectedCity(activeGn.divisionalSecretariatCode || activeGn.dsEn);
+      }
+      if (activeGn.id || activeGn.CCODE) {
+        setSelectedGN(activeGn.id || activeGn.CCODE);
+      }
     }
-  }, [activeGn]);
+  }, [activeGn, districtsData]);
 
   // Sync URL with loaded GN
   useEffect(() => {
     let loadedGn: any = null;
-    if (!showManualForm && activeGn) {
+    if (activeGn) {
       loadedGn = activeGn;
-    } else if (showManualForm && selectedGN && gnData?.pDistrict?.gramaNiladharis) {
-      loadedGn = gnData.pDistrict.gramaNiladharis.find((x: any) => x.id === selectedGN);
+    } else if (selectedGN && gnData?.pDistrict?.gramaNiladharis) {
+      loadedGn = gnData.pDistrict.gramaNiladharis.find((x: any) => x.id === selectedGN || x.CCODE === selectedGN);
     }
 
     if (loadedGn && loadedGn.CCODE && loadedGn.nameEn) {
@@ -296,7 +317,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         navigate(targetUrl, { replace: true });
       }
     }
-  }, [activeGn, selectedGN, gnData, showManualForm, navigate]);
+  }, [activeGn, selectedGN, gnData, navigate]);
 
   // Ensure modals close when URL params are present
   useEffect(() => {
@@ -1482,174 +1503,6 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
 
   return (
     <Box sx={{ fontFamily: "'Inter', sans-serif" }}>
-      {/* Navigation Bar */}
-      <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 3 }, display: 'flex', justifyContent: { xs: 'flex-end', sm: 'center' }, alignItems: 'center', zIndex: 1000, pointerEvents: 'none' }}>
-        <Box sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexWrap: 'wrap',
-          gap: { xs: 1.5, sm: 3 },
-          pointerEvents: 'auto',
-          bgcolor: isDarkMode ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.2)',
-          backdropFilter: 'blur(10px)',
-          px: { xs: 2, sm: 3 },
-          py: { xs: 1, sm: 1.5 },
-          borderRadius: 30,
-          color: '#ffffff',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-          maxWidth: '90vw'
-        }}>
-
-          <Box sx={{ display: 'flex', gap: 0.5 }}>
-            <IconButton
-              onClick={() => setIsDarkMode(!isDarkMode)}
-              size="small"
-              sx={{ color: isDarkMode ? '#ffffff' : '#000000', p: 0.5, transition: 'transform 0.2s', '&:hover': { transform: 'scale(1.1)' } }}
-            >
-              {isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
-            </IconButton>
-            <IconButton
-              onClick={() => setShowLocationModal(true)}
-              size="small"
-              sx={{ color: isDarkMode ? '#ffffff' : '#000000', p: 0.5, transition: 'transform 0.2s', '&:hover': { transform: 'scale(1.1)' } }}
-            >
-              <SearchIcon fontSize="small" />
-            </IconButton>
-          </Box>
-
-          {/* Desktop Nav */}
-          <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 1.5, fontWeight: 600, fontSize: '0.95rem', letterSpacing: '0.5px' }}>
-            <Typography onClick={() => navigate(gnName && ccode ? `/gnpage/${gnName}/${ccode}` : '/gnpage')} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: isDarkMode ? '#ffffff' : '#000000', '&:hover': { opacity: 0.7 } }}>Home</Typography>
-            <Typography sx={{ opacity: 0.4, fontWeight: 300, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
-
-            {isAuthenticated ? (
-              <>
-                <Typography onClick={() => {
-                  if (userInfo?.realm_roles?.includes('super_admin')) {
-                    navigate('/admins');
-                  } else {
-                    navigate('/user');
-                  }
-                }} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: isDarkMode ? '#ffffff' : '#000000', '&:hover': { opacity: 0.7 } }}>Dashboard</Typography>
-                <Typography sx={{ opacity: 0.4, fontWeight: 300, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
-              </>
-            ) : null}
-
-            {/* Categories dropdown */}
-            {gnName && ccode && (
-              <>
-                <Typography
-                  onClick={(e) => setCatMenuAnchor(e.currentTarget as HTMLElement)}
-                  sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: isDarkMode ? '#ffffff' : '#000000', '&:hover': { opacity: 0.7 } }}
-                >
-                  Categories ▾
-                </Typography>
-                <Menu
-                  anchorEl={catMenuAnchor}
-                  open={Boolean(catMenuAnchor)}
-                  onClose={() => setCatMenuAnchor(null)}
-                  PaperProps={{
-                    sx: {
-                      bgcolor: isDarkMode ? 'rgba(15,23,42,0.97)' : 'rgba(255,255,255,0.97)',
-                      backdropFilter: 'blur(12px)',
-                      borderRadius: 3,
-                      minWidth: 230,
-                      boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
-                      mt: 1,
-                    },
-                  }}
-                >
-                  {CATEGORIES.map((cat) => (
-                    <MenuItem
-                      key={cat.slug}
-                      onClick={() => { setCatMenuAnchor(null); navigate(`/gnpage/${gnName}/${ccode}/${cat.slug}`); }}
-                      sx={{ fontWeight: 500, color: isDarkMode ? '#e2e8f0' : '#1e293b', gap: 1.2, borderRadius: 2, mx: 0.5, my: 0.2 }}
-                    >
-                      {cat.name}
-                    </MenuItem>
-                  ))}
-                </Menu>
-                <Typography sx={{ opacity: 0.4, fontWeight: 300, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
-              </>
-            )}
-
-            {isAuthenticated ? (
-              <>
-                <Typography onClick={() => logout()} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: '#ef4444', '&:hover': { opacity: 0.7 } }}>Logout</Typography>
-                <Typography sx={{ opacity: 0.4, fontWeight: 300, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
-                <Typography sx={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, color: isDarkMode ? '#ffffff' : '#000000' }}>
-                  {userInfo?.preferred_username || userInfo?.name || 'User'}
-                </Typography>
-                <Typography sx={{ opacity: 0.4, fontWeight: 300, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
-              </>
-            ) : !isLoading ? (
-              <>
-                <Typography onClick={() => login(window.location.href)} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: isDarkMode ? '#ffffff' : '#000000', '&:hover': { opacity: 0.7 } }}>Login</Typography>
-                <Typography sx={{ opacity: 0.4, fontWeight: 300, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
-                <Typography onClick={() => register(window.location.href)} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 600, color: isDarkMode ? '#ffffff' : '#000000', '&:hover': { opacity: 0.7 } }}>Signup</Typography>
-                <Typography sx={{ opacity: 0.4, fontWeight: 300, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
-              </>
-            ) : null}
-
-            <Typography onClick={cycleLanguage} sx={{ cursor: 'pointer', textTransform: 'uppercase', transition: 'opacity 0.2s', fontFamily: "'Inter', sans-serif", fontWeight: 700, color: themeColors.primary, '&:hover': { opacity: 0.7 } }}>{language}</Typography>
-          </Box>
-
-          {/* Mobile Nav */}
-          <Box sx={{ display: { xs: 'flex', sm: 'none' }, alignItems: 'center', gap: 1.5 }}>
-            <IconButton onClick={handleMobileMenuClick} size="small" sx={{ color: isDarkMode ? '#ffffff' : '#000000', p: 0 }}>
-              <MenuIcon />
-            </IconButton>
-            <Menu
-              anchorEl={mobileMenuAnchor}
-              open={isMobileMenuOpen}
-              onClose={handleMobileMenuClose}
-              PaperProps={{
-                sx: {
-                  bgcolor: isDarkMode ? 'rgba(30,30,30,0.9)' : 'rgba(255,255,255,0.9)',
-                  backdropFilter: 'blur(10px)',
-                  color: isDarkMode ? '#fff' : '#000',
-                  minWidth: 150
-                }
-              }}
-            >
-              <MenuItem onClick={() => { handleMobileMenuClose(); navigate(gnName && ccode ? `/gnpage/${gnName}/${ccode}` : '/gnpage'); }}>Home</MenuItem>
-              {isAuthenticated ? (
-                [
-                  <MenuItem key="user" disabled sx={{ color: isDarkMode ? '#ffffff' : '#000000', fontWeight: 'bold' }}>
-                    Welcome, {userInfo?.preferred_username || userInfo?.name || 'User'}
-                  </MenuItem>,
-                  <MenuItem key="dash" onClick={() => { 
-                    handleMobileMenuClose(); 
-                    if (userInfo?.realm_roles?.includes('super_admin')) {
-                      navigate('/admins');
-                    } else {
-                      navigate('/user');
-                    }
-                  }}>Dashboard</MenuItem>,
-                  <MenuItem key="logout" onClick={() => { handleMobileMenuClose(); logout(); }} sx={{ color: '#ef4444' }}>Logout</MenuItem>,
-                  ...(gnName && ccode ? [
-                    <Divider key="cat-divider" />,
-                    <MenuItem key="cat-header" disabled sx={{ fontWeight: 700, fontSize: '0.8rem', opacity: 0.6 }}>Categories</MenuItem>,
-                    ...CATEGORIES.map((cat) => (
-                      <MenuItem key={cat.slug} onClick={() => { handleMobileMenuClose(); navigate(`/gnpage/${gnName}/${ccode}/${cat.slug}`); }}>
-                        {cat.name}
-                      </MenuItem>
-                    ))
-                  ] : [])
-                ]
-              ) : !isLoading ? (
-                [
-                  <MenuItem key="login" onClick={() => { handleMobileMenuClose(); login(window.location.href); }}>Login</MenuItem>,
-                  <MenuItem key="signup" onClick={() => { handleMobileMenuClose(); register(window.location.href); }}>Signup</MenuItem>
-                ]
-              ) : null}
-              <Divider />
-              <MenuItem onClick={() => { handleMobileMenuClose(); cycleLanguage(); }} sx={{ fontWeight: 'bold', color: themeColors.primary }}>Language: {language.toUpperCase()}</MenuItem>
-            </Menu>
-          </Box>
-        </Box>
-      </Box>
 
       {/* Location Modal */}
       <Dialog
@@ -1932,7 +1785,6 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           <Button
             variant="contained"
             onClick={() => {
-              // Determine which GN was selected
               let loadedGn: any = null;
               if (!showManualForm && activeGn) {
                 loadedGn = activeGn;
@@ -1964,20 +1816,17 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         </DialogActions>
       </Dialog>
 
-      {/* Hero Section */}
+      {/* ── MAIN DASHBOARD VIEW ────────────────────────────────────────── */}
       <Box
         sx={{
-          bgcolor: '#a2c8c4', // Match the left side gradient of the image somewhat just in case
+          bgcolor: isDarkMode ? '#0f172a' : '#f1f5f9',
           color: themeColors.textLight,
-          minHeight: '100vh', // Full screen
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          minHeight: '100vh',
           position: 'relative',
           overflow: 'hidden',
         }}
       >
-        {/* Background Image */}
+        {/* Background Image with serene tea hills / workspace aesthetic */}
         <Box
           sx={{
             position: 'absolute',
@@ -1985,534 +1834,358 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundImage: 'url(/hero-background-generated.png)',
+            backgroundImage: 'linear-gradient(rgba(255,255,255,0.45), rgba(255,255,255,0.65)), url(/hero-background-new.jpeg)',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            opacity: 1,
-            zIndex: 0,
-          }}
-        />
-        {/* Transparent Overlay for Text Readability */}
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            bgcolor: 'rgba(255, 255, 255, 0.6)', // Light transparent layer to contrast with dark text
-            backdropFilter: 'blur(3px)',
+            backgroundAttachment: 'fixed',
             zIndex: 0,
           }}
         />
 
+        <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1, pt: { xs: 3, md: 4.5 }, pb: 8 }}>
+          {/* ── TOP PRIMARY NAVBAR (Cleanly at the Top) ─────────────────── */}
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              width: '100%',
+              mb: 3,
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexWrap: 'wrap',
+                gap: { xs: 1.5, sm: 3 },
+                bgcolor: isDarkMode ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255, 255, 255, 0.88)',
+                backdropFilter: 'blur(20px)',
+                px: { xs: 2, sm: 3 },
+                py: { xs: 1, sm: 1.2 },
+                borderRadius: '50px',
+                border: isDarkMode ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(255,255,255,0.85)',
+                boxShadow: isDarkMode ? '0 8px 32px rgba(0,0,0,0.4)' : '0 8px 32px rgba(0,0,0,0.06)',
+                maxWidth: '92vw',
+              }}
+            >
+              {/* Theme & Search */}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <IconButton
+                  onClick={() => setIsDarkMode(!isDarkMode)}
+                  size="small"
+                  sx={{ color: isDarkMode ? '#f59e0b' : '#334155', p: 0.6 }}
+                >
+                  {isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
+                </IconButton>
+                <IconButton
+                  onClick={() => setShowLocationModal(true)}
+                  size="small"
+                  sx={{ color: isDarkMode ? '#f8fafc' : '#334155', p: 0.6 }}
+                >
+                  <SearchIcon fontSize="small" />
+                </IconButton>
+              </Box>
 
-        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, py: { xs: 8, md: 0 } }}>
-          <Grid container spacing={4} alignItems="center">
-            {/* Words / Text on the right side (order 2 on desktop, order 1 on mobile) */}
-            <Grid item xs={12} sx={{ order: { xs: 1, md: 2 } }}>
-              {!showLocationModal && (
-                <Box
-                  sx={{
-                    animation: 'fadeSlideUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards',
-                    '@keyframes fadeSlideUp': {
-                      '0%': { opacity: 0, transform: 'translateY(40px)' },
-                      '100%': { opacity: 1, transform: 'translateY(0)' },
+              {/* Desktop Links */}
+              <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 1.8, fontWeight: 600, fontSize: '0.92rem' }}>
+                <Typography
+                  onClick={() => navigate(gnName && ccode ? `/gnpage/${gnName}/${ccode}` : '/gnpage')}
+                  sx={{ cursor: 'pointer', fontWeight: 700, color: isDarkMode ? '#f8fafc' : '#1e293b', '&:hover': { color: '#3b82f6' } }}
+                >
+                  Home
+                </Typography>
+                <Typography sx={{ opacity: 0.3, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
+
+                {/* Categories dropdown */}
+                <Typography
+                  onClick={(e) => setCatMenuAnchor(e.currentTarget as HTMLElement)}
+                  sx={{ cursor: 'pointer', fontWeight: 600, color: isDarkMode ? '#f8fafc' : '#1e293b', '&:hover': { color: '#3b82f6' } }}
+                >
+                  Categories ▾
+                </Typography>
+                <Menu
+                  anchorEl={catMenuAnchor}
+                  open={Boolean(catMenuAnchor)}
+                  onClose={() => setCatMenuAnchor(null)}
+                  PaperProps={{
+                    sx: {
+                      bgcolor: isDarkMode ? 'rgba(15,23,42,0.97)' : 'rgba(255,255,255,0.97)',
+                      backdropFilter: 'blur(16px)',
+                      borderRadius: '16px',
+                      minWidth: 230,
+                      boxShadow: '0 16px 36px rgba(0,0,0,0.2)',
+                      mt: 1,
                     },
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    textAlign: 'center',
-                    bgcolor: 'transparent',
-                    backdropFilter: 'none',
-                    borderRadius: '24px',
-                    p: { xs: 3, md: 0 },
-                    border: 'none',
-                    boxShadow: 'none',
-                    mt: { xs: 0, md: -6 } // Moved up as requested
                   }}
                 >
-                  {/* "My Village" Header */}
-                  <Typography
-                    variant="h2"
-                    sx={{
-                      color: themeColors.textDark,
-                      fontFamily: "'Playfair Display', serif",
-                      fontWeight: 800,
-                      fontStyle: 'italic',
-                      fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4.5rem', lg: '5.5rem' },
-                      mb: { xs: 1, md: 2 },
-                      textAlign: 'center',
-                      textShadow: '0 0 20px rgba(255,255,255,0.9), 0 0 10px rgba(255,255,255,1)'
-                    }}
-                  >
-                    {language === 'en' ? 'MY Village' : language === 'si' ? 'මගේ ගම' : 'என் கிராமம்'}
-                  </Typography>
+                  {CATEGORIES.map((cat) => (
+                    <MenuItem
+                      key={cat.slug}
+                      onClick={() => {
+                        setCatMenuAnchor(null);
+                        const targetGn = (displayGN || activeGn?.nameEn || gnName || 'Pahalagama').replace(/ /g, '-');
+                        const targetCcode = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'RATPA';
+                        navigate(`/gnpage/${encodeURIComponent(targetGn)}/${encodeURIComponent(targetCcode)}/${cat.slug}`);
+                      }}
+                      sx={{ fontWeight: 500, color: isDarkMode ? '#e2e8f0' : '#1e293b', py: 0.8, px: 2 }}
+                    >
+                      {cat.name}
+                    </MenuItem>
+                  ))}
+                </Menu>
 
-                  {/* CCODE - Above District */}
-                  {displayCCODE && (
+                <Typography sx={{ opacity: 0.3, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
+
+                {isAuthenticated ? (
+                  <>
                     <Typography
-                      variant="h3"
-                      sx={{
-                        color: themeColors.textDark,
-                        fontFamily: "'Playfair Display', serif",
-                        fontWeight: 700,
-                        fontSize: { xs: '1.5rem', sm: '2.25rem', md: '2.75rem', lg: '3.25rem' },
-                        mb: { xs: 2, md: 3 },
-                        textAlign: 'center',
-                        textShadow: '0 0 20px rgba(255,255,255,0.9), 0 0 10px rgba(255,255,255,1)'
+                      onClick={() => {
+                        if (userInfo?.realm_roles?.includes('super_admin')) navigate('/admins');
+                        else navigate('/user');
                       }}
+                      sx={{ cursor: 'pointer', fontWeight: 600, color: isDarkMode ? '#f8fafc' : '#1e293b', '&:hover': { color: '#3b82f6' } }}
                     >
-                      {displayCCODE}
+                      Dashboard
                     </Typography>
-                  )}
-
-                  {/* District - Top Glass Pill */}
-                  {displayDistrict && (
-                    <Box
-                      sx={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        px: { xs: 2, md: 3 },
-                        py: { xs: 0.75, md: 1 },
-                        mb: { xs: 1, md: 1.5 },
-                        borderRadius: '50px',
-                        bgcolor: 'rgba(255, 255, 255, 0.1)',
-                        backdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                        boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
-                      }}
-                    >
-                      <Typography
-                        variant="overline"
-                        sx={{
-                          color: themeColors.textDark,
-                          letterSpacing: { xs: '1px', md: '2px' },
-                          fontWeight: 700,
-                          fontSize: { xs: '1rem', md: '1.25rem' }, // Made slightly bigger
-                          lineHeight: 1,
-                          m: 0
-                        }}
-                      >
-                        {displayDistrict}
-                      </Typography>
-                    </Box>
-                  )}
-
-                  {/* GN Division - Main Title (Biggest) */}
-                  <Typography
-                    variant="h1"
-                    sx={{
-                      color: themeColors.textDark,
-                      fontFamily: "'Playfair Display', serif",
-                      fontWeight: 800,
-                      fontSize: { xs: '2rem', sm: '2.75rem', md: '3.5rem', lg: '4.25rem' }, // Made even smaller
-                      lineHeight: 1.1,
-                      mb: 1,
-                      textShadow: '0 0 20px rgba(255,255,255,0.9), 0 0 10px rgba(255,255,255,1)'
-                    }}
-                  >
-                    {displayGN || (language === 'en' ? 'Your Location' : language === 'si' ? 'ඔබගේ ස්ථානය' : 'உங்கள் இடம்')}
-                  </Typography>
-
-                  {/* City / DS Division - Subtitle (Half size of GN Division) */}
-                  {displayCity && (
-                    <Typography
-                      variant="h3"
-                      sx={{
-                        color: themeColors.textDark,
-                        fontFamily: "'Playfair Display', serif",
-                        fontWeight: 600,
-                        fontSize: { xs: '1.5rem', sm: '2.25rem', md: '2.75rem', lg: '3.25rem' },
-                        mb: 1,
-                        textShadow: '0 0 20px rgba(255,255,255,0.9), 0 0 10px rgba(255,255,255,1)'
-                      }}
-                    >
-                      {displayCity}
+                    <Typography sx={{ opacity: 0.3, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
+                    <Typography onClick={() => logout()} sx={{ cursor: 'pointer', fontWeight: 600, color: '#ef4444', '&:hover': { opacity: 0.8 } }}>
+                      Logout
                     </Typography>
+                  </>
+                ) : !isLoading ? (
+                  <>
+                    <Typography onClick={() => login(window.location.href)} sx={{ cursor: 'pointer', fontWeight: 600, color: isDarkMode ? '#f8fafc' : '#1e293b', '&:hover': { color: '#3b82f6' } }}>
+                      Login
+                    </Typography>
+                    <Typography sx={{ opacity: 0.3, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
+                    <Typography onClick={() => register(window.location.href)} sx={{ cursor: 'pointer', fontWeight: 600, color: isDarkMode ? '#f8fafc' : '#1e293b', '&:hover': { color: '#3b82f6' } }}>
+                      Signup
+                    </Typography>
+                  </>
+                ) : null}
+
+                <Typography sx={{ opacity: 0.3, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
+                <Typography
+                  onClick={cycleLanguage}
+                  sx={{ cursor: 'pointer', textTransform: 'uppercase', fontWeight: 800, color: '#3b82f6', '&:hover': { opacity: 0.8 } }}
+                >
+                  {language}
+                </Typography>
+              </Box>
+
+              {/* Mobile Hamburger Button */}
+              <Box sx={{ display: { xs: 'flex', sm: 'none' }, alignItems: 'center' }}>
+                <IconButton onClick={handleMobileMenuClick} size="small" sx={{ color: isDarkMode ? '#ffffff' : '#000000', p: 0.5 }}>
+                  <MenuIcon />
+                </IconButton>
+                <Menu
+                  anchorEl={mobileMenuAnchor}
+                  open={isMobileMenuOpen}
+                  onClose={handleMobileMenuClose}
+                  PaperProps={{
+                    sx: {
+                      bgcolor: isDarkMode ? 'rgba(30,30,30,0.95)' : 'rgba(255,255,255,0.95)',
+                      backdropFilter: 'blur(16px)',
+                      borderRadius: '16px',
+                      minWidth: 180,
+                    },
+                  }}
+                >
+                  <MenuItem onClick={() => { handleMobileMenuClose(); navigate(gnName && ccode ? `/gnpage/${gnName}/${ccode}` : '/gnpage'); }}>
+                    Home
+                  </MenuItem>
+                  {isAuthenticated ? (
+                    [
+                      <MenuItem key="dash" onClick={() => { handleMobileMenuClose(); navigate('/user'); }}>Dashboard</MenuItem>,
+                      <MenuItem key="logout" onClick={() => { handleMobileMenuClose(); logout(); }} sx={{ color: '#ef4444' }}>Logout</MenuItem>,
+                    ]
+                  ) : (
+                    [
+                      <MenuItem key="login" onClick={() => { handleMobileMenuClose(); login(window.location.href); }}>Login</MenuItem>,
+                      <MenuItem key="signup" onClick={() => { handleMobileMenuClose(); register(window.location.href); }}>Signup</MenuItem>,
+                    ]
                   )}
-                </Box>
-              )}
+                  <Divider />
+                  <MenuItem onClick={() => { handleMobileMenuClose(); cycleLanguage(); }} sx={{ fontWeight: 'bold', color: '#3b82f6' }}>
+                    Language: {language.toUpperCase()}
+                  </MenuItem>
+                </Menu>
+              </Box>
+            </Box>
+          </Box>
+
+          {/* ── TOP HEADER GLASS BAR (Location Selectors & Categories Ribbon) ── */}
+          <GnTopHeaderBar
+            districts={districtsData?.pDistricts || []}
+            selectedDistrict={selectedDistrict}
+            onDistrictChange={(d) => {
+              setSelectedDistrict(d);
+              setSelectedCity('');
+              setSelectedGN('');
+            }}
+            dsDivisions={uniqueCities}
+            selectedCity={selectedCity}
+            onCityChange={(c) => {
+              setSelectedCity(c);
+              setSelectedGN('');
+            }}
+            gramaNiladharis={filteredGNs}
+            selectedGN={selectedGN}
+            onGNChange={(g) => {
+              setSelectedGN(g);
+              const chosen = gnData?.pDistrict?.gramaNiladharis?.find((x: any) => x.id === g || x.CCODE === g);
+              if (chosen && chosen.CCODE && chosen.nameEn) {
+                navigate(`/gnpage/${encodeURIComponent(chosen.nameEn.replace(/ /g, '-'))}/${encodeURIComponent(chosen.CCODE)}`);
+              }
+            }}
+            language={language}
+            onCycleLanguage={cycleLanguage}
+            isDarkMode={isDarkMode}
+            onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
+            isAuthenticated={isAuthenticated}
+            onLoginClick={() => (isAuthenticated ? navigate('/profile') : login())}
+            onSelectCategory={(slug) => {
+              const targetGn = (displayGN || activeGn?.nameEn || gnName || 'Pahalagama').replace(/ /g, '-');
+              const targetCcode = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'RATPA';
+              navigate(`/gnpage/${encodeURIComponent(targetGn)}/${encodeURIComponent(targetCcode)}/${slug}`);
+            }}
+          />
+
+          {/* ── ELEGANT STACKED HERO TOPIC (Bigger & Bolder) ───────────── */}
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textAlign: 'center',
+              mt: { xs: 2, md: 3 },
+              mb: { xs: 4, md: 5.5 },
+              gap: { xs: 0.6, md: 0.8 },
+            }}
+          >
+            {/* 1. MY Village (Italic Elegant Serif) */}
+            <Typography
+              sx={{
+                fontFamily: "'Playfair Display', 'Georgia', 'Cinzel', serif",
+                fontStyle: 'italic',
+                fontWeight: 700,
+                fontSize: { xs: '2.4rem', sm: '3.2rem', md: '4.2rem' },
+                color: isDarkMode ? '#f8fafc' : '#0f172a',
+                letterSpacing: '0.5px',
+                lineHeight: 1.1,
+                textShadow: isDarkMode ? '0 4px 16px rgba(0,0,0,0.6)' : '0 2px 14px rgba(255,255,255,0.9)',
+              }}
+            >
+              {language === 'si' ? 'මගේ ගම' : language === 'ta' ? 'எனது கிராமம்' : 'MY Village'}
+            </Typography>
+
+            {/* 2. CCODE (Bold Serif Uppercase) */}
+            {(displayCCODE || activeGn?.CCODE || ccode || selectedGN) && (
+              <Typography
+                sx={{
+                  fontFamily: "'Playfair Display', 'Georgia', serif",
+                  fontWeight: 800,
+                  fontSize: { xs: '1.5rem', sm: '1.9rem', md: '2.4rem' },
+                  color: isDarkMode ? '#e2e8f0' : '#1e293b',
+                  letterSpacing: '2px',
+                  lineHeight: 1.15,
+                  mt: 0.4,
+                  textShadow: isDarkMode ? '0 3px 12px rgba(0,0,0,0.5)' : '0 2px 10px rgba(255,255,255,0.8)',
+                }}
+              >
+                {displayCCODE || activeGn?.CCODE || ccode || selectedGN}
+              </Typography>
+            )}
+
+            {/* 3. District Pill (e.g. COLOMBO in pill) */}
+            {displayDistrict && (
+              <Box
+                sx={{
+                  my: { xs: 0.6, md: 1 },
+                  px: { xs: 2.8, md: 4 },
+                  py: { xs: 0.45, md: 0.65 },
+                  borderRadius: '50px',
+                  bgcolor: isDarkMode ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.08)',
+                  backdropFilter: 'blur(12px)',
+                  border: isDarkMode ? '1px solid rgba(255,255,255,0.22)' : '1px solid rgba(0,0,0,0.12)',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: { xs: '0.82rem', md: '1.05rem' },
+                    fontWeight: 800,
+                    letterSpacing: '2.5px',
+                    textTransform: 'uppercase',
+                    color: isDarkMode ? '#cbd5e1' : '#334155',
+                  }}
+                >
+                  {displayDistrict}
+                </Typography>
+              </Box>
+            )}
+
+            {/* 4. Village Name (Large Bold Serif) */}
+            {displayGN && (
+              <Typography
+                sx={{
+                  fontFamily: "'Playfair Display', 'Georgia', serif",
+                  fontWeight: 900,
+                  fontSize: { xs: '2.3rem', sm: '3.2rem', md: '4.2rem' },
+                  color: isDarkMode ? '#ffffff' : '#0f172a',
+                  letterSpacing: '-0.5px',
+                  lineHeight: 1.15,
+                  textShadow: isDarkMode ? '0 4px 20px rgba(0,0,0,0.7)' : '0 2px 16px rgba(255,255,255,0.9)',
+                }}
+              >
+                {displayGN}
+              </Typography>
+            )}
+
+            {/* 5. DS Division / City (Medium Serif) */}
+            {displayCity && (
+              <Typography
+                sx={{
+                  fontFamily: "'Playfair Display', 'Georgia', serif",
+                  fontWeight: 700,
+                  fontSize: { xs: '1.4rem', sm: '1.9rem', md: '2.4rem' },
+                  color: isDarkMode ? '#94a3b8' : '#334155',
+                  lineHeight: 1.2,
+                  textShadow: isDarkMode ? '0 2px 10px rgba(0,0,0,0.5)' : '0 2px 10px rgba(255,255,255,0.8)',
+                }}
+              >
+                {displayCity}
+              </Typography>
+            )}
+          </Box>
+
+          {/* ── 2-COLUMN RESPONSIVE DASHBOARD LAYOUT ── */}
+          <Grid container spacing={4} alignItems="flex-start" sx={{ mb: 6 }}>
+            {/* Left Column: Demographic & Survey Summary Cards */}
+            <Grid item xs={12} md={5} lg={4.5}>
+              <DemographicCards
+                populationData={populationData}
+                gnEconomyData={gnEconomyData}
+                language={language}
+                isDarkMode={isDarkMode}
+                onOpenCategory={(slug) => navigate(`/category/${slug}`)}
+              />
             </Grid>
 
-            {/* Charts Section on the left side (order 1 on desktop, order 2 on mobile) */}
-            <Grid item xs={12} sx={{ order: { xs: 2, md: 1 } }}>
-              {!showLocationModal && (displayGN || displayCity || displayDistrict) && (
-                <Box
-                  {...swipeHandlers}
-                  sx={{
-                    animation: 'fadeIn 1.5s ease-out forwards',
-                    '@keyframes fadeIn': {
-                      '0%': { opacity: 0 },
-                      '100%': { opacity: 1 },
-                    },
-                    bgcolor: { xs: isDarkMode ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.2)', md: 'transparent' },
-                    backdropFilter: { xs: 'blur(10px)', md: 'none' },
-                    borderRadius: '24px',
-                    p: { xs: 3, md: 0 },
-                    border: { xs: '1px solid rgba(255, 255, 255, 0.1)', md: 'none' },
-                    boxShadow: { xs: '0 8px 32px rgba(0,0,0,0.3)', md: 'none' }
-                  }}
-                >
-                  {/* Mobile Toggle Buttons */}
-                  {isMobileView && (
-                    <Box sx={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(3, 1fr)',
-                      gap: 1,
-                      mb: 3,
-                      alignItems: 'stretch',
-                      '& > button': {
-                        width: '100%',
-                        height: '100%',
-                        fontSize: '0.75rem',
-                        px: 0.5,
-                        py: 0.75,
-                        minWidth: 0,
-                        textTransform: 'none',
-                        lineHeight: 1.2,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        textAlign: 'center'
-                      }
-                    }}>
-                      {hasPopulationData && (
-                        <Button
-                          variant={activeMobileChart === 'pie' ? 'contained' : 'outlined'}
-                          onClick={() => setActiveMobileChart('pie')}
-                          size="small"
-                          sx={{
-                            borderRadius: '20px',
-                            color: activeMobileChart === 'pie' ? '#fff' : '#000000',
-                            borderColor: activeMobileChart === 'pie' ? 'transparent' : 'rgba(0,0,0,0.3)',
-                            fontWeight: 'bold',
-                            bgcolor: activeMobileChart === 'pie' ? 'primary.main' : 'transparent',
-                            '&:hover': { bgcolor: activeMobileChart === 'pie' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
-                          }}
-                        >
-                          Population
-                        </Button>
-                      )}
-                      {hasHousingData && (
-                        <Button
-                          variant={activeMobileChart === 'bar' ? 'contained' : 'outlined'}
-                          onClick={() => setActiveMobileChart('bar')}
-                          size="small"
-                          sx={{
-                            borderRadius: '20px',
-                            color: activeMobileChart === 'bar' ? '#fff' : '#000000',
-                            borderColor: activeMobileChart === 'bar' ? 'transparent' : 'rgba(0,0,0,0.3)',
-                            fontWeight: 'bold',
-                            bgcolor: activeMobileChart === 'bar' ? 'primary.main' : 'transparent',
-                            '&:hover': { bgcolor: activeMobileChart === 'bar' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
-                          }}
-                        >
-                          Housing
-                        </Button>
-                      )}
-                      {hasEconomyData && (
-                        <Button
-                          variant={activeMobileChart === 'economy' ? 'contained' : 'outlined'}
-                          onClick={() => setActiveMobileChart('economy')}
-                          size="small"
-                          sx={{
-                            borderRadius: '20px',
-                            color: activeMobileChart === 'economy' ? '#fff' : '#000000',
-                            borderColor: activeMobileChart === 'economy' ? 'transparent' : 'rgba(0,0,0,0.3)',
-                            fontWeight: 'bold',
-                            bgcolor: activeMobileChart === 'economy' ? 'primary.main' : 'transparent',
-                            '&:hover': { bgcolor: activeMobileChart === 'economy' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
-                          }}
-                        >
-                          Economy
-                        </Button>
-                      )}
-                      {hasAgeData && (
-                        <Button
-                          variant={activeMobileChart === 'age' ? 'contained' : 'outlined'}
-                          onClick={() => setActiveMobileChart('age')}
-                          size="small"
-                          sx={{
-                            borderRadius: '20px',
-                            color: activeMobileChart === 'age' ? '#fff' : '#000000',
-                            borderColor: activeMobileChart === 'age' ? 'transparent' : 'rgba(0,0,0,0.3)',
-                            fontWeight: 'bold',
-                            bgcolor: activeMobileChart === 'age' ? 'primary.main' : 'transparent',
-                            '&:hover': { bgcolor: activeMobileChart === 'age' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
-                          }}
-                        >
-                          Age
-                        </Button>
-                      )}
-                      {hasOwnershipData && (
-                        <Button
-                          variant={activeMobileChart === 'ownership' ? 'contained' : 'outlined'}
-                          onClick={() => setActiveMobileChart('ownership')}
-                          size="small"
-                          sx={{
-                            borderRadius: '20px',
-                            color: activeMobileChart === 'ownership' ? '#fff' : '#000000',
-                            borderColor: activeMobileChart === 'ownership' ? 'transparent' : 'rgba(0,0,0,0.3)',
-                            fontWeight: 'bold',
-                            bgcolor: activeMobileChart === 'ownership' ? 'primary.main' : 'transparent',
-                            '&:hover': { bgcolor: activeMobileChart === 'ownership' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
-                          }}
-                        >
-                          Ownership
-                        </Button>
-                      )}
-                      {hasWallData && (
-                        <Button
-                          variant={activeMobileChart === 'wall' ? 'contained' : 'outlined'}
-                          onClick={() => setActiveMobileChart('wall')}
-                          size="small"
-                          sx={{
-                            borderRadius: '20px',
-                            color: activeMobileChart === 'wall' ? '#fff' : '#000000',
-                            borderColor: activeMobileChart === 'wall' ? 'transparent' : 'rgba(0,0,0,0.3)',
-                            fontWeight: 'bold',
-                            bgcolor: activeMobileChart === 'wall' ? 'primary.main' : 'transparent',
-                            '&:hover': { bgcolor: activeMobileChart === 'wall' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
-                          }}
-                        >
-                          Wall Type
-                        </Button>
-                      )}
-                      {hasUnitData && (
-                        <Button
-                          variant={activeMobileChart === 'unit' ? 'contained' : 'outlined'}
-                          onClick={() => setActiveMobileChart('unit')}
-                          size="small"
-                          sx={{
-                            borderRadius: '20px',
-                            color: activeMobileChart === 'unit' ? '#fff' : '#000000',
-                            borderColor: activeMobileChart === 'unit' ? 'transparent' : 'rgba(0,0,0,0.3)',
-                            fontWeight: 'bold',
-                            bgcolor: activeMobileChart === 'unit' ? 'primary.main' : 'transparent',
-                            '&:hover': { bgcolor: activeMobileChart === 'unit' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
-                          }}
-                        >
-                          Unit Type
-                        </Button>
-                      )}
-                      {hasToiletData && (
-                        <Button
-                          variant={activeMobileChart === 'toilet' ? 'contained' : 'outlined'}
-                          onClick={() => setActiveMobileChart('toilet')}
-                          size="small"
-                          sx={{
-                            borderRadius: '20px',
-                            color: activeMobileChart === 'toilet' ? '#fff' : '#000000',
-                            borderColor: activeMobileChart === 'toilet' ? 'transparent' : 'rgba(0,0,0,0.3)',
-                            fontWeight: 'bold',
-                            bgcolor: activeMobileChart === 'toilet' ? 'primary.main' : 'transparent',
-                            '&:hover': { bgcolor: activeMobileChart === 'toilet' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
-                          }}
-                        >
-                          Toilet
-                        </Button>
-                      )}
-                      {hasWaterData && (
-                        <Button
-                          variant={activeMobileChart === 'water' ? 'contained' : 'outlined'}
-                          onClick={() => setActiveMobileChart('water')}
-                          size="small"
-                          sx={{
-                            borderRadius: '20px',
-                            color: activeMobileChart === 'water' ? '#fff' : '#000000',
-                            borderColor: activeMobileChart === 'water' ? 'transparent' : 'rgba(0,0,0,0.3)',
-                            fontWeight: 'bold',
-                            bgcolor: activeMobileChart === 'water' ? 'primary.main' : 'transparent',
-                            '&:hover': { bgcolor: activeMobileChart === 'water' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
-                          }}
-                        >
-                          Water
-                        </Button>
-                      )}
-                      {hasWasteData && (
-                        <Button
-                          variant={activeMobileChart === 'waste' ? 'contained' : 'outlined'}
-                          onClick={() => setActiveMobileChart('waste')}
-                          size="small"
-                          sx={{
-                            borderRadius: '20px',
-                            color: activeMobileChart === 'waste' ? '#fff' : '#000000',
-                            borderColor: activeMobileChart === 'waste' ? 'transparent' : 'rgba(0,0,0,0.3)',
-                            fontWeight: 'bold',
-                            bgcolor: activeMobileChart === 'waste' ? 'primary.main' : 'transparent',
-                            '&:hover': { bgcolor: activeMobileChart === 'waste' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
-                          }}
-                        >
-                          Waste
-                        </Button>
-                      )}
-                      {hasRoomsData && (
-                        <Button
-                          variant={activeMobileChart === 'rooms' ? 'contained' : 'outlined'}
-                          onClick={() => setActiveMobileChart('rooms')}
-                          size="small"
-                          sx={{
-                            borderRadius: '20px',
-                            color: activeMobileChart === 'rooms' ? '#fff' : '#000000',
-                            borderColor: activeMobileChart === 'rooms' ? 'transparent' : 'rgba(0,0,0,0.3)',
-                            fontWeight: 'bold',
-                            bgcolor: activeMobileChart === 'rooms' ? 'primary.main' : 'transparent',
-                            '&:hover': { bgcolor: activeMobileChart === 'rooms' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
-                          }}
-                        >
-                          Rooms
-                        </Button>
-                      )}
-                      {hasRoofData && (
-                        <Button
-                          variant={activeMobileChart === 'roof' ? 'contained' : 'outlined'}
-                          onClick={() => setActiveMobileChart('roof')}
-                          size="small"
-                          sx={{
-                            borderRadius: '20px',
-                            color: activeMobileChart === 'roof' ? '#fff' : '#000000',
-                            borderColor: activeMobileChart === 'roof' ? 'transparent' : 'rgba(0,0,0,0.3)',
-                            fontWeight: 'bold',
-                            bgcolor: activeMobileChart === 'roof' ? 'primary.main' : 'transparent',
-                            '&:hover': { bgcolor: activeMobileChart === 'roof' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
-                          }}
-                        >
-                          Roof Type
-                        </Button>
-                      )}
-                      {hasReligionData && (
-                        <Button
-                          variant={activeMobileChart === 'religion' ? 'contained' : 'outlined'}
-                          onClick={() => setActiveMobileChart('religion')}
-                          size="small"
-                          sx={{
-                            borderRadius: '20px',
-                            color: activeMobileChart === 'religion' ? '#fff' : '#000000',
-                            borderColor: activeMobileChart === 'religion' ? 'transparent' : 'rgba(0,0,0,0.3)',
-                            fontWeight: 'bold',
-                            bgcolor: activeMobileChart === 'religion' ? 'primary.main' : 'transparent',
-                            '&:hover': { bgcolor: activeMobileChart === 'religion' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
-                          }}
-                        >
-                          Religion
-                        </Button>
-                      )}
-                      {hasHouseholdData && (
-                        <Button
-                          variant={activeMobileChart === 'household' ? 'contained' : 'outlined'}
-                          onClick={() => setActiveMobileChart('household')}
-                          size="small"
-                          sx={{
-                            borderRadius: '20px',
-                            color: activeMobileChart === 'household' ? '#fff' : '#000000',
-                            borderColor: activeMobileChart === 'household' ? 'transparent' : 'rgba(0,0,0,0.3)',
-                            fontWeight: 'bold',
-                            bgcolor: activeMobileChart === 'household' ? 'primary.main' : 'transparent',
-                            '&:hover': { bgcolor: activeMobileChart === 'household' ? 'primary.dark' : 'rgba(255,255,255,0.1)' }
-                          }}
-                        >
-                          Household
-                        </Button>
-                      )}
-                    </Box>
-                  )}
-
-                  {hasPopulationData && isMobileView && activeMobileChart === 'pie' && (
-                    <PopulationInfographic populationData={populationData} language={language} />
-                  )}
-
-                  {isMobileView && activeMobileChart === 'bar' && (
-                    <Box sx={{ height: '350px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Custom3DBarChart
-                        gn_id={selectedGN}
-                        city_code={selectedCity}
-                        district_id={selectedDistrict}
-                        location_name={displayGN || displayCity || displayDistrict}
-                      />
-                    </Box>
-                  )}
-
-                  {isMobileView && activeMobileChart === 'economy' && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                      {gnEconomyChartUI}
-                    </Box>
-                  )}
-
-                  {isMobileView && activeMobileChart === 'age' && (
-                    <Box sx={{ height: '350px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <AgeDemographicsChart
-                        data={populationData || undefined}
-                        location_name={displayGN || displayCity || displayDistrict}
-                      />
-                    </Box>
-                  )}
-
-                  {isMobileView && activeMobileChart === 'ownership' && (
-                    <Box sx={{ height: '350px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <HousingOwnershipChart
-                        data={housingOwnershipData || undefined}
-                        location_name={displayGN || displayCity || displayDistrict}
-                      />
-                    </Box>
-                  )}
-
-                  {isMobileView && activeMobileChart === 'wall' && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                      {gnWallChartUI}
-                    </Box>
-                  )}
-
-                  {isMobileView && activeMobileChart === 'unit' && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                      {gnUnitChartUI}
-                    </Box>
-                  )}
-
-                  {isMobileView && activeMobileChart === 'toilet' && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                      {gnToiletChartUI}
-                    </Box>
-                  )}
-
-                  {isMobileView && activeMobileChart === 'water' && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                      {gnWaterChartUI}
-                    </Box>
-                  )}
-
-                  {isMobileView && activeMobileChart === 'waste' && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                      {gnWasteChartUI}
-                    </Box>
-                  )}
-
-                  {isMobileView && activeMobileChart === 'rooms' && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                      {gnRoomsChartUI}
-                    </Box>
-                  )}
-
-                  {isMobileView && activeMobileChart === 'roof' && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                      {gnRoofChartUI}
-                    </Box>
-                  )}
-
-                  {isMobileView && activeMobileChart === 'religion' && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                      {gnReligionChartUI}
-                    </Box>
-                  )}
-
-                  {isMobileView && activeMobileChart === 'household' && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                      {gnHouseholdChartUI}
-                    </Box>
-                  )}
-                </Box>
-              )}
+            {/* Right Column: Village Map Card */}
+            <Grid item xs={12} md={7} lg={7.5} sx={{ display: 'flex', flexDirection: 'column' }}>
+              {/* Village Map Card */}
+              <VillageMap
+                gnName={displayGN}
+                district={displayDistrict}
+                dsDivision={displayCity}
+                ccode={displayCCODE}
+                boundary={activeGn?.boundary}
+                height={600}
+                language={language}
+              />
             </Grid>
           </Grid>
         </Container>
