@@ -24,7 +24,7 @@ import GnPageFooter from '../components/GnPageFooter';
 import LocationSelectorModal from '../components/LocationSelectorModal';
 import { VillageMap } from '../components/VillageMap';
 import { GnTopHeaderBar } from '../components/GnTopHeaderBar';
-import { DemographicCards } from '../components/DemographicCards';
+import { DemographicCards, BelowMapCards } from '../components/DemographicCards';
 import { WeatherInfoCard } from '../components/WeatherInfoCard';
 
 
@@ -2163,19 +2163,22 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
 
           {/* ── 2-COLUMN RESPONSIVE DASHBOARD LAYOUT ── */}
           <Grid container spacing={4} alignItems="flex-start" sx={{ mb: 6 }}>
-            {/* Left Column: Demographic & Survey Summary Cards */}
+            {/* Left Column: Demographic Cards (Village Population & Survey Census Categories) */}
             <Grid item xs={12} md={5} lg={4.5}>
               <DemographicCards
                 populationData={populationData}
-                gnEconomyData={gnEconomyData}
                 language={language}
                 isDarkMode={isDarkMode}
-                onOpenCategory={(slug) => navigate(`/category/${slug}`)}
+                onOpenCategory={(slug) => {
+                  const targetGn = (displayGN || activeGn?.nameEn || gnName || 'Pahalagama').replace(/ /g, '-');
+                  const targetCcode = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'RATPA';
+                  navigate(`/gnpage/${encodeURIComponent(targetGn)}/${encodeURIComponent(targetCcode)}/${slug}`);
+                }}
               />
             </Grid>
 
-            {/* Right Column: Village Map Card */}
-            <Grid item xs={12} md={7} lg={7.5} sx={{ display: 'flex', flexDirection: 'column' }}>
+            {/* Right Column: Village Map Card + Both Age Groups & Employment Cards (Below Map) */}
+            <Grid item xs={12} md={7} lg={7.5} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
               {/* Village Map Card */}
               <VillageMap
                 gnName={displayGN}
@@ -2183,8 +2186,21 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                 dsDivision={displayCity}
                 ccode={displayCCODE}
                 boundary={activeGn?.boundary}
-                height={600}
+                height={500}
                 language={language}
+              />
+
+              {/* Both Age Groups & Employment Cards Below the Map */}
+              <BelowMapCards
+                populationData={populationData}
+                gnEconomyData={gnEconomyData}
+                language={language}
+                isDarkMode={isDarkMode}
+                onOpenCategory={(slug) => {
+                  const targetGn = (displayGN || activeGn?.nameEn || gnName || 'Pahalagama').replace(/ /g, '-');
+                  const targetCcode = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'RATPA';
+                  navigate(`/gnpage/${encodeURIComponent(targetGn)}/${encodeURIComponent(targetCcode)}/${slug}`);
+                }}
               />
             </Grid>
           </Grid>
