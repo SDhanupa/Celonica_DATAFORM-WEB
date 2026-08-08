@@ -22,6 +22,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { CATEGORIES } from './CategoryDetailPage';
 import GnPageFooter from '../components/GnPageFooter';
 import LocationSelectorModal from '../components/LocationSelectorModal';
+import { VillageMap } from '../components/VillageMap';
 
 
 const tChart = {
@@ -2576,6 +2577,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                   }
                 }}
               >
+            <Button href="#chart-map" sx={{ justifyContent: 'flex-end', color: themeColors.textDark, textTransform: 'none', fontWeight: 'bold', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)', borderRadius: '12px' } }}>🗺️ {language === 'en' ? 'Village Map' : language === 'si' ? 'ගම් සිතියම' : 'வரைபடம்'}</Button>
             {hasPopulationData && <Button href="#chart-population" sx={{ justifyContent: 'flex-end', color: themeColors.textDark, textTransform: 'none', fontWeight: 'bold', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)', borderRadius: '12px' } }}>{t.tabPopulation}</Button>}
             {hasAgeData && <Button href="#chart-age" sx={{ justifyContent: 'flex-end', color: themeColors.textDark, textTransform: 'none', fontWeight: 'bold', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)', borderRadius: '12px' } }}>{t.tabAge}</Button>}
             {hasUnitData && <Button href="#chart-unit" sx={{ justifyContent: 'flex-end', color: themeColors.textDark, textTransform: 'none', fontWeight: 'bold', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)', borderRadius: '12px' } }}>{t.tabUnitType}</Button>}
@@ -2596,9 +2598,23 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         )}
       </Box>
 
-      {/* Charts Section (Desktop Only) */}
+      {/* Charts & Map Section (Desktop Only) */}
       {!isMobileView && (selectedGN || selectedCity || selectedDistrict) && (
         <>
+          {/* ── OpenStreetMap Village Boundary Explorer ────────────────── */}
+          <Box id="chart-map" sx={{ width: '100%', mb: 6, mt: 4 }}>
+            <Container maxWidth="xl">
+              <VillageMap
+                gnName={displayGN}
+                district={displayDistrict}
+                dsDivision={displayCity}
+                ccode={displayCCODE}
+                boundary={activeGn?.boundary}
+                height={500}
+              />
+            </Container>
+          </Box>
+
           {hasPopulationData && (
             <Box id="chart-population" sx={{
               bgcolor: '#eef2f3',

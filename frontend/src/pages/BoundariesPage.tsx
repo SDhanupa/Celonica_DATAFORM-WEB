@@ -21,6 +21,7 @@ import { useAuth } from '../auth/AuthProvider';
 import { GET_GN_BY_CCODE, GET_POLICE_BY_GN_CCODE, GET_POST_OFFICES_BY_DS_CODE, GET_APPROVED_SUBMISSIONS } from '../graphql/queries';
 import GnPageFooter from '../components/GnPageFooter';
 import { CATEGORIES } from './CategoryDetailPage';
+import { VillageMap } from '../components/VillageMap';
 
 // ─── Theme helper ────────────────────────────────────────────────────────────
 const getTC = (dark: boolean) => ({
@@ -391,6 +392,18 @@ const BoundariesPage: React.FC = () => {
 
         {!loading && !error && gn && (
           <Grid container spacing={3}>
+
+            {/* ── OpenStreetMap Interactive Boundary Map ────────────────── */}
+            <Grid item xs={12}>
+              <VillageMap
+                gnName={gn?.nameEn || decodedGnName}
+                district={district?.admin2NameEn || ''}
+                dsDivision={gn?.dsEn || ''}
+                ccode={gn?.CCODE || ccode || ''}
+                boundary={gn?.boundary}
+                height={480}
+              />
+            </Grid>
 
             {/* ── Location Hierarchy ─────────────────────────────────────── */}
             <Grid item xs={12}>

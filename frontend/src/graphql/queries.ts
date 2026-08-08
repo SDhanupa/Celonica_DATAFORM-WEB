@@ -562,6 +562,13 @@ export const GET_GN_BY_COORDINATES = gql`
       dsSi
       dsTa
       divisionalSecretariatCode
+      boundary {
+        minLat
+        maxLat
+        minLng
+        maxLng
+        polygons
+      }
       pDistrict {
         id
         admin2NameEn
@@ -719,6 +726,13 @@ export const GET_GN_BY_CCODE = gql`
       dsSi
       dsTa
       divisionalSecretariatCode
+      boundary {
+        minLat
+        maxLat
+        minLng
+        maxLng
+        polygons
+      }
       pDistrict {
         id
         admin2NameEn

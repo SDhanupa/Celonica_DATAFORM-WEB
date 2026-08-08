@@ -100,6 +100,10 @@ type Query {
     "Get GN by CCODE directly"
     gnByCcode(CCODE: String! @eq): GramaNiladhari @find
 
+    "Get GN boundary and polygon coordinates"
+    gnBoundary(gn_name: String, ccode: String, district: String): GnBoundary
+        @field(resolver: "App\\GraphQL\\Queries\\GramaNiladhariQueries@getGnBoundary")
+
     "Get all admins"
     admins: [Admin!]!
         @field(resolver: "App\\GraphQL\\Queries\\AdminQueries@admins")
@@ -453,6 +457,15 @@ type GramaNiladhari {
     housingRoofType: HousingRoofType @hasOne
     religiousAffiliation: ReligiousAffiliation @hasOne
     householdHeadRelationship: HouseholdHeadRelationship @hasOne
+    boundary: GnBoundary @field(resolver: "App\\GraphQL\\Queries\\GramaNiladhariQueries@boundary")
+}
+
+type GnBoundary {
+    minLat: Float @rename(attribute: "min_lat")
+    maxLat: Float @rename(attribute: "max_lat")
+    minLng: Float @rename(attribute: "min_lng")
+    maxLng: Float @rename(attribute: "max_lng")
+    polygons: String
 }
 
 type HouseholdHeadRelationship {
