@@ -209,11 +209,8 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
         }}
       >
         {/* ── LEFT LOGO SECTION (Dynamic Location Info) ── */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', px: { xs: 2, md: 4 }, borderRight: { md: `1px solid ${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}` }, minWidth: '220px' }}>
-          <Typography sx={{ fontFamily: "'Noto Serif Sinhala', serif", fontSize: '1.8rem', fontWeight: 800, color: isDarkMode ? '#e2e8f0' : '#1e293b', lineHeight: 1.2 }}>
-            {t.myVillage}
-          </Typography>
-          <Typography sx={{ fontFamily: "'Playfair Display', serif", fontSize: '1.4rem', fontWeight: 900, color: '#3b82f6', letterSpacing: '2px', mt: 0.5 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', px: { xs: 2, md: 4 }, borderRight: { md: `1px solid ${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}` }, minWidth: '220px' }}>
+          <Typography sx={{ fontFamily: "'Playfair Display', serif", fontSize: '2.5rem', fontWeight: 900, color: '#3b82f6', letterSpacing: '2px' }}>
             {activeCcode || 'WCDOR'}
           </Typography>
         </Box>

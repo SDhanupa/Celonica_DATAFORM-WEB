@@ -148,6 +148,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [locating, setLocating] = useState<boolean>(false);
+  const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
 
   // Dropdown State
   const [selectedDistrict, setSelectedDistrict] = useState<string>('');
@@ -851,7 +852,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           zIndex: 10,
         }}>
           {/* Theme & Search */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1 }}>
             <IconButton onClick={() => setIsDarkMode(!isDarkMode)} size="small" sx={{ color: '#d1d5db' }}>
               {isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
             </IconButton>
@@ -860,8 +861,28 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             </IconButton>
           </Box>
 
+          {/* Center Button */}
+          <Box sx={{ display: 'flex', justifyContent: 'center', flex: 1 }}>
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => { register(window.location.href); }}
+              sx={{
+                bgcolor: '#3b82f6',
+                color: '#fff',
+                textTransform: 'none',
+                fontWeight: 600,
+                px: 3,
+                borderRadius: '20px',
+                '&:hover': { bgcolor: '#2563eb' }
+              }}
+            >
+              Join with us
+            </Button>
+          </Box>
+
           {/* Desktop Links */}
-          <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 2, fontWeight: 500, fontSize: '0.9rem' }}>
+          <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', justifyContent: 'flex-end', gap: 2, fontWeight: 500, fontSize: '0.9rem', flex: 1 }}>
             <Typography onClick={() => navigate(gnName && ccode ? `/gnpage/${gnName}/${ccode}` : '/gnpage')} sx={{ cursor: 'pointer', color: '#d1d5db', '&:hover': { color: '#fff' } }}>Home</Typography>
             <Typography sx={{ opacity: 0.3, color: '#9ca3af' }}>|</Typography>
             <Typography onClick={(e) => setCatMenuAnchor(e.currentTarget as HTMLElement)} sx={{ cursor: 'pointer', color: '#d1d5db', '&:hover': { color: '#fff' } }}>Categories ▾</Typography>
@@ -907,7 +928,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             </Menu>
           </Box>
         </Box>
-        <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1, pt: { xs: 7, md: 7 }, pb: 8 }}>
+        <Container maxWidth={false} sx={{ position: 'relative', zIndex: 1, pt: { xs: 7, md: 7 }, pb: 8, px: { xs: 2, md: 4, lg: 6, xl: 10 } }}>
 
           {/* ── TOP HEADER GLASS BAR (Location Selectors & Categories Ribbon) ── */}
           <GnTopHeaderBar
@@ -938,46 +959,114 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           />
 
           {/* ── LARGE GN NAME DISPLAY ── */}
-          <Box sx={{ mt: 0, mb: { xs: 1, md: 2 }, px: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Typography
-              variant="h1"
-              sx={{
-                fontFamily: '"Playfair Display", "Merriweather", "Georgia", serif',
-                fontWeight: 900,
-                fontSize: { xs: '2rem', sm: '2.8rem', md: '3.5rem', lg: '4.2rem' },
-                color: isDarkMode ? '#f8fafc' : '#0f172a',
-                lineHeight: 1,
-                letterSpacing: '-0.02em',
-                wordBreak: 'break-word',
-                textAlign: 'center',
-                textShadow: isDarkMode ? '0 10px 30px rgba(0,0,0,0.8)' : '0 10px 30px rgba(255,255,255,0.8)',
-                mb: 1,
-              }}
-            >
-              {displayGN || 'Sammanthranapura'}
-            </Typography>
+          <Box sx={{ mt: 0, mb: { xs: 1, md: 2 }, px: 2, display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr auto 1fr' }, alignItems: 'center', gap: { xs: 1, md: 2 }, width: '100%' }}>
+            {/* Spacer for perfect center alignment */}
+            <Box sx={{ display: { xs: 'none', md: 'block' } }} />
 
-            <Typography
-              sx={{
-                maxWidth: '1400px',
-                width: '100%',
-                textAlign: 'center',
-                fontFamily: '"Times New Roman", Times, serif',
-                fontSize: { xs: '1rem', md: '1.15rem' },
-                color: isDarkMode ? '#ffffff' : '#000000',
-                lineHeight: 1.6,
-                textShadow: isDarkMode 
-                  ? '0 2px 10px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.8)' 
-                  : '0 2px 10px rgba(255,255,255,1), 0 0 15px rgba(255,255,255,1)',
-                fontWeight: 600,
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: { xs: 1, sm: 1.5, md: 2 } }}>
+              <Box 
+                component="img" 
+                src="/logo.png" 
+                alt="CDIC Logo" 
+                sx={{ 
+                  height: { xs: '2.2rem', sm: '3rem', md: '3.8rem', lg: '4.5rem' }, 
+                  width: 'auto',
+                  objectFit: 'contain' 
+                }} 
+              />
+              <Typography
+                variant="h1"
+                sx={{
+                  fontFamily: '"Playfair Display", "Merriweather", "Georgia", serif',
+                  fontWeight: 900,
+                  fontSize: { xs: '2rem', sm: '2.8rem', md: '3.5rem', lg: '4.2rem' },
+                  color: isDarkMode ? '#f8fafc' : '#0f172a',
+                  lineHeight: 1,
+                  letterSpacing: '-0.02em',
+                  wordBreak: 'break-word',
+                  textAlign: 'center',
+                  textShadow: isDarkMode ? '0 10px 30px rgba(0,0,0,0.8)' : '0 10px 30px rgba(255,255,255,0.8)',
+                  mb: 0,
+                }}
+              >
+                {displayGN || 'Sammanthranapura'}
+              </Typography>
+            </Box>
+
+            <Box sx={{ display: 'flex', justifyContent: { xs: 'center', md: 'flex-start' } }}>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => setIsAboutModalOpen(true)}
+                sx={{
+                  mt: { xs: 1, md: 1.5 },
+                  px: 1.5,
+                  py: 0.25,
+                  fontSize: '0.75rem',
+                  borderRadius: '20px',
+                  textTransform: 'none',
+                  fontWeight: 700,
+                  color: isDarkMode ? '#ffffff' : '#0f172a',
+                  backgroundColor: isDarkMode ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.8)',
+                  backdropFilter: 'blur(4px)',
+                  borderColor: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.3)',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  '&:hover': {
+                    backgroundColor: isDarkMode ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,1)',
+                    borderColor: isDarkMode ? '#ffffff' : '#000000',
+                  }
+                }}
+              >
+                {language === 'si' ? 'ගම පිළිබඳව' : language === 'ta' ? 'கிராமத்தைப் பற்றி' : 'About Village'}
+              </Button>
+            </Box>
+            
+            <Dialog 
+              open={isAboutModalOpen} 
+              onClose={() => setIsAboutModalOpen(false)}
+              maxWidth="sm"
+              fullWidth
+              PaperProps={{
+                sx: {
+                  borderRadius: '16px',
+                  bgcolor: isDarkMode ? '#1e293b' : '#ffffff',
+                  color: isDarkMode ? '#f8fafc' : '#0f172a',
+                }
               }}
             >
-              {language === 'si' 
-                ? 'ප්‍රජා තොරතුරු සම්පාදනය තුළින් ගම සංවර්ධනයේ පදනම සකස් වේ. ඒ සඳහා ලංකාවේ ඕනෑම පුද්ගලයෙකුට සාමාජිකත්වය, ප්‍රතිලාභ, නායකත්වය ලබාගත හැකි වේදිකාවකි. මෙය මුළුමනින්ම ගමේ සාමාජිකයින් එකතු වී ගම සංවිධානය කරගන්නා නව ප්‍රවේශයකි. දශක කිහිපයක පර්යේෂණයකින් ගොඩනැගුණු මහජන මෙවලමකි. ඔබ ඔබේ ගම ගොඩනගන්න, ගමේ වෙබ් අඩවිය නිර්මානය කරගනිමින් එකතු වෙන්න. Login වන්න. පද්ධතිය සඳහා ඔබේ ගමේ පළමු සාමාජිකයා, නියමුවා බවට පත්වන්න.'
-                : language === 'ta'
-                ? 'சமூக தகவல் தொகுப்பின் மூலம் கிராம வளர்ச்சியின் அடிப்படை அமைக்கப்படுகிறது. இது இலங்கையில் உள்ள எவரும் உறுப்புரிமை, நன்மைகள் மற்றும் தலைமையை பெறக்கூடிய ஒரு தளமாகும். இது கிராம உறுப்பினர்கள் ஒன்றிணைந்து கிராமத்தை ஒழுங்கமைக்கும் ஒரு புதிய அணுகுமுறையாகும். இது பல தசாப்த கால ஆராய்ச்சியின் மூலம் உருவாக்கப்பட்ட ஒரு பொது கருவியாகும். உங்கள் கிராமத்தை உருவாக்குங்கள், கிராம வலைத்தளத்தை உருவாக்குவதன் மூலம் இணையுங்கள். உள்நுழையவும். உங்கள் கிராமத்திற்கான அமைப்பின் முதல் உறுப்பினர் மற்றும் வழிகாட்டியாக மாறுங்கள்.'
-                : 'Community information compilation lays the foundation for village development. It is a platform where any individual in Sri Lanka can obtain membership, benefits, and leadership. This is a completely new approach where village members come together to organize their own village. It is a public tool built on decades of research. Build your village, and join by creating your village website. Login now. Become the first member and the pioneer of your village system.'}
-            </Typography>
+              <DialogContent sx={{ p: 4, textAlign: 'center' }}>
+                <Typography sx={{ 
+                  fontFamily: '"Times New Roman", Times, serif',
+                  fontSize: '1.1rem',
+                  lineHeight: 1.6,
+                  color: isDarkMode ? '#e2e8f0' : '#1e293b'
+                }}>
+                  {language === 'si' 
+                    ? 'ප්‍රජා තොරතුරු සම්පාදනය තුළින් ගම සංවර්ධනයේ පදනම සකස් වේ. ඒ සඳහා ලංකාවේ ඕනෑම පුද්ගලයෙකුට සාමාජිකත්වය, ප්‍රතිලාභ, නායකත්වය ලබාගත හැකි වේදිකාවකි. මෙය මුළුමනින්ම ගමේ සාමාජිකයින් එකතු වී ගම සංවිධානය කරගන්නා නව ප්‍රවේශයකි. දශක කිහිපයක පර්යේෂණයකින් ගොඩනැගුණු මහජන මෙවලමකි. ඔබ ඔබේ ගම ගොඩනගන්න, ගමේ වෙබ් අඩවිය නිර්මානය කරගනිමින් එකතු වෙන්න. Login වන්න. පද්ධතිය සඳහා ඔබේ ගමේ පළමු සාමාජිකයා, නියමුවා බවට පත්වන්න.'
+                    : language === 'ta'
+                    ? 'சமூக தகவல் தொகுப்பின் மூலம் கிராம வளர்ச்சியின் அடிப்படை அமைக்கப்படுகிறது. இது இலங்கையில் உள்ள எவரும் உறுப்புரிமை, நன்மைகள் மற்றும் தலைமையை பெறக்கூடிய ஒரு தளமாகும். இது கிராம உறுப்பினர்கள் ஒன்றிணைந்து கிராமத்தை ஒழுங்கமைக்கும் ஒரு புதிய அணுகுமுறையாகும். இது பல தசாப்த கால ஆராய்ச்சியின் மூலம் உருவாக்கப்பட்ட ஒரு பொது கருவியாகும். உங்கள் கிராமத்தை உருவாக்குங்கள், கிராம வலைத்தளத்தை உருவாக்குவதன் மூலம் இணையுங்கள். உள்நுழையவும். உங்கள் கிராமத்திற்கான அமைப்பின் முதல் உறுப்பினர் மற்றும் வழிகாட்டியாக மாறுங்கள்.'
+                    : 'Community information compilation lays the foundation for village development. It is a platform where any individual in Sri Lanka can obtain membership, benefits, and leadership. This is a completely new approach where village members come together to organize their own village. It is a public tool built on decades of research. Build your village, and join by creating your village website. Login now. Become the first member and the pioneer of your village system.'}
+                </Typography>
+              </DialogContent>
+              <DialogActions sx={{ p: 2, pb: 3, justifyContent: 'center' }}>
+                <Button 
+                  onClick={() => setIsAboutModalOpen(false)}
+                  variant="contained"
+                  disableElevation
+                  sx={{ 
+                    fontWeight: 600, 
+                    textTransform: 'none',
+                    borderRadius: '8px',
+                    bgcolor: isDarkMode ? '#3b82f6' : '#2563eb',
+                    '&:hover': {
+                      bgcolor: isDarkMode ? '#2563eb' : '#1d4ed8',
+                    }
+                  }}
+                >
+                  {language === 'si' ? 'වහන්න' : language === 'ta' ? 'மூடு' : 'Close'}
+                </Button>
+              </DialogActions>
+            </Dialog>
           </Box>
 
           {/* ── 2-COLUMN RESPONSIVE DASHBOARD LAYOUT ── */}

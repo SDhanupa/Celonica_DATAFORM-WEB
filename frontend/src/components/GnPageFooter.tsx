@@ -20,6 +20,7 @@ const GnPageFooter: React.FC<GnPageFooterProps> = () => {
           
           {/* Branding */}
           <Grid item xs={12} md={4} sx={{ textAlign: { xs: 'center', md: 'left' } }}>
+            <Box component="img" src="/logo.png" alt="CDIC Logo" sx={{ height: 130, mb: 2, objectFit: 'contain' }} />
             <Typography variant="h4" sx={{ fontWeight: 800, fontFamily: "'Playfair Display', serif", color: '#ffffff', mb: 2 }}>
               Ceylonica
             </Typography>
