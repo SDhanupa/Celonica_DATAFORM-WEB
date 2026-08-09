@@ -575,23 +575,6 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, width: '100%' }}>
-      {/* ── TOP BADGE: DEMOGRAPHIC DATA ────────────────────────────── */}
-      <Box
-        sx={{
-          bgcolor: '#1d4ed8',
-          color: '#ffffff',
-          py: 1.2,
-          px: 3,
-          borderRadius: '16px',
-          textAlign: 'center',
-          boxShadow: '0 8px 24px rgba(29, 78, 216, 0.35)',
-          fontWeight: 800,
-          fontSize: '1.05rem',
-          letterSpacing: '0.5px',
-        }}
-      >
-        {t.demographicBadge}
-      </Box>
 
       {/* ── CARD 1: VILLAGE POPULATION (Bar Diagram) ────────────────── */}
       <Box

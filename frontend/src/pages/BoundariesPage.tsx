@@ -347,30 +347,7 @@ const BoundariesPage: React.FC = () => {
             {decodedGnName} &nbsp;<span style={{opacity: 0.6}}>•</span>&nbsp; <span style={{fontFamily: 'monospace', background: 'rgba(0,0,0,0.2)', padding: '3px 8px', borderRadius: '6px'}}>{ccode}</span>
           </Typography>
 
-          {/* Breadcrumb chips */}
-          <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', justifyContent: 'center', mt: 4 }}>
-            {district && (
-              <Chip
-                icon={<AccountBalanceIcon sx={{ fontSize: '1.1rem !important', color: '#fff' }} />}
-                label={`District: ${district.admin2NameEn}`}
-                sx={{ bgcolor: 'rgba(255,255,255,0.15)', color: '#fff', fontWeight: 600, fontSize: '0.88rem', py: 2.2, px: 0.5, borderRadius: 3, backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.2)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
-              />
-            )}
-            {gn?.dsEn && (
-              <Chip
-                icon={<BusinessIcon sx={{ fontSize: '1.1rem !important', color: '#fff' }} />}
-                label={`DS Division: ${gn.dsEn}`}
-                sx={{ bgcolor: 'rgba(255,255,255,0.15)', color: '#fff', fontWeight: 600, fontSize: '0.88rem', py: 2.2, px: 0.5, borderRadius: 3, backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.2)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
-              />
-            )}
-            {gn?.nameEn && (
-              <Chip
-                icon={<LocationOnIcon sx={{ fontSize: '1.1rem !important', color: '#fff' }} />}
-                label={`GN: ${gn.nameEn}`}
-                sx={{ bgcolor: 'rgba(255,255,255,0.15)', color: '#fff', fontWeight: 600, fontSize: '0.88rem', py: 2.2, px: 0.5, borderRadius: 3, backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.2)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
-              />
-            )}
-          </Box>
+          {/* Breadcrumb chips removed as per request */}
         </Box>
       </Box>
 

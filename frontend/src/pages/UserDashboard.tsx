@@ -841,79 +841,74 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           }}
         />
 
-        <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1, pt: { xs: 3, md: 4.5 }, pb: 8 }}>
-
-          {/* ── TOP PRIMARY NAVBAR ── */}
-          <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', mb: 3 }}>
-            <Box sx={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap',
-              gap: { xs: 1.5, sm: 3 },
-              bgcolor: isDarkMode ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255, 255, 255, 0.88)',
-              backdropFilter: 'blur(20px)',
-              px: { xs: 2, sm: 3 }, py: { xs: 1, sm: 1.2 },
-              borderRadius: '50px',
-              border: isDarkMode ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(255,255,255,0.85)',
-              boxShadow: isDarkMode ? '0 8px 32px rgba(0,0,0,0.4)' : '0 8px 32px rgba(0,0,0,0.06)',
-              maxWidth: '92vw',
-            }}>
-              {/* Theme & Search */}
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <IconButton onClick={() => setIsDarkMode(!isDarkMode)} size="small" sx={{ color: isDarkMode ? '#f59e0b' : '#334155', p: 0.6 }}>
-                  {isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
-                </IconButton>
-                <IconButton onClick={() => setShowLocationModal(true)} size="small" sx={{ color: isDarkMode ? '#f8fafc' : '#334155', p: 0.6 }}>
-                  <SearchIcon fontSize="small" />
-                </IconButton>
-              </Box>
-
-              {/* Desktop Links */}
-              <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 1.8, fontWeight: 600, fontSize: '0.92rem' }}>
-                <Typography onClick={() => navigate(gnName && ccode ? `/gnpage/${gnName}/${ccode}` : '/gnpage')} sx={{ cursor: 'pointer', fontWeight: 700, color: isDarkMode ? '#f8fafc' : '#1e293b', '&:hover': { color: '#3b82f6' } }}>Home</Typography>
-                <Typography sx={{ opacity: 0.3, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
-                <Typography onClick={(e) => setCatMenuAnchor(e.currentTarget as HTMLElement)} sx={{ cursor: 'pointer', fontWeight: 600, color: isDarkMode ? '#f8fafc' : '#1e293b', '&:hover': { color: '#3b82f6' } }}>Categories ▾</Typography>
-                <Menu anchorEl={catMenuAnchor} open={Boolean(catMenuAnchor)} onClose={() => setCatMenuAnchor(null)}
-                  PaperProps={{ sx: { bgcolor: isDarkMode ? 'rgba(15,23,42,0.97)' : 'rgba(255,255,255,0.97)', backdropFilter: 'blur(16px)', borderRadius: '16px', minWidth: 230, boxShadow: '0 16px 36px rgba(0,0,0,0.2)', mt: 1 } }}>
-                  {CATEGORIES.map((cat) => (
-                    <MenuItem key={cat.slug} onClick={() => { setCatMenuAnchor(null); const tGn = (displayGN || activeGn?.nameEn || gnName || 'Pahalagama').replace(/ /g, '-'); const tCc = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'RATPA'; navigate(`/gnpage/${encodeURIComponent(tGn)}/${encodeURIComponent(tCc)}/${cat.slug}`); }} sx={{ fontWeight: 500, color: isDarkMode ? '#e2e8f0' : '#1e293b', py: 0.8, px: 2 }}>{cat.name}</MenuItem>
-                  ))}
-                </Menu>
-                <Typography sx={{ opacity: 0.3, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
-                {isAuthenticated ? (
-                  <>
-                    <Typography onClick={() => { if (userInfo?.realm_roles?.includes('super_admin')) navigate('/admins'); else navigate('/user'); }} sx={{ cursor: 'pointer', fontWeight: 600, color: isDarkMode ? '#f8fafc' : '#1e293b', '&:hover': { color: '#3b82f6' } }}>Dashboard</Typography>
-                    <Typography sx={{ opacity: 0.3, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
-                    <Typography onClick={() => logout()} sx={{ cursor: 'pointer', fontWeight: 600, color: '#ef4444', '&:hover': { opacity: 0.8 } }}>Logout</Typography>
-                  </>
-                ) : !isLoading ? (
-                  <>
-                    <Typography onClick={() => login(window.location.href)} sx={{ cursor: 'pointer', fontWeight: 600, color: isDarkMode ? '#f8fafc' : '#1e293b', '&:hover': { color: '#3b82f6' } }}>Login</Typography>
-                    <Typography sx={{ opacity: 0.3, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
-                    <Typography onClick={() => register(window.location.href)} sx={{ cursor: 'pointer', fontWeight: 600, color: isDarkMode ? '#f8fafc' : '#1e293b', '&:hover': { color: '#3b82f6' } }}>Signup</Typography>
-                  </>
-                ) : null}
-                <Typography sx={{ opacity: 0.3, color: isDarkMode ? '#ffffff' : '#000000' }}>|</Typography>
-                <Typography onClick={cycleLanguage} sx={{ cursor: 'pointer', textTransform: 'uppercase', fontWeight: 800, color: '#3b82f6', '&:hover': { opacity: 0.8 } }}>{language}</Typography>
-              </Box>
-
-              {/* Mobile Hamburger */}
-              <Box sx={{ display: { xs: 'flex', sm: 'none' }, alignItems: 'center' }}>
-                <IconButton onClick={handleMobileMenuClick} size="small" sx={{ color: isDarkMode ? '#ffffff' : '#000000', p: 0.5 }}><MenuIcon /></IconButton>
-                <Menu anchorEl={mobileMenuAnchor} open={isMobileMenuOpen} onClose={handleMobileMenuClose}
-                  PaperProps={{ sx: { bgcolor: isDarkMode ? 'rgba(30,30,30,0.95)' : 'rgba(255,255,255,0.95)', backdropFilter: 'blur(16px)', borderRadius: '16px', minWidth: 180 } }}>
-                  <MenuItem onClick={() => { handleMobileMenuClose(); navigate(gnName && ccode ? `/gnpage/${gnName}/${ccode}` : '/gnpage'); }}>Home</MenuItem>
-                  {isAuthenticated ? [
-                    <MenuItem key="dash" onClick={() => { handleMobileMenuClose(); navigate('/user'); }}>Dashboard</MenuItem>,
-                    <MenuItem key="logout" onClick={() => { handleMobileMenuClose(); logout(); }} sx={{ color: '#ef4444' }}>Logout</MenuItem>,
-                  ] : [
-                    <MenuItem key="login" onClick={() => { handleMobileMenuClose(); login(window.location.href); }}>Login</MenuItem>,
-                    <MenuItem key="signup" onClick={() => { handleMobileMenuClose(); register(window.location.href); }}>Signup</MenuItem>,
-                  ]}
-                  <Divider />
-                  <MenuItem onClick={() => { handleMobileMenuClose(); cycleLanguage(); }} sx={{ fontWeight: 'bold', color: '#3b82f6' }}>Language: {language.toUpperCase()}</MenuItem>
-                </Menu>
-              </Box>
-            </Box>
+        {/* ── FULL WIDTH TOP NAVBAR ── */}
+        <Box sx={{
+          position: 'absolute',
+          top: 0, left: 0, right: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          bgcolor: '#111827', // Dark navy/gray as in image
+          px: { xs: 2, sm: 4 }, py: 1.2,
+          zIndex: 10,
+        }}>
+          {/* Theme & Search */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <IconButton onClick={() => setIsDarkMode(!isDarkMode)} size="small" sx={{ color: '#d1d5db' }}>
+              {isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
+            </IconButton>
+            <IconButton onClick={() => setShowLocationModal(true)} size="small" sx={{ color: '#d1d5db' }}>
+              <SearchIcon fontSize="small" />
+            </IconButton>
           </Box>
+
+          {/* Desktop Links */}
+          <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 2, fontWeight: 500, fontSize: '0.9rem' }}>
+            <Typography onClick={() => navigate(gnName && ccode ? `/gnpage/${gnName}/${ccode}` : '/gnpage')} sx={{ cursor: 'pointer', color: '#d1d5db', '&:hover': { color: '#fff' } }}>Home</Typography>
+            <Typography sx={{ opacity: 0.3, color: '#9ca3af' }}>|</Typography>
+            <Typography onClick={(e) => setCatMenuAnchor(e.currentTarget as HTMLElement)} sx={{ cursor: 'pointer', color: '#d1d5db', '&:hover': { color: '#fff' } }}>Categories ▾</Typography>
+            <Menu anchorEl={catMenuAnchor} open={Boolean(catMenuAnchor)} onClose={() => setCatMenuAnchor(null)}
+              PaperProps={{ sx: { bgcolor: isDarkMode ? 'rgba(15,23,42,0.97)' : 'rgba(255,255,255,0.97)', backdropFilter: 'blur(16px)', borderRadius: '16px', minWidth: 230, boxShadow: '0 16px 36px rgba(0,0,0,0.2)', mt: 1 } }}>
+              {CATEGORIES.map((cat) => (
+                <MenuItem key={cat.slug} onClick={() => { setCatMenuAnchor(null); const tGn = (displayGN || activeGn?.nameEn || gnName || 'Pahalagama').replace(/ /g, '-'); const tCc = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'RATPA'; navigate(`/gnpage/${encodeURIComponent(tGn)}/${encodeURIComponent(tCc)}/${cat.slug}`); }} sx={{ fontWeight: 500, color: isDarkMode ? '#e2e8f0' : '#1e293b', py: 0.8, px: 2 }}>{cat.name}</MenuItem>
+              ))}
+            </Menu>
+            <Typography sx={{ opacity: 0.3, color: '#9ca3af' }}>|</Typography>
+            {isAuthenticated ? (
+              <>
+                <Typography onClick={() => { if (userInfo?.realm_roles?.includes('super_admin')) navigate('/admins'); else navigate('/user'); }} sx={{ cursor: 'pointer', color: '#d1d5db', '&:hover': { color: '#fff' } }}>Dashboard</Typography>
+                <Typography sx={{ opacity: 0.3, color: '#9ca3af' }}>|</Typography>
+                <Typography onClick={() => logout()} sx={{ cursor: 'pointer', color: '#f87171', '&:hover': { opacity: 0.8 } }}>Logout</Typography>
+              </>
+            ) : !isLoading ? (
+              <>
+                <Typography onClick={() => login(window.location.href)} sx={{ cursor: 'pointer', color: '#d1d5db', '&:hover': { color: '#fff' } }}>Login</Typography>
+                <Typography sx={{ opacity: 0.3, color: '#9ca3af' }}>|</Typography>
+                <Typography onClick={() => register(window.location.href)} sx={{ cursor: 'pointer', color: '#d1d5db', '&:hover': { color: '#fff' } }}>Signup</Typography>
+              </>
+            ) : null}
+            <Typography sx={{ opacity: 0.3, color: '#9ca3af' }}>|</Typography>
+            <Typography onClick={cycleLanguage} sx={{ cursor: 'pointer', textTransform: 'uppercase', fontWeight: 700, color: '#60a5fa', '&:hover': { opacity: 0.8 } }}>{language}</Typography>
+          </Box>
+
+          {/* Mobile Hamburger */}
+          <Box sx={{ display: { xs: 'flex', sm: 'none' }, alignItems: 'center' }}>
+            <IconButton onClick={handleMobileMenuClick} size="small" sx={{ color: '#fff', p: 0.5 }}><MenuIcon /></IconButton>
+            <Menu anchorEl={mobileMenuAnchor} open={isMobileMenuOpen} onClose={handleMobileMenuClose}
+              PaperProps={{ sx: { bgcolor: isDarkMode ? 'rgba(30,30,30,0.95)' : 'rgba(255,255,255,0.95)', backdropFilter: 'blur(16px)', borderRadius: '16px', minWidth: 180 } }}>
+              <MenuItem onClick={() => { handleMobileMenuClose(); navigate(gnName && ccode ? `/gnpage/${gnName}/${ccode}` : '/gnpage'); }}>Home</MenuItem>
+              {isAuthenticated ? [
+                <MenuItem key="dash" onClick={() => { handleMobileMenuClose(); navigate('/user'); }}>Dashboard</MenuItem>,
+                <MenuItem key="logout" onClick={() => { handleMobileMenuClose(); logout(); }} sx={{ color: '#ef4444' }}>Logout</MenuItem>,
+              ] : [
+                <MenuItem key="login" onClick={() => { handleMobileMenuClose(); login(window.location.href); }}>Login</MenuItem>,
+                <MenuItem key="signup" onClick={() => { handleMobileMenuClose(); register(window.location.href); }}>Signup</MenuItem>,
+              ]}
+              <Divider />
+              <MenuItem onClick={() => { handleMobileMenuClose(); cycleLanguage(); }} sx={{ fontWeight: 'bold', color: '#3b82f6' }}>Language: {language.toUpperCase()}</MenuItem>
+            </Menu>
+          </Box>
+        </Box>
+
+        <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1, pt: { xs: 8, md: 10 }, pb: 8 }}>
 
           {/* ── TOP HEADER GLASS BAR (Location Selectors & Categories Ribbon) ── */}
           <GnTopHeaderBar
@@ -956,67 +951,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
               gap: { xs: 0.6, md: 0.8 },
             }}
           >
-            {/* 1. MY Village (Italic Elegant Serif) */}
-            <Typography
-              sx={{
-                fontFamily: "'Playfair Display', 'Georgia', 'Cinzel', serif",
-                fontStyle: 'italic',
-                fontWeight: 700,
-                fontSize: { xs: '2.4rem', sm: '3.2rem', md: '4.2rem' },
-                color: isDarkMode ? '#f8fafc' : '#0f172a',
-                letterSpacing: '0.5px',
-                lineHeight: 1.1,
-                textShadow: isDarkMode ? '0 4px 16px rgba(0,0,0,0.6)' : '0 2px 14px rgba(255,255,255,0.9)',
-              }}
-            >
-              {language === 'si' ? 'මගේ ගම' : language === 'ta' ? 'எனது கிராமம்' : 'MY Village'}
-            </Typography>
-
-            {/* 2. CCODE (Bold Serif Uppercase) */}
-            {(displayCCODE || activeGn?.CCODE || ccode || selectedGN) && (
-              <Typography
-                sx={{
-                  fontFamily: "'Playfair Display', 'Georgia', serif",
-                  fontWeight: 800,
-                  fontSize: { xs: '1.5rem', sm: '1.9rem', md: '2.4rem' },
-                  color: isDarkMode ? '#e2e8f0' : '#1e293b',
-                  letterSpacing: '2px',
-                  lineHeight: 1.15,
-                  mt: 0.4,
-                  textShadow: isDarkMode ? '0 3px 12px rgba(0,0,0,0.5)' : '0 2px 10px rgba(255,255,255,0.8)',
-                }}
-              >
-                {displayCCODE || activeGn?.CCODE || ccode || selectedGN}
-              </Typography>
-            )}
-
-            {/* 3. District Pill (e.g. COLOMBO in pill) */}
-            {displayDistrict && (
-              <Box
-                sx={{
-                  my: { xs: 0.6, md: 1 },
-                  px: { xs: 2.8, md: 4 },
-                  py: { xs: 0.45, md: 0.65 },
-                  borderRadius: '50px',
-                  bgcolor: isDarkMode ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.08)',
-                  backdropFilter: 'blur(12px)',
-                  border: isDarkMode ? '1px solid rgba(255,255,255,0.22)' : '1px solid rgba(0,0,0,0.12)',
-                  boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
-                }}
-              >
-                <Typography
-                  sx={{
-                    fontSize: { xs: '0.82rem', md: '1.05rem' },
-                    fontWeight: 800,
-                    letterSpacing: '2.5px',
-                    textTransform: 'uppercase',
-                    color: isDarkMode ? '#cbd5e1' : '#334155',
-                  }}
-                >
-                  {displayDistrict}
-                </Typography>
-              </Box>
-            )}
+            {/* (Removed MY Village and CCODE as per user request - now displayed in Top Header) */}
 
             {/* 4. Village Name (Large Bold Serif) */}
             {displayGN && (
@@ -1024,30 +959,17 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                 sx={{
                   fontFamily: "'Playfair Display', 'Georgia', serif",
                   fontWeight: 900,
-                  fontSize: { xs: '2.3rem', sm: '3.2rem', md: '4.2rem' },
+                  fontSize: { xs: 'clamp(2rem, 8vw, 2.5rem)', sm: 'clamp(2.5rem, 6vw, 3.2rem)', md: 'clamp(3rem, 5vw, 4.2rem)' },
                   color: isDarkMode ? '#ffffff' : '#0f172a',
                   letterSpacing: '-0.5px',
                   lineHeight: 1.15,
+                  wordBreak: 'break-word',
+                  textAlign: 'center',
+                  px: { xs: 2, md: 4 },
                   textShadow: isDarkMode ? '0 4px 20px rgba(0,0,0,0.7)' : '0 2px 16px rgba(255,255,255,0.9)',
                 }}
               >
                 {displayGN}
-              </Typography>
-            )}
-
-            {/* 5. DS Division / City (Medium Serif) */}
-            {displayCity && (
-              <Typography
-                sx={{
-                  fontFamily: "'Playfair Display', 'Georgia', serif",
-                  fontWeight: 700,
-                  fontSize: { xs: '1.4rem', sm: '1.9rem', md: '2.4rem' },
-                  color: isDarkMode ? '#94a3b8' : '#334155',
-                  lineHeight: 1.2,
-                  textShadow: isDarkMode ? '0 2px 10px rgba(0,0,0,0.5)' : '0 2px 10px rgba(255,255,255,0.8)',
-                }}
-              >
-                {displayCity}
               </Typography>
             )}
           </Box>
@@ -1077,7 +999,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                 dsDivision={displayCity}
                 ccode={displayCCODE}
                 boundary={activeGn?.boundary}
-                height={500}
+                height={400}
                 language={language}
               />
 
