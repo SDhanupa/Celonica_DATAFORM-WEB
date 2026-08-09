@@ -385,7 +385,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
   isDarkMode = false,
   onOpenCategory,
 }) => {
-  const [selectedSurveyId, setSelectedSurveyId] = useState<string>('religion');
+  const [selectedSurveyId, setSelectedSurveyId] = useState<string>('village-population');
   const [modalData, setModalData] = useState<ChartModalData | null>(null);
 
   const t = {
@@ -405,17 +405,13 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
 
   const surveyCategories = [
     {
-      id: 'religion',
-      slug: 'religion',
-      icon: '🛕',
-      type: 'pie' as const,
-      title: language === 'si' ? 'ආගමික සංයුතිය' : language === 'ta' ? 'மத ரீதியான இணைப்பு' : 'RELIGIOUS AFFILIATION',
-      pieData: [
-        { label: language === 'si' ? 'බෞද්ධ' : 'Buddhist', value: Math.round(totalCount * 0.68), color: '#f59e0b' },
-        { label: language === 'si' ? 'හින්දු' : 'Hindu', value: Math.round(totalCount * 0.14), color: '#ef4444' },
-        { label: language === 'si' ? 'ඉස්ලාම්' : 'Islam', value: Math.round(totalCount * 0.11), color: '#10b981' },
-        { label: language === 'si' ? 'ක්‍රිස්තියානි' : 'Christian', value: Math.round(totalCount * 0.07), color: '#3b82f6' },
-      ],
+      id: 'village-population',
+      slug: 'boundaries',
+      icon: '👥',
+      type: 'bar' as const,
+      title: t.villagePopulation,
+      shortTitle: language === 'si' ? 'ජනගහනය' : language === 'ta' ? 'மக்கள்தொகை' : 'POPULATION',
+      bars: villagePopBars,
     },
     {
       id: 'housing-ownership',
@@ -576,53 +572,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, width: '100%' }}>
 
-      {/* ── CARD 1: VILLAGE POPULATION (Bar Diagram) ────────────────── */}
-      <Box
-        onClick={() =>
-          setModalData({
-            title: t.villagePopulation,
-            type: 'bar',
-            items: [
-              { label: t.male, value: maleCount, color: '#3b82f6' },
-              { label: t.female, value: femaleCount, color: '#ec4899' },
-            ],
-            bars: villagePopBars,
-            slug: 'boundaries',
-          })
-        }
-        sx={{
-          borderRadius: '24px',
-          p: { xs: 2, md: 2.5 },
-          bgcolor: isDarkMode ? 'rgba(30, 41, 59, 0.85)' : 'rgba(255, 255, 255, 0.85)',
-          backdropFilter: 'blur(20px)',
-          border: isDarkMode ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(255,255,255,0.8)',
-          boxShadow: isDarkMode ? '0 12px 32px rgba(0,0,0,0.5)' : '0 12px 32px rgba(0,0,0,0.06)',
-          cursor: 'pointer',
-          transition: 'all 0.25s ease',
-          '&:hover': {
-            transform: 'translateY(-3px)',
-            boxShadow: '0 16px 36px rgba(0,0,0,0.12)',
-          },
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-          <Typography
-            sx={{
-              fontWeight: 800,
-              fontSize: '0.95rem',
-              color: isDarkMode ? '#f8fafc' : '#1e293b',
-              textTransform: 'uppercase',
-            }}
-          >
-            {t.villagePopulation}
-          </Typography>
-          <OpenInFullIcon sx={{ fontSize: '1rem', color: isDarkMode ? '#94a3b8' : '#64748b', opacity: 0.6 }} />
-        </Box>
-
-        <SvgBarChart bars={villagePopBars} isDarkMode={isDarkMode} />
-      </Box>
-
-      {/* ── CARD 2: SURVEY & CENSUS CHARTS CARD (Religious Affiliation + Switcher) ── */}
+      {/* ── CARD 2: SURVEY & CENSUS CHARTS CARD (Side-by-Side Layout) ── */}
       <Box
         sx={{
           borderRadius: '24px',
@@ -631,10 +581,74 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
           backdropFilter: 'blur(20px)',
           border: isDarkMode ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(255,255,255,0.8)',
           boxShadow: isDarkMode ? '0 12px 32px rgba(0,0,0,0.5)' : '0 12px 32px rgba(0,0,0,0.06)',
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          height: { md: 400 },
+          gap: 2,
         }}
       >
-        {/* Dynamic Category Header */}
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
+        {/* Left Side: Chart */}
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, pr: { md: 2 }, borderRight: { md: isDarkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.06)' } }}>
+          {/* Dynamic Category Header */}
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
+            <Box
+              onClick={() =>
+                setModalData({
+                  title: activeSurvey.title,
+                  type: activeSurvey.type,
+                  items: getItemsForSurvey(activeSurvey),
+                  bars: activeSurvey.bars,
+                  slug: activeSurvey.slug,
+                })
+              }
+              sx={{ display: 'flex', alignItems: 'center', gap: 1.2, cursor: 'pointer', overflow: 'hidden' }}
+            >
+              <Typography sx={{ fontSize: '1.2rem', flexShrink: 0 }}>{activeSurvey.icon}</Typography>
+              <Typography
+                sx={{
+                  fontWeight: 800,
+                  fontSize: '0.95rem',
+                  color: isDarkMode ? '#f8fafc' : '#1e293b',
+                  textTransform: 'uppercase',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {activeSurvey.title}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
+              <IconButton
+                size="small"
+                onClick={() =>
+                  setModalData({
+                    title: activeSurvey.title,
+                    type: activeSurvey.type,
+                    items: getItemsForSurvey(activeSurvey),
+                    bars: activeSurvey.bars,
+                    slug: activeSurvey.slug,
+                  })
+                }
+                sx={{ color: isDarkMode ? '#94a3b8' : '#64748b' }}
+                title="Open popup window"
+              >
+                <OpenInFullIcon sx={{ fontSize: '1rem' }} />
+              </IconButton>
+              {onOpenCategory && (
+                <IconButton
+                  size="small"
+                  onClick={() => onOpenCategory(activeSurvey.slug)}
+                  sx={{ color: '#3b82f6', '&:hover': { transform: 'scale(1.1)' } }}
+                  title="Open full category page"
+                >
+                  <ChevronRightIcon sx={{ fontSize: '1.25rem' }} />
+                </IconButton>
+              )}
+            </Box>
+          </Box>
+
+          {/* Selected Dimension Chart Rendering */}
           <Box
             onClick={() =>
               setModalData({
@@ -645,114 +659,67 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
                 slug: activeSurvey.slug,
               })
             }
-            sx={{ display: 'flex', alignItems: 'center', gap: 1.2, cursor: 'pointer' }}
+            sx={{
+              flexGrow: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              '&:hover': { opacity: 0.9 },
+              overflow: 'hidden',
+              minHeight: 140,
+            }}
           >
-            <Typography sx={{ fontSize: '1.2rem' }}>{activeSurvey.icon}</Typography>
-            <Typography
-              sx={{
-                fontWeight: 800,
-                fontSize: { xs: '0.92rem', md: '1rem' },
-                color: isDarkMode ? '#f8fafc' : '#1e293b',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-              }}
-            >
-              {activeSurvey.title}
-            </Typography>
-          </Box>
-
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <IconButton
-              size="small"
-              onClick={() =>
-                setModalData({
-                  title: activeSurvey.title,
-                  type: activeSurvey.type,
-                  items: getItemsForSurvey(activeSurvey),
-                  bars: activeSurvey.bars,
-                  slug: activeSurvey.slug,
-                })
-              }
-              sx={{ color: isDarkMode ? '#94a3b8' : '#64748b' }}
-              title="Open popup window"
-            >
-              <OpenInFullIcon sx={{ fontSize: '1rem' }} />
-            </IconButton>
-
-            {onOpenCategory && (
-              <IconButton
-                size="small"
-                onClick={() => onOpenCategory(activeSurvey.slug)}
-                sx={{ color: '#3b82f6', '&:hover': { transform: 'scale(1.1)' } }}
-                title="Open full category page"
-              >
-                <ChevronRightIcon sx={{ fontSize: '1.25rem' }} />
-              </IconButton>
+            {activeSurvey.type === 'bar' && activeSurvey.bars && (
+              <SvgBarChart bars={activeSurvey.bars} isDarkMode={isDarkMode} />
+            )}
+            {activeSurvey.type === 'pie' && activeSurvey.pieData && (
+              <SvgPieChart data={activeSurvey.pieData} isDarkMode={isDarkMode} />
+            )}
+            {activeSurvey.type === 'donut' && activeSurvey.donutData && (
+              <SvgDonutChart data={activeSurvey.donutData} isDarkMode={isDarkMode} />
             )}
           </Box>
         </Box>
 
-        {/* Selected Dimension Chart Rendering */}
-        <Box
-          onClick={() =>
-            setModalData({
-              title: activeSurvey.title,
-              type: activeSurvey.type,
-              items: getItemsForSurvey(activeSurvey),
-              bars: activeSurvey.bars,
-              slug: activeSurvey.slug,
-            })
-          }
-          sx={{
-            mb: 2,
-            minHeight: 140,
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            '&:hover': { opacity: 0.9 },
-          }}
-        >
-          {activeSurvey.type === 'bar' && activeSurvey.bars && (
-            <SvgBarChart bars={activeSurvey.bars} isDarkMode={isDarkMode} />
-          )}
-          {activeSurvey.type === 'pie' && activeSurvey.pieData && (
-            <SvgPieChart data={activeSurvey.pieData} isDarkMode={isDarkMode} />
-          )}
-          {activeSurvey.type === 'donut' && activeSurvey.donutData && (
-            <SvgDonutChart data={activeSurvey.donutData} isDarkMode={isDarkMode} />
-          )}
-        </Box>
-
-        {/* Dimension Switcher Pills */}
-        <Divider sx={{ my: 1.5, borderColor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)' }} />
-        <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: isDarkMode ? '#94a3b8' : '#64748b', mb: 1, letterSpacing: '0.4px' }}>
-          {t.surveyExplorer}
-        </Typography>
-
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8, maxHeight: 180, overflowY: 'auto', pr: 0.5 }}>
-          {surveyCategories.map((cat) => {
-            const isSelected = cat.id === selectedSurveyId;
-            return (
-              <Chip
-                key={cat.id}
-                label={`${cat.icon} ${cat.title.split(' ')[0]}`}
-                onClick={() => setSelectedSurveyId(cat.id)}
-                size="small"
-                sx={{
-                  fontWeight: isSelected ? 800 : 600,
-                  fontSize: '0.72rem',
-                  borderRadius: '10px',
-                  bgcolor: isSelected ? '#2563eb' : isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
-                  color: isSelected ? '#ffffff' : isDarkMode ? '#cbd5e1' : '#475569',
-                  border: isSelected ? '1px solid #1d4ed8' : 'none',
-                  '&:hover': {
-                    bgcolor: isSelected ? '#1d4ed8' : isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.09)',
-                  },
-                }}
-              />
-            );
-          })}
+        {/* Right Side: Switcher Pills */}
+        <Box sx={{ flex: '0 0 35%', display: 'flex', flexDirection: 'column', pl: { md: 1 } }}>
+          <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: isDarkMode ? '#94a3b8' : '#64748b', mb: 1, letterSpacing: '0.4px', textTransform: 'uppercase' }}>
+            {t.surveyExplorer}
+          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'row', md: 'column' }, flexWrap: { xs: 'wrap', md: 'nowrap' }, gap: 1, overflowY: 'auto', pr: 0.5, pb: 1, flexGrow: 1 }}>
+            {surveyCategories.map((cat) => {
+              const isSelected = cat.id === selectedSurveyId;
+              return (
+                <Chip
+                  key={cat.id}
+                  label={`${cat.icon} ${(cat as any).shortTitle || cat.title.split(' ')[0]}`}
+                  onClick={() => setSelectedSurveyId(cat.id)}
+                  size="small"
+                  sx={{
+                    justifyContent: 'flex-start',
+                    px: 0.5,
+                    py: 2,
+                    fontWeight: isSelected ? 800 : 600,
+                    fontSize: '0.75rem',
+                    borderRadius: '10px',
+                    bgcolor: isSelected ? '#2563eb' : isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
+                    color: isSelected ? '#ffffff' : isDarkMode ? '#cbd5e1' : '#475569',
+                    border: isSelected ? '1px solid #1d4ed8' : 'none',
+                    '& .MuiChip-label': { pl: 0.5 },
+                    '&:hover': {
+                      bgcolor: isSelected ? '#1d4ed8' : isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.09)',
+                    },
+                  }}
+                />
+              );
+            })}
+          </Box>
         </Box>
       </Box>
+
+      {/* ── CARD 3 WAS MOVED TO BelowMapCards ── */}
 
       {/* Interactive Detail Modal Window */}
       <ChartDetailModal
@@ -796,11 +763,22 @@ export const BelowMapCards: React.FC<DemographicCardsProps> = ({
     { label: t.notInLabourForce, value: gnEconomyData?.economically_not_active || 2487, color: '#8b5cf6' },
   ];
 
+  const maleCount = populationData?.male || 3864;
+  const femaleCount = populationData?.female || 3776;
+  const totalCount = populationData?.both || (maleCount + femaleCount) || 7640;
+
+  const religionPieData = [
+    { label: language === 'si' ? 'බෞද්ධ' : 'Buddhist', value: Math.round(totalCount * 0.68), color: '#f59e0b' },
+    { label: language === 'si' ? 'හින්දු' : 'Hindu', value: Math.round(totalCount * 0.14), color: '#ef4444' },
+    { label: language === 'si' ? 'ඉස්ලාම්' : 'Islam', value: Math.round(totalCount * 0.11), color: '#10b981' },
+    { label: language === 'si' ? 'ක්‍රිස්තියානි' : 'Christian', value: Math.round(totalCount * 0.07), color: '#3b82f6' },
+  ];
+
   return (
     <Box sx={{ width: '100%' }}>
       <Grid container spacing={3}>
         {/* Card 1: POPULATION BY AGE GROUPS */}
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12} md={4}>
           <Box
             sx={{
               borderRadius: '24px',
@@ -896,7 +874,7 @@ export const BelowMapCards: React.FC<DemographicCardsProps> = ({
         </Grid>
 
         {/* Card 2: EMPLOYMENT */}
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12} md={4}>
           <Box
             sx={{
               borderRadius: '24px',
@@ -987,6 +965,102 @@ export const BelowMapCards: React.FC<DemographicCardsProps> = ({
               }}
             >
               <SvgDonutChart data={employmentDonutData} isDarkMode={isDarkMode} size={140} />
+            </Box>
+          </Box>
+        </Grid>
+
+        {/* Card 3: RELIGIOUS AFFILIATION */}
+        <Grid item xs={12} md={4}>
+          <Box
+            sx={{
+              borderRadius: '24px',
+              p: { xs: 2.2, md: 2.8 },
+              bgcolor: isDarkMode ? 'rgba(30, 41, 59, 0.85)' : 'rgba(255, 255, 255, 0.85)',
+              backdropFilter: 'blur(20px)',
+              border: isDarkMode ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(255,255,255,0.8)',
+              boxShadow: isDarkMode ? '0 12px 32px rgba(0,0,0,0.5)' : '0 12px 32px rgba(0,0,0,0.06)',
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
+              <Box
+                onClick={() =>
+                  setModalData({
+                    title: language === 'si' ? 'ආගමික සංයුතිය' : language === 'ta' ? 'மத ரீதியான இணைப்பு' : 'RELIGIOUS AFFILIATION',
+                    type: 'pie',
+                    items: religionPieData,
+                    slug: 'religion',
+                  })
+                }
+                sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }}
+              >
+                <Typography sx={{ fontSize: '1.15rem' }}>🛕</Typography>
+                <Typography
+                  sx={{
+                    fontWeight: 800,
+                    fontSize: { xs: '0.88rem', md: '0.96rem' },
+                    color: isDarkMode ? '#f8fafc' : '#1e293b',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                  }}
+                >
+                  {language === 'si' ? 'ආගමික සංයුතිය' : language === 'ta' ? 'மத ரீதியான இணைப்பு' : 'RELIGIOUS AFFILIATION'}
+                </Typography>
+              </Box>
+
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <IconButton
+                  size="small"
+                  onClick={() =>
+                    setModalData({
+                      title: language === 'si' ? 'ආගමික සංයුතිය' : language === 'ta' ? 'மத ரீதியான இணைப்பு' : 'RELIGIOUS AFFILIATION',
+                      type: 'pie',
+                      items: religionPieData,
+                      slug: 'religion',
+                    })
+                  }
+                  sx={{ color: isDarkMode ? '#94a3b8' : '#64748b' }}
+                  title="Open popup window"
+                >
+                  <OpenInFullIcon sx={{ fontSize: '1rem' }} />
+                </IconButton>
+
+                {onOpenCategory && (
+                  <IconButton
+                    size="small"
+                    onClick={() => onOpenCategory('religion')}
+                    sx={{ color: '#3b82f6', '&:hover': { transform: 'scale(1.1)' } }}
+                    title="Open full category page"
+                  >
+                    <ChevronRightIcon sx={{ fontSize: '1.25rem' }} />
+                  </IconButton>
+                )}
+              </Box>
+            </Box>
+
+            <Box
+              onClick={() =>
+                setModalData({
+                  title: language === 'si' ? 'ආගමික සංයුතිය' : language === 'ta' ? 'மத ரீதியான இணைப்பு' : 'RELIGIOUS AFFILIATION',
+                  type: 'pie',
+                  items: religionPieData,
+                  slug: 'religion',
+                })
+              }
+              sx={{
+                minHeight: 150,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.25s ease',
+                '&:hover': { opacity: 0.9, transform: 'scale(1.01)' },
+              }}
+            >
+              <SvgPieChart data={religionPieData} isDarkMode={isDarkMode} size={140} />
             </Box>
           </Box>
         </Grid>

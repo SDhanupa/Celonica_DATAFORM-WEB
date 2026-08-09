@@ -171,22 +171,22 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
   const districtName = language === 'si'
     ? (activeDistrictObj?.admin2NameSi || activeDistrictObj?.nameSi || activeDistrictObj?.admin2NameEn || activeDistrictObj?.nameEn)
     : language === 'ta'
-    ? (activeDistrictObj?.admin2NameTa || activeDistrictObj?.nameTa || activeDistrictObj?.admin2NameEn || activeDistrictObj?.nameEn)
-    : (activeDistrictObj?.admin2NameEn || activeDistrictObj?.nameEn || selectedDistrict);
+      ? (activeDistrictObj?.admin2NameTa || activeDistrictObj?.nameTa || activeDistrictObj?.admin2NameEn || activeDistrictObj?.nameEn)
+      : (activeDistrictObj?.admin2NameEn || activeDistrictObj?.nameEn || selectedDistrict);
 
   const activeCityObj = dsDivisions?.find((c: any) => c.divisionalSecretariatCode === selectedCity);
   const cityName = language === 'si'
     ? (activeCityObj?.dsSi || activeCityObj?.dsEn)
     : language === 'ta'
-    ? (activeCityObj?.dsTa || activeCityObj?.dsEn)
-    : (activeCityObj?.dsEn || selectedCity);
+      ? (activeCityObj?.dsTa || activeCityObj?.dsEn)
+      : (activeCityObj?.dsEn || selectedCity);
 
   const activeGnObj = gramaNiladharis?.find((g: any) => g.id === selectedGN || g.CCODE === selectedGN);
   const villageName = language === 'si'
     ? (activeGnObj?.nameSi || activeGnObj?.nameEn)
     : language === 'ta'
-    ? (activeGnObj?.nameTa || activeGnObj?.nameEn)
-    : (activeGnObj?.nameEn || selectedGN);
+      ? (activeGnObj?.nameTa || activeGnObj?.nameEn)
+      : (activeGnObj?.nameEn || selectedGN);
 
   const activeCcode = activeGnObj?.CCODE || selectedGN || '';
 
@@ -204,6 +204,7 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
           backdropFilter: 'blur(24px)',
           border: isDarkMode ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(255,255,255,0.6)',
           boxShadow: isDarkMode ? '0 12px 32px rgba(0,0,0,0.5)' : '0 12px 32px rgba(0,0,0,0.08)',
+          width: '100%',
           maxWidth: '100%',
         }}
       >
@@ -219,13 +220,13 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
 
         {/* ── RIGHT SECTION (Categories + Selectors) ── */}
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, flex: 1, minWidth: 0 }}>
-          
+
           {/* Top Row: Categories */}
-          <Box sx={{ 
-            display: 'flex', 
-            flexWrap: 'nowrap', 
-            gap: 0.3, 
-            alignItems: 'center', 
+          <Box sx={{
+            display: 'flex',
+            flexWrap: 'nowrap',
+            gap: 0.3,
+            alignItems: 'center',
             justifyContent: { xs: 'flex-start', md: 'flex-start' },
             overflowX: 'auto',
             pb: 0.5,
@@ -249,6 +250,7 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
                       fontWeight: isActive ? 700 : 600,
                       fontSize: '0.78rem',
                       whiteSpace: 'nowrap',
+                      flexShrink: 0,
                       textTransform: 'none',
                       px: 1.2,
                       py: 0.4,
@@ -268,7 +270,7 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
                 </React.Fragment>
               );
             })}
-            
+
             {/* More Button */}
             <Button
               onClick={(e) => setCategoriesMenuAnchor(e.currentTarget)}

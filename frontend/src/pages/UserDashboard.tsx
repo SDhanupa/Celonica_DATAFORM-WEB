@@ -907,8 +907,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             </Menu>
           </Box>
         </Box>
-
-        <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1, pt: { xs: 8, md: 10 }, pb: 8 }}>
+        <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1, pt: { xs: 7, md: 7 }, pb: 8 }}>
 
           {/* ── TOP HEADER GLASS BAR (Location Selectors & Categories Ribbon) ── */}
           <GnTopHeaderBar
@@ -938,46 +937,29 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             }}
           />
 
-          {/* ── ELEGANT STACKED HERO TOPIC (Bigger & Bolder) ── */}
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              textAlign: 'center',
-              mt: { xs: 2, md: 3 },
-              mb: { xs: 4, md: 5.5 },
-              gap: { xs: 0.6, md: 0.8 },
-            }}
-          >
-            {/* (Removed MY Village and CCODE as per user request - now displayed in Top Header) */}
 
-            {/* 4. Village Name (Large Bold Serif) */}
-            {displayGN && (
-              <Typography
-                sx={{
-                  fontFamily: "'Playfair Display', 'Georgia', serif",
-                  fontWeight: 900,
-                  fontSize: { xs: 'clamp(2rem, 8vw, 2.5rem)', sm: 'clamp(2.5rem, 6vw, 3.2rem)', md: 'clamp(3rem, 5vw, 4.2rem)' },
-                  color: isDarkMode ? '#ffffff' : '#0f172a',
-                  letterSpacing: '-0.5px',
-                  lineHeight: 1.15,
-                  wordBreak: 'break-word',
-                  textAlign: 'center',
-                  px: { xs: 2, md: 4 },
-                  textShadow: isDarkMode ? '0 4px 20px rgba(0,0,0,0.7)' : '0 2px 16px rgba(255,255,255,0.9)',
-                }}
-              >
-                {displayGN}
-              </Typography>
-            )}
-          </Box>
 
           {/* ── 2-COLUMN RESPONSIVE DASHBOARD LAYOUT ── */}
           <Grid container spacing={4} alignItems="flex-start" sx={{ mb: 6 }}>
-            {/* Left Column: Demographic Cards (Village Population & Survey Census Categories) */}
-            <Grid item xs={12} md={5} lg={4.5}>
+            {/* Left Column (Now Map): Village Map Card + Both Age Groups & Employment Cards (Below Map) */}
+            <Grid item xs={12} md={6} lg={6} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              {/* Village Map Card */}
+              <Box sx={{ width: '100%', maxWidth: '100%' }}>
+                <VillageMap
+                  gnName={displayGN}
+                  district={displayDistrict}
+                  dsDivision={displayCity}
+                  ccode={displayCCODE}
+                  boundary={activeGn?.boundary}
+                  height={400}
+                  language={language}
+                />
+              </Box>
+
+            </Grid>
+
+            {/* Right Column (Now Demographics): Demographic Cards (Village Population & Survey Census Categories) */}
+            <Grid item xs={12} md={6} lg={6}>
               <DemographicCards
                 populationData={populationData}
                 language={language}
@@ -990,20 +972,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
               />
             </Grid>
 
-            {/* Right Column: Village Map Card + Both Age Groups & Employment Cards (Below Map) */}
-            <Grid item xs={12} md={7} lg={7.5} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-              {/* Village Map Card */}
-              <VillageMap
-                gnName={displayGN}
-                district={displayDistrict}
-                dsDivision={displayCity}
-                ccode={displayCCODE}
-                boundary={activeGn?.boundary}
-                height={400}
-                language={language}
-              />
-
-              {/* Both Age Groups & Employment Cards Below the Map */}
+            {/* ── 3-COLUMN DEMOGRAPHICS ROW (Below Map & Survey Charts) ── */}
+            <Grid item xs={12}>
               <BelowMapCards
                 populationData={populationData}
                 gnEconomyData={gnEconomyData}
