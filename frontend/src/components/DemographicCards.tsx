@@ -67,7 +67,7 @@ const SvgPieChart: React.FC<{
   });
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: { xs: 2.5, sm: 4, md: 5 }, px: { xs: 1, sm: 2 }, width: '100%', py: 1 }}>
+    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center', justifyContent: 'center', gap: { xs: 2, sm: 4, md: 5 }, px: { xs: 1, sm: 2 }, width: '100%', py: 1 }}>
       {/* 2D Pie Chart */}
       <Box sx={{ width: size, height: size, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
@@ -134,7 +134,7 @@ const SvgDonutChart: React.FC<{
   });
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: { xs: 2.5, sm: 4, md: 5 }, px: { xs: 1, sm: 2 }, width: '100%', py: 1 }}>
+    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center', justifyContent: 'center', gap: { xs: 2, sm: 4, md: 5 }, px: { xs: 1, sm: 2 }, width: '100%', py: 1 }}>
       {/* 2D Donut / Solar Chart */}
       <Box sx={{ width: size, height: size, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
@@ -381,6 +381,7 @@ const ChartDetailModal: React.FC<{
 // ── LEFT COLUMN DEMOGRAPHIC CARDS (Village Population & Survey & Census Card) ──
 export const DemographicCards: React.FC<DemographicCardsProps> = ({
   populationData,
+  gnEconomyData,
   language = 'en',
   isDarkMode = false,
   onOpenCategory,
@@ -412,6 +413,48 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
       title: t.villagePopulation,
       shortTitle: language === 'si' ? 'ජනගහනය' : language === 'ta' ? 'மக்கள்தொகை' : 'POPULATION',
       bars: villagePopBars,
+    },
+    {
+      id: 'population-by-age',
+      slug: 'boundaries',
+      icon: '📊',
+      type: 'pie' as const,
+      title: language === 'si' ? 'වයස් කාණ්ඩ අනුව ජනගහනය' : language === 'ta' ? 'வயதுக் குழுக்களின்படி மக்கள்தொகை' : 'POPULATION BY AGE GROUPS',
+      shortTitle: language === 'si' ? 'වයස' : language === 'ta' ? 'வயது' : 'AGE GROUPS',
+      pieData: [
+        { label: '0-14', value: populationData?.age_0_14 || 1695, color: '#3b82f6' },
+        { label: '15-24', value: Math.round((populationData?.age_15_59 || 4891) * 0.35), color: '#10b981' },
+        { label: '25-54', value: Math.round((populationData?.age_15_59 || 4891) * 0.65), color: '#f59e0b' },
+        { label: '55-64', value: populationData?.age_60_64 || 393, color: '#8b5cf6' },
+        { label: '65+', value: populationData?.age_65_above || 661, color: '#ec4899' },
+      ],
+    },
+    {
+      id: 'employment',
+      slug: 'economy',
+      icon: '💼',
+      type: 'donut' as const,
+      title: language === 'si' ? 'රැකියා නියුක්තිය' : language === 'ta' ? 'வேலைவாய்ப்பு' : 'EMPLOYMENT',
+      shortTitle: language === 'si' ? 'රැකියාව' : language === 'ta' ? 'வேலைவாய்ப்பு' : 'EMPLOYMENT',
+      donutData: [
+        { label: language === 'si' ? 'රැකියා නියුක්ත' : language === 'ta' ? 'தொழில் புரிவோர்' : 'Employed', value: gnEconomyData?.employed || 2844, color: '#2563eb' },
+        { label: language === 'si' ? 'රැකියා විරහිත' : language === 'ta' ? 'வேலையற்றோர்' : 'Unemployed', value: gnEconomyData?.unemployed || 149, color: '#ef4444' },
+        { label: language === 'si' ? 'ශ්‍රම බලකායට අයත් නොවන' : language === 'ta' ? 'தொழில்படையல்லாதோர்' : 'Not in Labour Force', value: gnEconomyData?.economically_not_active || 2487, color: '#8b5cf6' },
+      ],
+    },
+    {
+      id: 'religious-affiliation',
+      slug: 'religion',
+      icon: '🛕',
+      type: 'pie' as const,
+      title: language === 'si' ? 'ආගමික සංයුතිය' : language === 'ta' ? 'மத ரீதியான இணைப்பு' : 'RELIGIOUS AFFILIATION',
+      shortTitle: language === 'si' ? 'ආගම' : language === 'ta' ? 'மதம்' : 'RELIGION',
+      pieData: [
+        { label: language === 'si' ? 'බෞද්ධ' : 'Buddhist', value: Math.round(totalCount * 0.68), color: '#f59e0b' },
+        { label: language === 'si' ? 'හින්දු' : 'Hindu', value: Math.round(totalCount * 0.14), color: '#ef4444' },
+        { label: language === 'si' ? 'ඉස්ලාම්' : 'Islam', value: Math.round(totalCount * 0.11), color: '#10b981' },
+        { label: language === 'si' ? 'ක්‍රිස්තියානි' : 'Christian', value: Math.round(totalCount * 0.07), color: '#3b82f6' },
+      ],
     },
     {
       id: 'housing-ownership',
@@ -733,349 +776,6 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
   );
 };
 
-// ── BOTH AGE GROUPS & EMPLOYMENT CARDS (For Below the Map in the Right Column) ──
-export const BelowMapCards: React.FC<DemographicCardsProps> = ({
-  populationData,
-  gnEconomyData,
-  language = 'en',
-  isDarkMode = false,
-  onOpenCategory,
-}) => {
-  const [modalData, setModalData] = useState<ChartModalData | null>(null);
 
-  const t = {
-    en: { ageTitle: 'POPULATION BY AGE GROUPS', empTitle: 'EMPLOYMENT', employed: 'Employed', unemployed: 'Unemployed', notInLabourForce: 'Not in Labour Force' },
-    si: { ageTitle: 'වයස් කාණ්ඩ අනුව ජනගහනය', empTitle: 'රැකියා නියුක්තිය', employed: 'රැකියා නියුක්ත', unemployed: 'රැකියා විරහිත', notInLabourForce: 'ශ්‍රම බලකායට අයත් නොවන' },
-    ta: { ageTitle: 'வயதுக் குழுக்களின்படி மக்கள்தொகை', empTitle: 'வேலைவாய்ப்பு', employed: 'தொழில் புரிவோர்', unemployed: 'வேலையற்றோர்', notInLabourForce: 'தொழில்படையல்லாதோர்' },
-  }[language] || { ageTitle: 'POPULATION BY AGE GROUPS', empTitle: 'EMPLOYMENT', employed: 'Employed', unemployed: 'Unemployed', notInLabourForce: 'Not in Labour Force' };
-
-  const agePieData = [
-    { label: '0-14', value: populationData?.age_0_14 || 1695, color: '#3b82f6' },
-    { label: '15-24', value: Math.round((populationData?.age_15_59 || 4891) * 0.35), color: '#10b981' },
-    { label: '25-54', value: Math.round((populationData?.age_15_59 || 4891) * 0.65), color: '#f59e0b' },
-    { label: '55-64', value: populationData?.age_60_64 || 393, color: '#8b5cf6' },
-    { label: '65+', value: populationData?.age_65_above || 661, color: '#ec4899' },
-  ];
-
-  const employmentDonutData = [
-    { label: t.employed, value: gnEconomyData?.employed || 2844, color: '#2563eb' },
-    { label: t.unemployed, value: gnEconomyData?.unemployed || 149, color: '#ef4444' },
-    { label: t.notInLabourForce, value: gnEconomyData?.economically_not_active || 2487, color: '#8b5cf6' },
-  ];
-
-  const maleCount = populationData?.male || 3864;
-  const femaleCount = populationData?.female || 3776;
-  const totalCount = populationData?.both || (maleCount + femaleCount) || 7640;
-
-  const religionPieData = [
-    { label: language === 'si' ? 'බෞද්ධ' : 'Buddhist', value: Math.round(totalCount * 0.68), color: '#f59e0b' },
-    { label: language === 'si' ? 'හින්දු' : 'Hindu', value: Math.round(totalCount * 0.14), color: '#ef4444' },
-    { label: language === 'si' ? 'ඉස්ලාම්' : 'Islam', value: Math.round(totalCount * 0.11), color: '#10b981' },
-    { label: language === 'si' ? 'ක්‍රිස්තියානි' : 'Christian', value: Math.round(totalCount * 0.07), color: '#3b82f6' },
-  ];
-
-  return (
-    <Box sx={{ width: '100%' }}>
-      <Grid container spacing={3}>
-        {/* Card 1: POPULATION BY AGE GROUPS */}
-        <Grid item xs={12} md={4}>
-          <Box
-            sx={{
-              borderRadius: '24px',
-              p: { xs: 2.2, md: 2.8 },
-              bgcolor: isDarkMode ? 'rgba(30, 41, 59, 0.85)' : 'rgba(255, 255, 255, 0.85)',
-              backdropFilter: 'blur(20px)',
-              border: isDarkMode ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(255,255,255,0.8)',
-              boxShadow: isDarkMode ? '0 12px 32px rgba(0,0,0,0.5)' : '0 12px 32px rgba(0,0,0,0.06)',
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
-              <Box
-                onClick={() =>
-                  setModalData({
-                    title: t.ageTitle,
-                    type: 'pie',
-                    items: agePieData,
-                    slug: 'boundaries',
-                  })
-                }
-                sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }}
-              >
-                <Typography sx={{ fontSize: '1.15rem' }}>📊</Typography>
-                <Typography
-                  sx={{
-                    fontWeight: 800,
-                    fontSize: { xs: '0.88rem', md: '0.96rem' },
-                    color: isDarkMode ? '#f8fafc' : '#1e293b',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                  }}
-                >
-                  {t.ageTitle}
-                </Typography>
-              </Box>
-
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <IconButton
-                  size="small"
-                  onClick={() =>
-                    setModalData({
-                      title: t.ageTitle,
-                      type: 'pie',
-                      items: agePieData,
-                      slug: 'boundaries',
-                    })
-                  }
-                  sx={{ color: isDarkMode ? '#94a3b8' : '#64748b' }}
-                  title="Open popup window"
-                >
-                  <OpenInFullIcon sx={{ fontSize: '1rem' }} />
-                </IconButton>
-
-                {onOpenCategory && (
-                  <IconButton
-                    size="small"
-                    onClick={() => onOpenCategory('boundaries')}
-                    sx={{ color: '#3b82f6', '&:hover': { transform: 'scale(1.1)' } }}
-                    title="Open full category page"
-                  >
-                    <ChevronRightIcon sx={{ fontSize: '1.25rem' }} />
-                  </IconButton>
-                )}
-              </Box>
-            </Box>
-
-            <Box
-              onClick={() =>
-                setModalData({
-                  title: t.ageTitle,
-                  type: 'pie',
-                  items: agePieData,
-                  slug: 'boundaries',
-                })
-              }
-              sx={{
-                minHeight: 150,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                transition: 'all 0.25s ease',
-                '&:hover': { opacity: 0.9, transform: 'scale(1.01)' },
-              }}
-            >
-              <SvgPieChart data={agePieData} isDarkMode={isDarkMode} size={140} />
-            </Box>
-          </Box>
-        </Grid>
-
-        {/* Card 2: EMPLOYMENT */}
-        <Grid item xs={12} md={4}>
-          <Box
-            sx={{
-              borderRadius: '24px',
-              p: { xs: 2.2, md: 2.8 },
-              bgcolor: isDarkMode ? 'rgba(30, 41, 59, 0.85)' : 'rgba(255, 255, 255, 0.85)',
-              backdropFilter: 'blur(20px)',
-              border: isDarkMode ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(255,255,255,0.8)',
-              boxShadow: isDarkMode ? '0 12px 32px rgba(0,0,0,0.5)' : '0 12px 32px rgba(0,0,0,0.06)',
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
-              <Box
-                onClick={() =>
-                  setModalData({
-                    title: t.empTitle,
-                    type: 'donut',
-                    items: employmentDonutData,
-                    slug: 'economy',
-                  })
-                }
-                sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }}
-              >
-                <Typography sx={{ fontSize: '1.15rem' }}>💼</Typography>
-                <Typography
-                  sx={{
-                    fontWeight: 800,
-                    fontSize: { xs: '0.88rem', md: '0.96rem' },
-                    color: isDarkMode ? '#f8fafc' : '#1e293b',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                  }}
-                >
-                  {t.empTitle}
-                </Typography>
-              </Box>
-
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <IconButton
-                  size="small"
-                  onClick={() =>
-                    setModalData({
-                      title: t.empTitle,
-                      type: 'donut',
-                      items: employmentDonutData,
-                      slug: 'economy',
-                    })
-                  }
-                  sx={{ color: isDarkMode ? '#94a3b8' : '#64748b' }}
-                  title="Open popup window"
-                >
-                  <OpenInFullIcon sx={{ fontSize: '1rem' }} />
-                </IconButton>
-
-                {onOpenCategory && (
-                  <IconButton
-                    size="small"
-                    onClick={() => onOpenCategory('economy')}
-                    sx={{ color: '#3b82f6', '&:hover': { transform: 'scale(1.1)' } }}
-                    title="Open full category page"
-                  >
-                    <ChevronRightIcon sx={{ fontSize: '1.25rem' }} />
-                  </IconButton>
-                )}
-              </Box>
-            </Box>
-
-            <Box
-              onClick={() =>
-                setModalData({
-                  title: t.empTitle,
-                  type: 'donut',
-                  items: employmentDonutData,
-                  slug: 'economy',
-                })
-              }
-              sx={{
-                minHeight: 150,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                transition: 'all 0.25s ease',
-                '&:hover': { opacity: 0.9, transform: 'scale(1.01)' },
-              }}
-            >
-              <SvgDonutChart data={employmentDonutData} isDarkMode={isDarkMode} size={140} />
-            </Box>
-          </Box>
-        </Grid>
-
-        {/* Card 3: RELIGIOUS AFFILIATION */}
-        <Grid item xs={12} md={4}>
-          <Box
-            sx={{
-              borderRadius: '24px',
-              p: { xs: 2.2, md: 2.8 },
-              bgcolor: isDarkMode ? 'rgba(30, 41, 59, 0.85)' : 'rgba(255, 255, 255, 0.85)',
-              backdropFilter: 'blur(20px)',
-              border: isDarkMode ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(255,255,255,0.8)',
-              boxShadow: isDarkMode ? '0 12px 32px rgba(0,0,0,0.5)' : '0 12px 32px rgba(0,0,0,0.06)',
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
-              <Box
-                onClick={() =>
-                  setModalData({
-                    title: language === 'si' ? 'ආගමික සංයුතිය' : language === 'ta' ? 'மத ரீதியான இணைப்பு' : 'RELIGIOUS AFFILIATION',
-                    type: 'pie',
-                    items: religionPieData,
-                    slug: 'religion',
-                  })
-                }
-                sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }}
-              >
-                <Typography sx={{ fontSize: '1.15rem' }}>🛕</Typography>
-                <Typography
-                  sx={{
-                    fontWeight: 800,
-                    fontSize: { xs: '0.88rem', md: '0.96rem' },
-                    color: isDarkMode ? '#f8fafc' : '#1e293b',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                  }}
-                >
-                  {language === 'si' ? 'ආගමික සංයුතිය' : language === 'ta' ? 'மத ரீதியான இணைப்பு' : 'RELIGIOUS AFFILIATION'}
-                </Typography>
-              </Box>
-
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <IconButton
-                  size="small"
-                  onClick={() =>
-                    setModalData({
-                      title: language === 'si' ? 'ආගමික සංයුතිය' : language === 'ta' ? 'மத ரீதியான இணைப்பு' : 'RELIGIOUS AFFILIATION',
-                      type: 'pie',
-                      items: religionPieData,
-                      slug: 'religion',
-                    })
-                  }
-                  sx={{ color: isDarkMode ? '#94a3b8' : '#64748b' }}
-                  title="Open popup window"
-                >
-                  <OpenInFullIcon sx={{ fontSize: '1rem' }} />
-                </IconButton>
-
-                {onOpenCategory && (
-                  <IconButton
-                    size="small"
-                    onClick={() => onOpenCategory('religion')}
-                    sx={{ color: '#3b82f6', '&:hover': { transform: 'scale(1.1)' } }}
-                    title="Open full category page"
-                  >
-                    <ChevronRightIcon sx={{ fontSize: '1.25rem' }} />
-                  </IconButton>
-                )}
-              </Box>
-            </Box>
-
-            <Box
-              onClick={() =>
-                setModalData({
-                  title: language === 'si' ? 'ආගමික සංයුතිය' : language === 'ta' ? 'மத ரீதியான இணைப்பு' : 'RELIGIOUS AFFILIATION',
-                  type: 'pie',
-                  items: religionPieData,
-                  slug: 'religion',
-                })
-              }
-              sx={{
-                minHeight: 150,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                transition: 'all 0.25s ease',
-                '&:hover': { opacity: 0.9, transform: 'scale(1.01)' },
-              }}
-            >
-              <SvgPieChart data={religionPieData} isDarkMode={isDarkMode} size={140} />
-            </Box>
-          </Box>
-        </Grid>
-      </Grid>
-
-      {/* Interactive Detail Modal Window */}
-      <ChartDetailModal
-        open={Boolean(modalData)}
-        onClose={() => setModalData(null)}
-        data={modalData}
-        isDarkMode={isDarkMode}
-        onNavigateCategory={onOpenCategory}
-      />
-    </Box>
-  );
-};
 
 export default DemographicCards;

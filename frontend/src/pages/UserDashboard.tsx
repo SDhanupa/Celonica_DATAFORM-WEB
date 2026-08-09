@@ -15,7 +15,7 @@ import { CATEGORIES } from './CategoryDetailPage';
 import GnPageFooter from '../components/GnPageFooter';
 import { VillageMap } from '../components/VillageMap';
 import { GnTopHeaderBar } from '../components/GnTopHeaderBar';
-import { DemographicCards, BelowMapCards } from '../components/DemographicCards';
+import { DemographicCards } from '../components/DemographicCards';
 
 
 const tChart = {
@@ -937,44 +937,54 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             }}
           />
 
+          {/* ── LARGE GN NAME DISPLAY ── */}
+          <Box sx={{ mt: 0, mb: { xs: 1, md: 2 }, px: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Typography
+              variant="h1"
+              sx={{
+                fontFamily: '"Playfair Display", "Merriweather", "Georgia", serif',
+                fontWeight: 900,
+                fontSize: { xs: '2rem', sm: '2.8rem', md: '3.5rem', lg: '4.2rem' },
+                color: isDarkMode ? '#f8fafc' : '#0f172a',
+                lineHeight: 1,
+                letterSpacing: '-0.02em',
+                wordBreak: 'break-word',
+                textAlign: 'center',
+                textShadow: isDarkMode ? '0 10px 30px rgba(0,0,0,0.8)' : '0 10px 30px rgba(255,255,255,0.8)',
+                mb: 1,
+              }}
+            >
+              {displayGN || 'Sammanthranapura'}
+            </Typography>
 
+            <Typography
+              sx={{
+                maxWidth: '1400px',
+                width: '100%',
+                textAlign: 'center',
+                fontFamily: '"Times New Roman", Times, serif',
+                fontSize: { xs: '1rem', md: '1.15rem' },
+                color: isDarkMode ? '#ffffff' : '#000000',
+                lineHeight: 1.6,
+                textShadow: isDarkMode 
+                  ? '0 2px 10px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.8)' 
+                  : '0 2px 10px rgba(255,255,255,1), 0 0 15px rgba(255,255,255,1)',
+                fontWeight: 600,
+              }}
+            >
+              {language === 'si' 
+                ? 'ප්‍රජා තොරතුරු සම්පාදනය තුළින් ගම සංවර්ධනයේ පදනම සකස් වේ. ඒ සඳහා ලංකාවේ ඕනෑම පුද්ගලයෙකුට සාමාජිකත්වය, ප්‍රතිලාභ, නායකත්වය ලබාගත හැකි වේදිකාවකි. මෙය මුළුමනින්ම ගමේ සාමාජිකයින් එකතු වී ගම සංවිධානය කරගන්නා නව ප්‍රවේශයකි. දශක කිහිපයක පර්යේෂණයකින් ගොඩනැගුණු මහජන මෙවලමකි. ඔබ ඔබේ ගම ගොඩනගන්න, ගමේ වෙබ් අඩවිය නිර්මානය කරගනිමින් එකතු වෙන්න. Login වන්න. පද්ධතිය සඳහා ඔබේ ගමේ පළමු සාමාජිකයා, නියමුවා බවට පත්වන්න.'
+                : language === 'ta'
+                ? 'சமூக தகவல் தொகுப்பின் மூலம் கிராம வளர்ச்சியின் அடிப்படை அமைக்கப்படுகிறது. இது இலங்கையில் உள்ள எவரும் உறுப்புரிமை, நன்மைகள் மற்றும் தலைமையை பெறக்கூடிய ஒரு தளமாகும். இது கிராம உறுப்பினர்கள் ஒன்றிணைந்து கிராமத்தை ஒழுங்கமைக்கும் ஒரு புதிய அணுகுமுறையாகும். இது பல தசாப்த கால ஆராய்ச்சியின் மூலம் உருவாக்கப்பட்ட ஒரு பொது கருவியாகும். உங்கள் கிராமத்தை உருவாக்குங்கள், கிராம வலைத்தளத்தை உருவாக்குவதன் மூலம் இணையுங்கள். உள்நுழையவும். உங்கள் கிராமத்திற்கான அமைப்பின் முதல் உறுப்பினர் மற்றும் வழிகாட்டியாக மாறுங்கள்.'
+                : 'Community information compilation lays the foundation for village development. It is a platform where any individual in Sri Lanka can obtain membership, benefits, and leadership. This is a completely new approach where village members come together to organize their own village. It is a public tool built on decades of research. Build your village, and join by creating your village website. Login now. Become the first member and the pioneer of your village system.'}
+            </Typography>
+          </Box>
 
           {/* ── 2-COLUMN RESPONSIVE DASHBOARD LAYOUT ── */}
-          <Grid container spacing={4} alignItems="flex-start" sx={{ mb: 6 }}>
-            {/* Left Column (Now Map): Village Map Card + Both Age Groups & Employment Cards (Below Map) */}
-            <Grid item xs={12} md={6} lg={6} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-              {/* Village Map Card */}
-              <Box sx={{ width: '100%', maxWidth: '100%' }}>
-                <VillageMap
-                  gnName={displayGN}
-                  district={displayDistrict}
-                  dsDivision={displayCity}
-                  ccode={displayCCODE}
-                  boundary={activeGn?.boundary}
-                  height={400}
-                  language={language}
-                />
-              </Box>
-
-            </Grid>
-
-            {/* Right Column (Now Demographics): Demographic Cards (Village Population & Survey Census Categories) */}
-            <Grid item xs={12} md={6} lg={6}>
+          <Grid container spacing={4} alignItems="stretch" sx={{ mb: 6 }}>
+            {/* Left Column (Now Demographics): Demographic Cards (Village Population & Survey Census Categories) */}
+            <Grid item xs={12} md={6} lg={6} sx={{ display: 'flex', flexDirection: 'column' }}>
               <DemographicCards
-                populationData={populationData}
-                language={language}
-                isDarkMode={isDarkMode}
-                onOpenCategory={(slug) => {
-                  const targetGn = (displayGN || activeGn?.nameEn || gnName || 'Pahalagama').replace(/ /g, '-');
-                  const targetCcode = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'RATPA';
-                  navigate(`/gnpage/${encodeURIComponent(targetGn)}/${encodeURIComponent(targetCcode)}/${slug}`);
-                }}
-              />
-            </Grid>
-
-            {/* ── 3-COLUMN DEMOGRAPHICS ROW (Below Map & Survey Charts) ── */}
-            <Grid item xs={12}>
-              <BelowMapCards
                 populationData={populationData}
                 gnEconomyData={gnEconomyData}
                 language={language}
@@ -985,6 +995,22 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                   navigate(`/gnpage/${encodeURIComponent(targetGn)}/${encodeURIComponent(targetCcode)}/${slug}`);
                 }}
               />
+            </Grid>
+
+            {/* Right Column (Now Map): Village Map Card */}
+            <Grid item xs={12} md={6} lg={6} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              {/* Village Map Card */}
+              <Box sx={{ width: '100%', maxWidth: '95%', mx: 'auto' }}>
+                <VillageMap
+                  gnName={displayGN}
+                  district={displayDistrict}
+                  dsDivision={displayCity}
+                  ccode={displayCCODE}
+                  boundary={activeGn?.boundary}
+                  height={400}
+                  language={language}
+                />
+              </Box>
             </Grid>
           </Grid>
         </Container>

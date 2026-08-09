@@ -78,6 +78,18 @@ const GnPageFooter: React.FC<GnPageFooterProps> = () => {
                     {item}
                   </Typography>
                 ))}
+                
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#ffffff', mt: 4, mb: 2, textTransform: 'uppercase', letterSpacing: 1.5 }}>
+                  Contact Us
+                </Typography>
+                <Typography 
+                  component="a" 
+                  href="mailto:cdicceylon@gmail.com"
+                  variant="body2" 
+                  sx={{ display: 'block', color: '#94a3b8', mb: 1.5, textDecoration: 'none', cursor: 'pointer', transition: 'color 0.2s', '&:hover': { color: '#38bdf8' } }}
+                >
+                  cdicceylon@gmail.com
+                </Typography>
               </Grid>
               
             </Grid>
