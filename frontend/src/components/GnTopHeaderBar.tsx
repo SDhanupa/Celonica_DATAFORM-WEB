@@ -196,9 +196,11 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
       <Box
         sx={{
           display: 'flex',
+          width: 'fit-content',
+          margin: '0 auto',
           flexWrap: 'wrap',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent: 'center',
           gap: { xs: 1.5, lg: 2 },
           p: { xs: 1.5, md: 1.8 },
           borderRadius: '24px',
@@ -208,124 +210,6 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
           boxShadow: isDarkMode ? '0 12px 32px rgba(0,0,0,0.5)' : '0 12px 32px rgba(0,0,0,0.06)',
         }}
       >
-        {/* Left Section: Logo & Home & Categories */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
-          {/* Logo Capsule */}
-          <Box
-            onClick={() => navigate('/')}
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-              px: 2.2,
-              py: 0.8,
-              borderRadius: '50px',
-              bgcolor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.04)',
-              border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(0,0,0,0.08)',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              '&:hover': { transform: 'scale(1.02)' },
-            }}
-          >
-            <Box
-              sx={{
-                width: 20,
-                height: 20,
-                borderRadius: '50%',
-                border: '3px solid #3b82f6',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Box sx={{ width: 6, height: 6, bgcolor: '#3b82f6', borderRadius: '50%' }} />
-            </Box>
-            <Typography sx={{ fontWeight: 800, fontSize: '1.05rem', color: isDarkMode ? '#f8fafc' : '#1e293b' }}>
-              ceystem.com
-            </Typography>
-          </Box>
-
-          {/* Quick Home Icon */}
-          <Tooltip title="Home">
-            <IconButton
-              size="small"
-              onClick={() => navigate('/')}
-              sx={{
-                p: 0.8,
-                bgcolor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
-                color: isDarkMode ? '#f8fafc' : '#1e293b',
-                borderRadius: '12px',
-                '&:hover': { bgcolor: isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)' },
-              }}
-            >
-              <HomeIcon sx={{ fontSize: '1.2rem' }} />
-            </IconButton>
-          </Tooltip>
-
-          <Button
-            size="small"
-            endIcon={<KeyboardArrowDownIcon />}
-            onClick={(e) => setCategoriesMenuAnchor(e.currentTarget)}
-            sx={{
-              fontWeight: 700,
-              fontSize: '0.82rem',
-              color: isDarkMode ? '#cbd5e1' : '#475569',
-              textTransform: 'none',
-              borderRadius: '12px',
-              px: 1.5,
-              py: 0.6,
-              bgcolor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
-              '&:hover': { bgcolor: isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)' },
-            }}
-          >
-            {t.categories}
-          </Button>
-
-          <Menu
-            anchorEl={categoriesMenuAnchor}
-            open={Boolean(categoriesMenuAnchor)}
-            onClose={() => setCategoriesMenuAnchor(null)}
-            PaperProps={{
-              sx: {
-                borderRadius: '16px',
-                minWidth: 220,
-                mt: 1,
-                bgcolor: isDarkMode ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(16px)',
-                boxShadow: '0 16px 36px rgba(0,0,0,0.2)',
-                border: isDarkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.06)',
-              },
-            }}
-          >
-            {categories.map((item) => (
-              <MenuItem
-                key={item.slug}
-                onClick={() => {
-                  setCategoriesMenuAnchor(null);
-                  if (onSelectCategory) {
-                    onSelectCategory(item.slug);
-                  } else {
-                    navigate(`/category/${item.slug}`);
-                  }
-                }}
-                sx={{
-                  fontSize: '0.85rem',
-                  fontWeight: 600,
-                  py: 1,
-                  px: 2,
-                  color: isDarkMode ? '#f8fafc' : '#1e293b',
-                  '&:hover': {
-                    bgcolor: 'rgba(59, 130, 246, 0.12)',
-                    color: '#3b82f6',
-                  },
-                }}
-              >
-                {item.label}
-              </MenuItem>
-            ))}
-          </Menu>
-        </Box>
-
         {/* Center: Location Selectors (District, DS, Village) */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 }, flexWrap: 'wrap' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
@@ -428,58 +312,6 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
               })}
             </Select>
           </Box>
-        </Box>
-
-        {/* Right Section: Login, Language, Theme */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, flexWrap: 'wrap' }}>
-          <Button
-            onClick={onLoginClick}
-            startIcon={<AccountCircleIcon sx={{ fontSize: '1.1rem' }} />}
-            sx={{
-              borderRadius: '50px',
-              px: 2.2,
-              py: 0.7,
-              bgcolor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0, 0, 0, 0.05)',
-              border: isDarkMode ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(0,0,0,0.1)',
-              color: isDarkMode ? '#f8fafc' : '#1e293b',
-              fontWeight: 800,
-              fontSize: '0.82rem',
-              textTransform: 'none',
-              '&:hover': { bgcolor: isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)' },
-            }}
-          >
-            {isAuthenticated ? t.profile : t.login}
-          </Button>
-
-          <Tooltip title={`Switch Language (Current: ${language.toUpperCase()})`}>
-            <IconButton
-              onClick={onCycleLanguage}
-              size="small"
-              sx={{
-                p: 0.7,
-                color: isDarkMode ? '#cbd5e1' : '#475569',
-                bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
-                borderRadius: '10px',
-              }}
-            >
-              <TranslateIcon sx={{ fontSize: '1.15rem' }} />
-            </IconButton>
-          </Tooltip>
-
-          <Tooltip title="Toggle Theme">
-            <IconButton
-              onClick={onToggleDarkMode}
-              size="small"
-              sx={{
-                p: 0.7,
-                color: isDarkMode ? '#f59e0b' : '#475569',
-                bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
-                borderRadius: '10px',
-              }}
-            >
-              {isDarkMode ? <LightModeIcon sx={{ fontSize: '1.15rem' }} /> : <DarkModeIcon sx={{ fontSize: '1.15rem' }} />}
-            </IconButton>
-          </Tooltip>
         </Box>
       </Box>
 

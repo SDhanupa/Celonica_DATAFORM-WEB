@@ -28,7 +28,6 @@ import PhiConnectionsPage from './pages/PhiConnectionsPage';
 import TrsConnectionsPage from './pages/TrsConnectionsPage';
 import DistrictProvinceConnectionsPage from './pages/DistrictProvinceConnectionsPage';
 import CategoryDetailPage from './pages/CategoryDetailPage';
-import FloatingEditButton from './components/FloatingEditButton';
 import ApprovalsPage from './pages/ApprovalsPage';
 
 const App: React.FC = () => {
@@ -38,15 +37,14 @@ const App: React.FC = () => {
         <CssBaseline />
         <Router>
           <AuthProvider>
-            <FloatingEditButton />
             <Routes>
               {/* Public */}
               <Route path="/login" element={<LoginPage />} />
 
-              {/* Public Landing Page */}
+              {/* Home → redirect to GN page */}
               <Route
                 path="/"
-                element={<LandingPage />}
+                element={<Navigate to="/gnpage" replace />}
               />
 
               {/* Public Home Page (Admin layout handled inside DashboardPage for admins) */}
@@ -233,9 +231,9 @@ const App: React.FC = () => {
               />
 
 
-              {/* Default redirect */}
-              <Route path="/dashboard" element={<Navigate to="/" replace />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
+              {/* Default redirects */}
+              <Route path="/dashboard" element={<Navigate to="/gnpage" replace />} />
+              <Route path="*" element={<Navigate to="/gnpage" replace />} />
             </Routes>
           </AuthProvider>
         </Router>
