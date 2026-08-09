@@ -19,8 +19,8 @@ const GnPageFooter: React.FC<GnPageFooterProps> = () => {
         <Grid container spacing={6} justifyContent="space-between">
           
           {/* Branding */}
-          <Grid item xs={12} md={4} sx={{ textAlign: { xs: 'center', md: 'left' } }}>
-            <Box component="img" src="/logo.png" alt="CDIC Logo" sx={{ height: 130, mb: 2, objectFit: 'contain' }} />
+          <Grid item xs={12} md={4} sx={{ textAlign: { xs: 'center', md: 'left' }, pr: { md: 4 } }}>
+            <Box component="img" src="/logo.png" alt="CDIC Logo" sx={{ height: 100, mb: 2, objectFit: 'contain' }} />
             <Typography variant="h4" sx={{ fontWeight: 800, fontFamily: "'Playfair Display', serif", color: '#ffffff', mb: 2 }}>
               Ceylonica
             </Typography>
@@ -31,7 +31,7 @@ const GnPageFooter: React.FC<GnPageFooterProps> = () => {
           
           {/* Links / Info */}
           <Grid item xs={12} md={8}>
-            <Grid container spacing={4} sx={{ textAlign: { xs: 'center', md: 'left' }, justifyContent: { xs: 'center', md: 'flex-end' } }}>
+            <Grid container spacing={4} sx={{ textAlign: { xs: 'center', md: 'left' }, justifyContent: { xs: 'center', md: 'space-between' } }}>
               
               {/* Quick Links */}
               <Grid item xs={6} sm={3}>
@@ -111,7 +111,7 @@ const GnPageFooter: React.FC<GnPageFooterProps> = () => {
           <Typography variant="body2" sx={{ color: '#64748b' }}>
             &copy; {new Date().getFullYear()} Ceylonica Data Platform. All rights reserved.
           </Typography>
-          <Typography variant="body2" sx={{ color: '#475569', fontSize: '0.8rem' }}>
+          <Typography variant="body2" sx={{ color: '#475569', fontSize: '0.8rem', pr: { md: 6 } }}>
             Designed with precision and care
           </Typography>
         </Box>

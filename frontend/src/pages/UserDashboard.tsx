@@ -819,14 +819,14 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
       {/* ── MAIN DASHBOARD VIEW ────────────────────────────────────────── */}
       <Box
         sx={{
-          bgcolor: isDarkMode ? '#0f172a' : '#f1f5f9',
+          bgcolor: isDarkMode ? '#0f172a' : '#ffffff',
           color: themeColors.textLight,
           minHeight: '100vh',
           position: 'relative',
           overflow: 'hidden',
         }}
       >
-        {/* Background Image with serene tea hills / workspace aesthetic */}
+        {/* Background Image with adaptive overlays */}
         <Box
           sx={{
             position: 'absolute',
@@ -834,7 +834,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundImage: 'linear-gradient(rgba(255,255,255,0.45), rgba(255,255,255,0.65)), url(/hero-background-new.jpeg)',
+            backgroundImage: isDarkMode 
+              ? 'linear-gradient(rgba(15,23,42,0.8), rgba(15,23,42,0.9)), url(/hero-background-new.jpeg)' 
+              : 'linear-gradient(rgba(255,255,255,0.75), rgba(255,255,255,0.9)), url(/hero-background-new.jpeg)',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundAttachment: 'fixed',

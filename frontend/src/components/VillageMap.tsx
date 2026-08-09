@@ -182,8 +182,8 @@ export const VillageMap: React.FC<VillageMapProps> = ({
         overflow: 'hidden',
         boxShadow: isDark
           ? '0 16px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.15)'
-          : '0 16px 40px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.8)',
-        bgcolor: isDark ? '#1a1f2c' : '#f8fafc',
+          : '0 16px 40px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.1)',
+        bgcolor: isDark ? 'rgba(15, 23, 42, 0.7)' : 'rgba(0, 0, 0, 0.12)',
         backdropFilter: 'blur(20px)',
       }}
     >

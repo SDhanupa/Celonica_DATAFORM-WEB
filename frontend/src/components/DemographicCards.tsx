@@ -620,10 +620,10 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
         sx={{
           borderRadius: '24px',
           p: { xs: 2, md: 2.5 },
-          bgcolor: isDarkMode ? 'rgba(30, 41, 59, 0.85)' : 'rgba(255, 255, 255, 0.85)',
+          bgcolor: isDarkMode ? 'rgba(15, 23, 42, 0.7)' : 'rgba(0, 0, 0, 0.12)',
           backdropFilter: 'blur(20px)',
-          border: isDarkMode ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(255,255,255,0.8)',
-          boxShadow: isDarkMode ? '0 12px 32px rgba(0,0,0,0.5)' : '0 12px 32px rgba(0,0,0,0.06)',
+          border: isDarkMode ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(0,0,0,0.1)',
+          boxShadow: isDarkMode ? '0 12px 32px rgba(0,0,0,0.5)' : '0 12px 32px rgba(0,0,0,0.1)',
           display: 'flex',
           flexDirection: { xs: 'column', md: 'row' },
           height: { md: 400 },

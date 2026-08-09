@@ -346,6 +346,8 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
                 sx={{
                   minWidth: 140, height: 32, fontSize: '0.85rem', fontWeight: 600,
                   bgcolor: isDarkMode ? 'rgba(15, 23, 42, 0.6)' : '#ffffff', borderRadius: '8px',
+                  color: isDarkMode ? '#e2e8f0' : '#0f172a',
+                  '& .MuiSvgIcon-root': { color: isDarkMode ? '#94a3b8' : 'inherit' },
                   '& fieldset': { borderColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.12)' },
                 }}
               >
@@ -373,6 +375,8 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
                 sx={{
                   minWidth: 140, height: 32, fontSize: '0.85rem', fontWeight: 600,
                   bgcolor: isDarkMode ? 'rgba(15, 23, 42, 0.6)' : '#ffffff', borderRadius: '8px',
+                  color: isDarkMode ? '#e2e8f0' : '#0f172a',
+                  '& .MuiSvgIcon-root': { color: isDarkMode ? '#94a3b8' : 'inherit' },
                   '& fieldset': { borderColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.12)' },
                 }}
               >
@@ -400,6 +404,8 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
                 sx={{
                   minWidth: 140, height: 32, fontSize: '0.85rem', fontWeight: 600,
                   bgcolor: isDarkMode ? 'rgba(15, 23, 42, 0.6)' : '#ffffff', borderRadius: '8px',
+                  color: isDarkMode ? '#e2e8f0' : '#0f172a',
+                  '& .MuiSvgIcon-root': { color: isDarkMode ? '#94a3b8' : 'inherit' },
                   '& fieldset': { borderColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.12)' },
                 }}
               >
