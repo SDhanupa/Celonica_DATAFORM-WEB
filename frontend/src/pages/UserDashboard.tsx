@@ -1078,6 +1078,16 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
               <DemographicCards
                 populationData={populationData}
                 gnEconomyData={gnEconomyData}
+                housingOwnershipData={housingOwnershipData}
+                housingWallData={housingWallData}
+                housingUnitData={housingUnitData}
+                toiletFacilityData={toiletFacilityData}
+                drinkingWaterData={drinkingWaterData}
+                solidWasteData={solidWasteData}
+                roomsData={roomsData}
+                roofData={roofData}
+                religionData={religionData}
+                householdHeadData={householdHeadData}
                 language={language}
                 isDarkMode={isDarkMode}
                 onOpenCategory={(slug) => {

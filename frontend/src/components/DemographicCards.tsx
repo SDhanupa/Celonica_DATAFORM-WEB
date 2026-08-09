@@ -31,6 +31,16 @@ interface DemographicCardsProps {
     unemployed?: number;
     economically_not_active?: number;
   } | null;
+  housingOwnershipData?: any | null;
+  housingWallData?: any | null;
+  housingUnitData?: any | null;
+  toiletFacilityData?: any | null;
+  drinkingWaterData?: any | null;
+  solidWasteData?: any | null;
+  roomsData?: any | null;
+  roofData?: any | null;
+  religionData?: any | null;
+  householdHeadData?: any | null;
   language?: 'en' | 'si' | 'ta';
   isDarkMode?: boolean;
   onOpenCategory?: (slug: string) => void;
@@ -382,6 +392,16 @@ const ChartDetailModal: React.FC<{
 export const DemographicCards: React.FC<DemographicCardsProps> = ({
   populationData,
   gnEconomyData,
+  housingOwnershipData,
+  housingWallData,
+  housingUnitData,
+  toiletFacilityData,
+  drinkingWaterData,
+  solidWasteData,
+  roomsData,
+  roofData,
+  religionData,
+  householdHeadData,
   language = 'en',
   isDarkMode = false,
   onOpenCategory,
@@ -395,9 +415,9 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     ta: { demographicBadge: 'மக்கள்தொகை தரவு', villagePopulation: 'கிராம மக்கள்தொகை', male: 'ஆண்', female: 'பெண்', surveyExplorer: 'கணக்கெடுப்பு வரைபடங்கள்:' },
   }[language] || { demographicBadge: 'DEMOGRAPHIC DATA', villagePopulation: 'VILLAGE POPULATION', male: 'Male', female: 'Female', surveyExplorer: 'SURVEY & CENSUS CHARTS:' };
 
-  const maleCount = populationData?.male || 3864;
-  const femaleCount = populationData?.female || 3776;
-  const totalCount = populationData?.both || (maleCount + femaleCount) || 7640;
+  const maleCount = populationData?.male ?? 0;
+  const femaleCount = populationData?.female ?? 0;
+  const totalCount = populationData?.both ?? (maleCount + femaleCount);
 
   const villagePopBars = [
     { label: t.male, count: maleCount, color1: '#3b82f6', color2: '#1d4ed8', shadowColor: 'rgba(59, 130, 246, 0.45)' },
@@ -422,11 +442,11 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
       title: language === 'si' ? 'වයස් කාණ්ඩ අනුව ජනගහනය' : language === 'ta' ? 'வயதுக் குழுக்களின்படி மக்கள்தொகை' : 'POPULATION BY AGE GROUPS',
       shortTitle: language === 'si' ? 'වයස' : language === 'ta' ? 'வயது' : 'AGE GROUPS',
       pieData: [
-        { label: '0-14', value: populationData?.age_0_14 || 1695, color: '#3b82f6' },
-        { label: '15-24', value: Math.round((populationData?.age_15_59 || 4891) * 0.35), color: '#10b981' },
-        { label: '25-54', value: Math.round((populationData?.age_15_59 || 4891) * 0.65), color: '#f59e0b' },
-        { label: '55-64', value: populationData?.age_60_64 || 393, color: '#8b5cf6' },
-        { label: '65+', value: populationData?.age_65_above || 661, color: '#ec4899' },
+        { label: '0-14', value: populationData?.age_0_14 ?? 0, color: '#3b82f6' },
+        { label: '15-24', value: Math.round((populationData?.age_15_59 ?? 0) * 0.35), color: '#10b981' },
+        { label: '25-54', value: Math.round((populationData?.age_15_59 ?? 0) * 0.65), color: '#f59e0b' },
+        { label: '55-64', value: populationData?.age_60_64 ?? 0, color: '#8b5cf6' },
+        { label: '65+', value: populationData?.age_65_above ?? 0, color: '#ec4899' },
       ],
     },
     {
@@ -450,10 +470,10 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
       title: language === 'si' ? 'ආගමික සංයුතිය' : language === 'ta' ? 'மத ரீதியான இணைப்பு' : 'RELIGIOUS AFFILIATION',
       shortTitle: language === 'si' ? 'ආගම' : language === 'ta' ? 'மதம்' : 'RELIGION',
       pieData: [
-        { label: language === 'si' ? 'බෞද්ධ' : 'Buddhist', value: Math.round(totalCount * 0.68), color: '#f59e0b' },
-        { label: language === 'si' ? 'හින්දු' : 'Hindu', value: Math.round(totalCount * 0.14), color: '#ef4444' },
-        { label: language === 'si' ? 'ඉස්ලාම්' : 'Islam', value: Math.round(totalCount * 0.11), color: '#10b981' },
-        { label: language === 'si' ? 'ක්‍රිස්තියානි' : 'Christian', value: Math.round(totalCount * 0.07), color: '#3b82f6' },
+        { label: language === 'si' ? 'බෞද්ධ' : 'Buddhist', value: religionData?.buddhist || 0, color: '#f59e0b' },
+        { label: language === 'si' ? 'හින්දු' : 'Hindu', value: religionData?.hindu || 0, color: '#ef4444' },
+        { label: language === 'si' ? 'ඉස්ලාම්' : 'Islam', value: religionData?.islam || 0, color: '#10b981' },
+        { label: language === 'si' ? 'ක්‍රිස්තියානි' : 'Christian', value: (religionData?.roman_catholic || 0) + (religionData?.other_christian || 0), color: '#3b82f6' },
       ],
     },
     {
@@ -463,10 +483,10 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
       type: 'donut' as const,
       title: language === 'si' ? 'නිවාස හිමිකාරිත්වය' : language === 'ta' ? 'வீட்டுரிமை நிலை' : 'HOUSING OWNERSHIP STATUS',
       donutData: [
-        { label: language === 'si' ? 'තමන්ගේම' : 'Owned', value: Math.round(totalCount * 0.78), color: '#10b981' },
-        { label: language === 'si' ? 'කුලියට' : 'Rented', value: Math.round(totalCount * 0.14), color: '#3b82f6' },
-        { label: language === 'si' ? 'නොමිලේ' : 'Rent-free', value: Math.round(totalCount * 0.06), color: '#f59e0b' },
-        { label: language === 'si' ? 'වෙනත්' : 'Other', value: Math.round(totalCount * 0.02), color: '#94a3b8' },
+        { label: language === 'si' ? 'තමන්ගේම' : 'Owned', value: housingOwnershipData?.owned_by_member || 0, color: '#10b981' },
+        { label: language === 'si' ? 'කුලියට' : 'Rented', value: (housingOwnershipData?.rent_gov || 0) + (housingOwnershipData?.rent_private || 0), color: '#3b82f6' },
+        { label: language === 'si' ? 'නොමිලේ' : 'Rent-free', value: housingOwnershipData?.free_of_rent || 0, color: '#f59e0b' },
+        { label: language === 'si' ? 'වෙනත්' : 'Other', value: (housingOwnershipData?.encroached || 0) + (housingOwnershipData?.other || 0), color: '#94a3b8' },
       ],
     },
     {
@@ -502,10 +522,10 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
       type: 'bar' as const,
       title: language === 'si' ? 'නිවාස බිත්ති වර්ගය' : language === 'ta' ? 'சுவர் வகை' : 'HOUSING WALL TYPE',
       bars: [
-        { label: language === 'si' ? 'ගඩොල්' : 'Brick', count: Math.round(totalCount * 0.58), color1: '#ea580c', color2: '#c2410c', shadowColor: 'rgba(234,88,12,0.4)' },
-        { label: language === 'si' ? 'සිමෙන්ති' : 'Block', count: Math.round(totalCount * 0.32), color1: '#64748b', color2: '#475569', shadowColor: 'rgba(100,116,139,0.4)' },
-        { label: language === 'si' ? 'මැටි' : 'Cabook', count: Math.round(totalCount * 0.06), color1: '#ca8a04', color2: '#a16207', shadowColor: 'rgba(202,138,4,0.4)' },
-        { label: language === 'si' ? 'වෙනත්' : 'Other', count: Math.round(totalCount * 0.04), color1: '#94a3b8', color2: '#64748b', shadowColor: 'rgba(148,163,184,0.4)' },
+        { label: language === 'si' ? 'ගඩොල්' : 'Brick', count: housingWallData?.brick || 0, color1: '#ea580c', color2: '#c2410c', shadowColor: 'rgba(234,88,12,0.4)' },
+        { label: language === 'si' ? 'සිමෙන්ති' : 'Block', count: housingWallData?.cement_block_stone || 0, color1: '#64748b', color2: '#475569', shadowColor: 'rgba(100,116,139,0.4)' },
+        { label: language === 'si' ? 'මැටි' : 'Cabook', count: housingWallData?.cabook || 0, color1: '#ca8a04', color2: '#a16207', shadowColor: 'rgba(202,138,4,0.4)' },
+        { label: language === 'si' ? 'වෙනත්' : 'Other', count: (housingWallData?.soil_bricks || 0) + (housingWallData?.mud || 0) + (housingWallData?.cadjan_palmyrah || 0) + (housingWallData?.plank_metal_sheet || 0) + (housingWallData?.other || 0), color1: '#94a3b8', color2: '#64748b', shadowColor: 'rgba(148,163,184,0.4)' },
       ],
     },
     {
@@ -515,10 +535,10 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
       type: 'pie' as const,
       title: language === 'si' ? 'නිවාස ඒකක වර්ගය' : language === 'ta' ? 'அலகு வகை' : 'HOUSING UNIT TYPE',
       pieData: [
-        { label: language === 'si' ? 'තනි නිවස' : 'Single', value: Math.round(totalCount * 0.72), color: '#2563eb' },
-        { label: language === 'si' ? 'මහල්/පැතලි' : 'Flat/Attached', value: Math.round(totalCount * 0.20), color: '#8b5cf6' },
-        { label: language === 'si' ? 'පේළි' : 'Line Room', value: Math.round(totalCount * 0.06), color: '#f59e0b' },
-        { label: language === 'si' ? 'වෙනත්' : 'Other', value: Math.round(totalCount * 0.02), color: '#94a3b8' },
+        { label: language === 'si' ? 'තනි නිවස' : 'Single', value: housingUnitData?.permanent || 0, color: '#2563eb' },
+        { label: language === 'si' ? 'මහල්/පැතලි' : 'Flat/Attached', value: housingUnitData?.semi_permanent || 0, color: '#8b5cf6' },
+        { label: language === 'si' ? 'පේළි' : 'Line Room', value: housingUnitData?.improvised || 0, color: '#f59e0b' },
+        { label: language === 'si' ? 'වෙනත්' : 'Other', value: housingUnitData?.unclassified || 0, color: '#94a3b8' },
       ],
     },
     {
@@ -528,10 +548,10 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
       type: 'donut' as const,
       title: language === 'si' ? 'වැසිකිලි පහසුකම්' : language === 'ta' ? 'மலசலகூட வசதிகள்' : 'TOILET FACILITIES',
       donutData: [
-        { label: language === 'si' ? 'ජල මුද්‍රිත' : 'Water Sealed', value: Math.round(totalCount * 0.84), color: '#10b981' },
-        { label: language === 'si' ? 'වතුර දැමීම' : 'Pour Flush', value: Math.round(totalCount * 0.11), color: '#06b6d4' },
-        { label: language === 'si' ? 'වල වැසිකිලි' : 'Pit Latrine', value: Math.round(totalCount * 0.04), color: '#f59e0b' },
-        { label: language === 'si' ? 'නැත' : 'None', value: Math.round(totalCount * 0.01), color: '#ef4444' },
+        { label: language === 'si' ? 'ජල මුද්‍රිත' : 'Water Sealed', value: (toiletFacilityData?.water_seal_piped_sewer || 0) + (toiletFacilityData?.water_seal_septic_tank || 0), color: '#10b981' },
+        { label: language === 'si' ? 'වතුර දැමීම' : 'Pour Flush', value: toiletFacilityData?.pour_flush || 0, color: '#06b6d4' },
+        { label: language === 'si' ? 'වල වැසිකිලි' : 'Pit Latrine', value: toiletFacilityData?.direct_pit || 0, color: '#f59e0b' },
+        { label: language === 'si' ? 'නැත' : 'None', value: (toiletFacilityData?.not_using || 0) + (toiletFacilityData?.other || 0), color: '#ef4444' },
       ],
     },
     {
@@ -541,9 +561,9 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
       type: 'bar' as const,
       title: language === 'si' ? 'නිවාස ඒකකයේ කාමර' : language === 'ta' ? 'அறைகள் எண்ணிக்கை' : 'ROOMS IN HOUSING UNIT',
       bars: [
-        { label: '1 - 2 Rooms', count: Math.round(totalCount * 0.26), color1: '#f59e0b', color2: '#d97706', shadowColor: 'rgba(245,158,11,0.4)' },
-        { label: '3 - 4 Rooms', count: Math.round(totalCount * 0.56), color1: '#3b82f6', color2: '#1d4ed8', shadowColor: 'rgba(59,130,246,0.4)' },
-        { label: '5+ Rooms', count: Math.round(totalCount * 0.18), color1: '#10b981', color2: '#059669', shadowColor: 'rgba(16,185,129,0.4)' },
+        { label: '1 - 2 Rooms', count: (roomsData?.room_1 || 0) + (roomsData?.rooms_2 || 0), color1: '#f59e0b', color2: '#d97706', shadowColor: 'rgba(245,158,11,0.4)' },
+        { label: '3 - 4 Rooms', count: (roomsData?.rooms_3 || 0) + (roomsData?.rooms_4 || 0), color1: '#3b82f6', color2: '#1d4ed8', shadowColor: 'rgba(59,130,246,0.4)' },
+        { label: '5+ Rooms', count: (roomsData?.rooms_5 || 0) + (roomsData?.rooms_6 || 0) + (roomsData?.rooms_7 || 0) + (roomsData?.rooms_8 || 0) + (roomsData?.rooms_9 || 0) + (roomsData?.rooms_10_and_above || 0), color1: '#10b981', color2: '#059669', shadowColor: 'rgba(16,185,129,0.4)' },
       ],
     },
     {
@@ -553,10 +573,10 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
       type: 'donut' as const,
       title: language === 'si' ? 'පානීය ජල මූලාශ්‍රය' : language === 'ta' ? 'குடிநீர் ஆதாரம்' : 'SOURCE OF DRINKING WATER',
       donutData: [
-        { label: language === 'si' ? 'ආරක්ෂිත ළිඳ' : 'Protected Well', value: Math.round(totalCount * 0.46), color: '#0ea5e9' },
-        { label: language === 'si' ? 'නළ ජලය' : 'Tap/Piped', value: Math.round(totalCount * 0.38), color: '#3b82f6' },
-        { label: language === 'si' ? 'නළ ළිඳ' : 'Tube Well', value: Math.round(totalCount * 0.11), color: '#06b6d4' },
-        { label: language === 'si' ? 'බෝතල්' : 'Bottled', value: Math.round(totalCount * 0.05), color: '#8b5cf6' },
+        { label: language === 'si' ? 'ළිඳ' : 'Well', value: (drinkingWaterData?.protected_well_within || 0) + (drinkingWaterData?.protected_well_outside || 0) + (drinkingWaterData?.unprotected_well || 0), color: '#0ea5e9' },
+        { label: language === 'si' ? 'නළ ජලය' : 'Tap/Piped', value: (drinkingWaterData?.tap_within_unit || 0) + (drinkingWaterData?.tap_within_premises_outside || 0) + (drinkingWaterData?.tap_outside_premises || 0), color: '#3b82f6' },
+        { label: language === 'si' ? 'නළ ළිඳ' : 'Tube Well', value: drinkingWaterData?.tube_well || 0, color: '#06b6d4' },
+        { label: language === 'si' ? 'වෙනත්' : 'Other', value: (drinkingWaterData?.rural_water_projects || 0) + (drinkingWaterData?.bowser || 0) + (drinkingWaterData?.river_tank_stream || 0) + (drinkingWaterData?.other || 0), color: '#8b5cf6' },
       ],
     },
     {
@@ -566,10 +586,10 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
       type: 'pie' as const,
       title: language === 'si' ? 'ඝන අපද්‍රව්‍ය බැහැර කිරීම' : language === 'ta' ? 'திடக்கழிவு அகற்றல்' : 'SOLID WASTE DISPOSAL',
       pieData: [
-        { label: language === 'si' ? 'පළාත් පාලන' : 'Local Auth', value: Math.round(totalCount * 0.52), color: '#10b981' },
-        { label: language === 'si' ? 'පිළිස්සීම' : 'Burned', value: Math.round(totalCount * 0.31), color: '#f59e0b' },
-        { label: language === 'si' ? 'වල දැමීම' : 'Buried', value: Math.round(totalCount * 0.11), color: '#64748b' },
-        { label: language === 'si' ? 'කොම්පෝස්ට්' : 'Composted', value: Math.round(totalCount * 0.06), color: '#84cc16' },
+        { label: language === 'si' ? 'පළාත් පාලන' : 'Local Auth', value: solidWasteData?.collected_by_local_authorities || 0, color: '#10b981' },
+        { label: language === 'si' ? 'පිළිස්සීම' : 'Burned', value: solidWasteData?.occupants_burn || 0, color: '#f59e0b' },
+        { label: language === 'si' ? 'වල දැමීම' : 'Buried', value: solidWasteData?.occupants_bury || 0, color: '#64748b' },
+        { label: language === 'si' ? 'කොම්පෝස්ට්/වෙනත්' : 'Compost/Other', value: (solidWasteData?.occupants_composting || 0) + (solidWasteData?.dispose_into_environment || 0) + (solidWasteData?.other || 0), color: '#84cc16' },
       ],
     },
     {
@@ -579,10 +599,10 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
       type: 'bar' as const,
       title: language === 'si' ? 'නිවාස වහල වර්ගය' : language === 'ta' ? 'கூரை வகை' : 'HOUSING UNIT ROOF TYPE',
       bars: [
-        { label: language === 'si' ? 'උළු' : 'Tile', count: Math.round(totalCount * 0.44), color1: '#ea580c', color2: '#c2410c', shadowColor: 'rgba(234,88,12,0.4)' },
-        { label: language === 'si' ? 'ඇස්බැස්ටස්' : 'Asbestos', count: Math.round(totalCount * 0.36), color1: '#64748b', color2: '#475569', shadowColor: 'rgba(100,116,139,0.4)' },
-        { label: language === 'si' ? 'කොන්ක්‍රීට්' : 'Concrete', count: Math.round(totalCount * 0.14), color1: '#3b82f6', color2: '#1d4ed8', shadowColor: 'rgba(59,130,246,0.4)' },
-        { label: language === 'si' ? 'තහඩු' : 'Metal', count: Math.round(totalCount * 0.06), color1: '#94a3b8', color2: '#64748b', shadowColor: 'rgba(148,163,184,0.4)' },
+        { label: language === 'si' ? 'උළු' : 'Tile', count: roofData?.tile || 0, color1: '#ea580c', color2: '#c2410c', shadowColor: 'rgba(234,88,12,0.4)' },
+        { label: language === 'si' ? 'ඇස්බැස්ටස්' : 'Asbestos', count: roofData?.asbestos || 0, color1: '#64748b', color2: '#475569', shadowColor: 'rgba(100,116,139,0.4)' },
+        { label: language === 'si' ? 'කොන්ක්‍රීට්' : 'Concrete', count: roofData?.concrete || 0, color1: '#3b82f6', color2: '#1d4ed8', shadowColor: 'rgba(59,130,246,0.4)' },
+        { label: language === 'si' ? 'තහඩු/වෙනත්' : 'Metal/Other', count: (roofData?.zink_aluminium_sheet || 0) + (roofData?.metal_sheet || 0) + (roofData?.cadjan_palmyrah_straw || 0) + (roofData?.other || 0), color1: '#94a3b8', color2: '#64748b', shadowColor: 'rgba(148,163,184,0.4)' },
       ],
     },
     {
@@ -592,10 +612,10 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
       type: 'pie' as const,
       title: language === 'si' ? 'ගෘහ මූලිකයාට ඇති ඥාතිත්වය' : language === 'ta' ? 'குடும்பத் தலைவருடனான உறவு' : 'RELATIONSHIP TO HOUSEHOLD HEAD',
       pieData: [
-        { label: language === 'si' ? 'ගෘහ මූලික' : 'Head', value: Math.round(totalCount * 0.28), color: '#2563eb' },
-        { label: language === 'si' ? 'ස්වාමිපුරුෂ/භාර්යාව' : 'Spouse', value: Math.round(totalCount * 0.24), color: '#ec4899' },
-        { label: language === 'si' ? 'දූ දරුවන්' : 'Child', value: Math.round(totalCount * 0.36), color: '#10b981' },
-        { label: language === 'si' ? 'ඥාතීන්' : 'Relative', value: Math.round(totalCount * 0.12), color: '#f59e0b' },
+        { label: language === 'si' ? 'ගෘහ මූලික' : 'Head', value: householdHeadData?.head || 0, color: '#2563eb' },
+        { label: language === 'si' ? 'ස්වාමිපුරුෂ/භාර්යාව' : 'Spouse', value: householdHeadData?.wife_husband || 0, color: '#ec4899' },
+        { label: language === 'si' ? 'දූ දරුවන්' : 'Child', value: (householdHeadData?.son_daughter || 0) + (householdHeadData?.son_daughter_in_law || 0), color: '#10b981' },
+        { label: language === 'si' ? 'වෙනත්' : 'Other', value: (householdHeadData?.grandchild_great_grandchild || 0) + (householdHeadData?.parent_of_head_or_spouse || 0) + (householdHeadData?.other_relative || 0) + (householdHeadData?.domestic_employee || 0) + (householdHeadData?.boarder || 0) + (householdHeadData?.non_relative || 0) + (householdHeadData?.clergy || 0) + (householdHeadData?.not_stated || 0), color: '#f59e0b' },
       ],
     },
   ];
