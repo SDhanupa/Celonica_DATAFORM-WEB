@@ -10,7 +10,7 @@ const GnPageFooter: React.FC<GnPageFooterProps> = () => {
     <Box sx={{
       bgcolor: '#0f172a',
       color: '#e2e8f0',
-      py: { xs: 6, md: 8 },
+      py: { xs: 4, md: 5 },
       borderTop: '1px solid rgba(255,255,255,0.1)',
       mt: 'auto',
       width: '100%',

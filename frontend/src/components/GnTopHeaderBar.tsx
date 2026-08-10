@@ -216,13 +216,13 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
         </Box>
 
         {/* ── RIGHT SECTION (Categories + Selectors) ── */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, flex: 1, minWidth: 0 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 1, xl: 2.5 }, flex: 1, minWidth: 0, py: { xs: 0, xl: 1 }, px: { xs: 0, xl: 1 } }}>
 
           {/* Top Row: Categories */}
           <Box sx={{
             display: 'flex',
             flexWrap: 'nowrap',
-            gap: 0.3,
+            gap: 1,
             alignItems: 'center',
             justifyContent: { xs: 'flex-start', md: 'flex-start' },
             overflowX: 'auto',
@@ -261,7 +261,7 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
                   >
                     {cat.label}
                   </Button>
-                  <Typography sx={{ color: isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)', fontWeight: 300, mx: 0.2 }}>
+                  <Typography sx={{ color: isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)', fontWeight: 300, mx: { xs: 0.2, xl: 0.5 } }}>
                     |
                   </Typography>
                 </React.Fragment>
@@ -332,7 +332,7 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
           <Box sx={{ height: '1px', width: '100%', bgcolor: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }} />
 
           {/* Bottom Row: Location Selectors */}
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 2, justifyContent: { xs: 'center', md: 'flex-start' } }}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: { xs: 2, xl: 4 }, justifyContent: { xs: 'center', md: 'flex-start' } }}>
             {/* District */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: isDarkMode ? '#94a3b8' : '#64748b' }}>

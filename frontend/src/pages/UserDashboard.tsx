@@ -502,7 +502,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   // Chart UI variables removed - hero-only mode
 
   return (
-    <Box sx={{ fontFamily: "'Inter', sans-serif" }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>
 
       {/* Location Modal */}
       <Dialog
@@ -819,9 +819,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
       {/* ── MAIN DASHBOARD VIEW ────────────────────────────────────────── */}
       <Box
         sx={{
+          flexGrow: 1,
           bgcolor: isDarkMode ? '#0f172a' : '#ffffff',
           color: themeColors.textLight,
-          minHeight: '100vh',
           position: 'relative',
           overflow: 'hidden',
         }}
@@ -930,7 +930,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             </Menu>
           </Box>
         </Box>
-        <Container maxWidth={false} sx={{ position: 'relative', zIndex: 1, pt: { xs: 7, md: 7 }, pb: 8, px: { xs: 2, md: 4, lg: 6, xl: 10 } }}>
+        <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1, pt: { xs: 7, md: 7 }, pb: 4, px: { xs: 2, md: 4, lg: 6, xl: 8 } }}>
 
           {/* ── TOP HEADER GLASS BAR (Location Selectors & Categories Ribbon) ── */}
           <GnTopHeaderBar
