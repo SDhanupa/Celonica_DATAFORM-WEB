@@ -19,6 +19,8 @@ Route::get('/health', fn() => response()->json(['status' => 'ok', 'service' => '
 
 // Image Upload
 Route::post('/upload-category-image', [ImageUploadController::class, 'upload']);
+Route::post('/upload-category-data', [\App\Http\Controllers\CategoryDataUploadController::class, 'upload']);
+Route::get('/category-data/{slug}', [\App\Http\Controllers\CategoryDataUploadController::class, 'getData']);
 
 // Logs
 Route::get('/logs', function () {

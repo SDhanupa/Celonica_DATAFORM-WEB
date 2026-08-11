@@ -34,8 +34,12 @@ import QuizIcon from '@mui/icons-material/Quiz';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import ExploreIcon from '@mui/icons-material/Explore';
 import CategoryDialog from './CategoryDialog';
+import BulkUploadDialog from './BulkUploadDialog';
+import CategoryDataList from './CategoryDataList';
+import CategoryDataAdminTable from './CategoryDataAdminTable';
 import QuestionDialog from './QuestionDialog';
 import { useAuth } from '../auth/AuthProvider';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { TextField, RadioGroup, FormControlLabel, Radio, Snackbar, Alert } from '@mui/material';
 
 interface SubCategoryPageProps {
@@ -83,7 +87,9 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
   const [submitCategoryData] = useMutation(SUBMIT_CATEGORY_DATA);
 
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [bulkUploadOpen, setBulkUploadOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<any>(null);
+  const [bulkUploadCategory, setBulkUploadCategory] = useState<any>(null);
 
   const [qDialogOpen, setQDialogOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<any>(null);
@@ -233,6 +239,12 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
     setDialogOpen(true);
   };
 
+  const handleBulkUploadClick = (cat: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setBulkUploadCategory(cat);
+    setBulkUploadOpen(true);
+  };
+
   const handleAdd = () => {
     setEditingCategory(null);
     setDialogOpen(true);
@@ -323,6 +335,9 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
         <Box sx={{ display: 'flex', gap: 2 }}>
           {isSuperAdmin && (
             <>
+              <Button variant="contained" color="secondary" startIcon={<CloudUploadIcon />} onClick={(e) => handleBulkUploadClick(parentCategory, e as any)}>
+                Bulk Upload Data
+              </Button>
               <Button variant="contained" color="primary" startIcon={<QuizIcon />} onClick={() => { setEditingQuestion(null); setQDialogOpen(true); }}>
                 Add Question
               </Button>
@@ -389,12 +404,21 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
                 )}
                 {isSuperAdmin && (
                   <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1, display: 'flex', gap: 0.5 }}>
-                    <IconButton size="small" sx={{ bgcolor: 'rgba(255,255,255,0.8)' }} onClick={(e) => handleEdit(cat, e)}>
-                      <EditIcon fontSize="small" color="primary" />
-                    </IconButton>
-                    <IconButton size="small" sx={{ bgcolor: 'rgba(255,255,255,0.8)' }} onClick={(e) => handleDelete(cat.id, e)}>
-                      <DeleteIcon fontSize="small" color="error" />
-                    </IconButton>
+                    <Tooltip title="Bulk Upload Data" arrow placement="top">
+                      <IconButton size="small" sx={{ bgcolor: 'rgba(255,255,255,0.8)' }} onClick={(e) => handleBulkUploadClick(cat, e)}>
+                        <CloudUploadIcon fontSize="small" color="secondary" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Edit Sub-Category" arrow placement="top">
+                      <IconButton size="small" sx={{ bgcolor: 'rgba(255,255,255,0.8)' }} onClick={(e) => handleEdit(cat, e)}>
+                        <EditIcon fontSize="small" color="primary" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Delete Sub-Category" arrow placement="top">
+                      <IconButton size="small" sx={{ bgcolor: 'rgba(255,255,255,0.8)' }} onClick={(e) => handleDelete(cat.id, e)}>
+                        <DeleteIcon fontSize="small" color="error" />
+                      </IconButton>
+                    </Tooltip>
                   </Box>
                 )}
                 <CardActionArea 
@@ -623,12 +647,36 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
         </Box>
       )}
 
+      {/* Bulk Uploaded Data Section */}
+      <Box sx={{ mt: 4 }}>
+        {isSuperAdmin ? (
+          <CategoryDataAdminTable slug={slug || ''} />
+        ) : (
+          <CategoryDataList 
+            slug={slug || ''} 
+            categoryName={parentCategory?.nameEn || parentCategory?.nameSi || parentCategory?.nameTa || 'Category Data'}
+            districtId={selectedLocation?.district_id}
+            dsDivisionCode={selectedLocation?.ds_division_code}
+            gnId={selectedLocation?.CCODE || selectedLocation?.ccode || selectedLocation?.code}
+          />
+        )}
+      </Box>
+
       <CategoryDialog 
         open={dialogOpen} 
         onClose={() => setDialogOpen(false)} 
         category={editingCategory}
-        parentId={parentCategory.id}
+        parentId={parentCategory?.id}
         parentSlug={slug}
+      />
+
+      <BulkUploadDialog
+        open={bulkUploadOpen}
+        onClose={() => setBulkUploadOpen(false)}
+        category={bulkUploadCategory}
+        onSuccess={() => {
+          window.location.reload();
+        }}
       />
 
       <QuestionDialog

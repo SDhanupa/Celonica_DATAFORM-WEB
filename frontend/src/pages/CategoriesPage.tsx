@@ -22,7 +22,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import CategoryDialog from '../components/CategoryDialog';
+import BulkUploadDialog from '../components/BulkUploadDialog';
 import { useAuth } from '../auth/AuthProvider';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 const CategoriesPage: React.FC = () => {
   const [lang, setLang] = useState<'en' | 'si' | 'ta'>('en');
@@ -37,7 +40,9 @@ const CategoriesPage: React.FC = () => {
   });
 
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [bulkUploadOpen, setBulkUploadOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<any>(null);
+  const [bulkUploadCategory, setBulkUploadCategory] = useState<any>(null);
 
   if (loading) return <Box sx={{ p: 4, display: 'flex', justifyContent: 'center' }}><CircularProgress /></Box>;
   if (error) return <Typography color="error">Failed to load categories.</Typography>;
@@ -57,9 +62,28 @@ const CategoriesPage: React.FC = () => {
     setDialogOpen(true);
   };
 
+  const handleBulkUploadClick = (cat: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setBulkUploadCategory(cat);
+    setBulkUploadOpen(true);
+  };
+
   const handleAdd = () => {
     setEditingCategory(null);
     setDialogOpen(true);
+  };
+
+  const handleDownloadTemplate = () => {
+    const headers = ['Reg Number', 'Name si', 'Name en', 'Name ta', 'Name singlish', 'Longitute', 'Latitude', 'Mobile', 'Description', 'Contact person name', 'Address'];
+    const csvContent = headers.join(',') + '\n';
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'category_data_template.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -70,9 +94,14 @@ const CategoriesPage: React.FC = () => {
         </Typography>
         <Box sx={{ display: 'flex', gap: 2 }}>
           {isSuperAdmin && (
-            <Button variant="contained" color="success" startIcon={<AddIcon />} onClick={handleAdd}>
-              Add Category
-            </Button>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button variant="outlined" color="primary" startIcon={<FileDownloadIcon />} onClick={handleDownloadTemplate}>
+                Download Template
+              </Button>
+              <Button variant="contained" color="success" startIcon={<AddIcon />} onClick={handleAdd}>
+                Add Category
+              </Button>
+            </Box>
           )}
           <Box>
             <Button 
@@ -132,12 +161,21 @@ const CategoriesPage: React.FC = () => {
               )}
               {isSuperAdmin && (
                 <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1, display: 'flex', gap: 0.5 }}>
-                  <IconButton size="small" sx={{ bgcolor: 'rgba(255,255,255,0.8)' }} onClick={(e) => handleEdit(cat, e)}>
-                    <EditIcon fontSize="small" color="primary" />
-                  </IconButton>
-                  <IconButton size="small" sx={{ bgcolor: 'rgba(255,255,255,0.8)' }} onClick={(e) => handleDelete(cat.id, e)}>
-                    <DeleteIcon fontSize="small" color="error" />
-                  </IconButton>
+                  <Tooltip title="Bulk Upload Data" arrow placement="top">
+                    <IconButton size="small" sx={{ bgcolor: 'rgba(255,255,255,0.8)' }} onClick={(e) => handleBulkUploadClick(cat, e)}>
+                      <CloudUploadIcon fontSize="small" color="secondary" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Edit Category" arrow placement="top">
+                    <IconButton size="small" sx={{ bgcolor: 'rgba(255,255,255,0.8)' }} onClick={(e) => handleEdit(cat, e)}>
+                      <EditIcon fontSize="small" color="primary" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Delete Category" arrow placement="top">
+                    <IconButton size="small" sx={{ bgcolor: 'rgba(255,255,255,0.8)' }} onClick={(e) => handleDelete(cat.id, e)}>
+                      <DeleteIcon fontSize="small" color="error" />
+                    </IconButton>
+                  </Tooltip>
                 </Box>
               )}
               <CardActionArea 
@@ -188,6 +226,16 @@ const CategoriesPage: React.FC = () => {
         open={dialogOpen} 
         onClose={() => setDialogOpen(false)} 
         category={editingCategory}
+      />
+
+      <BulkUploadDialog
+        open={bulkUploadOpen}
+        onClose={() => setBulkUploadOpen(false)}
+        category={bulkUploadCategory}
+        onSuccess={() => {
+          // Refetch categories to show the newly created one
+          window.location.reload();
+        }}
       />
     </Box>
   );

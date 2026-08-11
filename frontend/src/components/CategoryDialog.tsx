@@ -14,6 +14,7 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useMutation } from '@apollo/client';
 import { CREATE_CATEGORY, UPDATE_CATEGORY } from '../graphql/mutations';
 import { GET_CATEGORIES, GET_CATEGORY_BY_SLUG } from '../graphql/queries';
+import { useAuth } from '../auth/AuthProvider';
 
 interface CategoryDialogProps {
   open: boolean;
@@ -35,6 +36,7 @@ const CategoryDialog: React.FC<CategoryDialogProps> = ({ open, onClose, category
   const [imagePath, setImagePath] = useState('');
   const [sortOrder, setSortOrder] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+  const { token } = useAuth();
 
   const [createCategory] = useMutation(CREATE_CATEGORY);
   const [updateCategory] = useMutation(UPDATE_CATEGORY);
@@ -200,7 +202,6 @@ const CategoryDialog: React.FC<CategoryDialogProps> = ({ open, onClose, category
           multiline
           rows={3}
         />
-        
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, border: '1px dashed #ccc', p: 2, borderRadius: 1, alignItems: 'center' }}>
           <Typography variant="subtitle2" color="textSecondary">Category Icon</Typography>
           {imagePath && (
