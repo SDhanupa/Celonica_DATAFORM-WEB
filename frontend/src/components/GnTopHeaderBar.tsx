@@ -181,14 +181,14 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
       ? (activeCityObj?.dsTa || activeCityObj?.dsEn)
       : (activeCityObj?.dsEn || selectedCity);
 
-  const activeGnObj = gramaNiladharis?.find((g: any) => g.id === selectedGN || g.CCODE === selectedGN);
+  const activeGnObj = gramaNiladharis?.find((g: any) => String(g.id) === String(selectedGN) || g.CCODE === selectedGN || g.ccode === selectedGN);
   const villageName = language === 'si'
     ? (activeGnObj?.nameSi || activeGnObj?.nameEn)
     : language === 'ta'
       ? (activeGnObj?.nameTa || activeGnObj?.nameEn)
       : (activeGnObj?.nameEn || selectedGN);
 
-  const activeCcode = activeGnObj?.CCODE || selectedGN || '';
+  const activeCcode = activeGnObj?.CCODE || activeGnObj?.ccode || selectedGN || '';
 
   return (
     <Box sx={{ width: '100%', mb: 4, display: 'flex', justifyContent: 'center' }}>
@@ -381,10 +381,10 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
                 }}
               >
                 <MenuItem value="" disabled><em>Select</em></MenuItem>
-                {dsDivisions.map((city: any) => {
-                  const name = language === 'si' ? (city.dsSi || city.dsEn) : language === 'ta' ? (city.dsTa || city.dsEn) : (city.dsEn || city.divisionalSecretariatCode);
-                  return <MenuItem key={city.divisionalSecretariatCode} value={city.divisionalSecretariatCode}>{name}</MenuItem>;
-                })}
+                  {dsDivisions.map((city: any) => {
+                    const name = language === 'si' ? (city.dsSi || city.dsEn) : language === 'ta' ? (city.dsTa || city.dsEn) : (city.dsEn || city.divisionalSecretariatCode || city.dsCode);
+                    return <MenuItem key={city.divisionalSecretariatCode || city.dsCode} value={city.divisionalSecretariatCode || city.dsCode}>{name}</MenuItem>;
+                  })}
               </Select>
             </Box>
 
@@ -412,7 +412,7 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
                 <MenuItem value="" disabled><em>Select</em></MenuItem>
                 {gramaNiladharis.map((gn: any) => {
                   const name = language === 'si' ? (gn.nameSi || gn.nameEn) : language === 'ta' ? (gn.nameTa || gn.nameEn) : gn.nameEn;
-                  return <MenuItem key={gn.id || gn.CCODE} value={gn.id || gn.CCODE}>{name}</MenuItem>;
+                  return <MenuItem key={gn.id || gn.CCODE || gn.ccode} value={String(gn.id) || gn.CCODE || gn.ccode}>{name}</MenuItem>;
                 })}
               </Select>
             </Box>

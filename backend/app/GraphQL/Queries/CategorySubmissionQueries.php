@@ -6,11 +6,20 @@ use App\Models\CategorySubmission;
 
 class CategorySubmissionQueries
 {
+    private function ensureSuperAdmin()
+    {
+        $admin = request()->get('current_admin');
+        if (!$admin || !in_array($admin->role, ['super_admin'])) {
+            throw new \GraphQL\Error\Error('Super Admin access required');
+        }
+    }
+
     /**
      * Get pending submissions for a category (Admin)
      */
     public function pending($_, array $args)
     {
+        $this->ensureSuperAdmin();
         $categoryId = $args['category_id'];
         
         // Get the category and all its descendant IDs recursively
@@ -65,6 +74,7 @@ class CategorySubmissionQueries
      */
     public function all($_, array $args)
     {
+        $this->ensureSuperAdmin();
         $categoryId = $args['category_id'];
         
         $categories = \App\Models\Category::all();

@@ -188,8 +188,11 @@ type Query {
     police(id: ID! @eq): Police @find
 
     "Users"
-    users(search: String @where(operator: "like")): [User!]! @paginate(defaultCount: 10)
-    user(id: ID @eq): User @find
+    users(search: String @where(operator: "like")): [User!]! 
+        @paginate(defaultCount: 10, builder: "App\\GraphQL\\Queries\\UserQueries@usersBuilder")
+    user(id: ID): User 
+        @builder(method: "App\\GraphQL\\Queries\\UserQueries@userBuilder")
+        @find
 
     "Districts"
     districts(search: String, first: Int, page: Int): [District!]!

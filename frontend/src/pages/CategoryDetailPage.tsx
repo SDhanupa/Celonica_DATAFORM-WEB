@@ -15,7 +15,6 @@ import { useQuery } from '@apollo/client';
 import { useAuth } from '../auth/AuthProvider';
 import { GET_APPROVED_SUBMISSIONS } from '../graphql/queries';
 import GnPageFooter from '../components/GnPageFooter';
-import BoundariesPage from './BoundariesPage';
 import CategoryDataList from '../components/CategoryDataList';
 import CategoryDataAdminTable from '../components/CategoryDataAdminTable';
 
@@ -54,9 +53,6 @@ const CategoryDetailPage: React.FC = () => {
     categorySlug: string;
   }>();
 
-  // Delegate to dedicated pages for specific categories
-  if (categorySlug === 'boundaries') return <BoundariesPage />;
-
   const navigate = useNavigate();
   const { isAuthenticated, isLoading, userInfo, logout, login, register } = useAuth();
   const muiTheme = useTheme();
@@ -76,6 +72,26 @@ const CategoryDetailPage: React.FC = () => {
   const catDbId = category?.dbId ?? '0';
 
   const gnPageUrl = `/gnpage/${gnName}/${ccode}`;
+
+  const [subCatTables, setSubCatTables] = useState<any[]>([]);
+
+  React.useEffect(() => {
+    if (!catDbId || catDbId === '0') return;
+    
+    fetch(`/api/category-tables/${catDbId}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.tables) {
+          setSubCatTables(data.tables);
+        } else {
+          setSubCatTables([]);
+        }
+      })
+      .catch(err => {
+        console.error('Error fetching category tables:', err);
+        setSubCatTables([]);
+      });
+  }, [catDbId]);
 
   // Fetch approved submissions for this category + GN
   const { data: approvedData, loading: approvedLoading, error: approvedError } = useQuery(GET_APPROVED_SUBMISSIONS, {
@@ -398,20 +414,29 @@ const CategoryDetailPage: React.FC = () => {
           </Box>
         ))}
 
-        {/* Bulk Uploaded Data Section */}
-        <Box sx={{ mt: 4 }}>
-          {isSuperAdmin ? (
-            <CategoryDataAdminTable 
-              slug={categorySlug || ''} 
-            />
-          ) : (
-            <CategoryDataList 
-              slug={categorySlug || ''} 
-              categoryName={catName}
-              gnId={ccode}
-            />
-          )}
-        </Box>
+        {/* Bulk Uploaded Data Section (Dynamic Subcategories) */}
+        {subCatTables.length > 0 && (
+          <Box sx={{ mt: 4 }}>
+            {subCatTables.map((subCat: any) => (
+              <Box key={subCat.slug} sx={{ mb: 2 }}>
+                {isSuperAdmin ? (
+                  <CategoryDataAdminTable 
+                    slug={subCat.slug}
+                    categoryName={subCat.nameEn}
+                    hideIfEmpty={true}
+                  />
+                ) : (
+                  <CategoryDataList 
+                    slug={subCat.slug}
+                    categoryName={subCat.nameEn}
+                    gnId={ccode}
+                    hideIfEmpty={true}
+                  />
+                )}
+              </Box>
+            ))}
+          </Box>
+        )}
 
         {/* Navigate to other categories */}
         <Box sx={{ mt: 6, display: 'flex', flexWrap: 'wrap', gap: 1.5, justifyContent: 'center', maxWidth: 700, mx: 'auto' }}>

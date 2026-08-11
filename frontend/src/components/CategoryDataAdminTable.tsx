@@ -23,6 +23,9 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
   // Edit & Delete state
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editData, setEditData] = useState<any>(null);
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [recordToDelete, setRecordToDelete] = useState<any>(null);
   const [actionLoading, setActionLoading] = useState(false);
   
   // Fetch data function extracted so it can be re-used after edit/delete
@@ -70,17 +73,24 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
     }
   }, [slug, token, districtId, dsDivisionCode, gnId]);
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this record?')) return;
+  const handleDeleteClick = (row: any) => {
+    setRecordToDelete(row);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!recordToDelete) return;
     
     try {
       setActionLoading(true);
-      const response = await fetch(`/api/category-data/${slug}/${id}`, {
+      const response = await fetch(`/api/category-data/${slug}/${recordToDelete.id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const result = await response.json();
       if (result.success) {
+        setDeleteModalOpen(false);
+        setRecordToDelete(null);
         fetchData();
       } else {
         alert('Failed to delete: ' + result.message);
@@ -173,7 +183,7 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
           <IconButton onClick={() => handleEditClick(params.row)} color="primary" size="small" disabled={actionLoading}>
             <EditIcon fontSize="small" />
           </IconButton>
-          <IconButton onClick={() => handleDelete(params.row.id)} color="error" size="small" disabled={actionLoading}>
+          <IconButton onClick={() => handleDeleteClick(params.row)} color="error" size="small" disabled={actionLoading}>
             <DeleteIcon fontSize="small" />
           </IconButton>
         </Box>
@@ -225,6 +235,21 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
           <Button onClick={() => setEditModalOpen(false)} color="inherit" disabled={actionLoading}>Cancel</Button>
           <Button onClick={handleEditSubmit} variant="contained" color="primary" disabled={actionLoading}>
             {actionLoading ? 'Saving...' : 'Save Changes'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete this record?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteModalOpen(false)} color="inherit" disabled={actionLoading}>Cancel</Button>
+          <Button onClick={confirmDelete} variant="contained" color="error" disabled={actionLoading}>
+            {actionLoading ? 'Deleting...' : 'Delete'}
           </Button>
         </DialogActions>
       </Dialog>

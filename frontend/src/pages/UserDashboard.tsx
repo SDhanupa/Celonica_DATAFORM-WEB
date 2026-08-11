@@ -425,7 +425,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
       }
 
       if (selectedGN) {
-        const g = gnData?.pDistrict?.gramaNiladharis?.find((x: any) => x.id === selectedGN);
+        const g = gnData?.pDistrict?.gramaNiladharis?.find((x: any) => String(x.id) === String(selectedGN) || x.CCODE === selectedGN || x.ccode === selectedGN);
         if (g) {
           displayGN = language === 'en' ? g.nameEn : language === 'si' ? g.nameSi : g.nameTa;
           displayCCODE = g.CCODE || '';
@@ -734,9 +734,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                     const name = language === 'en' ? option.nameEn : language === 'si' ? option.nameSi : option.nameTa;
                     return name || option.nameEn || option.gnName || option.code || '';
                   }}
-                  value={gnData?.pDistrict?.gramaNiladharis?.find((gn: any) => gn.id === selectedGN) || null}
+                  value={filteredGNs?.find((gn: any) => String(gn.id) === String(selectedGN) || gn.CCODE === selectedGN || gn.ccode === selectedGN) || null}
                   onChange={(event, newValue) => {
-                    setSelectedGN(newValue ? newValue.id : '');
+                    setSelectedGN(newValue ? (newValue.CCODE || newValue.ccode || newValue.id) : '');
                   }}
                   loading={gnLoading}
                   renderInput={(params) => (
@@ -858,7 +858,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             <IconButton onClick={() => setIsDarkMode(!isDarkMode)} size="small" sx={{ color: '#d1d5db' }}>
               {isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
             </IconButton>
-            <IconButton onClick={() => setShowLocationModal(true)} size="small" sx={{ color: '#d1d5db' }}>
+            <IconButton onClick={() => { window.location.href = '/gnpage'; }} size="small" sx={{ color: '#d1d5db' }}>
               <SearchIcon fontSize="small" />
             </IconButton>
           </Box>

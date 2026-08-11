@@ -15,11 +15,20 @@ final class AdminQueries
         return request()->get('current_admin');
     }
 
+    private function ensureSuperAdmin()
+    {
+        $admin = request()->get('current_admin');
+        if (!$admin || !in_array($admin->role, ['super_admin'])) {
+            throw new \GraphQL\Error\Error('Super Admin access required');
+        }
+    }
+
     /**
      * Return all admins
      */
     public function admins(mixed $root, array $args): array
     {
+        $this->ensureSuperAdmin();
         return Admin::orderBy('created_at', 'desc')->get()->toArray();
     }
 
@@ -28,6 +37,7 @@ final class AdminQueries
      */
     public function admin(mixed $root, array $args): ?Admin
     {
+        $this->ensureSuperAdmin();
         return Admin::find($args['id']);
     }
 
@@ -36,6 +46,7 @@ final class AdminQueries
      */
     public function dashboardStats(mixed $root, array $args): array
     {
+        $this->ensureSuperAdmin();
         return [
             'totalAdmins'    => Admin::count(),
             'activeAdmins'   => Admin::where('is_active', true)->count(),

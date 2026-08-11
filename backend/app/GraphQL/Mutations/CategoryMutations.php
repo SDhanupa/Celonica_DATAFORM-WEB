@@ -8,8 +8,17 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class CategoryMutations
 {
+    private function ensureSuperAdmin()
+    {
+        $admin = request()->get('current_admin');
+        if (!$admin || !in_array($admin->role, ['super_admin'])) {
+            throw new \GraphQL\Error\Error('Super Admin access required');
+        }
+    }
+
     public function createCategory($_, array $args)
     {
+        $this->ensureSuperAdmin();
         // Check for duplicate name
         $nameEn = $args['name_en'] ?? '';
         $nameSi = $args['name_si'] ?? '';
@@ -39,6 +48,7 @@ class CategoryMutations
 
     public function updateCategory($_, array $args)
     {
+        $this->ensureSuperAdmin();
         $category = Category::findOrFail($args['id']);
         if (array_key_exists('name_en', $args) && is_null($args['name_en'])) {
             $args['name_en'] = '';
@@ -55,6 +65,7 @@ class CategoryMutations
 
     public function deleteCategory($_, array $args)
     {
+        $this->ensureSuperAdmin();
         $category = Category::findOrFail($args['id']);
         $category->delete();
         return true;

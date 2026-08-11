@@ -127,6 +127,9 @@ const CategoryDialog: React.FC<CategoryDialogProps> = ({ open, onClose, category
     try {
       const response = await fetch('/api/upload-category-image', {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
         body: formData,
       });
 

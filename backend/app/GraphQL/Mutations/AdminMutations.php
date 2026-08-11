@@ -7,11 +7,20 @@ use GraphQL\Error\Error;
 
 final class AdminMutations
 {
+    private function ensureSuperAdmin()
+    {
+        $admin = request()->get('current_admin');
+        if (!$admin || !in_array($admin->role, ['super_admin'])) {
+            throw new Error('Super Admin access required');
+        }
+    }
+
     /**
      * Register a new admin linked to a Keycloak user
      */
     public function registerAdmin(mixed $root, array $args): Admin
     {
+        $this->ensureSuperAdmin();
         if (Admin::where('keycloak_sub', $args['keycloakSub'])->exists()) {
             throw new Error('An admin with this Keycloak ID already exists.');
         }
@@ -34,6 +43,7 @@ final class AdminMutations
      */
     public function updateAdminRole(mixed $root, array $args): Admin
     {
+        $this->ensureSuperAdmin();
         $admin = Admin::findOrFail($args['id']);
         $admin->update(['role' => strtolower($args['role'])]);
         return $admin->fresh();
@@ -44,6 +54,7 @@ final class AdminMutations
      */
     public function deactivateAdmin(mixed $root, array $args): Admin
     {
+        $this->ensureSuperAdmin();
         $admin = Admin::findOrFail($args['id']);
         $admin->update(['is_active' => false]);
         return $admin->fresh();
@@ -54,6 +65,7 @@ final class AdminMutations
      */
     public function activateAdmin(mixed $root, array $args): Admin
     {
+        $this->ensureSuperAdmin();
         $admin = Admin::findOrFail($args['id']);
         $admin->update(['is_active' => true]);
         return $admin->fresh();

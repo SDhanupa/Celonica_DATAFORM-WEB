@@ -26,13 +26,13 @@ class KeycloakAuthGuard
         $token = $this->extractToken($request);
 
         if (!$token) {
-            $content = json_decode($request->getContent(), true) ?: [];
-            $query = $content['query'] ?? '';
+            // Reject any request without a token to prevent brute forcing
+            return response()->json(['error' => 'Unauthorized: Token required'], 401);
+        }
 
-            if (preg_match('/^\s*mutation\b/i', $query)) {
-                return response()->json(['error' => 'Unauthorized: Mutations require a token'], 401);
-            }
-
+        // Check if it's a valid guest token
+        if (\Illuminate\Support\Facades\Cache::has('guest_token_' . $token)) {
+            $request->merge(['is_guest' => true]);
             return $next($request);
         }
 

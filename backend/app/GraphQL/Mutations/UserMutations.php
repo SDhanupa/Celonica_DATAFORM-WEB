@@ -114,7 +114,7 @@ class UserMutations
     public function registerUser($_, array $args)
     {
         // 1. Authorization check: Only SUPER_ADMIN can do this
-        $authUser = auth()->user();
+        $authUser = request()->get('current_admin');
         if (!$authUser || $authUser->role !== 'super_admin') {
             throw new Exception('Unauthorized. Only Super Admins can register users.');
         }

@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Register Keycloak guard as a named alias for use on routes
         $middleware->alias([
             'keycloak.admin' => \App\Http\Middleware\KeycloakAuthGuard::class,
+            'super_admin' => \App\Http\Middleware\SuperAdminMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

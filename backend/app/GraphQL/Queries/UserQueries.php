@@ -7,6 +7,14 @@ use Illuminate\Http\Request;
 
 final class UserQueries
 {
+    private function ensureSuperAdmin()
+    {
+        $admin = request()->get('current_admin');
+        if (!$admin || !in_array($admin->role, ['super_admin'])) {
+            throw new \GraphQL\Error\Error('Super Admin access required');
+        }
+    }
+
     /**
      * Return the currently authenticated normal user (from middleware)
      */
@@ -34,5 +42,17 @@ final class UserQueries
         }
 
         return false;
+    }
+
+    public function usersBuilder(mixed $root, array $args)
+    {
+        $this->ensureSuperAdmin();
+        return User::query();
+    }
+
+    public function userBuilder(mixed $root, array $args)
+    {
+        $this->ensureSuperAdmin();
+        return User::query();
     }
 }
