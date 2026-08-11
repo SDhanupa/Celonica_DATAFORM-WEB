@@ -16,6 +16,8 @@ import { useAuth } from '../auth/AuthProvider';
 import { GET_APPROVED_SUBMISSIONS } from '../graphql/queries';
 import GnPageFooter from '../components/GnPageFooter';
 import BoundariesPage from './BoundariesPage';
+import CategoryDataList from '../components/CategoryDataList';
+import CategoryDataAdminTable from '../components/CategoryDataAdminTable';
 
 // ─── Category Config ─────────────────────────────────────────────────────────
 
@@ -395,6 +397,21 @@ const CategoryDetailPage: React.FC = () => {
             </Grid>
           </Box>
         ))}
+
+        {/* Bulk Uploaded Data Section */}
+        <Box sx={{ mt: 4 }}>
+          {isSuperAdmin ? (
+            <CategoryDataAdminTable 
+              slug={categorySlug || ''} 
+            />
+          ) : (
+            <CategoryDataList 
+              slug={categorySlug || ''} 
+              categoryName={catName}
+              gnId={ccode}
+            />
+          )}
+        </Box>
 
         {/* Navigate to other categories */}
         <Box sx={{ mt: 6, display: 'flex', flexWrap: 'wrap', gap: 1.5, justifyContent: 'center', maxWidth: 700, mx: 'auto' }}>

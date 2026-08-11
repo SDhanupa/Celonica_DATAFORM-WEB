@@ -45,6 +45,7 @@ const navItems = [
   { label: 'Categories', icon: <CategoryIcon />, path: '/categories', roles: ['super_admin'] },
   { label: 'GM Divisions', icon: <MapIcon />, path: '/grama-niladharis', roles: ['super_admin'] },
   { label: 'Register User', icon: <UserPlusIcon />, path: '/registration', roles: ['super_admin'] },
+  { label: 'Bulk Data', icon: <CategoryIcon />, path: '/bulk-data', roles: ['super_admin'] },
   { label: 'Data Base Mapping', icon: <MapIcon />, path: '/police-connections', roles: ['super_admin'] },
   { label: 'Post Office Mapping', icon: <MapIcon />, path: '/post-office-connections', roles: ['super_admin'] },
   { label: 'Health Mapping', icon: <MapIcon />, path: '/phi-connections', roles: ['super_admin'] },

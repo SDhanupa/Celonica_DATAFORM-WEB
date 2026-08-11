@@ -18,6 +18,7 @@ import UserPage from './pages/UserPage';
 import { UsersPage, ReportsPage } from './pages/PlaceholderPages';
 import RegistrationPage from './pages/RegistrationPage';
 import QuestionsPage from './pages/QuestionsPage';
+import BulkDataPage from './pages/BulkDataPage';
 import SurveyPage from './pages/SurveyPage';
 import CategoriesPage from './pages/CategoriesPage';
 import DynamicCategoryWrapper from './components/DynamicCategoryWrapper';
@@ -115,6 +116,16 @@ const App: React.FC = () => {
                   <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator']}>
                     <AdminLayout>
                       <QuestionsPage />
+                    </AdminLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/bulk-data"
+                element={
+                  <ProtectedRoute allowedRoles={['super_admin']}>
+                    <AdminLayout>
+                      <BulkDataPage />
                     </AdminLayout>
                   </ProtectedRoute>
                 }

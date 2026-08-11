@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box, Typography, IconButton, Menu, MenuItem, Divider,
   useTheme, useMediaQuery, CircularProgress, Chip, Alert,
@@ -18,10 +18,12 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 import { useAuth } from '../auth/AuthProvider';
-import { GET_GN_BY_CCODE, GET_POLICE_BY_GN_CCODE, GET_POST_OFFICES_BY_DS_CODE, GET_APPROVED_SUBMISSIONS } from '../graphql/queries';
+import { GET_GN_BY_CCODE, GET_POLICE_BY_GN_CCODE, GET_POST_OFFICES_BY_DS_CODE, GET_APPROVED_SUBMISSIONS, GET_CATEGORIES } from '../graphql/queries';
 import GnPageFooter from '../components/GnPageFooter';
 import { CATEGORIES } from './CategoryDetailPage';
 import { VillageMap } from '../components/VillageMap';
+import CategoryDataList from '../components/CategoryDataList';
+import CategoryDataAdminTable from '../components/CategoryDataAdminTable';
 
 // ─── Theme helper ────────────────────────────────────────────────────────────
 const getTC = (dark: boolean) => ({
@@ -156,6 +158,38 @@ const BoundariesPage: React.FC = () => {
     fetchPolicy: 'cache-and-network',
   });
   const approvedSubmissions = approvedData?.approvedSubmissions || [];
+
+  // ─── Fetch Categories for Bulk Upload Mapping (GraphQL) ────────────────────
+  const { data: catData } = useQuery(GET_CATEGORIES, {
+    fetchPolicy: 'cache-first',
+  });
+  const boundariesCategory = catData?.categories?.find((c: any) => c.slug === 'boundaries');
+  const graphqlBoundarySubCats = boundariesCategory?.children || [];
+
+  // ─── Fetch Dynamic Bulk Data Tables (from REST API) ──────────────────────
+  const [bulkTables, setBulkTables] = useState<any[]>([]);
+  useEffect(() => {
+    fetch('/api/category-data-tables')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.categories) {
+          // For now, assume these are mostly boundaries or at least village boundaries.
+          // Ideally, we'd recursively check if they belong to root category 2.
+          setBulkTables(data.categories);
+        }
+      })
+      .catch(err => console.error("Failed to fetch bulk tables:", err));
+  }, []);
+
+  // Merge GraphQL known subcategories with dynamically fetched bulk data tables
+  // that might be deeply nested (like Village Boundaries)
+  const allBoundarySubCats = [...graphqlBoundarySubCats];
+  bulkTables.forEach(bt => {
+    if (!allBoundarySubCats.find(c => c.slug === bt.slug)) {
+      // Add missing deeply nested tables (like sapdsgv-village-boundaries)
+      allBoundarySubCats.push({ slug: bt.slug, nameEn: bt.name_en });
+    }
+  });
 
   // Parse answers and map question IDs to labels
   const parseAnswers = (submission: any) => {
@@ -640,6 +674,30 @@ const BoundariesPage: React.FC = () => {
 
 
           </Grid>
+        )}
+
+        {/* Bulk Uploaded Data Section for Boundaries (Dynamic Subcategories) */}
+        {allBoundarySubCats.length > 0 && (
+          <Box sx={{ mt: 4 }}>
+            {allBoundarySubCats.map((subCat: any) => (
+              <Box key={subCat.slug} sx={{ mb: 2 }}>
+                {isSuperAdmin ? (
+                  <CategoryDataAdminTable 
+                    slug={subCat.slug}
+                    categoryName={subCat.nameEn}
+                    hideIfEmpty={true}
+                  />
+                ) : (
+                  <CategoryDataList 
+                    slug={subCat.slug}
+                    categoryName={subCat.nameEn}
+                    gnId={ccode}
+                    hideIfEmpty={true}
+                  />
+                )}
+              </Box>
+            ))}
+          </Box>
         )}
 
         {!loading && !error && !gn && (

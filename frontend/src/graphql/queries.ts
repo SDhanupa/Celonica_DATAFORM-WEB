@@ -145,6 +145,8 @@ export const GET_CATEGORIES = gql`
       progress
       children {
         id
+        slug
+        nameEn
       }
     }
   }

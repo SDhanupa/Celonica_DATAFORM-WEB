@@ -26,6 +26,7 @@ interface CategoryDataListProps {
   dsDivisionCode?: string;
   gnId?: string;
   isSuperAdmin?: boolean;
+  hideIfEmpty?: boolean;
 }
 
 const CategoryDataList: React.FC<CategoryDataListProps> = ({ 
@@ -34,7 +35,8 @@ const CategoryDataList: React.FC<CategoryDataListProps> = ({
   districtId, 
   dsDivisionCode, 
   gnId,
-  isSuperAdmin
+  isSuperAdmin,
+  hideIfEmpty
 }) => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -93,11 +95,17 @@ const CategoryDataList: React.FC<CategoryDataListProps> = ({
   }
 
   if (error) {
+    if (hideIfEmpty) return null;
     return <Alert severity="error" sx={{ mt: 4 }}>Error loading data: {error}</Alert>;
   }
 
   if (data.length === 0) {
-    return null;
+    if (hideIfEmpty) return null;
+    return (
+      <Alert severity="info" sx={{ mt: 2 }}>
+        No data available for your selected location.
+      </Alert>
+    );
   }
 
   return (
@@ -152,6 +160,15 @@ const CategoryDataList: React.FC<CategoryDataListProps> = ({
                       <LocationOnIcon fontSize="small" sx={{ color: 'text.secondary', mt: 0.3 }} />
                       <Typography variant="body2" color="text.primary">
                         {item.address}
+                      </Typography>
+                    </Box>
+                  )}
+
+                  {(item.district_name || item.ds_name || item.gn_name) && (
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mt: 1 }}>
+                      <LocationOnIcon fontSize="small" color="primary" sx={{ mt: 0.3 }} />
+                      <Typography variant="body2" color="text.primary" sx={{ fontWeight: 500 }}>
+                        {item.district_name} District &gt; {item.ds_name} DS &gt; {item.gn_name} GN
                       </Typography>
                     </Box>
                   )}

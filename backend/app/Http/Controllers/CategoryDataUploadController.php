@@ -31,6 +31,20 @@ class CategoryDataUploadController extends Controller
         $gnId = $request->input('gn_id');
         $slug = $request->input('slug');
 
+        // Always resolve gn_id to the integer ID to maintain consistency
+        if (!is_numeric($gnId)) {
+            // First try CCODE (e.g. RATPA), then code (e.g. LK1103030)
+            $gn = DB::table('grama_niladharis')
+                    ->where('CCODE', $gnId)
+                    ->orWhere('code', $gnId)
+                    ->first();
+            if ($gn) {
+                $gnId = $gn->id;
+            }
+        }
+
+        $tableName = 'category_data_' . str_replace('-', '_', $slug);
+
         if (!$slug) {
             return response()->json(['success' => false, 'message' => 'Invalid category slug.'], 400);
         }
@@ -170,13 +184,20 @@ class CategoryDataUploadController extends Controller
         $query = DB::table($tableName);
 
         if ($request->has('district_id') && $request->input('district_id')) {
-            $query->where('district_id', $request->input('district_id'));
+            $query->where($tableName . '.district_id', $request->input('district_id'));
         }
         if ($request->has('ds_division_code') && $request->input('ds_division_code')) {
-            $query->where('ds_division_code', $request->input('ds_division_code'));
+            $query->where($tableName . '.ds_division_code', $request->input('ds_division_code'));
         }
         if ($request->has('gn_id') && $request->input('gn_id')) {
-            $query->where('gn_id', $request->input('gn_id'));
+            $gnId = $request->input('gn_id');
+            if (!is_numeric($gnId)) {
+                $gn = DB::table('grama_niladharis')->where('CCODE', $gnId)->first();
+                if ($gn) {
+                    $gnId = $gn->id;
+                }
+            }
+            $query->where($tableName . '.gn_id', $gnId);
         }
 
         $data = $query->leftJoin('grama_niladharis', function($join) use ($tableName) {
@@ -193,5 +214,67 @@ class CategoryDataUploadController extends Controller
             'success' => true,
             'data' => $data
         ]);
+    }
+
+    public function getBulkDataCategories()
+    {
+        $tables = DB::select("SELECT table_name FROM information_schema.tables WHERE table_name LIKE 'category_data_%'");
+        $slugs = [];
+        foreach ($tables as $table) {
+            $slugs[] = str_replace('_', '-', substr($table->table_name, 14));
+        }
+        
+        $categories = \App\Models\Category::whereIn('slug', $slugs)->get(['slug', 'name_en', 'parent_id']);
+        
+        return response()->json([
+            'success' => true,
+            'categories' => $categories
+        ]);
+    }
+
+    public function updateData(Request $request, $slug, $id)
+    {
+        $tableName = 'category_data_' . str_replace('-', '_', $slug);
+
+        if (!Schema::hasTable($tableName)) {
+            return response()->json(['success' => false, 'message' => 'Table not found.'], 404);
+        }
+
+        $record = DB::table($tableName)->where('id', $id)->first();
+        if (!$record) {
+            return response()->json(['success' => false, 'message' => 'Record not found.'], 404);
+        }
+
+        $updateData = $request->only([
+            'reg_number', 'name_en', 'name_si', 'name_ta', 'name_singlish',
+            'mobile', 'contact_person_name', 'address', 'description',
+            'latitude', 'longitude'
+        ]);
+
+        $updateData['updated_at'] = now();
+
+        DB::table($tableName)->where('id', $id)->update($updateData);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Record updated successfully.'
+        ]);
+    }
+
+    public function deleteData($slug, $id)
+    {
+        $tableName = 'category_data_' . str_replace('-', '_', $slug);
+
+        if (!Schema::hasTable($tableName)) {
+            return response()->json(['success' => false, 'message' => 'Table not found.'], 404);
+        }
+
+        $deleted = DB::table($tableName)->where('id', $id)->delete();
+
+        if ($deleted) {
+            return response()->json(['success' => true, 'message' => 'Record deleted successfully.']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Record not found.'], 404);
     }
 }

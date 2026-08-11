@@ -650,7 +650,9 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
       {/* Bulk Uploaded Data Section */}
       <Box sx={{ mt: 4 }}>
         {isSuperAdmin ? (
-          <CategoryDataAdminTable slug={slug || ''} />
+          <CategoryDataAdminTable 
+            slug={slug || ''} 
+          />
         ) : (
           <CategoryDataList 
             slug={slug || ''} 

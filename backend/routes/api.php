@@ -20,7 +20,10 @@ Route::get('/health', fn() => response()->json(['status' => 'ok', 'service' => '
 // Image Upload
 Route::post('/upload-category-image', [ImageUploadController::class, 'upload']);
 Route::post('/upload-category-data', [\App\Http\Controllers\CategoryDataUploadController::class, 'upload']);
+Route::get('/category-data-tables', [\App\Http\Controllers\CategoryDataUploadController::class, 'getBulkDataCategories']);
 Route::get('/category-data/{slug}', [\App\Http\Controllers\CategoryDataUploadController::class, 'getData']);
+Route::put('/category-data/{slug}/{id}', [\App\Http\Controllers\CategoryDataUploadController::class, 'updateData']);
+Route::delete('/category-data/{slug}/{id}', [\App\Http\Controllers\CategoryDataUploadController::class, 'deleteData']);
 
 // Logs
 Route::get('/logs', function () {
