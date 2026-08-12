@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Str;
 
 class CategoryDataUploadController extends Controller
 {
@@ -15,34 +14,10 @@ class CategoryDataUploadController extends Controller
         $request->validate([
             'slug' => 'required|string|max:255',
             'name_en' => 'required|string|max:255',
-            'name_si' => 'nullable|string|max:255',
-            'name_ta' => 'nullable|string|max:255',
-            'district_id' => 'nullable|string|max:255',
-            'ds_division_code' => 'nullable|string|max:255',
-            'gn_id' => 'nullable|string|max:255',
             'file' => 'required|file|mimes:csv,txt',
         ]);
 
-        $nameEn = $request->input('name_en');
-        $nameSi = $request->input('name_si');
-        $nameTa = $request->input('name_ta');
-        $districtId = $request->input('district_id');
-        $dsDivisionCode = $request->input('ds_division_code');
-        $gnId = $request->input('gn_id');
         $slug = $request->input('slug');
-
-        // Always resolve gn_id to the integer ID to maintain consistency
-        if (!is_numeric($gnId)) {
-            // First try CCODE (e.g. RATPA), then code (e.g. LK1103030)
-            $gn = DB::table('grama_niladharis')
-                    ->where('CCODE', $gnId)
-                    ->orWhere('code', $gnId)
-                    ->first();
-            if ($gn) {
-                $gnId = $gn->id;
-            }
-        }
-
         $tableName = 'category_data_' . str_replace('-', '_', $slug);
 
         if (!$slug) {
@@ -55,8 +30,6 @@ class CategoryDataUploadController extends Controller
             return response()->json(['success' => false, 'message' => 'Category not found.'], 404);
         }
 
-        $tableName = 'category_data_' . str_replace('-', '_', $slug);
-
         // Create table if it doesn't exist
         if (!Schema::hasTable($tableName)) {
             Schema::create($tableName, function (Blueprint $table) {
@@ -64,6 +37,10 @@ class CategoryDataUploadController extends Controller
                 $table->string('district_id')->nullable();
                 $table->string('ds_division_code')->nullable();
                 $table->string('gn_id')->nullable();
+                $table->string('raw_province')->nullable();
+                $table->string('raw_district')->nullable();
+                $table->string('raw_ds')->nullable();
+                $table->string('raw_gn')->nullable();
                 $table->string('reg_number')->nullable();
                 $table->string('name_si')->nullable();
                 $table->string('name_en')->nullable();
@@ -78,6 +55,33 @@ class CategoryDataUploadController extends Controller
                 $table->timestamps();
             });
         }
+        
+        // Ensure existing tables have the raw columns
+        if (!Schema::hasColumn($tableName, 'raw_province')) {
+            Schema::table($tableName, function (Blueprint $table) {
+                $table->string('raw_province')->nullable();
+                $table->string('raw_district')->nullable();
+                $table->string('raw_ds')->nullable();
+                $table->string('raw_gn')->nullable();
+            });
+        }
+
+        // Pre-fetch all GNs to build a fast memory map
+        $allGns = DB::table('grama_niladharis')->get([
+            'id', 'name_en', 'CCODE', 'pro_en', 'dis_en', 'ds_en', 'district_code', 'divisional_secretariat_code'
+        ]);
+        
+        $gnMap = [];
+        foreach ($allGns as $gn) {
+            // Build the 4-tier hierarchy key (we ignore National as it's always SL)
+            $key = strtolower(trim($gn->name_en) . '|' . trim($gn->ds_en) . '|' . trim($gn->dis_en) . '|' . trim($gn->pro_en));
+            $gnMap[$key] = $gn;
+            
+            // Also map by CCODE if it exists
+            if ($gn->CCODE) {
+                $gnMap[strtolower(trim($gn->CCODE))] = $gn;
+            }
+        }
 
         // Process CSV
         $file = $request->file('file');
@@ -90,19 +94,13 @@ class CategoryDataUploadController extends Controller
         }
         
         // Remove headers
-        $headers = array_shift($data);
+        array_shift($data);
         
-        // Fetch existing records for duplicate checking
-        $existingRecords = DB::table($tableName)
-            ->where('district_id', $districtId)
-            ->where('ds_division_code', $dsDivisionCode)
-            ->where('gn_id', $gnId)
-            ->select('name_en', 'name_si', 'name_ta')
-            ->get();
-            
+        // Fetch existing records for duplicate checking globally for this table
+        $existingRecords = DB::table($tableName)->select('gn_id', 'name_en', 'name_si', 'name_ta')->get();
         $existingHashes = [];
         foreach ($existingRecords as $record) {
-            $hash = md5(trim($record->name_en ?: '') . '|' . trim($record->name_si ?: '') . '|' . trim($record->name_ta ?: ''));
+            $hash = md5(($record->gn_id ?: 'null') . '|' . trim($record->name_en ?: '') . '|' . trim($record->name_si ?: '') . '|' . trim($record->name_ta ?: ''));
             $existingHashes[$hash] = true;
         }
 
@@ -111,17 +109,49 @@ class CategoryDataUploadController extends Controller
         $savedCount = 0;
 
         foreach ($data as $row) {
-            // Ensure row has the correct number of columns or pad it
-            $row = array_pad($row, 11, null);
+            // New 16-column CSV structure
+            $row = array_pad($row, 16, null);
             
-            $name_si = $row[1] ?: null;
-            $name_en = $row[2] ?: null;
-            $name_ta = $row[3] ?: null;
+            $province = strtolower(trim($row[1] ?? ''));
+            $district = strtolower(trim($row[2] ?? ''));
+            $ds = strtolower(trim($row[3] ?? ''));
+            $gn_val = strtolower(trim($row[4] ?? ''));
             
-            $hash = md5(trim($name_en ?: '') . '|' . trim($name_si ?: '') . '|' . trim($name_ta ?: ''));
+            $mapped_gn_id = null;
+            $mapped_district_id = null;
+            $mapped_ds_code = null;
+            
+            if (isset($gnMap[$gn_val])) {
+                $matchedGn = $gnMap[$gn_val];
+                $mapped_gn_id = $matchedGn->id;
+                $mapped_district_id = $matchedGn->district_code;
+                $mapped_ds_code = $matchedGn->divisional_secretariat_code;
+            } else {
+                $searchKey = $gn_val . '|' . $ds . '|' . $district . '|' . $province;
+                if (isset($gnMap[$searchKey])) {
+                    $matchedGn = $gnMap[$searchKey];
+                    $mapped_gn_id = $matchedGn->id;
+                    $mapped_district_id = $matchedGn->district_code;
+                    $mapped_ds_code = $matchedGn->divisional_secretariat_code;
+                }
+            }
+
+            // The data columns start from index 5
+            $reg_number = $row[5] ?: null;
+            $name_si = $row[6] ?: null;
+            $name_en = $row[7] ?: null;
+            $name_ta = $row[8] ?: null;
+            $name_singlish = $row[9] ?: null;
+            $longitude = $row[10] ?: null;
+            $latitude = $row[11] ?: null;
+            $mobile = $row[12] ?: null;
+            $description = $row[13] ?: null;
+            $contact_person = $row[14] ?: null;
+            $address = $row[15] ?: null;
+            
+            $hash = md5(($mapped_gn_id ?: 'null') . '|' . trim($name_en ?: '') . '|' . trim($name_si ?: '') . '|' . trim($name_ta ?: ''));
             
             if (isset($existingHashes[$hash])) {
-                // Duplicate found
                 $duplicates[] = [
                     'name_en' => $name_en,
                     'name_si' => $name_si,
@@ -131,20 +161,24 @@ class CategoryDataUploadController extends Controller
             }
             
             $insertData[] = [
-                'district_id' => $districtId,
-                'ds_division_code' => $dsDivisionCode,
-                'gn_id' => $gnId,
-                'reg_number' => $row[0] ?: null,
+                'district_id' => $mapped_district_id,
+                'ds_division_code' => $mapped_ds_code,
+                'gn_id' => $mapped_gn_id,
+                'raw_province' => $province ?: null,
+                'raw_district' => $district ?: null,
+                'raw_ds' => $ds ?: null,
+                'raw_gn' => $gn_val ?: null,
+                'reg_number' => $reg_number,
                 'name_si' => $name_si,
                 'name_en' => $name_en,
                 'name_ta' => $name_ta,
-                'name_singlish' => $row[4] ?: null,
-                'longitude' => $row[5] ?: null,
-                'latitude' => $row[6] ?: null,
-                'mobile' => $row[7] ?: null,
-                'description' => $row[8] ?: null,
-                'contact_person_name' => $row[9] ?: null,
-                'address' => $row[10] ?: null,
+                'name_singlish' => $name_singlish,
+                'longitude' => $longitude,
+                'latitude' => $latitude,
+                'mobile' => $mobile,
+                'description' => $description,
+                'contact_person_name' => $contact_person,
+                'address' => $address,
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
@@ -152,14 +186,12 @@ class CategoryDataUploadController extends Controller
             $existingHashes[$hash] = true;
             $savedCount++;
             
-            // Chunk insert to avoid memory issues with large files
             if (count($insertData) >= 500) {
                 DB::table($tableName)->insert($insertData);
                 $insertData = [];
             }
         }
         
-        // Insert remaining
         if (count($insertData) > 0) {
             DB::table($tableName)->insert($insertData);
         }
@@ -183,6 +215,7 @@ class CategoryDataUploadController extends Controller
 
         $query = DB::table($tableName);
 
+        // Optional filtering by specific GN/DS/District
         if ($request->has('district_id') && $request->input('district_id')) {
             $query->where($tableName . '.district_id', $request->input('district_id'));
         }
@@ -200,13 +233,31 @@ class CategoryDataUploadController extends Controller
             $query->where($tableName . '.gn_id', $gnId);
         }
 
+        // Special flag to only return NULL data (unmapped)
+        if ($request->has('unmapped_only') && $request->input('unmapped_only') == 'true') {
+            $query->whereNull($tableName . '.gn_id');
+        } elseif ($request->has('mapped_only') && $request->input('mapped_only') == 'true') {
+            $query->whereNotNull($tableName . '.gn_id');
+        }
+
+        // Ensure the table has the raw columns before querying to prevent SQL errors on older tables
+        if (!Schema::hasColumn($tableName, 'raw_province')) {
+            Schema::table($tableName, function (Blueprint $table) {
+                $table->string('raw_province')->nullable();
+                $table->string('raw_district')->nullable();
+                $table->string('raw_ds')->nullable();
+                $table->string('raw_gn')->nullable();
+            });
+        }
+
         $data = $query->leftJoin('grama_niladharis', function($join) use ($tableName) {
                           $join->on($tableName . '.gn_id', '=', DB::raw('CAST(grama_niladharis.id AS varchar)'));
                       })
                       ->select($tableName . '.*', 
-                               'grama_niladharis.dis_en as district_name', 
-                               'grama_niladharis.ds_en as ds_name', 
-                               'grama_niladharis.name_en as gn_name')
+                               DB::raw("COALESCE(grama_niladharis.pro_en, $tableName.raw_province) as province_name"),
+                               DB::raw("COALESCE(grama_niladharis.dis_en, $tableName.raw_district) as district_name"),
+                               DB::raw("COALESCE(grama_niladharis.ds_en, $tableName.raw_ds) as ds_name"),
+                               DB::raw("COALESCE(grama_niladharis.name_en, $tableName.raw_gn) as gn_name"))
                       ->orderBy($tableName . '.created_at', 'desc')
                       ->get();
 
@@ -276,5 +327,39 @@ class CategoryDataUploadController extends Controller
         }
 
         return response()->json(['success' => false, 'message' => 'Record not found.'], 404);
+    }
+
+    public function bulkDeleteData(Request $request, $slug)
+    {
+        \Illuminate\Support\Facades\Log::info('bulkDeleteData hit', ['slug' => $slug, 'ids' => $request->input('ids')]);
+        
+        $tableName = 'category_data_' . str_replace('-', '_', $slug);
+
+        if (!Schema::hasTable($tableName)) {
+            \Illuminate\Support\Facades\Log::info('Table not found: ' . $tableName);
+            return response()->json(['success' => false, 'message' => 'Table not found.'], 404);
+        }
+
+        $ids = $request->input('ids');
+        if (!is_array($ids) || count($ids) === 0) {
+            \Illuminate\Support\Facades\Log::info('No IDs provided');
+            return response()->json(['success' => false, 'message' => 'No IDs provided.'], 400);
+        }
+
+        try {
+            $deleted = DB::table($tableName)->whereIn('id', $ids)->delete();
+            \Illuminate\Support\Facades\Log::info('Deleted count: ' . $deleted);
+
+            return response()->json([
+                'success' => true, 
+                'message' => $deleted . ' records deleted successfully.'
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Bulk delete failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Server error during deletion: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

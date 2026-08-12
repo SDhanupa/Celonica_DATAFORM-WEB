@@ -74,7 +74,7 @@ const CategoriesPage: React.FC = () => {
   };
 
   const handleDownloadTemplate = () => {
-    const headers = ['Reg Number', 'Name si', 'Name en', 'Name ta', 'Name singlish', 'Longitute', 'Latitude', 'Mobile', 'Description', 'Contact person name', 'Address'];
+    const headers = ['National', 'Province', 'District', 'DS Divisional sec', 'GN', 'Reg Number', 'Name si', 'Name en', 'Name ta', 'Name singlish', 'Longitute', 'Latitude', 'Mobile', 'Description', 'Contact person name', 'Address'];
     const csvContent = headers.join(',') + '\n';
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);

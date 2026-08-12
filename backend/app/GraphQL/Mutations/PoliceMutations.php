@@ -8,8 +8,17 @@ use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class PoliceMutations
 {
+    private function ensureSuperAdmin()
+    {
+        $admin = request()->get('current_admin');
+        if (!$admin || !in_array($admin->role, ['super_admin'])) {
+            throw new \GraphQL\Error\Error('Super Admin access required');
+        }
+    }
+
     public function updatePoliceMapping($root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
+        $this->ensureSuperAdmin();
         // Find existing or create new
         $police = Police::where('gnd_id', $args['code'])->first();
 

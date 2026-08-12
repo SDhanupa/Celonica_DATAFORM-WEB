@@ -33,10 +33,7 @@ const BulkUploadDialog: React.FC<BulkUploadDialogProps> = ({ open, onClose, onSu
   const { token } = useAuth();
   
   
-  // Location Mapping
-  const [selectedDistrict, setSelectedDistrict] = useState('');
-  const [selectedCity, setSelectedCity] = useState('');
-  const [selectedGN, setSelectedGN] = useState('');
+
   
   // File & State
   const [file, setFile] = useState<File | null>(null);
@@ -45,43 +42,7 @@ const BulkUploadDialog: React.FC<BulkUploadDialogProps> = ({ open, onClose, onSu
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [duplicateResults, setDuplicateResults] = useState<any>(null);
 
-  // Queries for Location Dropdowns
-  const { data: districtsData, loading: districtsLoading } = useQuery(GET_P_DISTRICTS, {
-    fetchPolicy: 'cache-first',
-  });
 
-  const { data: gnData, loading: gnLoading } = useQuery(GET_P_DISTRICT_WITH_GNS, {
-    variables: { id: selectedDistrict },
-    skip: !selectedDistrict,
-    fetchPolicy: 'cache-first',
-  });
-
-  const districts = districtsData?.pDistricts || [];
-
-  const dsDivisions = useMemo(() => {
-    if (!gnData?.pDistrict?.gramaNiladharis) return [];
-    const citiesMap = new Map();
-    gnData.pDistrict.gramaNiladharis.forEach((gn: any) => {
-      const code = gn.divisionalSecretariatCode || gn.dsEn;
-      if (code && !citiesMap.has(code)) {
-        citiesMap.set(code, {
-          divisionalSecretariatCode: code,
-          dsEn: gn.dsEn || gn.divisionalSecretariatCode,
-          dsSi: gn.dsSi,
-          dsTa: gn.dsTa,
-        });
-      }
-    });
-    return Array.from(citiesMap.values());
-  }, [gnData]);
-
-  const gramaNiladharis = useMemo(() => {
-    if (!gnData?.pDistrict?.gramaNiladharis) return [];
-    if (!selectedCity) return gnData.pDistrict.gramaNiladharis;
-    return gnData.pDistrict.gramaNiladharis.filter(
-      (gn: any) => gn.divisionalSecretariatCode === selectedCity || gn.dsEn === selectedCity
-    );
-  }, [gnData, selectedCity]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -108,9 +69,7 @@ const BulkUploadDialog: React.FC<BulkUploadDialogProps> = ({ open, onClose, onSu
     formData.append('name_en', category.nameEn);
     if (category.nameSi) formData.append('name_si', category.nameSi);
     if (category.nameTa) formData.append('name_ta', category.nameTa);
-    if (selectedDistrict) formData.append('district_id', selectedDistrict);
-    if (selectedCity) formData.append('ds_division_code', selectedCity);
-    if (selectedGN) formData.append('gn_id', selectedGN);
+
     formData.append('file', file);
 
     try {
@@ -145,9 +104,7 @@ const BulkUploadDialog: React.FC<BulkUploadDialogProps> = ({ open, onClose, onSu
   };
 
   const handleClose = () => {
-    setSelectedDistrict('');
-    setSelectedCity('');
-    setSelectedGN('');
+
     setFile(null);
     setError(null);
     setSuccessMsg(null);
@@ -191,69 +148,9 @@ const BulkUploadDialog: React.FC<BulkUploadDialogProps> = ({ open, onClose, onSu
             {successMsg && <Alert severity="success" sx={{ mb: 2, mt: 1 }}>{successMsg}</Alert>}
             
             <Typography variant="body2" color="textSecondary" sx={{ mb: 3, mt: 1 }}>
-              Select the location below to map this new data to a specific GN division. 
-              The data will be stored in a dynamically generated database table for the category.
+              Upload your CSV file using the official template. 
+              The system will automatically map the locations to the correct GN divisions based on the CSV data.
             </Typography>
-
-        {/* Location Dropdowns */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3, p: 2, bgcolor: '#f8fafc', borderRadius: 2, border: '1px solid #e2e8f0' }}>
-          <Typography variant="subtitle2" sx={{ color: '#475569', fontWeight: 600 }}>Location Mapping (Optional but recommended)</Typography>
-          
-          <FormControl fullWidth size="small">
-            <InputLabel>District</InputLabel>
-            <Select
-              value={selectedDistrict}
-              label="District"
-              onChange={(e) => {
-                setSelectedDistrict(e.target.value);
-                setSelectedCity('');
-                setSelectedGN('');
-              }}
-            >
-              <MenuItem value=""><em>None</em></MenuItem>
-              {districts.map((d: any) => (
-                <MenuItem key={d.id || d.admin2Pcode} value={d.id || d.admin2Pcode}>
-                  {d.admin2NameEn || d.nameEn}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl fullWidth size="small" disabled={!selectedDistrict || dsDivisions.length === 0}>
-            <InputLabel>City / DS Division</InputLabel>
-            <Select
-              value={selectedCity}
-              label="City / DS Division"
-              onChange={(e) => {
-                setSelectedCity(e.target.value);
-                setSelectedGN('');
-              }}
-            >
-              <MenuItem value=""><em>None</em></MenuItem>
-              {dsDivisions.map((city: any) => (
-                <MenuItem key={city.divisionalSecretariatCode} value={city.divisionalSecretariatCode}>
-                  {city.dsEn || city.divisionalSecretariatCode}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl fullWidth size="small" disabled={!selectedCity || gramaNiladharis.length === 0}>
-            <InputLabel>Grama Niladhari (GN)</InputLabel>
-            <Select
-              value={selectedGN}
-              label="Grama Niladhari (GN)"
-              onChange={(e) => setSelectedGN(e.target.value)}
-            >
-              <MenuItem value=""><em>None</em></MenuItem>
-              {gramaNiladharis.map((gn: any) => (
-                <MenuItem key={gn.id || gn.CCODE} value={gn.id || gn.CCODE}>
-                  {gn.nameEn}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Box>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, border: '2px dashed #ccc', borderRadius: 2, p: 3, justifyContent: 'center' }}>
           <Button variant="outlined" component="label" startIcon={<CloudUploadIcon />} disabled={loading}>

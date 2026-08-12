@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography, CircularProgress, Alert, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 import { useAuth } from '../auth/AuthProvider';
 
 interface CategoryDataAdminTableProps {
@@ -12,9 +12,10 @@ interface CategoryDataAdminTableProps {
   gnId?: string;
   hideIfEmpty?: boolean;
   categoryName?: string;
+  filterType?: 'mapped' | 'unmapped' | 'all';
 }
 
-const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, districtId, dsDivisionCode, gnId, hideIfEmpty, categoryName }) => {
+const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, districtId, dsDivisionCode, gnId, hideIfEmpty, categoryName, filterType }) => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,6 +29,10 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
   const [recordToDelete, setRecordToDelete] = useState<any>(null);
   const [actionLoading, setActionLoading] = useState(false);
   
+  // Bulk Delete state
+  const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>([]);
+  const [bulkDeleteModalOpen, setBulkDeleteModalOpen] = useState(false);
+  
   // Fetch data function extracted so it can be re-used after edit/delete
   const fetchData = async () => {
     try {
@@ -37,6 +42,8 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
       if (districtId) params.append('district_id', districtId);
       if (dsDivisionCode) params.append('ds_division_code', dsDivisionCode);
       if (gnId) params.append('gn_id', gnId);
+      if (filterType === 'mapped') params.append('mapped_only', 'true');
+      if (filterType === 'unmapped') params.append('unmapped_only', 'true');
       
       const queryString = params.toString() ? '?' + params.toString() : '';
 
@@ -91,6 +98,34 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
       if (result.success) {
         setDeleteModalOpen(false);
         setRecordToDelete(null);
+        fetchData();
+      } else {
+        alert('Failed to delete: ' + result.message);
+      }
+    } catch (err: any) {
+      alert('Error deleting: ' + err.message);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleBulkDeleteSubmit = async () => {
+    if (rowSelectionModel.length === 0) return;
+    
+    try {
+      setActionLoading(true);
+      const response = await fetch(`/api/category-data/${slug}/bulk-delete`, {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ ids: rowSelectionModel })
+      });
+      const result = await response.json();
+      if (result.success) {
+        setBulkDeleteModalOpen(false);
+        setRowSelectionModel([]);
         fetchData();
       } else {
         alert('Failed to delete: ' + result.message);
@@ -168,6 +203,8 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
     { field: 'name_en', headerName: 'Name (EN)', width: 180 },
     { field: 'name_si', headerName: 'Name (SI)', width: 180 },
     { field: 'name_ta', headerName: 'Name (TA)', width: 180 },
+    { field: 'national', headerName: 'National', width: 100, valueGetter: () => 'Sri Lanka' },
+    { field: 'province_name', headerName: 'Province', width: 130 },
     { field: 'district_name', headerName: 'District', width: 130 },
     { field: 'ds_name', headerName: 'DS Division', width: 150 },
     { field: 'gn_name', headerName: 'GN Name', width: 150 },
@@ -193,15 +230,29 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
 
   return (
     <Box sx={{ mt: 4, mb: 4, height: 500, width: '100%' }}>
-      {categoryName ? (
-        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-          {categoryName} (Admin View)
-        </Typography>
-      ) : (
-        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-          Bulk Uploaded Data (Admin View)
-        </Typography>
-      )}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        {categoryName ? (
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+            {categoryName} (Admin View)
+          </Typography>
+        ) : (
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+            Bulk Uploaded Data (Admin View)
+          </Typography>
+        )}
+        
+        {rowSelectionModel.length > 0 && (
+          <Button 
+            variant="contained" 
+            color="error" 
+            startIcon={<DeleteIcon />}
+            onClick={() => setBulkDeleteModalOpen(true)}
+            disabled={actionLoading}
+          >
+            Delete Selected ({rowSelectionModel.length})
+          </Button>
+        )}
+      </Box>
       <DataGrid
         rows={data}
         columns={columns}
@@ -211,6 +262,11 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
           },
         }}
         pageSizeOptions={[10, 25, 50]}
+        checkboxSelection
+        onRowSelectionModelChange={(newRowSelectionModel) => {
+          setRowSelectionModel(newRowSelectionModel);
+        }}
+        rowSelectionModel={rowSelectionModel}
         disableRowSelectionOnClick
       />
 
@@ -250,6 +306,23 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
           <Button onClick={() => setDeleteModalOpen(false)} color="inherit" disabled={actionLoading}>Cancel</Button>
           <Button onClick={confirmDelete} variant="contained" color="error" disabled={actionLoading}>
             {actionLoading ? 'Deleting...' : 'Delete'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      
+      {/* Bulk Delete Confirmation Dialog */}
+      <Dialog open={bulkDeleteModalOpen} onClose={() => setBulkDeleteModalOpen(false)}>
+        <DialogTitle>Confirm Bulk Delete</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete {rowSelectionModel.length} selected records?
+            This action cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setBulkDeleteModalOpen(false)} color="inherit" disabled={actionLoading}>Cancel</Button>
+          <Button onClick={handleBulkDeleteSubmit} variant="contained" color="error" disabled={actionLoading}>
+            {actionLoading ? 'Deleting...' : 'Delete All Selected'}
           </Button>
         </DialogActions>
       </Dialog>

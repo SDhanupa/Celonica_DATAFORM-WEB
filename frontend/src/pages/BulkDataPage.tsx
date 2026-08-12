@@ -94,11 +94,27 @@ const BulkDataPage: React.FC = () => {
       </Paper>
 
       {selectedSlug && (
-        <Box sx={{ mt: 4 }}>
-          <CategoryDataAdminTable 
-            slug={selectedSlug} 
-            categoryName={selectedName}
-          />
+        <Box sx={{ mt: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <Box>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: 'success.main' }}>
+              Complete Data (Successfully Mapped)
+            </Typography>
+            <CategoryDataAdminTable 
+              slug={selectedSlug} 
+              categoryName={selectedName}
+              filterType="mapped"
+            />
+          </Box>
+          <Box>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: 'error.main' }}>
+              Unmapped Data (Missing or Incorrect Location)
+            </Typography>
+            <CategoryDataAdminTable 
+              slug={selectedSlug} 
+              categoryName={selectedName}
+              filterType="unmapped"
+            />
+          </Box>
         </Box>
       )}
 

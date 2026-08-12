@@ -24,9 +24,11 @@ Route::middleware('throttle:10,1')->get('/guest-token', function() {
     return response()->json(['token' => $token, 'expires_in' => 86400]);
 });
 
-Route::get('/category-data-tables', [\App\Http\Controllers\CategoryDataUploadController::class, 'getBulkDataCategories']);
-Route::get('/category-data/{slug}', [\App\Http\Controllers\CategoryDataUploadController::class, 'getData']);
-Route::get('/category-tables/{id}', [\App\Http\Controllers\CategoryTablesController::class, 'getTablesForCategory']);
+Route::middleware('throttle:30,1')->group(function () {
+    Route::get('/category-data-tables', [\App\Http\Controllers\CategoryDataUploadController::class, 'getBulkDataCategories']);
+    Route::get('/category-data/{slug}', [\App\Http\Controllers\CategoryDataUploadController::class, 'getData']);
+    Route::get('/category-tables/{id}', [\App\Http\Controllers\CategoryTablesController::class, 'getTablesForCategory']);
+});
 
 
 // Secure Locations API
@@ -42,15 +44,10 @@ Route::middleware(['keycloak.admin', 'super_admin'])->group(function () {
     Route::post('/upload-category-data', [\App\Http\Controllers\CategoryDataUploadController::class, 'upload']);
     Route::put('/category-data/{slug}/{id}', [\App\Http\Controllers\CategoryDataUploadController::class, 'updateData']);
     Route::delete('/category-data/{slug}/{id}', [\App\Http\Controllers\CategoryDataUploadController::class, 'deleteData']);
+    Route::post('/category-data/{slug}/bulk-delete', [\App\Http\Controllers\CategoryDataUploadController::class, 'bulkDeleteData']);
 });
 
-// Logs
-Route::get('/logs', function () {
-    $logFile = storage_path('logs/laravel.log');
-    if (!file_exists($logFile)) return 'No log file found.';
-    $lines = file($logFile);
-    return implode('', array_slice($lines, -100));
-});
+
 
 // Serve images through PHP since frontend Nginx container doesn't share the volume
 Route::get('/uploads/{path}', function($path) {
