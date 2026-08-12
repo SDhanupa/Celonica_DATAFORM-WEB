@@ -11,7 +11,8 @@ import {
   Divider,
   Stack,
   IconButton,
-  Paper
+  Paper,
+  CardMedia
 } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import PhoneIcon from '@mui/icons-material/Phone';
@@ -136,6 +137,15 @@ const CategoryDataList: React.FC<CategoryDataListProps> = ({
                 }
               }}
             >
+              {item.image_path && (
+                <CardMedia
+                  component="img"
+                  height="200"
+                  image={`/api/uploads/category_images/${item.image_path}`}
+                  alt={item.name_en || 'Category Image'}
+                  sx={{ objectFit: 'cover' }}
+                />
+              )}
               <CardContent sx={{ p: 3 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, color: '#0f172a', lineHeight: 1.3 }}>

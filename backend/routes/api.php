@@ -45,6 +45,7 @@ Route::middleware(['keycloak.admin', 'super_admin'])->group(function () {
     Route::put('/category-data/{slug}/{id}', [\App\Http\Controllers\CategoryDataUploadController::class, 'updateData']);
     Route::delete('/category-data/{slug}/{id}', [\App\Http\Controllers\CategoryDataUploadController::class, 'deleteData']);
     Route::post('/category-data/{slug}/bulk-delete', [\App\Http\Controllers\CategoryDataUploadController::class, 'bulkDeleteData']);
+    Route::post('/category-data/{slug}/{id}/image', [\App\Http\Controllers\CategoryDataUploadController::class, 'uploadImage']);
 });
 
 

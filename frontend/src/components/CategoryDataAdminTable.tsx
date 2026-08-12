@@ -24,6 +24,7 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
   // Edit & Delete state
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editData, setEditData] = useState<any>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState<any>(null);
@@ -144,13 +145,42 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
 
   const handleEditClick = (row: any) => {
     setEditData({ ...row });
+    setSelectedFile(null);
     setEditModalOpen(true);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setSelectedFile(e.target.files[0]);
+    }
   };
 
   const handleEditSubmit = async () => {
     if (!editData) return;
     try {
       setActionLoading(true);
+
+      // If a file is selected, upload it first
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append('image', selectedFile);
+        const imageRes = await fetch(`/api/category-data/${slug}/${editData.id}/image`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          },
+          body: formData
+        });
+        const imageResult = await imageRes.json();
+        if (!imageResult.success) {
+            alert('Failed to upload image: ' + (imageResult.message || imageResult.error || JSON.stringify(imageResult)));
+            setActionLoading(false);
+            return; // Stop saving if image upload fails
+        }
+      }
+
+      // Then save the rest of the text data
       const response = await fetch(`/api/category-data/${slug}/${editData.id}`, {
         method: 'PUT',
         headers: { 
@@ -205,6 +235,23 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
   }
 
   const columns: GridColDef[] = [
+    {
+      field: 'image_path',
+      headerName: 'Image',
+      width: 100,
+      renderCell: (params) => {
+        if (!params.value) return null;
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+            <img 
+              src={`/api/uploads/category_images/${params.value}`} 
+              alt="thumbnail" 
+              style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 4 }}
+            />
+          </Box>
+        );
+      }
+    },
     { field: 'reg_number', headerName: 'Reg Number', width: 130 },
     { field: 'name_en', headerName: 'Name (EN)', width: 180 },
     { field: 'name_si', headerName: 'Name (SI)', width: 180 },
@@ -290,6 +337,27 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
               <TextField label="Contact Person" name="contact_person_name" value={editData.contact_person_name || ''} onChange={handleEditChange} fullWidth size="small" />
               <TextField label="Address" name="address" value={editData.address || ''} onChange={handleEditChange} fullWidth size="small" multiline rows={2} />
               <TextField label="Description" name="description" value={editData.description || ''} onChange={handleEditChange} fullWidth size="small" multiline rows={2} />
+              
+              <Box sx={{ mt: 2, p: 2, border: '1px dashed #ccc', borderRadius: 1 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1 }}>Image Upload (Max 50MB)</Typography>
+                {editData.image_path && (
+                  <Box sx={{ mb: 2 }}>
+                    <img 
+                      src={`/api/uploads/category_images/${editData.image_path}`} 
+                      alt="Current" 
+                      style={{ maxHeight: 100, borderRadius: 4 }} 
+                    />
+                  </Box>
+                )}
+                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleFileChange} 
+                    style={{ flex: 1 }} 
+                  />
+                </Box>
+              </Box>
             </Box>
           )}
         </DialogContent>

@@ -52,6 +52,7 @@ class CategoryDataUploadController extends Controller
                 $table->text('description')->nullable();
                 $table->string('contact_person_name')->nullable();
                 $table->text('address')->nullable();
+                $table->string('image_path')->nullable();
                 $table->timestamps();
             });
         }
@@ -63,6 +64,13 @@ class CategoryDataUploadController extends Controller
                 $table->string('raw_district')->nullable();
                 $table->string('raw_ds')->nullable();
                 $table->string('raw_gn')->nullable();
+            });
+        }
+
+        // Ensure existing tables have the image_path column
+        if (!Schema::hasColumn($tableName, 'image_path')) {
+            Schema::table($tableName, function (Blueprint $table) {
+                $table->string('image_path')->nullable();
             });
         }
 
@@ -249,6 +257,12 @@ class CategoryDataUploadController extends Controller
                 $table->string('raw_gn')->nullable();
             });
         }
+        
+        if (!Schema::hasColumn($tableName, 'image_path')) {
+            Schema::table($tableName, function (Blueprint $table) {
+                $table->string('image_path')->nullable();
+            });
+        }
 
         $data = $query->leftJoin('grama_niladharis', function($join) use ($tableName) {
                           $join->on($tableName . '.gn_id', '=', DB::raw('CAST(grama_niladharis.id AS varchar)'));
@@ -361,5 +375,53 @@ class CategoryDataUploadController extends Controller
                 'message' => 'Server error during deletion: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function uploadImage(Request $request, $slug, $id)
+    {
+        $tableName = 'category_data_' . str_replace('-', '_', $slug);
+
+        if (!Schema::hasTable($tableName)) {
+            return response()->json(['success' => false, 'message' => 'Table not found.'], 404);
+        }
+
+        $record = DB::table($tableName)->where('id', $id)->first();
+        if (!$record) {
+            return response()->json(['success' => false, 'message' => 'Record not found.'], 404);
+        }
+
+        // 50MB validation = 51200 kilobytes
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:51200',
+        ]);
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '_' . $id . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+            
+            $destinationPath = public_path('uploads/category_images');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+            $file->move($destinationPath, $filename);
+            
+            // Delete old image if exists
+            if (isset($record->image_path) && $record->image_path && file_exists($destinationPath . '/' . $record->image_path)) {
+                unlink($destinationPath . '/' . $record->image_path);
+            }
+
+            DB::table($tableName)->where('id', $id)->update([
+                'image_path' => $filename,
+                'updated_at' => now()
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Image uploaded successfully.',
+                'image_path' => $filename
+            ]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'No image provided.'], 400);
     }
 }
