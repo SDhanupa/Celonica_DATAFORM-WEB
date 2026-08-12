@@ -13,7 +13,11 @@ const BulkDataPage: React.FC = () => {
   const [uploadOpen, setUploadOpen] = useState(false);
 
   useEffect(() => {
-    fetch('/api/category-data-tables')
+    fetch('/api/category-data-tables', {
+      headers: {
+        'Accept': 'application/json'
+      }
+    })
       .then(res => res.json())
       .then(data => {
         if (data.success) {

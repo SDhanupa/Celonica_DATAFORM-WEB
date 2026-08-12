@@ -24,7 +24,7 @@ Route::middleware('throttle:10,1')->get('/guest-token', function() {
     return response()->json(['token' => $token, 'expires_in' => 86400]);
 });
 
-Route::middleware('throttle:30,1')->group(function () {
+Route::middleware('throttle:120,1')->group(function () {
     Route::get('/category-data-tables', [\App\Http\Controllers\CategoryDataUploadController::class, 'getBulkDataCategories']);
     Route::get('/category-data/{slug}', [\App\Http\Controllers\CategoryDataUploadController::class, 'getData']);
     Route::get('/category-tables/{id}', [\App\Http\Controllers\CategoryTablesController::class, 'getTablesForCategory']);
