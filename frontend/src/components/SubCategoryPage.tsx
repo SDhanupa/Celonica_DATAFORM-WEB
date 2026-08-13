@@ -25,6 +25,7 @@ import {
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_CATEGORY_BY_SLUG, GET_CATEGORY_ANSWERS, SUBMIT_CATEGORY_DATA, GET_APPROVED_SUBMISSIONS } from '../graphql/queries';
+import SurveyPage from '../pages/SurveyPage';
 import { DELETE_CATEGORY, DELETE_QUESTION, ANSWER_QUESTION } from '../graphql/mutations';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
@@ -509,92 +510,9 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
       )}
 
       {/* User Wizard View */}
-      {!isAdmin && steps.length > 0 && (
-        <Box sx={{ mt: 6, display: 'flex', justifyContent: 'center' }}>
-          <Paper sx={{ p: 4, width: '100%', maxWidth: 800, borderRadius: 3, position: 'relative', overflow: 'hidden' }}>
-             
-             {/* Progress Bar top of wizard */}
-             <LinearProgress 
-                variant="determinate" 
-                value={(currentStep / steps.length) * 100} 
-                sx={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, '& .MuiLinearProgress-bar': { backgroundColor: '#FFD700' } }} 
-             />
-
-             <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
-                Question {currentStep + 1} of {steps.length}
-             </Typography>
-             
-             {(() => {
-                const step = steps[currentStep];
-                const q = step.question;
-                
-                // Check if this category HAS a repeater somewhere before this question, to show "(Item 1)"
-                const hasRepeater = questions.some((x:any) => x.isRepeater);
-                const isAfterRepeater = hasRepeater && !q.isRepeater;
-
-                return (
-                  <Box sx={{ my: 4 }}>
-                    <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-                      {lang === 'en' ? q.questionTextEn : lang === 'si' ? (q.questionTextSi || q.questionTextEn) : (q.questionTextTa || q.questionTextEn)}
-                    </Typography>
-                    
-                    {isAfterRepeater && (
-                      <Typography variant="subtitle1" color="primary" sx={{ mb: 3 }}>
-                         {lang === 'en' ? `Entry #${step.iteration}` : `ඇතුළත් කිරීම #${step.iteration}`}
-                      </Typography>
-                    )}
-
-                    <Box sx={{ mt: 3 }}>
-                      {q.inputType === 'boolean' ? (
-                        <RadioGroup
-                          row
-                          value={userAnswersForm[`${q.id}_${step.iteration}`] || ''}
-                          onChange={(e) => setUserAnswersForm({ ...userAnswersForm, [`${q.id}_${step.iteration}`]: e.target.value })}
-                        >
-                          <FormControlLabel value="Yes" control={<Radio color="primary" />} label={lang === 'en' ? 'Yes' : 'ඔව්'} />
-                          <FormControlLabel value="No" control={<Radio color="primary" />} label={lang === 'en' ? 'No' : 'නැත'} />
-                        </RadioGroup>
-                      ) : (
-                        <TextField
-                          fullWidth
-                          autoFocus
-                          size="medium"
-                          type={q.inputType === 'number' ? 'number' : 'text'}
-                          variant="outlined"
-                          placeholder={lang === 'en' ? 'Your answer...' : 'ඔබේ පිළිතුර...'}
-                          value={userAnswersForm[`${q.id}_${step.iteration}`] || ''}
-                          onChange={(e) => setUserAnswersForm({ ...userAnswersForm, [`${q.id}_${step.iteration}`]: e.target.value })}
-                        />
-                      )}
-                    </Box>
-
-                    <Box sx={{ mt: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Box sx={{ display: 'flex', gap: 2 }}>
-                        <Button variant="outlined" color="inherit" onClick={() => navigate(backUrl)}>
-                           {lang === 'en' ? 'Quit' : 'ඉවත් වන්න'}
-                        </Button>
-                        <Button 
-                           variant="outlined" 
-                           onClick={() => setCurrentStep(c => Math.max(0, c - 1))}
-                           disabled={currentStep === 0}
-                        >
-                           {lang === 'en' ? 'Back' : 'ආපසු'}
-                        </Button>
-                      </Box>
-                      
-                      <Box sx={{ display: 'flex', gap: 2 }}>
-                        <Button variant="text" color="secondary" onClick={handleSkip} disabled={savingAnswers}>
-                           {lang === 'en' ? 'Skip' : 'මඟ හරින්න'}
-                        </Button>
-                        <Button variant="contained" color="primary" onClick={handleNext} disabled={savingAnswers}>
-                           {savingAnswers ? (lang === 'en' ? 'Saving...' : 'සුරකිමින්...') : (currentStep === steps.length - 1 ? (lang === 'en' ? 'Finish' : 'අවසන් කරන්න') : (lang === 'en' ? 'Next' : 'ඊළඟට'))}
-                        </Button>
-                      </Box>
-                    </Box>
-                  </Box>
-                );
-             })()}
-          </Paper>
+      {!isAdmin && categories.length === 0 && (
+        <Box sx={{ mt: 6 }}>
+          <SurveyPage slug={slug} />
         </Box>
       )}
 

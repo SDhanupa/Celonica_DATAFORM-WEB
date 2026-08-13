@@ -70,9 +70,42 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
         throw new Error(result.message || 'Failed to fetch data');
       }
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'Action failed');
     } finally {
+      setActionLoading(false);
+      setDeleteModalOpen(false);
+      setRecordToDelete(null);
       setLoading(false);
+    }
+  };
+
+  const handleApprove = async (row: any) => {
+    try {
+      setActionLoading(true);
+      const response = await fetch(`/api/category-data/${slug}/${row.id}/approve`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) await fetchData();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleReplace = async (row: any) => {
+    try {
+      setActionLoading(true);
+      const response = await fetch(`/api/category-data/${slug}/${row.id}/replace`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) await fetchData();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -208,7 +241,7 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
     setEditData({ ...editData, [e.target.name]: e.target.value });
   };
 
-  if (loading) {
+  if (loading && data.length === 0) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
         <CircularProgress />
@@ -267,9 +300,20 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
     {
       field: 'actions',
       headerName: 'Actions',
-      width: 120,
+      width: 250,
       renderCell: (params) => (
-        <Box>
+        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', height: '100%' }}>
+          {params.row.is_approved === false ? (
+            params.row.is_update_proposal ? (
+              <Button size="small" variant="contained" color="warning" onClick={() => handleReplace(params.row)} disabled={actionLoading}>
+                Replace
+              </Button>
+            ) : (
+              <Button size="small" variant="contained" color="success" onClick={() => handleApprove(params.row)} disabled={actionLoading}>
+                Approve
+              </Button>
+            )
+          ) : null}
           <IconButton onClick={() => handleEditClick(params.row)} color="primary" size="small" disabled={actionLoading}>
             <EditIcon fontSize="small" />
           </IconButton>
@@ -309,18 +353,41 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
       <DataGrid
         rows={data}
         columns={columns}
+        loading={loading}
+        getRowId={(row) => row.id}
+        checkboxSelection
+        disableRowSelectionOnClick
+        onRowSelectionModelChange={(newSelectionModel) => {
+          setRowSelectionModel(newSelectionModel);
+        }}
+        rowSelectionModel={rowSelectionModel}
+        getRowClassName={(params) => {
+           if (params.row.is_approved === false) {
+             return 'unapproved-row';
+           }
+           if (params.row.coordinate_mismatch) {
+             return 'mismatch-row';
+           }
+           return '';
+        }}
+        sx={{
+          '& .unapproved-row': {
+            backgroundColor: 'rgba(255, 235, 59, 0.2)', // Yellow tint
+            '&:hover': {
+              backgroundColor: 'rgba(255, 235, 59, 0.3)',
+            },
+          },
+          '& .mismatch-row': {
+            color: 'red', // Red text for mismatches
+            fontWeight: 'bold'
+          }
+        }}
         initialState={{
           pagination: {
             paginationModel: { pageSize: 10, page: 0 },
           },
         }}
         pageSizeOptions={[10, 25, 50]}
-        checkboxSelection
-        onRowSelectionModelChange={(newRowSelectionModel) => {
-          setRowSelectionModel(newRowSelectionModel);
-        }}
-        rowSelectionModel={rowSelectionModel}
-        disableRowSelectionOnClick
       />
 
       {/* Edit Dialog */}

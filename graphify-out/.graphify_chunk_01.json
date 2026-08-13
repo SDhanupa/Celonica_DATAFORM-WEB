@@ -1,0 +1,263 @@
+{
+  "nodes": [
+    {
+      "id": "backend_github_workflows_issues_workflow",
+      "label": "GitHub Actions Issues Workflow",
+      "file_type": "code",
+      "source_file": "C:\\xampp\\htdocs\\Celonica Quecion web\\backend\\.github\\workflows\\issues.yml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "backend_github_workflows_pull_requests_workflow",
+      "label": "GitHub Actions Pull Requests Workflow",
+      "file_type": "code",
+      "source_file": "C:\\xampp\\htdocs\\Celonica Quecion web\\backend\\.github\\workflows\\pull-requests.yml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "backend_github_workflows_tests_workflow",
+      "label": "GitHub Actions Tests Workflow",
+      "file_type": "code",
+      "source_file": "C:\\xampp\\htdocs\\Celonica Quecion web\\backend\\.github\\workflows\\tests.yml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "backend_github_workflows_update_changelog_workflow",
+      "label": "GitHub Actions Update Changelog Workflow",
+      "file_type": "code",
+      "source_file": "C:\\xampp\\htdocs\\Celonica Quecion web\\backend\\.github\\workflows\\update-changelog.yml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "backend_styleci_config",
+      "label": "StyleCI Configuration",
+      "file_type": "code",
+      "source_file": "C:\\xampp\\htdocs\\Celonica Quecion web\\backend\\.styleci.yml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "backend_changelog_release_notes",
+      "label": "Laravel Release Notes",
+      "file_type": "document",
+      "source_file": "C:\\xampp\\htdocs\\Celonica Quecion web\\backend\\CHANGELOG.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "backend_readme_documentation",
+      "label": "Laravel Framework Documentation",
+      "file_type": "document",
+      "source_file": "C:\\xampp\\htdocs\\Celonica Quecion web\\backend\\README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "backend_categories_visual_category_hierarchy",
+      "label": "Category Hierarchy Document",
+      "file_type": "document",
+      "source_file": "C:\\xampp\\htdocs\\Celonica Quecion web\\backend\\categories_visual.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "backend_categories_visual_boundaries",
+      "label": "Boundaries Category",
+      "file_type": "concept",
+      "source_file": "C:\\xampp\\htdocs\\Celonica Quecion web\\backend\\categories_visual.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "backend_categories_visual_space",
+      "label": "Space Category",
+      "file_type": "concept",
+      "source_file": "C:\\xampp\\htdocs\\Celonica Quecion web\\backend\\categories_visual.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "backend_categories_visual_land",
+      "label": "Land Category",
+      "file_type": "concept",
+      "source_file": "C:\\xampp\\htdocs\\Celonica Quecion web\\backend\\categories_visual.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "backend_categories_visual_building",
+      "label": "Building Category",
+      "file_type": "concept",
+      "source_file": "C:\\xampp\\htdocs\\Celonica Quecion web\\backend\\categories_visual.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "backend_categories_visual_road",
+      "label": "Road Category",
+      "file_type": "concept",
+      "source_file": "C:\\xampp\\htdocs\\Celonica Quecion web\\backend\\categories_visual.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "backend_public_robots_config",
+      "label": "Robots TXT Configuration",
+      "file_type": "code",
+      "source_file": "C:\\xampp\\htdocs\\Celonica Quecion web\\backend\\public\\robots.txt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "backend_github_workflows_update_changelog_workflow",
+      "target": "backend_changelog_release_notes",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\xampp\\htdocs\\Celonica Quecion web\\backend\\.github\\workflows\\update-changelog.yml",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "backend_styleci_config",
+      "target": "backend_github_workflows_tests_workflow",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "C:\\xampp\\htdocs\\Celonica Quecion web\\backend\\.styleci.yml",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "backend_categories_visual_boundaries",
+      "target": "backend_categories_visual_category_hierarchy",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\xampp\\htdocs\\Celonica Quecion web\\backend\\categories_visual.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "backend_categories_visual_space",
+      "target": "backend_categories_visual_category_hierarchy",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\xampp\\htdocs\\Celonica Quecion web\\backend\\categories_visual.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "backend_categories_visual_land",
+      "target": "backend_categories_visual_category_hierarchy",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\xampp\\htdocs\\Celonica Quecion web\\backend\\categories_visual.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "backend_categories_visual_building",
+      "target": "backend_categories_visual_category_hierarchy",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\xampp\\htdocs\\Celonica Quecion web\\backend\\categories_visual.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "backend_categories_visual_road",
+      "target": "backend_categories_visual_category_hierarchy",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\xampp\\htdocs\\Celonica Quecion web\\backend\\categories_visual.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "github_actions_ci_cd_workflows",
+      "label": "GitHub Actions CI/CD Workflows",
+      "nodes": [
+        "backend_github_workflows_issues_workflow",
+        "backend_github_workflows_pull_requests_workflow",
+        "backend_github_workflows_tests_workflow",
+        "backend_github_workflows_update_changelog_workflow"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\xampp\\htdocs\\Celonica Quecion web\\backend\\.github\\workflows\\tests.yml"
+    },
+    {
+      "id": "domain_category_hierarchy_concepts",
+      "label": "Domain Category Hierarchy",
+      "nodes": [
+        "backend_categories_visual_boundaries",
+        "backend_categories_visual_space",
+        "backend_categories_visual_land",
+        "backend_categories_visual_building",
+        "backend_categories_visual_road"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\xampp\\htdocs\\Celonica Quecion web\\backend\\categories_visual.md"
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

@@ -28,6 +28,13 @@ Route::middleware('throttle:120,1')->group(function () {
     Route::get('/category-data-tables', [\App\Http\Controllers\CategoryDataUploadController::class, 'getBulkDataCategories']);
     Route::get('/category-data/{slug}', [\App\Http\Controllers\CategoryDataUploadController::class, 'getData']);
     Route::get('/category-tables/{id}', [\App\Http\Controllers\CategoryTablesController::class, 'getTablesForCategory']);
+    Route::post('/upload-survey-image', [\App\Http\Controllers\CategoryDataUploadController::class, 'uploadSurveyImage']);
+    Route::get('/search-category-data/{slug}', [\App\Http\Controllers\CategoryDataUploadController::class, 'searchCategoryData']);
+    Route::post('/submit-survey-data/{slug}', [\App\Http\Controllers\CategoryDataUploadController::class, 'submitSurveyData']);
+});
+
+Route::middleware(['throttle:120,1', 'keycloak.admin'])->group(function () {
+    Route::get('/user-submissions', [\App\Http\Controllers\CategoryDataUploadController::class, 'getUserSubmissions']);
 });
 
 
@@ -46,6 +53,8 @@ Route::middleware(['keycloak.admin', 'super_admin'])->group(function () {
     Route::delete('/category-data/{slug}/{id}', [\App\Http\Controllers\CategoryDataUploadController::class, 'deleteData']);
     Route::post('/category-data/{slug}/bulk-delete', [\App\Http\Controllers\CategoryDataUploadController::class, 'bulkDeleteData']);
     Route::post('/category-data/{slug}/{id}/image', [\App\Http\Controllers\CategoryDataUploadController::class, 'uploadImage']);
+    Route::post('/category-data/{slug}/{id}/approve', [\App\Http\Controllers\CategoryDataUploadController::class, 'approveData']);
+    Route::post('/category-data/{slug}/{id}/replace', [\App\Http\Controllers\CategoryDataUploadController::class, 'replaceData']);
 });
 
 

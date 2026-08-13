@@ -1,0 +1,1 @@
+<?php require __DIR__."/vendor/autoload.php"; $app = require_once __DIR__."/bootstrap/app.php"; $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class); $kernel->bootstrap(); $items = DB::table("category_data_br_buildings")->where("name_en", "like", "%Neelly Star Hotel%")->get(); echo json_encode($items, JSON_PRETTY_PRINT);

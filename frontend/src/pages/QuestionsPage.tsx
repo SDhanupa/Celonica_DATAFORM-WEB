@@ -111,9 +111,14 @@ const QuestionsPage: React.FC = () => {
           <IconButton size="small" onClick={() => handleOpen(params.row)} color="primary">
             <EditIcon fontSize="small" />
           </IconButton>
-          <IconButton size="small" onClick={() => handleDelete(params.row.id)} color="error">
-            <DeleteIcon fontSize="small" />
-          </IconButton>
+          {!params.row.isStandard && (
+            <IconButton size="small" onClick={() => handleDelete(params.row.id)} color="error">
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          )}
+          {params.row.isStandard && (
+             <Chip label="Standard" size="small" color="secondary" sx={{ ml: 1, fontSize: '0.65rem', height: 20 }} />
+          )}
         </Box>
       )
     }
@@ -198,6 +203,11 @@ const QuestionsPage: React.FC = () => {
               <MenuItem value="number">Number</MenuItem>
               <MenuItem value="boolean">Yes/No (Boolean)</MenuItem>
               <MenuItem value="percentage">Percentage (%)</MenuItem>
+              <MenuItem value="image">Image Upload</MenuItem>
+              <MenuItem value="location_province">Location: Province</MenuItem>
+              <MenuItem value="location_district">Location: District</MenuItem>
+              <MenuItem value="location_ds">Location: DS Division</MenuItem>
+              <MenuItem value="location_gn">Location: GN Division</MenuItem>
             </TextField>
           </Box>
         </DialogContent>

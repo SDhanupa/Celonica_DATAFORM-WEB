@@ -22,6 +22,7 @@ import BulkDataPage from './pages/BulkDataPage';
 import SurveyPage from './pages/SurveyPage';
 import CategoriesPage from './pages/CategoriesPage';
 import DynamicCategoryWrapper from './components/DynamicCategoryWrapper';
+import UserSubmissionsPage from './pages/UserSubmissionsPage';
 import GramaNiladharisPage from './pages/GramaNiladharisPage';
 import PoliceConnectionsPage from './pages/PoliceConnectionsPage';
 import PostOfficeConnectionsPage from './pages/PostOfficeConnectionsPage';
@@ -131,7 +132,7 @@ const App: React.FC = () => {
                 }
               />
               <Route
-                path="/survey"
+                path="/survey/:slug"
                 element={
                   <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator']}>
                     <AdminLayout>
@@ -146,6 +147,16 @@ const App: React.FC = () => {
                   <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator']}>
                     <AdminLayout>
                       <ReportsPage />
+                    </AdminLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/user-submissions"
+                element={
+                  <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator', 'user']}>
+                    <AdminLayout>
+                      <UserSubmissionsPage />
                     </AdminLayout>
                   </ProtectedRoute>
                 }

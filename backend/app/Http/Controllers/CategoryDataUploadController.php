@@ -53,6 +53,10 @@ class CategoryDataUploadController extends Controller
                 $table->string('contact_person_name')->nullable();
                 $table->text('address')->nullable();
                 $table->string('image_path')->nullable();
+                $table->unsignedBigInteger('added_by_user_id')->nullable();
+                $table->boolean('is_approved')->default(true);
+                $table->boolean('coordinate_mismatch')->default(false);
+                $table->boolean('is_update_proposal')->default(false);
                 $table->timestamps();
             });
         }
@@ -223,12 +227,26 @@ class CategoryDataUploadController extends Controller
 
         $query = DB::table($tableName);
 
-        // Optional filtering by specific GN/DS/District
+        // Optional filtering by specific GN/DS/District (mapped)
         if ($request->has('district_id') && $request->input('district_id')) {
             $query->where($tableName . '.district_id', $request->input('district_id'));
         }
         if ($request->has('ds_division_code') && $request->input('ds_division_code')) {
             $query->where($tableName . '.ds_division_code', $request->input('ds_division_code'));
+        }
+        
+        // Optional filtering by raw strings (unmapped or mapped)
+        if ($request->has('raw_province') && $request->input('raw_province')) {
+            $query->where($tableName . '.raw_province', $request->input('raw_province'));
+        }
+        if ($request->has('raw_district') && $request->input('raw_district')) {
+            $query->where($tableName . '.raw_district', $request->input('raw_district'));
+        }
+        if ($request->has('raw_ds') && $request->input('raw_ds')) {
+            $query->where($tableName . '.raw_ds', $request->input('raw_ds'));
+        }
+        if ($request->has('raw_gn') && $request->input('raw_gn')) {
+            $query->where($tableName . '.raw_gn', $request->input('raw_gn'));
         }
         if ($request->has('gn_id') && $request->input('gn_id')) {
             $gnId = $request->input('gn_id');
@@ -423,5 +441,243 @@ class CategoryDataUploadController extends Controller
         }
 
         return response()->json(['success' => false, 'message' => 'No image provided.'], 400);
+    }
+
+    public function uploadSurveyImage(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:51200', // 50MB max
+        ]);
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $filename = time() . '_' . rand(1, 1000) . '_' . $file->getClientOriginalName();
+            $destinationPath = public_path('uploads/survey_images');
+
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+            
+            $file->move($destinationPath, $filename);
+            
+            return response()->json([
+                'success' => true,
+                'image_path' => $filename,
+                'url' => '/api/uploads/survey_images/' . $filename
+            ]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'No file uploaded.'], 400);
+    }
+
+    public function searchCategoryData(Request $request, $slug)
+    {
+        $query = $request->query('query');
+        $tableName = 'category_data_' . str_replace('-', '_', $slug);
+
+        if (!Schema::hasTable($tableName)) {
+            return response()->json(['success' => true, 'data' => []]);
+        }
+
+        $dbQuery = DB::table($tableName)->where('is_approved', true);
+
+        $hasLocationFilter = false;
+        if ($request->has('province') && $request->query('province')) {
+            $val = trim(str_ireplace(' Province', '', $request->query('province')));
+            $dbQuery->where(function($q) use ($val) {
+                $q->where('raw_province', 'ilike', '%' . $val . '%')
+                  ->orWhereNull('raw_province')
+                  ->orWhere('raw_province', '');
+            });
+            $hasLocationFilter = true;
+        }
+        if ($request->has('district') && $request->query('district')) {
+            $val = trim(str_ireplace(' District', '', $request->query('district')));
+            $dbQuery->where(function($q) use ($val) {
+                $q->where('raw_district', 'ilike', '%' . $val . '%')
+                  ->orWhereNull('raw_district')
+                  ->orWhere('raw_district', '');
+            });
+            $hasLocationFilter = true;
+        }
+        if ($request->has('ds') && $request->query('ds')) {
+            $val = $request->query('ds');
+            $dbQuery->where(function($q) use ($val) {
+                $q->where('raw_ds', 'ilike', '%' . $val . '%')
+                  ->orWhereNull('raw_ds')
+                  ->orWhere('raw_ds', '');
+            });
+            $hasLocationFilter = true;
+        }
+        if ($request->has('gn') && $request->query('gn')) {
+            $val = $request->query('gn');
+            $dbQuery->where(function($q) use ($val) {
+                $q->where('raw_gn', 'ilike', '%' . $val . '%')
+                  ->orWhereNull('raw_gn')
+                  ->orWhere('raw_gn', '');
+            });
+            $hasLocationFilter = true;
+        }
+
+        if (empty($query) && !$hasLocationFilter) {
+            return response()->json(['success' => true, 'data' => []]);
+        }
+
+        if (!empty($query)) {
+            $dbQuery->where(function($q) use ($query) {
+                $q->where('name_en', 'ilike', '%' . $query . '%')
+                  ->orWhere('name_si', 'ilike', '%' . $query . '%')
+                  ->orWhere('name_ta', 'ilike', '%' . $query . '%')
+                  ->orWhere('reg_number', 'ilike', '%' . $query . '%');
+            });
+        }
+
+        $results = $dbQuery->limit(50)->get();
+
+        return response()->json(['success' => true, 'data' => $results]);
+    }
+
+    public function submitSurveyData(Request $request, $slug)
+    {
+        $tableName = 'category_data_' . str_replace('-', '_', $slug);
+
+        if (!Schema::hasTable($tableName)) {
+            // Need to create the table structure if this is the first submission
+            // But usually the category is created with an empty table. Let's fail if it doesn't exist.
+            return response()->json(['success' => false, 'message' => 'Table does not exist.'], 400);
+        }
+
+        $payload = $request->all();
+        $isUpdate = !empty($payload['reg_number']);
+        
+        $regNumber = $payload['reg_number'] ?? null;
+        
+        // Generate new Reg Number if not provided
+        if (!$regNumber) {
+            $gnCode = $payload['gn_code'] ?? null;
+            if (!$gnCode && !empty($payload['raw_gn'])) {
+                $gn = DB::table('grama_niladharis')
+                    ->where('name_en', $payload['raw_gn'])
+                    ->orWhere('code', $payload['raw_gn'])
+                    ->orWhere('CCODE', $payload['raw_gn'])
+                    ->first();
+                $gnCode = $gn ? ($gn->CCODE ?: $gn->code) : 'UNKNOWN';
+            } elseif (!$gnCode) {
+                $gnCode = 'UNKNOWN';
+            }
+            
+            $category = DB::table('categories')->where('slug', $slug)->first();
+            $cCode = $category ? $category->code : 'CAT';
+            
+            // Get next sequence for this GN
+            $count = DB::table($tableName)->where('reg_number', 'like', $gnCode . '/%')->count() + 1;
+            $regNumber = $gnCode . '/' . $cCode . '/' . str_pad($count, 2, '0', STR_PAD_LEFT);
+        }
+
+        $insertData = [
+            'reg_number' => $regNumber,
+            'name_en' => $payload['name_en'] ?? null,
+            'name_si' => $payload['name_si'] ?? null,
+            'name_ta' => $payload['name_ta'] ?? null,
+            'name_singlish' => $payload['name_singlish'] ?? null,
+            'raw_province' => $payload['raw_province'] ?? null,
+            'raw_district' => $payload['raw_district'] ?? null,
+            'raw_ds' => $payload['raw_ds'] ?? null,
+            'raw_gn' => $payload['raw_gn'] ?? null,
+            'mobile' => $payload['mobile'] ?? null,
+            'address' => $payload['address'] ?? null,
+            'contact_person_name' => $payload['contact_person_name'] ?? null,
+            'longitude' => $payload['longitude'] ?? null,
+            'latitude' => $payload['latitude'] ?? null,
+            'image_path' => $payload['image_path'] ?? null,
+            'added_by_user_id' => auth()->id() ?? null,
+            'is_approved' => false,
+            'is_update_proposal' => $isUpdate,
+            'coordinate_mismatch' => $payload['coordinate_mismatch'] ?? false,
+            'created_at' => now(),
+            'updated_at' => now()
+        ];
+
+        DB::table($tableName)->insert($insertData);
+
+        return response()->json(['success' => true, 'message' => 'Data submitted successfully.', 'reg_number' => $regNumber]);
+    }
+
+    public function approveData(Request $request, $slug, $id)
+    {
+        $tableName = 'category_data_' . str_replace('-', '_', $slug);
+        if (!Schema::hasTable($tableName)) {
+            return response()->json(['success' => false, 'message' => 'Table not found.'], 404);
+        }
+
+        DB::table($tableName)->where('id', $id)->update([
+            'is_approved' => true
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function replaceData(Request $request, $slug, $id)
+    {
+        $tableName = 'category_data_' . str_replace('-', '_', $slug);
+        if (!Schema::hasTable($tableName)) {
+            return response()->json(['success' => false, 'message' => 'Table not found.'], 404);
+        }
+
+        $newRecord = DB::table($tableName)->where('id', $id)->first();
+        if (!$newRecord) {
+            return response()->json(['success' => false, 'message' => 'Proposal not found.'], 404);
+        }
+
+        // Delete the old record that has the same reg_number and is approved
+        DB::table($tableName)
+            ->where('reg_number', $newRecord->reg_number)
+            ->where('id', '!=', $id)
+            ->where('is_approved', true)
+            ->delete();
+
+        // Mark the proposal as approved
+        DB::table($tableName)->where('id', $id)->update([
+            'is_approved' => true,
+            'is_update_proposal' => false
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function getUserSubmissions(Request $request)
+    {
+        $tables = DB::select("SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND tablename LIKE 'category_data_%'");
+        $allSubmissions = [];
+
+        foreach ($tables as $table) {
+            $tableName = $table->tablename;
+            
+            // Reconstruct slug from table name
+            $slug = str_replace('_', '-', substr($tableName, 14));
+            $category = DB::table('categories')->where('slug', $slug)->first();
+            $categoryName = $category ? $category->name_en : $slug;
+
+            $submissions = DB::table($tableName)
+                ->where('is_approved', false)
+                ->orWhere('is_update_proposal', true)
+                ->get()
+                ->map(function($item) use ($slug, $categoryName) {
+                    $item->category_slug = $slug;
+                    $item->category_name = $categoryName;
+                    return $item;
+                });
+
+            foreach ($submissions as $sub) {
+                $allSubmissions[] = $sub;
+            }
+        }
+
+        // Sort by created_at desc
+        usort($allSubmissions, function($a, $b) {
+            return strtotime($b->created_at) - strtotime($a->created_at);
+        });
+
+        return response()->json(['success' => true, 'data' => $allSubmissions]);
     }
 }

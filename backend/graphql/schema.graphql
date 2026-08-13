@@ -60,6 +60,7 @@ type Question {
     isRepeater: Boolean! @rename(attribute: "is_repeater")
     sortOrder: Int! @rename(attribute: "sort_order")
     isActive: Boolean! @rename(attribute: "is_active")
+    isStandard: Boolean! @rename(attribute: "is_standard")
     createdAt: DateTime! @rename(attribute: "created_at")
     updatedAt: DateTime @rename(attribute: "updated_at")
 }

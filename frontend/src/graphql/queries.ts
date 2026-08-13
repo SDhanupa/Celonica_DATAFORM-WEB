@@ -109,6 +109,7 @@ export const GET_QUESTIONS = gql`
       inputType
       sortOrder
       isActive
+      isStandard
       createdAt
     }
   }
@@ -181,6 +182,7 @@ export const GET_CATEGORY_BY_SLUG = gql`
         isRepeater
         sortOrder
         isActive
+        isStandard
       }
       children {
         id

@@ -1,0 +1,1 @@
+<?php require __DIR__."/vendor/autoload.php"; $app = require_once __DIR__."/bootstrap/app.php"; $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class); $kernel->bootstrap(); $item = DB::table("category_data_bp_buildings_for_production_and_service_delivery")->where("id", 673)->first(); echo json_encode($item);

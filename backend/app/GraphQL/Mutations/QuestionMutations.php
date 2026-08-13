@@ -43,6 +43,9 @@ final class QuestionMutations
     {
         $this->ensureAdmin();
         $question = Question::findOrFail($args['id']);
+        if ($question->is_standard) {
+            throw new Error('Cannot delete a standard predefined question.');
+        }
         return $question->delete();
     }
 
