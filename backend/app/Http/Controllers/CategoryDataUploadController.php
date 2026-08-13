@@ -283,7 +283,9 @@ class CategoryDataUploadController extends Controller
         }
 
         $data = $query->leftJoin('grama_niladharis', function($join) use ($tableName) {
-                          $join->on($tableName . '.gn_id', '=', DB::raw('CAST(grama_niladharis.id AS varchar)'));
+                          $join->on($tableName . '.gn_id', '=', DB::raw('CAST(grama_niladharis.id AS varchar)'))
+                               ->orOn($tableName . '.gn_id', '=', 'grama_niladharis.CCODE')
+                               ->orOn($tableName . '.gn_id', '=', 'grama_niladharis.code');
                       })
                       ->select($tableName . '.*', 
                                DB::raw("COALESCE(grama_niladharis.pro_en, $tableName.raw_province) as province_name"),
