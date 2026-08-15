@@ -18,7 +18,7 @@ use App\Http\Controllers\ImageUploadController;
 Route::get('/health', fn() => response()->json(['status' => 'ok', 'service' => 'Ceylonica Admin API']));
 
 // Public API Endpoints
-Route::middleware('throttle:10,1')->get('/guest-token', function() {
+Route::middleware('throttle:30,1')->get('/guest-token', function() {
     $token = bin2hex(random_bytes(32));
     \Illuminate\Support\Facades\Cache::put('guest_token_' . $token, true, now()->addHours(24));
     return response()->json(['token' => $token, 'expires_in' => 86400]);
