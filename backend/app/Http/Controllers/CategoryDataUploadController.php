@@ -328,23 +328,28 @@ class CategoryDataUploadController extends Controller
                       ->get();
         } // end if ($tableExists)
 
-        // Merge normal user submissions so they appear in the Big Card components
+        // Merge normal user submissions — search category AND all descendants
         $category = \App\Models\Category::where('slug', $slug)->first();
 
         if ($category) {
-            $normalSubmissionsQuery = \App\Models\CategorySubmission::where('category_id', $category->id)->where('status', 'approved');
-            
-            if (isset($gnCode)) {
-                $normalSubmissionsQuery->where('gn_code', $gnCode);
+            // Collect category IDs: the parent + all descendants
+            $categoryIds = [$category->id];
+            $this->collectDescendantIds($category->id, $categoryIds);
+
+            $submissionsQuery = \App\Models\CategorySubmission::whereIn('category_id', $categoryIds)
+                ->where('status', 'approved');
+
+            if ($gnCode !== null) {
+                $submissionsQuery->where('gn_code', $gnCode);
             }
 
-            $normalSubmissions = $normalSubmissionsQuery->orderBy('created_at', 'desc')->get();
+            $submissions = $submissionsQuery->orderBy('created_at', 'desc')->get();
 
-            foreach ($normalSubmissions as $sub) {
+            foreach ($submissions as $sub) {
                 $answers = json_decode($sub->answers_data, true) ?: [];
-                
+
                 $mapped = new \stdClass();
-                $mapped->id = 'normal_' . $sub->id; 
+                $mapped->id = 'sub_' . $sub->id;
                 $mapped->reg_number = $sub->generated_code;
                 $mapped->address = $answers['Address'] ?? null;
                 $mapped->mobile = $answers['Mobile'] ?? null;
@@ -359,17 +364,35 @@ class CategoryDataUploadController extends Controller
                 $mapped->longitude = $sub->longitude;
                 $mapped->image_path = $answers['Image'] ?? null;
                 $mapped->created_at = $sub->created_at;
-                
+
+                // Flatten all other answer fields as q_ keys so cards display them
+                foreach ($answers as $key => $value) {
+                    if (!in_array($key, ['Address', 'Mobile', 'Contact Person', 'Name (EN)', 'Name (SI)', 'Name (TA)', 'Image', 'Name'])) {
+                        $safeKey = 'q_ans_' . preg_replace('/[^a-z0-9]/i', '_', strtolower($key));
+                        $mapped->$safeKey = $value;
+                    }
+                }
+
                 $data->push($mapped);
             }
-            
+
             $data = $data->sortByDesc('created_at')->values();
         }
+
 
         return response()->json([
             'success' => true,
             'data' => $data
         ]);
+    }
+
+    private function collectDescendantIds($parentId, &$ids)
+    {
+        $children = DB::table('categories')->where('parent_id', $parentId)->pluck('id');
+        foreach ($children as $childId) {
+            $ids[] = $childId;
+            $this->collectDescendantIds($childId, $ids);
+        }
     }
 
     public function getBulkDataCategories()
