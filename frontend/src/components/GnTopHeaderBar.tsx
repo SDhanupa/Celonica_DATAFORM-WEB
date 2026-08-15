@@ -138,16 +138,16 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
   };
 
   const categories = [
-    { label: t.boundaries, slug: 's-boundaries' },
-    { label: t.geographicalLocation, slug: 'g-geo-type' },
-    { label: t.space, slug: 'p-space' },
-    { label: t.land, slug: 'l-land' },
-    { label: t.buildingLand, slug: 'b-building' },
-    { label: t.waterBaseSpaces, slug: 'w-water-features' },
-    { label: t.road, slug: 'r-road' },
-    { label: t.naturalLocation, slug: 'n-nature' },
-    { label: t.lines, slug: 'ln-lines' },
-    { label: t.flora, slug: 'p-plants' },
+    { label: t.boundaries, slug: 'location-1-1' },
+    { label: t.space, slug: 'location-1-2' },
+    { label: t.land, slug: 'location-1-3' },
+    { label: t.buildingLand, slug: 'location-1-4' },
+    { label: t.road, slug: 'location-1-5' },
+    { label: t.geographicalLocation, slug: 'location-1-6' },
+    { label: t.naturalLocation, slug: 'location-1-7' },
+    { label: t.waterBaseSpaces, slug: 'location-1-8' },
+    { label: t.lines, slug: 'location-1-9' },
+    { label: t.flora, slug: 'location-1-10' },
   ];
 
   const surveyCategories = [

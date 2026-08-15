@@ -19,16 +19,16 @@ import GnPageFooter from '../components/GnPageFooter';
 // ─── Category Config ─────────────────────────────────────────────────────────
 
 export const CATEGORIES = [
-  { name: 'Boundaries', slug: 's-boundaries', emoji: '🗺️', color: '#6366f1', dbId: '2' },
-  { name: 'Geographical location', slug: 'g-geo-type', emoji: '🌍', color: '#0ea5e9', dbId: '2004' },
-  { name: 'Space', slug: 'p-space', emoji: '📐', color: '#8b5cf6', dbId: '230' },
-  { name: 'Land', slug: 'l-land', emoji: '🌾', color: '#22c55e', dbId: '306' },
-  { name: 'Building/Land', slug: 'b-building', emoji: '🏠', color: '#f59e0b', dbId: '1353' },
-  { name: 'Water base spaces', slug: 'w-water-features', emoji: '💧', color: '#38bdf8', dbId: '2026' },
-  { name: 'Road', slug: 'r-road', emoji: '🛣️', color: '#94a3b8', dbId: '1877' },
-  { name: 'Natural location', slug: 'n-nature', emoji: '🏔️', color: '#10b981', dbId: '2018' },
-  { name: 'Lines', slug: 'ln-lines', emoji: '⚡', color: '#f97316', dbId: '2113' },
-  { name: 'Flora', slug: 'p-plants', emoji: '🌿', color: '#84cc16', dbId: '2122' },
+  { name: 'Boundaries', slug: 'location-1-1', emoji: '🗺️', color: '#6366f1', dbId: '31720' },
+  { name: 'Space', slug: 'location-1-2', emoji: '📐', color: '#8b5cf6', dbId: '31945' },
+  { name: 'Land', slug: 'location-1-3', emoji: '🌾', color: '#22c55e', dbId: '32021' },
+  { name: 'Building/Land', slug: 'location-1-4', emoji: '🏠', color: '#f59e0b', dbId: '32063' },
+  { name: 'Roads', slug: 'location-1-5', emoji: '🛣️', color: '#94a3b8', dbId: '34514' },
+  { name: 'Geographical location', slug: 'location-1-6', emoji: '🌍', color: '#0ea5e9', dbId: '34641' },
+  { name: 'Natural location', slug: 'location-1-7', emoji: '🏔️', color: '#10b981', dbId: '34655' },
+  { name: 'Water base spaces', slug: 'location-1-8', emoji: '💧', color: '#38bdf8', dbId: '34663' },
+  { name: 'Lines', slug: 'location-1-9', emoji: '⚡', color: '#f97316', dbId: '34750' },
+  { name: 'Flora', slug: 'location-1-10', emoji: '🌿', color: '#84cc16', dbId: '34759' },
 ];
 
 // ─── Helper ────────────────────────────────────────────────────────────────
