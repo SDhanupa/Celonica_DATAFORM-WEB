@@ -79,7 +79,7 @@ type UserAnswer {
 type CategorySubmission {
     id: ID!
     category: Category! @belongsTo
-    user: User! @belongsTo
+    user: User @belongsTo
     district: String
     ds_division: String
     gn_name: String

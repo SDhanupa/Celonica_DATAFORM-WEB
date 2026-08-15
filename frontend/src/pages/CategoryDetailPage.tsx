@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import {
   Box, Typography, IconButton, Menu, MenuItem, Divider,
-  useTheme, useMediaQuery, CircularProgress, Alert, Paper,
+  useTheme, useMediaQuery, CircularProgress, Paper,
   Table, TableBody, TableRow, TableCell, TableContainer,
-  Chip, Grid
+  Chip, Grid, Button, Dialog, DialogTitle, DialogContent, DialogActions
 } from '@mui/material';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
@@ -13,24 +13,22 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 import { useAuth } from '../auth/AuthProvider';
-import { GET_APPROVED_SUBMISSIONS } from '../graphql/queries';
+import { GET_CATEGORY_BY_SLUG } from '../graphql/queries';
 import GnPageFooter from '../components/GnPageFooter';
-import CategoryDataList from '../components/CategoryDataList';
-import CategoryDataAdminTable from '../components/CategoryDataAdminTable';
 
 // ─── Category Config ─────────────────────────────────────────────────────────
 
 export const CATEGORIES = [
-  { name: 'Boundaries',             slug: 'boundaries',            emoji: '🗺️',  color: '#6366f1', dbId: '2' },
-  { name: 'Geographical location',  slug: 'geographical-location', emoji: '🌍',  color: '#0ea5e9', dbId: '2004' },
-  { name: 'Space',                  slug: 'space',                 emoji: '📐',  color: '#8b5cf6', dbId: '230' },
-  { name: 'Land',                   slug: 'land',                  emoji: '🌾',  color: '#22c55e', dbId: '306' },
-  { name: 'Building/Land',          slug: 'building-land',         emoji: '🏠',  color: '#f59e0b', dbId: '1353' },
-  { name: 'Water base spaces',      slug: 'water-base-spaces',     emoji: '💧',  color: '#38bdf8', dbId: '2026' },
-  { name: 'Road',                   slug: 'road',                  emoji: '🛣️',  color: '#94a3b8', dbId: '1877' },
-  { name: 'Natural location',       slug: 'natural-location',      emoji: '🏔️',  color: '#10b981', dbId: '2018' },
-  { name: 'Lines',                  slug: 'lines',                 emoji: '⚡',  color: '#f97316', dbId: '2113' },
-  { name: 'Flora',                  slug: 'flora',                 emoji: '🌿',  color: '#84cc16', dbId: '2122' },
+  { name: 'Boundaries', slug: 's-boundaries', emoji: '🗺️', color: '#6366f1', dbId: '2' },
+  { name: 'Geographical location', slug: 'g-geo-type', emoji: '🌍', color: '#0ea5e9', dbId: '2004' },
+  { name: 'Space', slug: 'p-space', emoji: '📐', color: '#8b5cf6', dbId: '230' },
+  { name: 'Land', slug: 'l-land', emoji: '🌾', color: '#22c55e', dbId: '306' },
+  { name: 'Building/Land', slug: 'b-building', emoji: '🏠', color: '#f59e0b', dbId: '1353' },
+  { name: 'Water base spaces', slug: 'w-water-features', emoji: '💧', color: '#38bdf8', dbId: '2026' },
+  { name: 'Road', slug: 'r-road', emoji: '🛣️', color: '#94a3b8', dbId: '1877' },
+  { name: 'Natural location', slug: 'n-nature', emoji: '🏔️', color: '#10b981', dbId: '2018' },
+  { name: 'Lines', slug: 'ln-lines', emoji: '⚡', color: '#f97316', dbId: '2113' },
+  { name: 'Flora', slug: 'p-plants', emoji: '🌿', color: '#84cc16', dbId: '2122' },
 ];
 
 // ─── Helper ────────────────────────────────────────────────────────────────
@@ -45,6 +43,210 @@ const getThemeColors = (dark: boolean) => ({
 });
 
 // ─── Component ────────────────────────────────────────────────────────────────
+
+const FastBigCardItem = ({ item, idx, tc, catColor, qMap }: any) => {
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+
+  // Parse Answers dynamically
+  const answers: { question: string, answer: string }[] = [];
+  if (item.image_path) answers.push({ question: 'Image', answer: String(item.image_path) });
+  
+  if (item.reg_number) answers.push({ question: 'Reg Number', answer: String(item.reg_number) });
+  if (item.name_en) answers.push({ question: 'Name (EN)', answer: String(item.name_en) });
+  if (item.name_si) answers.push({ question: 'Name (SI)', answer: String(item.name_si) });
+  if (item.name_ta) answers.push({ question: 'Name (TA)', answer: String(item.name_ta) });
+  
+  answers.push({ question: 'National', answer: 'Sri Lanka' });
+  if (item.province_name) answers.push({ question: 'Province', answer: String(item.province_name) });
+  if (item.district_name) answers.push({ question: 'District', answer: String(item.district_name) });
+  if (item.ds_name) answers.push({ question: 'DS Division', answer: String(item.ds_name) });
+  if (item.gn_name) answers.push({ question: 'GN Name', answer: String(item.gn_name) });
+  if (item.address) answers.push({ question: 'Address', answer: String(item.address) });
+  if (item.mobile) answers.push({ question: 'Mobile', answer: String(item.mobile) });
+
+  Object.keys(item).forEach(key => {
+    if (key.startsWith('q_')) {
+      const parts = key.split('_');
+      const qId = parts[1];
+      const iter = parts[2];
+      let label = qMap[qId] || `Question #${qId}`;
+      if (iter && iter !== '1') label += ` (Item #${iter})`;
+      if (item[key]) answers.push({ question: label, answer: String(item[key]) });
+    }
+  });
+
+  const title = item.name_en || item.name_si || item.name_ta || `#${idx + 1}`;
+  const displayAnswers = answers.filter(a => a.question !== 'Image');
+  const visibleAnswers = displayAnswers.slice(0, 3);
+
+  const hasMap = item.latitude && item.longitude;
+
+  return (
+    <>
+      <Grid item xs={12} md={6} key={item.id}>
+        <Paper
+          elevation={0}
+          sx={{
+            bgcolor: tc.card,
+            border: `1.5px solid ${tc.border}`,
+            borderRadius: 4,
+            overflow: 'hidden',
+            transition: 'all 0.3s',
+            position: 'relative',
+            '&::before': { content: '""', position: 'absolute', top: 0, left: 0, width: 4, height: '100%', bgcolor: catColor },
+            '&:hover': { boxShadow: '0 12px 32px rgba(0,0,0,0.08)', transform: 'translateY(-2px)' },
+          }}
+        >
+          <Box sx={{ px: 3, py: 1.5, borderBottom: `1px solid ${tc.border}`, bgcolor: `${catColor}06`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: catColor }}>
+              {title}
+            </Typography>
+            <Typography sx={{ fontSize: '0.75rem', color: tc.muted }}>
+              {item.reg_number || (item.created_at ? new Date(item.created_at).toLocaleDateString() : '')}
+            </Typography>
+          </Box>
+
+          {answers.find(a => a.question === 'Image') && (
+            <Box
+              component="img"
+              src={`/api/uploads/category_images/${answers.find(a => a.question === 'Image')?.answer}`}
+              alt="Submission Image"
+              sx={{ width: '100%', height: 160, objectFit: 'cover' }}
+            />
+          )}
+
+          <TableContainer>
+            <Table size="small">
+              <TableBody>
+                {visibleAnswers.map((a, aIdx) => (
+                  <TableRow key={aIdx} sx={{ '&:last-child td': { borderBottom: 0 } }}>
+                    <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: tc.muted, width: '40%', borderBottom: `1px solid ${tc.border}`, py: 1.5 }}>
+                      {a.question}
+                    </TableCell>
+                    <TableCell sx={{ fontSize: '0.88rem', color: tc.text, fontWeight: 500, borderBottom: `1px solid ${tc.border}`, py: 1.5, wordBreak: 'break-word' }}>
+                      {a.answer}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          <Box sx={{ px: 2, py: 1.5, display: 'flex', gap: 1, flexWrap: 'wrap', bgcolor: 'rgba(0,0,0,0.02)', borderTop: `1px solid ${tc.border}` }}>
+            <Button
+              size="small"
+              onClick={() => setDialogOpen(true)}
+              sx={{ color: catColor, textTransform: 'none', fontWeight: 600, fontSize: '0.8rem' }}
+            >
+              📋 View All Details
+            </Button>
+            {hasMap && (
+              <Button
+                size="small"
+                onClick={() => window.open(`https://maps.google.com/?q=${item.latitude},${item.longitude}`, '_blank')}
+                sx={{ color: '#10b981', textTransform: 'none', fontWeight: 600, fontSize: '0.8rem' }}
+              >
+                📍 Show on Map
+              </Button>
+            )}
+          </Box>
+        </Paper>
+      </Grid>
+
+      {/* Popup Dialog for All Details */}
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
+        <DialogTitle sx={{ fontWeight: 800, color: tc.text, borderBottom: `1px solid ${tc.border}` }}>
+          {title}
+        </DialogTitle>
+        <DialogContent sx={{ p: 0 }}>
+          {answers.find(a => a.question === 'Image') && (
+            <Box
+              component="img"
+              src={`/api/uploads/category_images/${answers.find(a => a.question === 'Image')?.answer}`}
+              alt="Submission Image"
+              sx={{ width: '100%', maxHeight: 400, objectFit: 'contain', bgcolor: '#000' }}
+            />
+          )}
+          <TableContainer>
+            <Table size="small">
+              <TableBody>
+                {displayAnswers.map((a, aIdx) => (
+                  <TableRow key={aIdx}>
+                    <TableCell sx={{ fontWeight: 600, fontSize: '0.85rem', color: tc.muted, width: '35%', py: 1.5 }}>
+                      {a.question}
+                    </TableCell>
+                    <TableCell sx={{ fontSize: '0.9rem', color: tc.text, fontWeight: 500, py: 1.5, wordBreak: 'break-word' }}>
+                      {a.answer}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </DialogContent>
+        <DialogActions sx={{ borderTop: `1px solid ${tc.border}`, p: 2 }}>
+          {hasMap && (
+            <Button
+              onClick={() => window.open(`https://maps.google.com/?q=${item.latitude},${item.longitude}`, '_blank')}
+              sx={{ color: '#10b981', fontWeight: 700 }}
+            >
+              📍 Show on Map
+            </Button>
+          )}
+          <Button onClick={() => setDialogOpen(false)} sx={{ color: tc.muted, fontWeight: 700 }}>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
+};
+
+const FastBigCardList = ({ slug, categoryName, gnId, catColor, parentQuestions }: { slug: string, categoryName: string, gnId: string, catColor: string, parentQuestions: any[] }) => {
+  const [data, setData] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const tc = getThemeColors(false);
+
+  React.useEffect(() => {
+    const controller = new AbortController();
+    fetch(`/api/category-data/${slug}?gn_id=${gnId}`, { signal: controller.signal })
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) setData(res.data);
+        setLoading(false);
+      })
+      .catch(err => {
+        if (err.name !== 'AbortError') setLoading(false);
+      });
+    return () => controller.abort();
+  }, [slug, gnId]);
+
+  if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}><CircularProgress sx={{ color: catColor }} /></Box>;
+  if (data.length === 0) return null;
+
+  const qMap: Record<string, string> = {};
+  parentQuestions.forEach((q: any) => {
+    qMap[String(q.id)] = q.questionTextEn || `Question ${q.id}`;
+  });
+
+  return (
+    <Box sx={{ mb: 5 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+        <Box sx={{ width: 4, height: 28, borderRadius: 2, bgcolor: catColor }} />
+        <Typography sx={{ fontWeight: 800, fontSize: '1.2rem', color: tc.text, fontFamily: "'Inter', sans-serif" }}>
+          {categoryName}
+        </Typography>
+        <Chip label={`${data.length}`} size="small" sx={{ bgcolor: `${catColor}15`, color: catColor, fontWeight: 700, fontSize: '0.75rem' }} />
+      </Box>
+
+      <Grid container spacing={3}>
+        {data.map((item: any, idx: number) => (
+          <FastBigCardItem key={item.id} item={item} idx={idx} tc={tc} catColor={catColor} qMap={qMap} />
+        ))}
+      </Grid>
+    </Box>
+  );
+};
 
 const CategoryDetailPage: React.FC = () => {
   const { gnName, ccode, categorySlug } = useParams<{
@@ -69,16 +271,16 @@ const CategoryDetailPage: React.FC = () => {
   const catName = category?.name ?? categorySlug ?? 'Category';
   const catEmoji = category?.emoji ?? '📋';
   const catColor = category?.color ?? '#4f46e5';
-  const catDbId = category?.dbId ?? '0';
 
   const gnPageUrl = `/gnpage/${gnName}/${ccode}`;
 
   const [subCatTables, setSubCatTables] = useState<any[]>([]);
 
+  // 1. Fetch tables by SLUG instead of dbId
   React.useEffect(() => {
-    if (!catDbId || catDbId === '0') return;
-    
-    fetch(`/api/category-tables/${catDbId}`)
+    if (!categorySlug) return;
+
+    fetch(`/api/category-tables/${categorySlug}`)
       .then(res => res.json())
       .then(data => {
         if (data.success && data.tables) {
@@ -91,56 +293,15 @@ const CategoryDetailPage: React.FC = () => {
         console.error('Error fetching category tables:', err);
         setSubCatTables([]);
       });
-  }, [catDbId]);
+  }, [categorySlug]);
 
-  // Fetch approved submissions for this category + GN
-  const { data: approvedData, loading: approvedLoading, error: approvedError } = useQuery(GET_APPROVED_SUBMISSIONS, {
-    variables: { categoryId: catDbId, gnCode: ccode },
-    skip: !ccode || !catDbId || catDbId === '0',
-    fetchPolicy: 'cache-and-network',
+  // 2. Fetch the dynamic category ID for the GraphQL query
+  const { data: catData } = useQuery(GET_CATEGORY_BY_SLUG, {
+    variables: { slug: categorySlug },
+    skip: !categorySlug,
   });
 
-  const submissions = approvedData?.approvedSubmissions || [];
 
-  // Parse answers and map question IDs to labels
-  const parseAnswers = (submission: any) => {
-    try {
-      const answersRaw = typeof submission.answers_data === 'string'
-        ? JSON.parse(submission.answers_data)
-        : submission.answers_data;
-      const questions = submission.category?.questions || [];
-
-      // Build a map of questionId -> question text
-      const qMap: Record<string, string> = {};
-      questions.forEach((q: any) => {
-        qMap[String(q.id)] = q.questionTextEn || `Question ${q.id}`;
-      });
-
-      // Parse answer keys like "5401_1" -> questionId=5401, index=1
-      Object.entries(answersRaw).forEach(([key, value]) => {
-        const parts = key.split('_');
-        const qId = parts[0];
-        const iter = parts[1];
-        let questionLabel = qMap[qId] || `Question #${qId}`;
-        if (iter && iter !== '1') {
-          questionLabel += ` (Item #${iter})`;
-        }
-        parsed.push({ question: questionLabel, answer: String(value) });
-      });
-
-      return parsed;
-    } catch {
-      return [];
-    }
-  };
-
-  // Group submissions by sub-category name
-  const groupedSubmissions: Record<string, any[]> = {};
-  submissions.forEach((sub: any) => {
-    const subCatName = sub.category?.nameEn || 'General';
-    if (!groupedSubmissions[subCatName]) groupedSubmissions[subCatName] = [];
-    groupedSubmissions[subCatName].push(sub);
-  });
 
   const navTypoSx = (color?: string) => ({
     cursor: 'pointer',
@@ -304,137 +465,32 @@ const CategoryDetailPage: React.FC = () => {
           {catName}
         </Typography>
 
-        <Chip
-          label={`${submissions.length} record${submissions.length !== 1 ? 's' : ''}`}
-          sx={{
-            bgcolor: `${catColor}20`,
-            color: catColor,
-            fontWeight: 700,
-            fontSize: '0.85rem',
-            border: `1px solid ${catColor}30`,
-          }}
-        />
       </Box>
 
       {/* ── Main Content ─────────────────────────────────────────────────── */}
       <Box sx={{ flex: 1, px: { xs: 2, sm: 4, md: 6 }, pb: 6, maxWidth: 1200, mx: 'auto', width: '100%' }}>
 
-        {approvedLoading && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-            <CircularProgress sx={{ color: catColor }} />
+        {/* Bulk Uploaded Data Section (Dynamic Subcategories) */}
+        {subCatTables.length > 0 ? (
+          <Box sx={{ mt: 4 }}>
+            {subCatTables.map((subCat: any) => (
+              <Box key={subCat.slug} sx={{ mb: 2 }}>
+                <FastBigCardList 
+                  slug={subCat.slug} 
+                  categoryName={subCat.nameEn} 
+                  gnId={ccode} 
+                  catColor={catColor}
+                  parentQuestions={catData?.categoryBySlug?.questions || []}
+                />
+              </Box>
+            ))}
           </Box>
-        )}
-
-        {approvedError && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            Failed to load data. Please try again later.
-          </Alert>
-        )}
-
-        {!approvedLoading && submissions.length === 0 && (
+        ) : (
           <Box sx={{ textAlign: 'center', py: 8 }}>
             <Typography sx={{ fontSize: '3rem', mb: 2 }}>📭</Typography>
             <Typography sx={{ fontSize: '1.1rem', color: tc.muted, fontWeight: 500 }}>
               No approved data yet for <strong>{catName}</strong> in this GN division.
             </Typography>
-          </Box>
-        )}
-
-        {/* Render grouped submissions */}
-        {Object.entries(groupedSubmissions).map(([subCatName, subs]) => (
-          <Box key={subCatName} sx={{ mb: 5 }}>
-            {/* Sub-category header */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
-              <Box sx={{ width: 4, height: 28, borderRadius: 2, bgcolor: catColor }} />
-              <Typography sx={{ fontWeight: 800, fontSize: '1.2rem', color: tc.text, fontFamily: "'Inter', sans-serif" }}>
-                {subCatName}
-              </Typography>
-              <Chip label={`${subs.length}`} size="small" sx={{ bgcolor: `${catColor}15`, color: catColor, fontWeight: 700, fontSize: '0.75rem' }} />
-            </Box>
-
-            {/* Each submission as a card */}
-            <Grid container spacing={3}>
-              {subs.map((sub: any, idx: number) => {
-                const answers = parseAnswers(sub);
-                return (
-                  <Grid item xs={12} md={6} key={sub.id}>
-                    <Paper
-                      elevation={0}
-                      sx={{
-                        bgcolor: tc.card,
-                        border: `1.5px solid ${tc.border}`,
-                        borderRadius: 4,
-                        overflow: 'hidden',
-                        transition: 'all 0.3s',
-                        position: 'relative',
-                        '&::before': {
-                          content: '""',
-                          position: 'absolute',
-                          top: 0, left: 0, width: 4, height: '100%',
-                          bgcolor: catColor,
-                        },
-                        '&:hover': {
-                          boxShadow: '0 12px 32px rgba(0,0,0,0.08)',
-                          transform: 'translateY(-2px)',
-                        },
-                      }}
-                    >
-                      {/* Card header */}
-                      <Box sx={{ px: 3, py: 1.5, borderBottom: `1px solid ${tc.border}`, bgcolor: `${catColor}06`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: catColor }}>
-                          #{idx + 1}
-                        </Typography>
-                        <Typography sx={{ fontSize: '0.75rem', color: tc.muted }}>
-                          {sub.created_at ? new Date(sub.created_at).toLocaleDateString() : ''}
-                        </Typography>
-                      </Box>
-
-                      {/* Answers table */}
-                      <TableContainer>
-                        <Table size="small">
-                          <TableBody>
-                            {answers.map((a, aIdx) => (
-                              <TableRow key={aIdx} sx={{ '&:last-child td': { borderBottom: 0 } }}>
-                                <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: tc.muted, width: '40%', borderBottom: `1px solid ${tc.border}`, py: 1.5 }}>
-                                  {a.question}
-                                </TableCell>
-                                <TableCell sx={{ fontSize: '0.88rem', color: tc.text, fontWeight: 500, borderBottom: `1px solid ${tc.border}`, py: 1.5, wordBreak: 'break-word' }}>
-                                  {a.answer}
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                    </Paper>
-                  </Grid>
-                );
-              })}
-            </Grid>
-          </Box>
-        ))}
-
-        {/* Bulk Uploaded Data Section (Dynamic Subcategories) */}
-        {subCatTables.length > 0 && (
-          <Box sx={{ mt: 4 }}>
-            {subCatTables.map((subCat: any) => (
-              <Box key={subCat.slug} sx={{ mb: 2 }}>
-                {isSuperAdmin ? (
-                  <CategoryDataAdminTable 
-                    slug={subCat.slug}
-                    categoryName={subCat.nameEn}
-                    hideIfEmpty={true}
-                  />
-                ) : (
-                  <CategoryDataList 
-                    slug={subCat.slug}
-                    categoryName={subCat.nameEn}
-                    gnId={ccode}
-                    hideIfEmpty={true}
-                  />
-                )}
-              </Box>
-            ))}
           </Box>
         )}
 
@@ -460,7 +516,7 @@ const CategoryDetailPage: React.FC = () => {
         </Box>
       </Box>
 
-      {/* ── Footer ────────────────────────────────────────────────────────── */}
+      {/* ── Footer ────────────────────────────────────────────────────────── */} 
       <GnPageFooter isDarkMode={isDarkMode} />
     </Box>
   );

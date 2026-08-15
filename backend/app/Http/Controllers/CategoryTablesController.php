@@ -12,10 +12,10 @@ class CategoryTablesController extends Controller
      * Get a list of all subcategories (including deep descendants) 
      * that have a bulk data table for a given top-level category slug.
      */
-    public function getTablesForCategory($id)
+    public function getTablesForCategory($slug)
     {
         // 1. Find the top level category
-        $topCat = DB::table('categories')->where('id', $id)->first();
+        $topCat = DB::table('categories')->where('slug', $slug)->first();
         if (!$topCat) {
             return response()->json(['success' => true, 'tables' => []]);
         }

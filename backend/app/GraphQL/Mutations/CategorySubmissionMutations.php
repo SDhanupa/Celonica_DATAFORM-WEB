@@ -83,11 +83,58 @@ class CategorySubmissionMutations
             throw new Exception("Unauthorized. Only administrators can approve or reject submissions.");
         }
 
-        $submission = CategorySubmission::findOrFail($args['id']);
-        $submission->update([
-            'status' => $args['status']
-        ]);
+        // ID format: {categoryId}_{recordId} (for bulk) OR just an integer for normal user submissions
+        if (!str_contains($args['id'], '_')) {
+            // Normal user submission!
+            $submission = CategorySubmission::find($args['id']);
+            if (!$submission) {
+                throw new Exception("Submission not found.");
+            }
+            if ($args['status'] === 'rejected') {
+                $submission->delete();
+            } else {
+                $submission->update(['status' => $args['status']]);
+            }
+            return [
+                'id' => $args['id'],
+                'status' => $args['status']
+            ];
+        }
 
-        return $submission;
+        $parts = explode('_', $args['id']);
+        if (count($parts) !== 2) {
+            throw new Exception("Invalid submission ID format.");
+        }
+        $categoryId = $parts[0];
+        $recordId = $parts[1];
+
+        $category = Category::find($categoryId);
+        if (!$category) {
+            throw new Exception("Category not found.");
+        }
+
+        $tableName = 'category_data_' . str_replace('-', '_', $category->slug);
+        
+        if (!\Illuminate\Support\Facades\Schema::hasTable($tableName)) {
+            throw new Exception("Data table for this category does not exist.");
+        }
+
+        if ($args['status'] === 'rejected') {
+            // Delete rejected proposals
+            \Illuminate\Support\Facades\DB::table($tableName)->where('id', $recordId)->delete();
+            return [
+                'id' => $args['id'],
+                'status' => 'rejected'
+            ];
+        } else {
+            \Illuminate\Support\Facades\DB::table($tableName)->where('id', $recordId)->update([
+                'status' => $args['status'],
+                'is_approved' => ($args['status'] === 'approved')
+            ]);
+            return [
+                'id' => $args['id'],
+                'status' => $args['status']
+            ];
+        }
     }
 }

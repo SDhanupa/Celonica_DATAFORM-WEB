@@ -249,14 +249,41 @@ class CategoryDataUploadController extends Controller
             $query->where($tableName . '.raw_gn', $request->input('raw_gn'));
         }
         if ($request->has('gn_id') && $request->input('gn_id')) {
-            $gnId = $request->input('gn_id');
-            if (!is_numeric($gnId)) {
-                $gn = DB::table('grama_niladharis')->where('CCODE', $gnId)->first();
-                if ($gn) {
-                    $gnId = $gn->id;
-                }
+            $gnCode = strtoupper($request->input('gn_id'));
+            
+            $gnQuery = DB::table('grama_niladharis')->where('CCODE', $gnCode);
+            if (is_numeric($gnCode)) {
+                $gnQuery->orWhere('id', $gnCode);
             }
-            $query->where($tableName . '.gn_id', $gnId);
+            $gn = $gnQuery->first();
+            
+            $gnNames = [];
+            if ($gn) {
+                if ($gn->name_en) $gnNames[] = $gn->name_en;
+                if ($gn->name_si) $gnNames[] = $gn->name_si;
+                if ($gn->name_ta) $gnNames[] = $gn->name_ta;
+            }
+
+            $query->where(function($q) use ($tableName, $gnCode, $gn, $gnNames) {
+                // 1. Matched perfectly via joined table or explicit gn_id
+                $q->where($tableName . '.gn_id', $gn ? $gn->id : $gnCode)
+                  ->orWhere($tableName . '.gn_id', $gnCode)
+                  // 2. Unmapped but has a generated reg_number with this CCODE
+                  ->orWhere($tableName . '.reg_number', 'ilike', $gnCode . '/%');
+                  
+                // 3. Unmapped but raw location data perfectly matches this GN
+                if ($gn && !empty($gnNames)) {
+                    $q->orWhere(function($subQ) use ($tableName, $gnNames, $gn) {
+                        $subQ->whereIn($tableName . '.raw_gn', $gnNames);
+                        if ($gn->ds_en) {
+                            $subQ->where($tableName . '.raw_ds', $gn->ds_en);
+                        }
+                        if ($gn->dis_en) {
+                            $subQ->where($tableName . '.raw_district', $gn->dis_en);
+                        }
+                    });
+                }
+            });
         }
 
         // Special flag to only return NULL data (unmapped)
@@ -294,6 +321,43 @@ class CategoryDataUploadController extends Controller
                                DB::raw("COALESCE(grama_niladharis.name_en, $tableName.raw_gn) as gn_name"))
                       ->orderBy($tableName . '.created_at', 'desc')
                       ->get();
+
+        // Merge normal user submissions so they appear in the Big Card components
+        $category = \App\Models\Category::where('slug', $slug)->first();
+        if ($category) {
+            $normalSubmissionsQuery = \App\Models\CategorySubmission::where('category_id', $category->id)->where('status', 'approved');
+            
+            if (isset($gnCode)) {
+                $normalSubmissionsQuery->where('gn_code', $gnCode);
+            }
+
+            $normalSubmissions = $normalSubmissionsQuery->orderBy('created_at', 'desc')->get();
+
+            foreach ($normalSubmissions as $sub) {
+                $answers = json_decode($sub->answers_data, true) ?: [];
+                
+                $mapped = new \stdClass();
+                $mapped->id = 'normal_' . $sub->id; 
+                $mapped->reg_number = $sub->generated_code;
+                $mapped->address = $answers['Address'] ?? null;
+                $mapped->mobile = $answers['Mobile'] ?? null;
+                $mapped->contact_person_name = $answers['Contact Person'] ?? null;
+                $mapped->name_en = $answers['Name (EN)'] ?? $answers['Name'] ?? null;
+                $mapped->name_si = $answers['Name (SI)'] ?? null;
+                $mapped->name_ta = $answers['Name (TA)'] ?? null;
+                $mapped->district_name = $sub->district;
+                $mapped->ds_name = $sub->ds_division;
+                $mapped->gn_name = $sub->gn_name;
+                $mapped->latitude = $sub->latitude;
+                $mapped->longitude = $sub->longitude;
+                $mapped->image_path = $answers['Image'] ?? null;
+                $mapped->created_at = $sub->created_at;
+                
+                $data->push($mapped);
+            }
+            
+            $data = $data->sortByDesc('created_at')->values();
+        }
 
         return response()->json([
             'success' => true,
@@ -594,6 +658,7 @@ class CategoryDataUploadController extends Controller
             'image_path' => $payload['image_path'] ?? null,
             'added_by_user_id' => auth()->id() ?? null,
             'is_approved' => false,
+            'status' => 'pending',
             'is_update_proposal' => $isUpdate,
             'coordinate_mismatch' => $payload['coordinate_mismatch'] ?? false,
             'created_at' => now(),
@@ -613,7 +678,8 @@ class CategoryDataUploadController extends Controller
         }
 
         DB::table($tableName)->where('id', $id)->update([
-            'is_approved' => true
+            'is_approved' => true,
+            'status' => 'approved'
         ]);
 
         return response()->json(['success' => true]);
@@ -635,12 +701,13 @@ class CategoryDataUploadController extends Controller
         DB::table($tableName)
             ->where('reg_number', $newRecord->reg_number)
             ->where('id', '!=', $id)
-            ->where('is_approved', true)
+            ->where('status', 'approved')
             ->delete();
 
         // Mark the proposal as approved
         DB::table($tableName)->where('id', $id)->update([
             'is_approved' => true,
+            'status' => 'approved',
             'is_update_proposal' => false
         ]);
 

@@ -27,7 +27,7 @@ Route::middleware('throttle:10,1')->get('/guest-token', function() {
 Route::middleware('throttle:120,1')->group(function () {
     Route::get('/category-data-tables', [\App\Http\Controllers\CategoryDataUploadController::class, 'getBulkDataCategories']);
     Route::get('/category-data/{slug}', [\App\Http\Controllers\CategoryDataUploadController::class, 'getData']);
-    Route::get('/category-tables/{id}', [\App\Http\Controllers\CategoryTablesController::class, 'getTablesForCategory']);
+    Route::get('/category-tables/{slug}', [\App\Http\Controllers\CategoryTablesController::class, 'getTablesForCategory']);
     Route::post('/upload-survey-image', [\App\Http\Controllers\CategoryDataUploadController::class, 'uploadSurveyImage']);
     Route::get('/search-category-data/{slug}', [\App\Http\Controllers\CategoryDataUploadController::class, 'searchCategoryData']);
     Route::post('/submit-survey-data/{slug}', [\App\Http\Controllers\CategoryDataUploadController::class, 'submitSurveyData']);
