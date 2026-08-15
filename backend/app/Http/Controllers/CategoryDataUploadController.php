@@ -220,11 +220,11 @@ class CategoryDataUploadController extends Controller
     public function getData(Request $request, $slug)
     {
         $tableName = 'category_data_' . str_replace('-', '_', $slug);
+        $tableExists = Schema::hasTable($tableName);
+        $data = collect();
+        $gnCode = null;
 
-        if (!Schema::hasTable($tableName)) {
-            return response()->json(['success' => true, 'data' => []]);
-        }
-
+        if ($tableExists) {
         $query = DB::table($tableName);
 
         // Optional filtering by specific GN/DS/District (mapped)
@@ -314,16 +314,18 @@ class CategoryDataUploadController extends Controller
                                ->orOn($tableName . '.gn_id', '=', 'grama_niladharis.CCODE')
                                ->orOn($tableName . '.gn_id', '=', 'grama_niladharis.code');
                       })
-                      ->select($tableName . '.*', 
+                      ->select($tableName . '.*',
                                DB::raw("COALESCE(grama_niladharis.pro_en, $tableName.raw_province) as province_name"),
                                DB::raw("COALESCE(grama_niladharis.dis_en, $tableName.raw_district) as district_name"),
                                DB::raw("COALESCE(grama_niladharis.ds_en, $tableName.raw_ds) as ds_name"),
                                DB::raw("COALESCE(grama_niladharis.name_en, $tableName.raw_gn) as gn_name"))
                       ->orderBy($tableName . '.created_at', 'desc')
                       ->get();
+        } // end if ($tableExists)
 
         // Merge normal user submissions so they appear in the Big Card components
         $category = \App\Models\Category::where('slug', $slug)->first();
+
         if ($category) {
             $normalSubmissionsQuery = \App\Models\CategorySubmission::where('category_id', $category->id)->where('status', 'approved');
             
