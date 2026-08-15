@@ -222,7 +222,12 @@ class CategoryDataUploadController extends Controller
         $tableName = 'category_data_' . str_replace('-', '_', $slug);
         $tableExists = Schema::hasTable($tableName);
         $data = collect();
+
+        // Extract GN code early so submissions can be filtered even without a bulk table
         $gnCode = null;
+        if ($request->has('gn_id') && $request->input('gn_id')) {
+            $gnCode = strtoupper($request->input('gn_id'));
+        }
 
         if ($tableExists) {
         $query = DB::table($tableName);

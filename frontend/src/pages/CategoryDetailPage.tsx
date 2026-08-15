@@ -470,29 +470,30 @@ const CategoryDetailPage: React.FC = () => {
       {/* ── Main Content ─────────────────────────────────────────────────── */}
       <Box sx={{ flex: 1, px: { xs: 2, sm: 4, md: 6 }, pb: 6, maxWidth: 1200, mx: 'auto', width: '100%' }}>
 
-        {/* Bulk Uploaded Data Section (Dynamic Subcategories) */}
-        {subCatTables.length > 0 ? (
-          <Box sx={{ mt: 4 }}>
-            {subCatTables.map((subCat: any) => (
-              <Box key={subCat.slug} sx={{ mb: 2 }}>
-                <FastBigCardList 
-                  slug={subCat.slug} 
-                  categoryName={subCat.nameEn} 
-                  gnId={ccode} 
-                  catColor={catColor}
-                  parentQuestions={catData?.categoryBySlug?.questions || []}
-                />
-              </Box>
-            ))}
-          </Box>
-        ) : (
-          <Box sx={{ textAlign: 'center', py: 8 }}>
-            <Typography sx={{ fontSize: '3rem', mb: 2 }}>📭</Typography>
-            <Typography sx={{ fontSize: '1.1rem', color: tc.muted, fontWeight: 500 }}>
-              No approved data yet for <strong>{catName}</strong> in this GN division.
-            </Typography>
-          </Box>
-        )}
+        {/* Main category data — always shown (captures user-submitted approved data) */}
+        <Box sx={{ mt: 4 }}>
+          <FastBigCardList
+            slug={categorySlug!}
+            categoryName={catName}
+            gnId={ccode!}
+            catColor={catColor}
+            parentQuestions={catData?.categoryBySlug?.questions || []}
+          />
+
+          {/* Also show any bulk-uploaded subcategory tables */}
+          {subCatTables.filter((s: any) => s.slug !== categorySlug).map((subCat: any) => (
+            <Box key={subCat.slug} sx={{ mb: 2 }}>
+              <FastBigCardList
+                slug={subCat.slug}
+                categoryName={subCat.nameEn}
+                gnId={ccode!}
+                catColor={catColor}
+                parentQuestions={catData?.categoryBySlug?.questions || []}
+              />
+            </Box>
+          ))}
+        </Box>
+
 
         {/* Navigate to other categories */}
         <Box sx={{ mt: 6, display: 'flex', flexWrap: 'wrap', gap: 1.5, justifyContent: 'center', maxWidth: 700, mx: 'auto' }}>
