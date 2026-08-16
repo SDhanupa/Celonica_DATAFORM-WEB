@@ -81,6 +81,8 @@ const ApprovalsPage: React.FC = () => {
         return <Chip label="✅ Approved" color="success" size="small" sx={{ fontWeight: 700 }} />;
       case 'rejected':
         return <Chip label="❌ Rejected" color="error" size="small" sx={{ fontWeight: 700 }} />;
+      case 'revoked':
+        return <Chip label="🚫 Revoked" size="small" sx={{ fontWeight: 700, bgcolor: '#6b7280', color: '#fff' }} />;
       case 'pending':
       default:
         return <Chip label="⏳ Pending" color="warning" size="small" sx={{ fontWeight: 700 }} />;
@@ -93,6 +95,7 @@ const ApprovalsPage: React.FC = () => {
     approved: allSubmissions.filter((s: any) => s.status === 'approved').length,
     pending: allSubmissions.filter((s: any) => s.status === 'pending').length,
     rejected: allSubmissions.filter((s: any) => s.status === 'rejected').length,
+    revoked: allSubmissions.filter((s: any) => s.status === 'revoked').length,
   };
 
   return (
@@ -154,6 +157,7 @@ const ApprovalsPage: React.FC = () => {
               <Chip label={`Approved: ${stats.approved}`} color="success" variant="outlined" sx={{ fontWeight: 700, bgcolor: '#f0fdf4' }} />
               <Chip label={`Pending: ${stats.pending}`} color="warning" variant="outlined" sx={{ fontWeight: 700, bgcolor: '#fffbeb' }} />
               <Chip label={`Rejected: ${stats.rejected}`} color="error" variant="outlined" sx={{ fontWeight: 700, bgcolor: '#fef2f2' }} />
+              {stats.revoked > 0 && <Chip label={`Revoked: ${stats.revoked}`} variant="outlined" sx={{ fontWeight: 700, bgcolor: '#f3f4f6', color: '#6b7280' }} />}
             </Stack>
           </Box>
 
@@ -189,7 +193,21 @@ const ApprovalsPage: React.FC = () => {
                         </TableRow>
                       )}
                       {displayedSubmissions.map((sub: any) => (
-                        <TableRow key={sub.id} hover sx={{ transition: 'background 0.2s', '&:hover': { bgcolor: '#f8fafc' } }}>
+                        <TableRow 
+                          key={sub.id} 
+                          hover 
+                          sx={{ 
+                            transition: 'background 0.2s', 
+                            '&:hover': { bgcolor: '#f8fafc' },
+                            // Revoked records appear greyed-out as a shadow/history entry
+                            ...(sub.status === 'revoked' ? {
+                              opacity: 0.5,
+                              bgcolor: '#f9fafb',
+                              '& td': { textDecoration: 'line-through', color: '#9ca3af' },
+                              '&:hover': { bgcolor: '#f3f4f6' },
+                            } : {})
+                          }}
+                        >
                           <TableCell>{getStatusChip(sub.status)}</TableCell>
                           <TableCell><Chip label={sub.generated_code || 'N/A'} size="small" variant="outlined" sx={{ fontWeight: 600, fontFamily: 'monospace' }} /></TableCell>
                           <TableCell><Typography sx={{ fontWeight: 600, fontSize: '0.88rem' }}>{sub.category?.nameEn || '—'}</Typography></TableCell>
@@ -204,14 +222,19 @@ const ApprovalsPage: React.FC = () => {
                           <TableCell>{new Date(sub.created_at).toLocaleDateString()}</TableCell>
                           <TableCell align="right">
                             <Button variant="outlined" size="small" onClick={() => handleView(sub)} sx={{ mr: 1, fontWeight: 600, borderRadius: 2 }}>View Details</Button>
-                            {sub.status !== 'approved' && (
+                            {sub.status !== 'approved' && sub.status !== 'revoked' && (
                               <Button variant="contained" color="success" size="small" onClick={() => handleApproveClick(sub.id, 'approved')} sx={{ mr: 0.5, fontWeight: 700, borderRadius: 2 }}>
                                 {sub.status === 'rejected' ? 'Re-approve' : 'Accept'}
                               </Button>
                             )}
-                            {sub.status !== 'rejected' && (
-                              <Button variant="outlined" color="error" size="small" onClick={() => handleApproveClick(sub.id, 'rejected')} sx={{ fontWeight: 700, borderRadius: 2 }}>
-                                {sub.status === 'approved' ? 'Revoke' : 'Reject'}
+                            {sub.status === 'approved' && (
+                              <Button variant="outlined" color="error" size="small" onClick={() => handleApproveClick(sub.id, 'revoked')} sx={{ fontWeight: 700, borderRadius: 2 }}>
+                                Revoke
+                              </Button>
+                            )}
+                            {sub.status === 'pending' && (
+                              <Button variant="outlined" color="warning" size="small" onClick={() => handleApproveClick(sub.id, 'rejected')} sx={{ fontWeight: 700, borderRadius: 2 }}>
+                                Reject
                               </Button>
                             )}
                           </TableCell>

@@ -85,20 +85,18 @@ class CategorySubmissionMutations
 
         // ID format: {categoryId}_{recordId} (for bulk) OR just an integer for normal user submissions
         if (!str_contains($args['id'], '_')) {
-            // Normal user submission!
+            // Normal user submission — always update status, NEVER delete (keep history)
             $submission = CategorySubmission::find($args['id']);
             if (!$submission) {
                 throw new Exception("Submission not found.");
             }
-            if ($args['status'] === 'rejected') {
-                $submission->delete();
-            } else {
-                $submission->update(['status' => $args['status']]);
-            }
+            // Map 'revoked' → set status to revoked, keep visible in history as greyed-out
+            $submission->update(['status' => $args['status']]);
             return [
                 'id' => $args['id'],
                 'status' => $args['status']
             ];
+
         }
 
         $parts = explode('_', $args['id']);

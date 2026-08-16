@@ -232,6 +232,11 @@ class CategoryDataUploadController extends Controller
         if ($tableExists) {
         $query = DB::table($tableName);
 
+        // Only show approved bulk records on the public GN page
+        if (Schema::hasColumn($tableName, 'is_approved')) {
+            $query->where($tableName . '.is_approved', true);
+        }
+
         // Optional filtering by specific GN/DS/District (mapped)
         if ($request->has('district_id') && $request->input('district_id')) {
             $query->where($tableName . '.district_id', $request->input('district_id'));

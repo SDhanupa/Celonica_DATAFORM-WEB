@@ -9,10 +9,29 @@ class CategorySubmissionQueries
     private function ensureSuperAdmin()
     {
         $admin = request()->get('current_admin');
-        if (!$admin || !in_array($admin->role, ['super_admin'])) {
-            throw new \GraphQL\Error\Error('Super Admin access required');
+        if ($admin && in_array($admin->role, ['super_admin', 'admin', 'moderator'])) {
+            return; // Authenticated as DB admin
         }
+        throw new \GraphQL\Error\Error('Admin access required');
     }
+
+    private function collectCategoryDescendants($categoryId): array
+    {
+        $all = \App\Models\Category::all();
+        $ids = [$categoryId];
+        $hasMore = true;
+        while ($hasMore) {
+            $hasMore = false;
+            foreach ($all as $cat) {
+                if (in_array($cat->parent_id, $ids) && !in_array($cat->id, $ids)) {
+                    $ids[] = $cat->id;
+                    $hasMore = true;
+                }
+            }
+        }
+        return $ids;
+    }
+
 
     private function fetchFromDynamicTables($categoryId, $filters = [])
     {
