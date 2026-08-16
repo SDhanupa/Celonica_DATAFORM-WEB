@@ -35,21 +35,24 @@ class CategorySubmissionQueries
 
     private function fetchFromDynamicTables($categoryId, $filters = [])
     {
-        $categories = \App\Models\Category::all();
-        $categoryIds = [$categoryId];
-        
-        $hasMore = true;
-        while ($hasMore) {
-            $hasMore = false;
-            foreach ($categories as $cat) {
-                if (in_array($cat->parent_id, $categoryIds) && !in_array($cat->id, $categoryIds)) {
-                    $categoryIds[] = $cat->id;
-                    $hasMore = true;
-                }
-            }
+        // Collect all descendant IDs in one SQL query (avoids N+1 on large trees)
+        $descendantRows = \Illuminate\Support\Facades\DB::select("
+            WITH RECURSIVE cat_tree AS (
+                SELECT id FROM categories WHERE id = ?
+                UNION ALL
+                SELECT c.id FROM categories c INNER JOIN cat_tree t ON c.parent_id = t.id
+            )
+            SELECT id FROM cat_tree
+        ", [$categoryId]);
+
+        $categoryIds = array_column($descendantRows, 'id');
+        if (empty($categoryIds)) {
+            $categoryIds = [$categoryId];
         }
 
-        // Get leaf categories only
+        $categories = \App\Models\Category::all();
+
+        // Get leaf categories only (those without children)
         $leafCategories = $categories->filter(function($c) use ($categoryIds, $categories) {
             return in_array($c->id, $categoryIds) && !$categories->where('parent_id', $c->id)->count();
         });

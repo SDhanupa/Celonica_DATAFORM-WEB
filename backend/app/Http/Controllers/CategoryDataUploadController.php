@@ -391,12 +391,23 @@ class CategoryDataUploadController extends Controller
         ]);
     }
 
+    /**
+     * Collect all descendant category IDs using a single recursive SQL CTE.
+     * This avoids N+1 queries on large category trees (34k+ rows).
+     */
     private function collectDescendantIds($parentId, &$ids)
     {
-        $children = DB::table('categories')->where('parent_id', $parentId)->pluck('id');
-        foreach ($children as $childId) {
-            $ids[] = $childId;
-            $this->collectDescendantIds($childId, $ids);
+        $results = DB::select("
+            WITH RECURSIVE cat_tree AS (
+                SELECT id FROM categories WHERE parent_id = ?
+                UNION ALL
+                SELECT c.id FROM categories c INNER JOIN cat_tree t ON c.parent_id = t.id
+            )
+            SELECT id FROM cat_tree
+        ", [$parentId]);
+
+        foreach ($results as $row) {
+            $ids[] = $row->id;
         }
     }
 

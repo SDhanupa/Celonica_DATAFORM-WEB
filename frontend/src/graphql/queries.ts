@@ -144,6 +144,9 @@ export const GET_CATEGORIES = gql`
       imagePath
       sortOrder
       progress
+      parent {
+        id
+      }
       children {
         id
         slug
