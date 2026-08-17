@@ -27,6 +27,12 @@ class CategoryQueries
                 return null; // Admins or guests: return null (field is now nullable)
             }
 
+            // Skip progress calculation for admins (they don't need it and it's slow)
+            $roles = $user['realm_roles'] ?? [];
+            if (in_array('super_admin', $roles) || in_array('admin', $roles) || in_array('moderator', $roles)) {
+                return null; 
+            }
+
             $categoryIds = $this->getAllCategoryIds($category);
 
             $totalQuestions = \App\Models\Question::whereIn('category_id', $categoryIds)

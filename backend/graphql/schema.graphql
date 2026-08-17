@@ -448,8 +448,8 @@ type GramaNiladhari {
     dsTa: String @rename(attribute: "ds_ta")
     police: Police @hasOne
     postOffice: PostOffice @belongsTo
-    pGn: PGn @hasOne
-    pDistrict: PDistrict @belongsTo
+    pGn: PGn @hasOne @cache(maxAge: 86400)
+    pDistrict: PDistrict @belongsTo @cache(maxAge: 86400)
     gnEconomy: GnEconomy @hasOne
     housingOwnershipStatus: HousingOwnershipStatus @hasOne
     housingWallType: HousingWallType @hasOne
@@ -723,7 +723,7 @@ type PDistrict {
     populationMale: Int
     populationFemale: Int
     pProvince: PProvince @belongsTo
-    gramaNiladharis: [GramaNiladhari!] @hasMany
+    gramaNiladharis: [GramaNiladhari!] @hasMany @cache(maxAge: 86400)
 }
 
 type PGn {

@@ -42,12 +42,18 @@ class SyncLocationData extends Command
             $this->info("  Found " . $records->count() . " unmapped records.");
 
             $updatedCount = 0;
+            
+            // OPTIMIZATION: Index the GNs by CCODE, code, and id for O(1) lookups!
+            $gnsByCcode = $gns->keyBy('CCODE');
+            $gnsByCode = $gns->keyBy('code');
+            $gnsById = $gns->keyBy('id');
+
             foreach ($records as $record) {
                 $matchedGn = null;
                 if ($record->gn_id) {
-                    $matchedGn = $gns->first(function($g) use ($record) {
-                        return $g->CCODE === $record->gn_id || $g->code === $record->gn_id || (string)$g->id === $record->gn_id;
-                    });
+                    $matchedGn = $gnsByCcode->get($record->gn_id) 
+                              ?? $gnsByCode->get($record->gn_id) 
+                              ?? $gnsById->get($record->gn_id);
                 }
 
                 DB::table($tableName)->where('id', $record->id)->update([
