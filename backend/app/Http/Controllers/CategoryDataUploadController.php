@@ -880,13 +880,11 @@ class CategoryDataUploadController extends Controller
         if (!$regNumber) {
             $gnCode = $payload['gn_code'] ?? null;
             if (!$gnCode && !empty($payload['raw_gn'])) {
-                $gn = DB::table('grama_niladharis')
-                    ->where('name_en', $payload['raw_gn'])
-                    ->orWhere('name_si', $payload['raw_gn'])
-                    ->orWhere('name_ta', $payload['raw_gn'])
-                    ->orWhere('code', $payload['raw_gn'])
-                    ->orWhere('CCODE', $payload['raw_gn'])
-                    ->first();
+                $gn = $this->resolveGramaNiladhari(
+                    $payload['raw_gn'],
+                    $payload['raw_ds'] ?? null,
+                    $payload['raw_district'] ?? null
+                );
                 $gnCode = $gn ? ($gn->CCODE ?: $gn->code) : null;
             }
 
@@ -1081,15 +1079,9 @@ class CategoryDataUploadController extends Controller
             }
         }
 
-        // Look up GN code from grama_niladharis using resolved gn_name
+        // Look up GN code from grama_niladharis using resolved gn_name, falling back with DS division and District
         $gnName = trim($row->gn_name);
-        $gn = DB::table('grama_niladharis')
-            ->where('name_en', $gnName)
-            ->orWhere('name_si', $gnName)
-            ->orWhere('name_ta', $gnName)
-            ->orWhere('code', $gnName)
-            ->orWhere('CCODE', $gnName)
-            ->first();
+        $gn = $this->resolveGramaNiladhari($gnName, $row->ds_name, $row->district_name, $row->gn_id ?? null);
 
         if (!$gn) {
             return response()->json([
@@ -1133,4 +1125,119 @@ class CategoryDataUploadController extends Controller
             'message'    => "Reg number generated: {$regNumber}"
         ]);
     }
+
+    /**
+     * Resolve a Grama Niladhari division by ID, code, or name (case-insensitive) using a fallback chain
+     * to narrow down the correct CCODE in case of duplicate or slightly misspelled names.
+     */
+    private function resolveGramaNiladhari($gnName, $dsName = null, $districtName = null, $gnId = null, $gnCode = null)
+    {
+        // 1. Resolve by ID if provided
+        if (!empty($gnId)) {
+            $match = DB::table('grama_niladharis')->where('id', $gnId)->first();
+            if ($match) {
+                return $match;
+            }
+        }
+
+        // 2. Resolve by exact Code/CCODE if provided
+        if (!empty($gnCode)) {
+            $match = DB::table('grama_niladharis')
+                ->where('code', trim($gnCode))
+                ->orWhere('CCODE', trim($gnCode))
+                ->first();
+            if ($match) {
+                return $match;
+            }
+        }
+
+        $gnClean = strtolower(trim($gnName));
+        if (empty($gnClean)) {
+            return null;
+        }
+
+        // 3. Attempt: Exact GN + DS + District (most specific)
+        if (!empty($dsName) && !empty($districtName)) {
+            $dsClean = strtolower(trim($dsName));
+            $distClean = strtolower(trim($districtName));
+
+            $match = DB::table('grama_niladharis')
+                ->where(function($q) use ($gnClean) {
+                    $q->whereRaw('LOWER(name_en) = ?', [$gnClean])
+                      ->orWhereRaw('LOWER(name_si) = ?', [$gnClean])
+                      ->orWhereRaw('LOWER(name_ta) = ?', [$gnClean]);
+                })
+                ->where(function($q) use ($dsClean) {
+                    $q->whereRaw('LOWER(ds_en) = ?', [$dsClean])
+                      ->orWhereRaw('LOWER(ds_si) = ?', [$dsClean])
+                      ->orWhereRaw('LOWER(ds_ta) = ?', [$dsClean]);
+                })
+                ->where(function($q) use ($distClean) {
+                    $q->whereRaw('LOWER(dis_en) = ?', [$distClean])
+                      ->orWhereRaw('LOWER(dis_si) = ?', [$distClean])
+                      ->orWhereRaw('LOWER(dis_ta) = ?', [$distClean]);
+                })
+                ->first();
+
+            if ($match) {
+                return $match;
+            }
+        }
+
+        // 4. Attempt: Exact GN + DS
+        if (!empty($dsName)) {
+            $dsClean = strtolower(trim($dsName));
+
+            $match = DB::table('grama_niladharis')
+                ->where(function($q) use ($gnClean) {
+                    $q->whereRaw('LOWER(name_en) = ?', [$gnClean])
+                      ->orWhereRaw('LOWER(name_si) = ?', [$gnClean])
+                      ->orWhereRaw('LOWER(name_ta) = ?', [$gnClean]);
+                })
+                ->where(function($q) use ($dsClean) {
+                    $q->whereRaw('LOWER(ds_en) = ?', [$dsClean])
+                      ->orWhereRaw('LOWER(ds_si) = ?', [$dsClean])
+                      ->orWhereRaw('LOWER(ds_ta) = ?', [$dsClean]);
+                })
+                ->first();
+
+            if ($match) {
+                return $match;
+            }
+        }
+
+        // 5. Attempt: Exact GN name / code / CCODE only (case-insensitive)
+        $match = DB::table('grama_niladharis')
+            ->where(function($q) use ($gnClean) {
+                $q->whereRaw('LOWER(name_en) = ?', [$gnClean])
+                  ->orWhereRaw('LOWER(name_si) = ?', [$gnClean])
+                  ->orWhereRaw('LOWER(name_ta) = ?', [$gnClean])
+                  ->orWhereRaw('LOWER(code) = ?', [$gnClean])
+                  ->orWhereRaw('LOWER("CCODE") = ?', [$gnClean]);
+            })
+            ->first();
+
+        if ($match) {
+            return $match;
+        }
+
+        // 6. Attempt: Fuzzy search (wildcard vowels) + DS
+        $wildcard = preg_replace('/[aeiou]/i', '_', $gnClean);
+        if (!empty($dsName)) {
+            $dsClean = strtolower(trim($dsName));
+            $match = DB::table('grama_niladharis')
+                ->whereRaw('LOWER(name_en) LIKE ?', [$wildcard])
+                ->whereRaw('LOWER(ds_en) = ?', [$dsClean])
+                ->first();
+            if ($match) {
+                return $match;
+            }
+        }
+
+        // 7. Attempt: Fuzzy search (wildcard vowels) GN name only
+        return DB::table('grama_niladharis')
+            ->whereRaw('LOWER(name_en) LIKE ?', [$wildcard])
+            ->first();
+    }
 }
+
