@@ -230,7 +230,7 @@ type Category {
     descriptionTa: String @rename(attribute: "description_ta")
     imagePath: String @rename(attribute: "image_path")
     sortOrder: Int! @rename(attribute: "sort_order")
-    progress: Float! @field(resolver: "App\\GraphQL\\Queries\\CategoryQueries@progress")
+    progress: Float @field(resolver: "App\\GraphQL\\Queries\\CategoryQueries@progress")
     createdAt: DateTime! @rename(attribute: "created_at")
     updatedAt: DateTime @rename(attribute: "updated_at")
 }

@@ -57,8 +57,10 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
   const isSuperAdmin = roles.includes('super_admin');
   const isAdmin = roles.includes('super_admin') || roles.includes('admin') || roles.includes('moderator');
 
-  const { data, loading, error } = useQuery(GET_CATEGORY_BY_SLUG, {
+  const { data, loading, error, refetch } = useQuery(GET_CATEGORY_BY_SLUG, {
     variables: { slug },
+    errorPolicy: 'all',
+    notifyOnNetworkStatusChange: true,
   });
 
   const parentCategory = data?.categoryBySlug;
@@ -223,7 +225,12 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
   };
 
   if (loading) return <Box sx={{ p: 4, display: 'flex', justifyContent: 'center' }}><CircularProgress /></Box>;
-  if (error || !parentCategory) return <Typography color="error">Failed to load category.</Typography>;
+  if (error || !parentCategory) return (
+    <Box sx={{ p: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+      <Typography color="error">Failed to load category. Please try again.</Typography>
+      <Button variant="contained" onClick={() => refetch()}>Retry</Button>
+    </Box>
+  );
 
   const categories = parentCategory.children || [];
 

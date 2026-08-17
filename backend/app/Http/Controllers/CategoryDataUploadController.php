@@ -429,6 +429,31 @@ class CategoryDataUploadController extends Controller
 
     public function updateData(Request $request, $slug, $id)
     {
+        // Handle user submissions (id prefixed with 'sub_')
+        if (str_starts_with((string)$id, 'sub_')) {
+            $submissionId = substr((string)$id, 4);
+            $submission = \App\Models\CategorySubmission::find($submissionId);
+            if (!$submission) {
+                return response()->json(['success' => false, 'message' => 'Submission not found.'], 404);
+            }
+
+            // Merge editable fields into the answers_data JSON
+            $answers = json_decode($submission->answers_data, true) ?: [];
+            $fields = $request->only(['name_en', 'name_si', 'name_ta', 'mobile', 'contact_person_name', 'address']);
+            if (isset($fields['name_en']))            $answers['Name (EN)']       = $fields['name_en'];
+            if (isset($fields['name_si']))            $answers['Name (SI)']       = $fields['name_si'];
+            if (isset($fields['name_ta']))            $answers['Name (TA)']       = $fields['name_ta'];
+            if (isset($fields['mobile']))             $answers['Mobile']          = $fields['mobile'];
+            if (isset($fields['contact_person_name'])) $answers['Contact Person'] = $fields['contact_person_name'];
+            if (isset($fields['address']))            $answers['Address']         = $fields['address'];
+
+            $submission->answers_data = json_encode($answers);
+            $submission->save();
+
+            return response()->json(['success' => true, 'message' => 'Submission updated successfully.']);
+        }
+
+        // Handle bulk uploaded data
         $tableName = 'category_data_' . str_replace('-', '_', $slug);
 
         if (!Schema::hasTable($tableName)) {
@@ -458,10 +483,21 @@ class CategoryDataUploadController extends Controller
 
     public function deleteData($slug, $id)
     {
+        // Handle user submissions (id prefixed with 'sub_')
+        if (str_starts_with((string)$id, 'sub_')) {
+            $submissionId = substr((string)$id, 4); // strip 'sub_' prefix
+            $deleted = \App\Models\CategorySubmission::where('id', $submissionId)->delete();
+            if ($deleted) {
+                return response()->json(['success' => true, 'message' => 'Submission deleted successfully.']);
+            }
+            return response()->json(['success' => false, 'message' => 'Submission not found.'], 404);
+        }
+
+        // Handle bulk uploaded data
         $tableName = 'category_data_' . str_replace('-', '_', $slug);
 
         if (!Schema::hasTable($tableName)) {
-            return response()->json(['success' => false, 'message' => 'Table not found.'], 404);
+            return response()->json(['success' => false, 'message' => 'No data table exists for this category yet.'], 404);
         }
 
         $deleted = DB::table($tableName)->where('id', $id)->delete();
@@ -476,35 +512,51 @@ class CategoryDataUploadController extends Controller
     public function bulkDeleteData(Request $request, $slug)
     {
         \Illuminate\Support\Facades\Log::info('bulkDeleteData hit', ['slug' => $slug, 'ids' => $request->input('ids')]);
-        
-        $tableName = 'category_data_' . str_replace('-', '_', $slug);
-
-        if (!Schema::hasTable($tableName)) {
-            \Illuminate\Support\Facades\Log::info('Table not found: ' . $tableName);
-            return response()->json(['success' => false, 'message' => 'Table not found.'], 404);
-        }
 
         $ids = $request->input('ids');
         if (!is_array($ids) || count($ids) === 0) {
-            \Illuminate\Support\Facades\Log::info('No IDs provided');
             return response()->json(['success' => false, 'message' => 'No IDs provided.'], 400);
         }
 
-        try {
-            $deleted = DB::table($tableName)->whereIn('id', $ids)->delete();
-            \Illuminate\Support\Facades\Log::info('Deleted count: ' . $deleted);
-
-            return response()->json([
-                'success' => true, 
-                'message' => $deleted . ' records deleted successfully.'
-            ]);
-        } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Bulk delete failed: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Server error during deletion: ' . $e->getMessage()
-            ], 500);
+        // Separate sub_ IDs (user submissions) from bulk data IDs
+        $subIds = [];
+        $bulkIds = [];
+        foreach ($ids as $id) {
+            if (str_starts_with((string)$id, 'sub_')) {
+                $subIds[] = substr((string)$id, 4);
+            } else {
+                $bulkIds[] = $id;
+            }
         }
+
+        $totalDeleted = 0;
+
+        // Delete user submissions
+        if (!empty($subIds)) {
+            $totalDeleted += \App\Models\CategorySubmission::whereIn('id', $subIds)->delete();
+        }
+
+        // Delete bulk data records
+        if (!empty($bulkIds)) {
+            $tableName = 'category_data_' . str_replace('-', '_', $slug);
+            if (Schema::hasTable($tableName)) {
+                try {
+                    $totalDeleted += DB::table($tableName)->whereIn('id', $bulkIds)->delete();
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('Bulk delete failed: ' . $e->getMessage());
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Server error during deletion: ' . $e->getMessage()
+                    ], 500);
+                }
+            }
+        }
+
+        \Illuminate\Support\Facades\Log::info('Deleted count: ' . $totalDeleted);
+        return response()->json([
+            'success' => true,
+            'message' => $totalDeleted . ' records deleted successfully.'
+        ]);
     }
 
     public function uploadImage(Request $request, $slug, $id)
@@ -597,7 +649,7 @@ class CategoryDataUploadController extends Controller
         if ($request->has('province') && $request->query('province')) {
             $val = trim(str_ireplace(' Province', '', $request->query('province')));
             $dbQuery->where(function($q) use ($val) {
-                $q->where('raw_province', 'ilike', '%' . $val . '%')
+                $q->where('raw_province', 'LIKE', '%' . $val . '%')
                   ->orWhereNull('raw_province')
                   ->orWhere('raw_province', '');
             });
@@ -606,7 +658,7 @@ class CategoryDataUploadController extends Controller
         if ($request->has('district') && $request->query('district')) {
             $val = trim(str_ireplace(' District', '', $request->query('district')));
             $dbQuery->where(function($q) use ($val) {
-                $q->where('raw_district', 'ilike', '%' . $val . '%')
+                $q->where('raw_district', 'LIKE', '%' . $val . '%')
                   ->orWhereNull('raw_district')
                   ->orWhere('raw_district', '');
             });
@@ -615,7 +667,7 @@ class CategoryDataUploadController extends Controller
         if ($request->has('ds') && $request->query('ds')) {
             $val = $request->query('ds');
             $dbQuery->where(function($q) use ($val) {
-                $q->where('raw_ds', 'ilike', '%' . $val . '%')
+                $q->where('raw_ds', 'LIKE', '%' . $val . '%')
                   ->orWhereNull('raw_ds')
                   ->orWhere('raw_ds', '');
             });
@@ -624,7 +676,7 @@ class CategoryDataUploadController extends Controller
         if ($request->has('gn') && $request->query('gn')) {
             $val = $request->query('gn');
             $dbQuery->where(function($q) use ($val) {
-                $q->where('raw_gn', 'ilike', '%' . $val . '%')
+                $q->where('raw_gn', 'LIKE', '%' . $val . '%')
                   ->orWhereNull('raw_gn')
                   ->orWhere('raw_gn', '');
             });
@@ -637,16 +689,20 @@ class CategoryDataUploadController extends Controller
 
         if (!empty($query)) {
             $dbQuery->where(function($q) use ($query) {
-                $q->where('name_en', 'ilike', '%' . $query . '%')
-                  ->orWhere('name_si', 'ilike', '%' . $query . '%')
-                  ->orWhere('name_ta', 'ilike', '%' . $query . '%')
-                  ->orWhere('reg_number', 'ilike', '%' . $query . '%');
+                $q->where('name_en', 'LIKE', '%' . $query . '%')
+                  ->orWhere('name_si', 'LIKE', '%' . $query . '%')
+                  ->orWhere('name_ta', 'LIKE', '%' . $query . '%')
+                  ->orWhere('reg_number', 'LIKE', '%' . $query . '%');
             });
         }
 
-        $results = $dbQuery->limit(50)->get();
-
-        return response()->json(['success' => true, 'data' => $results]);
+        try {
+            $results = $dbQuery->limit(50)->get();
+            return response()->json(['success' => true, 'data' => $results]);
+        } catch (\Throwable $e) {
+            error_log('[searchCategoryData] Query error slug=' . $slug . ': ' . $e->getMessage());
+            return response()->json(['success' => false, 'data' => [], 'message' => $e->getMessage()], 500);
+        }
     }
 
     public function submitSurveyData(Request $request, $slug)

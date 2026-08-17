@@ -8,6 +8,7 @@ import MyLocationIcon from '@mui/icons-material/MyLocation';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { GET_GN_BY_COORDINATES, GET_P_DISTRICTS, GET_P_DISTRICT_WITH_GNS } from '../graphql/queries';
+import { useAuth } from '../auth/AuthProvider';
 
 interface FormData {
   reg_number: string;
@@ -35,6 +36,7 @@ interface SurveyPageProps {
 
 const SurveyPage: React.FC<SurveyPageProps> = ({ slug }) => {
   const navigate = useNavigate();
+  const { token } = useAuth();
   
   const [formData, setFormData] = useState<FormData>({
     reg_number: '', name_en: '', name_si: '', name_ta: '', name_singlish: '',
@@ -81,7 +83,7 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug }) => {
           if (formData.raw_gn) params.append('gn', formData.raw_gn);
 
           const res = await fetch(`/api/search-category-data/${slug}?${params.toString()}`, {
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            headers: { 'Authorization': `Bearer ${token}` }
           });
           const json = await res.json();
           if (json.success) setNameOptions(json.data);
@@ -239,7 +241,7 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug }) => {
     try {
       const res = await fetch('/api/upload-survey-image', {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+        headers: { 'Authorization': `Bearer ${token}` },
         body: form
       });
       const data = await res.json();
@@ -267,7 +269,7 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(formData)
       });
@@ -314,12 +316,24 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug }) => {
             onChange={(e, val) => handleNameSelect(val)}
             renderInput={(params) => <TextField {...params} label="Search or Enter Name (EN/SI/TA)" fullWidth />}
           />
-          {(!formData.name_si || !formData.name_ta) && (
-             <Box sx={{ display: 'flex', gap: 2 }}>
-               <TextField label="Name (SI)" fullWidth value={formData.name_si} onChange={(e) => setFormData(f => ({...f, name_si: e.target.value}))} />
-               <TextField label="Name (TA)" fullWidth value={formData.name_ta} onChange={(e) => setFormData(f => ({...f, name_ta: e.target.value}))} />
-             </Box>
-          )}
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <TextField
+              label="Name (SI)"
+              fullWidth
+              value={formData.name_si}
+              onChange={(e) => setFormData(f => ({...f, name_si: e.target.value}))}
+              helperText={formData.name_si ? "Auto-filled — edit if incorrect" : ""}
+              FormHelperTextProps={{ sx: { color: 'info.main', fontSize: '0.72rem' } }}
+            />
+            <TextField
+              label="Name (TA)"
+              fullWidth
+              value={formData.name_ta}
+              onChange={(e) => setFormData(f => ({...f, name_ta: e.target.value}))}
+              helperText={formData.name_ta ? "Auto-filled — edit if incorrect" : ""}
+              FormHelperTextProps={{ sx: { color: 'info.main', fontSize: '0.72rem' } }}
+            />
+          </Box>
 
           <TextField label="Mobile" fullWidth value={formData.mobile} onChange={(e) => setFormData(f => ({...f, mobile: e.target.value}))} />
           <TextField label="Contact Person Name" fullWidth value={formData.contact_person_name} onChange={(e) => setFormData(f => ({...f, contact_person_name: e.target.value}))} />

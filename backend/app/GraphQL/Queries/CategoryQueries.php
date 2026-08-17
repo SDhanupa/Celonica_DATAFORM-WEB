@@ -21,34 +21,35 @@ class CategoryQueries
 
     public function progress(Category $category, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
-        $user = request()->get('current_user');
-        if (!$user) {
-            return 0; // Admins or guests see 0 progress
+        try {
+            $user = request()->get('current_user');
+            if (!$user) {
+                return null; // Admins or guests: return null (field is now nullable)
+            }
+
+            $categoryIds = $this->getAllCategoryIds($category);
+
+            $totalQuestions = \App\Models\Question::whereIn('category_id', $categoryIds)
+                ->where('is_active', true)
+                ->count();
+
+            if ($totalQuestions === 0) {
+                return 100.0; // If no questions, it's 100% complete
+            }
+
+            $answeredQuestions = \App\Models\UserAnswer::where('user_id', $user->id)
+                ->whereHas('question', function ($q) use ($categoryIds) {
+                    $q->whereIn('category_id', $categoryIds)
+                      ->where('is_active', true);
+                })
+                ->distinct('question_id')
+                ->count('question_id');
+
+            return ($answeredQuestions / $totalQuestions) * 100;
+        } catch (\Throwable $e) {
+            error_log('[CategoryQueries@progress] Error: ' . $e->getMessage());
+            return null; // Don't crash the whole query on progress failure
         }
-
-        // Get all questions under this category (and its subcategories ideally, but for now just this category)
-        // Wait, if it's a parent category, we should count all questions in all its subcategories.
-        $categoryIds = $this->getAllCategoryIds($category);
-
-        $totalQuestions = \App\Models\Question::whereIn('category_id', $categoryIds)
-            ->where('is_active', true)
-            ->count();
-
-        if ($totalQuestions === 0) {
-            return 100; // If no questions, it's 100% complete
-        }
-
-        $answeredQuestions = \App\Models\UserAnswer::where('user_id', $user->id)
-            ->whereHas('question', function ($q) use ($categoryIds) {
-                $q->whereIn('category_id', $categoryIds)
-                  ->where('is_active', true);
-            })
-            // A user might have multiple iterations of the same question, but we just care if they answered AT LEAST ONE iteration.
-            // Distinct question_id gives us the count of unique questions answered.
-            ->distinct('question_id')
-            ->count('question_id');
-
-        return ($answeredQuestions / $totalQuestions) * 100;
     }
 
     private function getAllCategoryIds(Category $category)
