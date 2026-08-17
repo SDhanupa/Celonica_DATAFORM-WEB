@@ -86,101 +86,187 @@ const FastBigCardItem = ({ item, idx, tc, catColor, qMap }: any) => {
 
   const hasMap = item.latitude && item.longitude;
 
+  const namesList = [];
+  if (item.name_en) namesList.push(item.name_en);
+  if (item.name_si) namesList.push(item.name_si);
+  if (item.name_ta) namesList.push(item.name_ta);
+  const namesText = namesList.join(' • ');
+
+  const dateText = item.created_at 
+    ? new Date(item.created_at).toLocaleDateString('en-US') 
+    : '';
+
+  const imageSrc = item.image_path 
+    ? `/api/uploads/category_images/${item.image_path}`
+    : null;
+
   return (
     <>
       <Grid item xs={12} md={6} key={item.id}>
         <Paper
           elevation={0}
           sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
             bgcolor: tc.card,
-            border: `1.5px solid ${tc.border}`,
-            borderRadius: 4,
-            overflow: 'hidden',
-            transition: 'all 0.3s',
-            position: 'relative',
-            '&::before': { content: '""', position: 'absolute', top: 0, left: 0, width: 4, height: '100%', bgcolor: catColor },
-            '&:hover': { boxShadow: '0 12px 32px rgba(0,0,0,0.08)', transform: 'translateY(-2px)' },
+            border: `1px solid ${tc.border}`,
+            borderRadius: 3,
+            p: 1.5,
+            transition: 'all 0.2s',
+            '&:hover': {
+              boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+              borderColor: catColor,
+            },
           }}
         >
-          <Box sx={{ px: 3, py: 1.5, borderBottom: `1px solid ${tc.border}`, bgcolor: `${catColor}06`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: catColor }}>
-              {title}
+          {/* Left & Middle combined names and image */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1, minWidth: 0 }}>
+            {/* Title / Main Name */}
+            <Typography
+              sx={{
+                fontWeight: 600,
+                fontSize: '0.95rem',
+                color: tc.text,
+                minWidth: '120px',
+                maxWidth: '220px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {item.name_en || item.name_si || item.name_ta || `#${idx + 1}`}
             </Typography>
-            <Typography sx={{ fontSize: '0.75rem', color: tc.muted }}>
-              {item.reg_number || (item.created_at ? new Date(item.created_at).toLocaleDateString() : '')}
-            </Typography>
+
+            {/* Thumbnail Image */}
+            <Box
+              sx={{
+                width: 48,
+                height: 48,
+                borderRadius: 2,
+                overflow: 'hidden',
+                bgcolor: 'rgba(0,0,0,0.04)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                border: `1px solid ${tc.border}`
+              }}
+            >
+              {imageSrc ? (
+                <Box
+                  component="img"
+                  src={imageSrc}
+                  alt="thumbnail"
+                  sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              ) : (
+                <Typography sx={{ fontSize: '1.2rem' }}>
+                  📍
+                </Typography>
+              )}
+            </Box>
+
+            {/* Combined Names stacked vertically with bullets for Sinhala/Tamil */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, gap: 0.3 }}>
+              {item.name_en && (
+                <Typography
+                  sx={{
+                    fontSize: '0.88rem',
+                    fontWeight: 650,
+                    color: tc.text,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {item.name_en}
+                </Typography>
+              )}
+              {item.name_si && (
+                <Typography
+                  sx={{
+                    fontSize: '0.84rem',
+                    color: tc.muted,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  • {item.name_si}
+                </Typography>
+              )}
+              {item.name_ta && (
+                <Typography
+                  sx={{
+                    fontSize: '0.84rem',
+                    color: tc.muted,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  • {item.name_ta}
+                </Typography>
+              )}
+              {!item.name_en && !item.name_si && !item.name_ta && (
+                <Typography sx={{ fontSize: '0.85rem', color: tc.muted }}>
+                  -
+                </Typography>
+              )}
+            </Box>
           </Box>
 
-          {answers.find(a => a.question === 'Image') && (
-            <Box
-              component="img"
-              src={`/api/uploads/category_images/${answers.find(a => a.question === 'Image')?.answer}`}
-              alt="Submission Image"
-              sx={{ width: '100%', height: 160, objectFit: 'cover' }}
-            />
-          )}
-
-          <TableContainer>
-            <Table size="small">
-              <TableBody>
-                {visibleAnswers.map((a, aIdx) => (
-                  <TableRow key={aIdx} sx={{ '&:last-child td': { borderBottom: 0 } }}>
-                    <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: tc.muted, width: '40%', borderBottom: `1px solid ${tc.border}`, py: 1.5 }}>
-                      {a.question}
-                    </TableCell>
-                    <TableCell sx={{ fontSize: '0.88rem', color: tc.text, fontWeight: 500, borderBottom: `1px solid ${tc.border}`, py: 1.5, wordBreak: 'break-word' }}>
-                      {a.answer}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-
-          <Box sx={{ px: 2, py: 1.5, display: 'flex', gap: 1, flexWrap: 'wrap', bgcolor: 'rgba(0,0,0,0.02)', borderTop: `1px solid ${tc.border}` }}>
-            <Button
-              size="small"
-              onClick={() => setDialogOpen(true)}
-              sx={{ color: catColor, textTransform: 'none', fontWeight: 600, fontSize: '0.8rem' }}
-            >
-              📋 View All Details
-            </Button>
-            {hasMap && (
-              <Button
-                size="small"
-                onClick={() => window.open(`https://maps.google.com/?q=${item.latitude},${item.longitude}`, '_blank')}
-                sx={{ color: '#10b981', textTransform: 'none', fontWeight: 600, fontSize: '0.8rem' }}
-              >
-                📍 Show on Map
-              </Button>
+          {/* Right Section (Date and View All link) */}
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 0.5, pl: 2, flexShrink: 0 }}>
+            {dateText && (
+              <Typography sx={{ fontSize: '0.78rem', color: tc.muted, fontWeight: 500 }}>
+                {dateText}
+              </Typography>
             )}
+            <Typography
+              onClick={() => setDialogOpen(true)}
+              sx={{
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                color: catColor,
+                cursor: 'pointer',
+                transition: 'opacity 0.2s',
+                '&:hover': {
+                  opacity: 0.8,
+                  textDecoration: 'underline'
+                }
+              }}
+            >
+              View All
+            </Typography>
           </Box>
         </Paper>
       </Grid>
 
       {/* Popup Dialog for All Details */}
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle sx={{ fontWeight: 800, color: tc.text, borderBottom: `1px solid ${tc.border}` }}>
-          {title}
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
+        <DialogTitle sx={{ fontWeight: 850, color: tc.text, borderBottom: `1px solid ${tc.border}`, px: 3, py: 2 }}>
+          {item.name_en || item.name_si || item.name_ta || `#${idx + 1}`}
         </DialogTitle>
         <DialogContent sx={{ p: 0 }}>
-          {answers.find(a => a.question === 'Image') && (
+          {imageSrc && (
             <Box
               component="img"
-              src={`/api/uploads/category_images/${answers.find(a => a.question === 'Image')?.answer}`}
+              src={imageSrc}
               alt="Submission Image"
-              sx={{ width: '100%', maxHeight: 400, objectFit: 'contain', bgcolor: '#000' }}
+              sx={{ width: '100%', maxHeight: 320, objectFit: 'contain', bgcolor: '#000' }}
             />
           )}
           <TableContainer>
-            <Table size="small">
+            <Table size="medium">
               <TableBody>
                 {displayAnswers.map((a, aIdx) => (
-                  <TableRow key={aIdx}>
-                    <TableCell sx={{ fontWeight: 600, fontSize: '0.85rem', color: tc.muted, width: '35%', py: 1.5 }}>
+                  <TableRow key={aIdx} sx={{ '&:last-child td': { borderBottom: 0 } }}>
+                    <TableCell sx={{ fontWeight: 600, fontSize: '0.85rem', color: tc.muted, width: '40%', py: 1.8, pl: 3 }}>
                       {a.question}
                     </TableCell>
-                    <TableCell sx={{ fontSize: '0.9rem', color: tc.text, fontWeight: 500, py: 1.5, wordBreak: 'break-word' }}>
+                    <TableCell sx={{ fontSize: '0.9rem', color: tc.text, fontWeight: 500, py: 1.8, pr: 3, wordBreak: 'break-word' }}>
                       {a.answer}
                     </TableCell>
                   </TableRow>
@@ -189,7 +275,7 @@ const FastBigCardItem = ({ item, idx, tc, catColor, qMap }: any) => {
             </Table>
           </TableContainer>
         </DialogContent>
-        <DialogActions sx={{ borderTop: `1px solid ${tc.border}`, p: 2 }}>
+        <DialogActions sx={{ borderTop: `1px solid ${tc.border}`, p: 2, px: 3 }}>
           {hasMap && (
             <Button
               onClick={() => window.open(`https://maps.google.com/?q=${item.latitude},${item.longitude}`, '_blank')}
@@ -244,7 +330,7 @@ const FastBigCardList = ({ slug, categoryName, gnId, catColor, parentQuestions }
         <Chip label={`${data.length}`} size="small" sx={{ bgcolor: `${catColor}15`, color: catColor, fontWeight: 700, fontSize: '0.75rem' }} />
       </Box>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={1.5}>
         {data.map((item: any, idx: number) => (
           <FastBigCardItem key={item.id} item={item} idx={idx} tc={tc} catColor={catColor} qMap={qMap} />
         ))}
