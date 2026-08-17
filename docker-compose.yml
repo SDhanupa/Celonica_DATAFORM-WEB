@@ -37,7 +37,7 @@ services:
       - DB_PORT=5432
       - DB_DATABASE=celonica_db
       - DB_USERNAME=celonica_user
-      - DB_PASSWORD=celonica_pass
+      - DB_PASSWORD=Postgres1234
       - KEYCLOAK_BASE_URL=http://celonica-web-keycloak:8080
       - KEYCLOAK_PUBLIC_URL=https://auth.ceystem.com
       - KEYCLOAK_REALM=ceylonica-admin
@@ -45,7 +45,7 @@ services:
       - KEYCLOAK_ADMIN_CLIENT_ID=admin-cli
       - KEYCLOAK_ADMIN_CLIENT_SECRET=my-super-secret-keycloak-client-secret
       - FRONTEND_URL=https://ceystem.com
-      - SUPER_ADMIN_KEYCLOAK_SUB=422df1e2-4287-4ad6-bb97-f551bdad51d9
+      - SUPER_ADMIN_KEYCLOAK_SUB=51050c63-27d4-40ff-9474-fa4d2ce6a6be
       - CACHE_DRIVER=redis
       - SESSION_DRIVER=redis
       - REDIS_HOST=redis
@@ -76,7 +76,7 @@ services:
     environment:
       POSTGRES_DB: celonica_db
       POSTGRES_USER: celonica_user
-      POSTGRES_PASSWORD: celonica_pass
+      POSTGRES_PASSWORD: Postgres1234
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
