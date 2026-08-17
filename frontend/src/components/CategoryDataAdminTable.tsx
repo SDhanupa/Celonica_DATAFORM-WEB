@@ -30,9 +30,16 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
   const [recordToDelete, setRecordToDelete] = useState<any>(null);
   const [actionLoading, setActionLoading] = useState(false);
   
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Pagination state
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 50 });
+  const [totalRowCount, setTotalRowCount] = useState(0);
+
   // Bulk Delete state
   const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>([]);
   const [bulkDeleteModalOpen, setBulkDeleteModalOpen] = useState(false);
+  const [clearAllModalOpen, setClearAllModalOpen] = useState(false);
   
   // Fetch data function extracted so it can be re-used after edit/delete
   const fetchData = async () => {
@@ -45,6 +52,9 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
       if (gnId) params.append('gn_id', gnId);
       if (filterType === 'mapped') params.append('mapped_only', 'true');
       if (filterType === 'unmapped') params.append('unmapped_only', 'true');
+      if (searchQuery) params.append('search', searchQuery);
+      params.append('limit', paginationModel.pageSize.toString());
+      params.append('offset', (paginationModel.page * paginationModel.pageSize).toString());
       
       const queryString = params.toString() ? '?' + params.toString() : '';
 
@@ -66,6 +76,9 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
           id: row.id || index
         }));
         setData(rowsWithIds);
+        if (result.total !== undefined) {
+          setTotalRowCount(result.total);
+        }
       } else {
         throw new Error(result.message || 'Failed to fetch data');
       }
@@ -110,10 +123,13 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
   };
 
   useEffect(() => {
-    if (slug) {
-      fetchData();
-    }
-  }, [slug, token, districtId, dsDivisionCode, gnId]);
+    const handler = setTimeout(() => {
+      if (slug) {
+        fetchData();
+      }
+    }, 400); // 400ms debounce
+    return () => clearTimeout(handler);
+  }, [slug, token, districtId, dsDivisionCode, gnId, filterType, searchQuery, paginationModel.page, paginationModel.pageSize]);
 
   const handleDeleteClick = (row: any) => {
     setRecordToDelete(row);
@@ -138,7 +154,7 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
         setRecordToDelete(null);
         fetchData();
       } else {
-        alert('Failed to delete: ' + result.message);
+        alert('Failed to delete: ' + (result.message || result.error || JSON.stringify(result) || 'Unknown error'));
       }
     } catch (err: any) {
       alert('Error deleting: ' + err.message);
@@ -167,10 +183,36 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
         setRowSelectionModel([]);
         fetchData();
       } else {
-        alert('Failed to delete: ' + result.message);
+        alert('Failed to delete: ' + (result.message || result.error || JSON.stringify(result) || 'Unknown error'));
       }
     } catch (err: any) {
       alert('Error deleting: ' + err.message);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleClearAllSubmit = async () => {
+    try {
+      setActionLoading(true);
+      const response = await fetch(`/api/category-data/${slug}/clear-all`, {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
+        }
+      });
+      const result = await response.json();
+      if (result.success) {
+        setClearAllModalOpen(false);
+        setRowSelectionModel([]);
+        fetchData();
+        alert(result.message || 'All data cleared.');
+      } else {
+        alert('Failed to clear data: ' + (result.message || result.error || JSON.stringify(result) || 'Unknown error'));
+      }
+    } catch (err: any) {
+      alert('Error clearing data: ' + err.message);
     } finally {
       setActionLoading(false);
     }
@@ -328,67 +370,90 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
   return (
     <Box sx={{ mt: 4, mb: 4, height: 500, width: '100%' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        {categoryName ? (
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>
-            {categoryName} (Admin View)
-          </Typography>
-        ) : (
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>
-            Bulk Uploaded Data (Admin View)
-          </Typography>
-        )}
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+          {categoryName ? (
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+              {categoryName} (Admin View)
+            </Typography>
+          ) : (
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+              Bulk Uploaded Data (Admin View)
+            </Typography>
+          )}
+          
+          <TextField
+            size="small"
+            placeholder="Search keywords..."
+            variant="outlined"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            sx={{ width: 250 }}
+          />
+        </Box>
         
-        {rowSelectionModel.length > 0 && (
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          {rowSelectionModel.length > 0 && (
+            <Button 
+              variant="contained" 
+              color="error" 
+              startIcon={<DeleteIcon />}
+              onClick={() => setBulkDeleteModalOpen(true)}
+              disabled={actionLoading}
+            >
+              Delete Selected ({rowSelectionModel.length})
+            </Button>
+          )}
           <Button 
-            variant="contained" 
+            variant="outlined" 
             color="error" 
             startIcon={<DeleteIcon />}
-            onClick={() => setBulkDeleteModalOpen(true)}
-            disabled={actionLoading}
+            onClick={() => setClearAllModalOpen(true)}
+            disabled={actionLoading || data.length === 0}
           >
-            Delete Selected ({rowSelectionModel.length})
+            Clear All Data
           </Button>
-        )}
+        </Box>
       </Box>
-      <DataGrid
-        rows={data}
-        columns={columns}
-        loading={loading}
-        getRowId={(row) => row.id}
-        checkboxSelection
-        disableRowSelectionOnClick
-        onRowSelectionModelChange={(newSelectionModel) => {
-          setRowSelectionModel(newSelectionModel);
-        }}
-        rowSelectionModel={rowSelectionModel}
-        getRowClassName={(params) => {
-           if (params.row.is_approved === false) {
-             return 'unapproved-row';
-           }
-           if (params.row.coordinate_mismatch) {
-             return 'mismatch-row';
-           }
-           return '';
-        }}
-        sx={{
-          '& .unapproved-row': {
-            backgroundColor: 'rgba(255, 235, 59, 0.2)', // Yellow tint
-            '&:hover': {
-              backgroundColor: 'rgba(255, 235, 59, 0.3)',
+      <Box sx={{ height: 600, width: '100%' }}>
+        <DataGrid
+          rows={data}
+          columns={columns}
+          loading={loading}
+          getRowId={(row) => row.id}
+          checkboxSelection
+          disableRowSelectionOnClick
+          onRowSelectionModelChange={(newSelectionModel) => {
+            setRowSelectionModel(newSelectionModel);
+          }}
+          rowSelectionModel={rowSelectionModel}
+          getRowClassName={(params) => {
+             if (params.row.is_approved === false) {
+               return 'unapproved-row';
+             }
+             if (params.row.coordinate_mismatch) {
+               return 'mismatch-row';
+             }
+             return '';
+          }}
+          sx={{
+            '& .unapproved-row': {
+              backgroundColor: 'rgba(255, 235, 59, 0.2)', // Yellow tint
+              '&:hover': {
+                backgroundColor: 'rgba(255, 235, 59, 0.3)',
+              },
             },
-          },
-          '& .mismatch-row': {
-            color: 'red', // Red text for mismatches
-            fontWeight: 'bold'
-          }
-        }}
-        initialState={{
-          pagination: {
-            paginationModel: { pageSize: 10, page: 0 },
-          },
-        }}
-        pageSizeOptions={[10, 25, 50]}
-      />
+            '& .mismatch-row': {
+              color: 'red', // Red text for mismatches
+              fontWeight: 'bold'
+            }
+          }}
+          paginationMode="server"
+          rowCount={totalRowCount}
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
+          pageSizeOptions={[10, 25, 50, 100]}
+        />
+      </Box>
 
       {/* Edit Dialog */}
       <Dialog open={editModalOpen} onClose={() => setEditModalOpen(false)} maxWidth="sm" fullWidth>
@@ -463,7 +528,26 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
         <DialogActions>
           <Button onClick={() => setBulkDeleteModalOpen(false)} color="inherit" disabled={actionLoading}>Cancel</Button>
           <Button onClick={handleBulkDeleteSubmit} variant="contained" color="error" disabled={actionLoading}>
-            {actionLoading ? 'Deleting...' : 'Delete All Selected'}
+            {actionLoading ? 'Deleting...' : 'Delete Selected'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      
+      {/* Clear All Confirmation Dialog */}
+      <Dialog open={clearAllModalOpen} onClose={() => setClearAllModalOpen(false)}>
+        <DialogTitle sx={{ color: 'error.main' }}>Confirm Clear All Data</DialogTitle>
+        <DialogContent>
+          <Typography fontWeight="bold" color="error" sx={{ mb: 2 }}>
+            WARNING: You are about to permanently delete ALL data in this category.
+          </Typography>
+          <Typography>
+            This will remove all {data.length > 0 ? 'records' : ''} currently in the database for this category, not just the ones on this page. This action cannot be undone. Are you absolutely sure?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setClearAllModalOpen(false)} color="inherit" disabled={actionLoading}>Cancel</Button>
+          <Button onClick={handleClearAllSubmit} variant="contained" color="error" disabled={actionLoading}>
+            {actionLoading ? 'Clearing Data...' : 'Yes, Clear All Data'}
           </Button>
         </DialogActions>
       </Dialog>

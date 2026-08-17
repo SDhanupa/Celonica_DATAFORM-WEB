@@ -23,7 +23,7 @@ import {
   Tooltip
 } from '@mui/material';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery, useMutation, useApolloClient } from '@apollo/client';
 import { GET_CATEGORY_BY_SLUG, GET_CATEGORY_ANSWERS, SUBMIT_CATEGORY_DATA, GET_APPROVED_SUBMISSIONS } from '../graphql/queries';
 import SurveyPage from '../pages/SurveyPage';
 import { DELETE_CATEGORY, DELETE_QUESTION, ANSWER_QUESTION } from '../graphql/mutations';
@@ -52,6 +52,7 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
   const [lang, setLang] = useState<'en' | 'si' | 'ta'>('en');
   const navigate = useNavigate();
   const { userInfo, logout } = useAuth();
+  const client = useApolloClient();
   
   const roles = userInfo?.realm_roles || [];
   const isSuperAdmin = roles.includes('super_admin');
@@ -63,18 +64,29 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
     notifyOnNetworkStatusChange: true,
   });
 
+  const selectedLocation = JSON.parse(localStorage.getItem('user_selected_location') || sessionStorage.getItem('user_selected_location') || 'null');
+
+  const handlePrefetch = (cat: any) => {
+    // 0ms Navigation Trick: Pre-fetch everything while user is hovering!
+    client.query({ query: GET_CATEGORY_BY_SLUG, variables: { slug: cat.slug }, fetchPolicy: 'cache-first' });
+    client.query({ query: GET_CATEGORY_ANSWERS, variables: { categoryId: cat.id }, fetchPolicy: 'cache-first' });
+    
+    const gnCode = selectedLocation?.CCODE || selectedLocation?.ccode || selectedLocation?.code || '';
+    if (gnCode) {
+      client.query({ query: GET_APPROVED_SUBMISSIONS, variables: { categoryId: cat.id, gnCode }, fetchPolicy: 'cache-first' });
+    }
+  };
+
   const parentCategory = data?.categoryBySlug;
 
   const { data: answersData, loading: answersLoading, refetch: refetchAnswers } = useQuery(GET_CATEGORY_ANSWERS, {
     variables: { categoryId: parentCategory?.id },
-    skip: !parentCategory?.id,
+    skip: isAdmin || !parentCategory?.id,
   });
-
-  const selectedLocation = JSON.parse(localStorage.getItem('user_selected_location') || sessionStorage.getItem('user_selected_location') || 'null');
   
   const { data: approvedSubmissionsData } = useQuery(GET_APPROVED_SUBMISSIONS, {
     variables: { categoryId: parentCategory?.id, gnCode: selectedLocation?.CCODE || selectedLocation?.ccode || selectedLocation?.code || '' },
-    skip: !parentCategory?.id || !(selectedLocation?.CCODE || selectedLocation?.ccode || selectedLocation?.code),
+    skip: isAdmin || !parentCategory?.id || !(selectedLocation?.CCODE || selectedLocation?.ccode || selectedLocation?.code),
     fetchPolicy: 'cache-and-network'
   });
 
@@ -224,7 +236,7 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
     }
   };
 
-  if (loading) return <Box sx={{ p: 4, display: 'flex', justifyContent: 'center' }}><CircularProgress /></Box>;
+  if (loading && !parentCategory) return <Box sx={{ p: 4, display: 'flex', justifyContent: 'center' }}><CircularProgress /></Box>;
   if (error || !parentCategory) return (
     <Box sx={{ p: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
       <Typography color="error">Failed to load category. Please try again.</Typography>
@@ -430,6 +442,7 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
                   </Box>
                 )}
                 <CardActionArea 
+                  onMouseEnter={() => handlePrefetch(cat)}
                   onClick={() => {
                     const currentPath = window.location.pathname;
                     navigate(`${currentPath}/${cat.slug}`);

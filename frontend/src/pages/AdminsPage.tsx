@@ -60,7 +60,10 @@ const AdminsPage: React.FC = () => {
   const [newAdmin, setNewAdmin] = useState({ keycloakSub: '', email: '', name: '', role: 'ADMIN' });
   const [successMsg, setSuccessMsg] = useState('');
 
-  const { data, loading, refetch } = useQuery(GET_ADMINS, { errorPolicy: 'ignore' });
+  const { data, loading, refetch } = useQuery(GET_ADMINS, { 
+    errorPolicy: 'ignore',
+    fetchPolicy: 'cache-first'
+  });
   const [registerAdmin] = useMutation(REGISTER_ADMIN);
   const [updateAdminRole] = useMutation(UPDATE_ADMIN_ROLE);
   const [deactivateAdmin] = useMutation(DEACTIVATE_ADMIN);
@@ -176,7 +179,7 @@ const AdminsPage: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {loading ? (
+            {loading && (!data || !data.admins) ? (
               <TableRow>
                 <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
                   <CircularProgress color="primary" />

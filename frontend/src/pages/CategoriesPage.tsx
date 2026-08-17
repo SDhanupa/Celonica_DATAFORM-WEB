@@ -14,8 +14,8 @@ import {
   Tooltip
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useMutation } from '@apollo/client';
-import { GET_CATEGORIES } from '../graphql/queries';
+import { useQuery, useMutation, useApolloClient } from '@apollo/client';
+import { GET_CATEGORIES, GET_CATEGORY_BY_SLUG, GET_CATEGORY_ANSWERS, GET_APPROVED_SUBMISSIONS } from '../graphql/queries';
 import { DELETE_CATEGORY } from '../graphql/mutations';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -31,6 +31,8 @@ const CategoriesPage: React.FC = () => {
   const [lang, setLang] = useState<'en' | 'si' | 'ta'>('en');
   const navigate = useNavigate();
   const { userInfo } = useAuth();
+  const client = useApolloClient();
+  const selectedLocation = JSON.parse(localStorage.getItem('user_selected_location') || sessionStorage.getItem('user_selected_location') || 'null');
   
   const isSuperAdmin = userInfo?.realm_roles?.includes('super_admin');
 
@@ -44,7 +46,7 @@ const CategoriesPage: React.FC = () => {
   const [editingCategory, setEditingCategory] = useState<any>(null);
   const [bulkUploadCategory, setBulkUploadCategory] = useState<any>(null);
 
-  if (loading) return <Box sx={{ p: 4, display: 'flex', justifyContent: 'center' }}><CircularProgress /></Box>;
+  if (loading && !data?.categories) return <Box sx={{ p: 4, display: 'flex', justifyContent: 'center' }}><CircularProgress /></Box>;
   if (error) return <Typography color="error">Failed to load categories.</Typography>;
 
   const categories = data?.categories || [];
@@ -53,6 +55,17 @@ const CategoriesPage: React.FC = () => {
     e.stopPropagation();
     if (window.confirm('Are you sure you want to delete this category?')) {
       await deleteCategory({ variables: { id } });
+    }
+  };
+
+  const handlePrefetch = (cat: any) => {
+    // 0ms Navigation Trick: Pre-fetch everything while user is hovering!
+    client.query({ query: GET_CATEGORY_BY_SLUG, variables: { slug: cat.slug }, fetchPolicy: 'cache-first' });
+    client.query({ query: GET_CATEGORY_ANSWERS, variables: { categoryId: cat.id }, fetchPolicy: 'cache-first' });
+    
+    const gnCode = selectedLocation?.CCODE || selectedLocation?.ccode || selectedLocation?.code || '';
+    if (gnCode) {
+      client.query({ query: GET_APPROVED_SUBMISSIONS, variables: { categoryId: cat.id, gnCode }, fetchPolicy: 'cache-first' });
     }
   };
 
@@ -179,6 +192,7 @@ const CategoriesPage: React.FC = () => {
                 </Box>
               )}
               <CardActionArea 
+                onMouseEnter={() => handlePrefetch(cat)}
                 onClick={() => {
                   navigate(`/categories/${cat.slug}`);
                 }}

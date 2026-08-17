@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\Cache;
 
 class CategoryDataUploadController extends Controller
 {
+    private function invalidateCategoryCache($slug)
+    {
+        Cache::put('category_data_version_' . $slug, microtime(true));
+    }
+
     public function upload(Request $request)
     {
         // Manual validation so we always return JSON (not HTML) on failure.
@@ -80,13 +85,26 @@ class CategoryDataUploadController extends Controller
             });
         }
         
-        // Ensure existing tables have the raw columns
+        // Ensure existing tables have the raw and final columns
         if (!Schema::hasColumn($tableName, 'raw_province')) {
             Schema::table($tableName, function (Blueprint $table) {
                 $table->string('raw_province')->nullable();
                 $table->string('raw_district')->nullable();
                 $table->string('raw_ds')->nullable();
                 $table->string('raw_gn')->nullable();
+                $table->string('final_province')->nullable();
+                $table->string('final_district')->nullable();
+                $table->string('final_ds')->nullable();
+                $table->string('final_gn')->nullable();
+            });
+        }
+        
+        if (!Schema::hasColumn($tableName, 'final_province')) {
+            Schema::table($tableName, function (Blueprint $table) {
+                $table->string('final_province')->nullable();
+                $table->string('final_district')->nullable();
+                $table->string('final_ds')->nullable();
+                $table->string('final_gn')->nullable();
             });
         }
 
@@ -151,6 +169,7 @@ class CategoryDataUploadController extends Controller
             $mapped_gn_id = null;
             $mapped_district_id = null;
             $mapped_ds_code = null;
+            $matchedGn = null;
             
             if (isset($gnMap[$gn_val])) {
                 $matchedGn = $gnMap[$gn_val];
@@ -199,6 +218,10 @@ class CategoryDataUploadController extends Controller
                 'raw_district' => $district ?: null,
                 'raw_ds' => $ds ?: null,
                 'raw_gn' => $gn_val ?: null,
+                'final_province' => $matchedGn ? $matchedGn->pro_en : ($province ?: null),
+                'final_district' => $matchedGn ? $matchedGn->dis_en : ($district ?: null),
+                'final_ds' => $matchedGn ? $matchedGn->ds_en : ($ds ?: null),
+                'final_gn' => $matchedGn ? $matchedGn->name_en : ($gn_val ?: null),
                 'reg_number' => $reg_number,
                 'name_si' => $name_si,
                 'name_en' => $name_en,
@@ -227,6 +250,10 @@ class CategoryDataUploadController extends Controller
             DB::table($tableName)->insert($insertData);
         }
 
+        if ($savedCount > 0) {
+            $this->invalidateCategoryCache($slug);
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Data processing completed.',
@@ -238,7 +265,8 @@ class CategoryDataUploadController extends Controller
 
     public function getData(Request $request, $slug)
     {
-        $cacheKey = 'category_data_' . $slug . '_' . md5(json_encode($request->all()));
+        $version = Cache::get('category_data_version_' . $slug, '1');
+        $cacheKey = 'category_data_' . $slug . '_v' . $version . '_' . md5(json_encode($request->all()));
 
         $data = Cache::remember($cacheKey, 3600, function() use ($request, $slug) {
             $tableName = 'category_data_' . str_replace('-', '_', $slug);
@@ -250,6 +278,10 @@ class CategoryDataUploadController extends Controller
         if ($request->has('gn_id') && $request->input('gn_id')) {
             $gnCode = strtoupper($request->input('gn_id'));
         }
+
+        $limit = $request->has('limit') ? (int) $request->input('limit') : 50;
+        $offset = $request->has('offset') ? (int) $request->input('offset') : 0;
+        $totalCount = 0;
 
         if ($tableExists) {
         $query = DB::table($tableName);
@@ -341,18 +373,43 @@ class CategoryDataUploadController extends Controller
             });
         }
 
-        $data = $query->leftJoin('grama_niladharis', function($join) use ($tableName) {
-                          $join->on($tableName . '.gn_id', '=', DB::raw('CAST(grama_niladharis.id AS varchar)'))
-                               ->orOn($tableName . '.gn_id', '=', 'grama_niladharis.CCODE')
-                               ->orOn($tableName . '.gn_id', '=', 'grama_niladharis.code');
-                      })
-                      ->select($tableName . '.*',
-                               DB::raw("COALESCE(grama_niladharis.pro_en, $tableName.raw_province) as province_name"),
-                               DB::raw("COALESCE(grama_niladharis.dis_en, $tableName.raw_district) as district_name"),
-                               DB::raw("COALESCE(grama_niladharis.ds_en, $tableName.raw_ds) as ds_name"),
-                               DB::raw("COALESCE(grama_niladharis.name_en, $tableName.raw_gn) as gn_name"))
-                      ->orderBy($tableName . '.created_at', 'desc')
-                      ->get();
+        if (!Schema::hasColumn($tableName, 'final_province')) {
+            Schema::table($tableName, function (Blueprint $table) {
+                $table->string('final_province')->nullable();
+                $table->string('final_district')->nullable();
+                $table->string('final_ds')->nullable();
+                $table->string('final_gn')->nullable();
+            });
+        }
+
+        // Search functionality
+        if ($request->has('search') && $request->input('search')) {
+            $search = strtolower(trim($request->input('search')));
+            $query->where(function($q) use ($tableName, $search) {
+                $q->where($tableName . '.name_en', 'ilike', '%' . $search . '%')
+                  ->orWhere($tableName . '.name_si', 'ilike', '%' . $search . '%')
+                  ->orWhere($tableName . '.name_ta', 'ilike', '%' . $search . '%')
+                  ->orWhere($tableName . '.reg_number', 'ilike', '%' . $search . '%')
+                  ->orWhere($tableName . '.mobile', 'ilike', '%' . $search . '%')
+                  ->orWhere($tableName . '.description', 'ilike', '%' . $search . '%')
+                  ->orWhere($tableName . '.contact_person_name', 'ilike', '%' . $search . '%');
+            });
+        }
+
+
+        // Simply select the final columns (or fallback to raw) and return instantly
+        $query->select($tableName . '.*',
+            DB::raw("COALESCE($tableName.final_province, $tableName.raw_province) as province_name"),
+            DB::raw("COALESCE($tableName.final_district, $tableName.raw_district) as district_name"),
+            DB::raw("COALESCE($tableName.final_ds, $tableName.raw_ds) as ds_name"),
+            DB::raw("COALESCE($tableName.final_gn, $tableName.raw_gn) as gn_name")
+        );
+
+        $totalCount += $query->count();
+
+        $baseData = $query->orderBy($tableName . '.id', 'desc')->offset($offset)->limit($limit)->get();
+        $data = collect($baseData);
+
         } // end if ($tableExists)
 
         // Merge normal user submissions — search category AND all descendants
@@ -370,7 +427,19 @@ class CategoryDataUploadController extends Controller
                 $submissionsQuery->where('gn_code', $gnCode);
             }
 
-            $submissions = $submissionsQuery->orderBy('created_at', 'desc')->get();
+            if ($request->has('search') && $request->input('search')) {
+                $search = strtolower(trim($request->input('search')));
+                $submissionsQuery->where(function($q) use ($search) {
+                    $q->where('generated_code', 'ilike', '%' . $search . '%')
+                      ->orWhere('answers_data', 'ilike', '%' . $search . '%');
+                });
+            }
+
+            $totalCount += $submissionsQuery->count();
+            
+            // For submissions, if we have a table, the offset might be tricky.
+            // But since Admin is usually just looking at bulk data or submissions independently, we do a basic limit/offset
+            $submissions = $submissionsQuery->orderBy('created_at', 'desc')->offset($offset)->limit($limit)->get();
 
             foreach ($submissions as $sub) {
                 $answers = json_decode($sub->answers_data, true) ?: [];
@@ -407,12 +476,16 @@ class CategoryDataUploadController extends Controller
         }
 
 
-            return $data;
+            return [
+                'data' => $data,
+                'total' => $totalCount
+            ];
         });
 
         return response()->json([
             'success' => true,
-            'data' => $data
+            'data' => $data['data'],
+            'total' => $data['total']
         ]);
     }
 
@@ -500,6 +573,8 @@ class CategoryDataUploadController extends Controller
 
         DB::table($tableName)->where('id', $id)->update($updateData);
 
+        $this->invalidateCategoryCache($slug);
+
         return response()->json([
             'success' => true,
             'message' => 'Record updated successfully.'
@@ -513,6 +588,7 @@ class CategoryDataUploadController extends Controller
             $submissionId = substr((string)$id, 4); // strip 'sub_' prefix
             $deleted = \App\Models\CategorySubmission::where('id', $submissionId)->delete();
             if ($deleted) {
+                $this->invalidateCategoryCache($slug);
                 return response()->json(['success' => true, 'message' => 'Submission deleted successfully.']);
             }
             return response()->json(['success' => false, 'message' => 'Submission not found.'], 404);
@@ -525,13 +601,22 @@ class CategoryDataUploadController extends Controller
             return response()->json(['success' => false, 'message' => 'No data table exists for this category yet.'], 404);
         }
 
-        $deleted = DB::table($tableName)->where('id', $id)->delete();
+        try {
+            $deleted = DB::table($tableName)->where('id', $id)->delete();
 
-        if ($deleted) {
-            return response()->json(['success' => true, 'message' => 'Record deleted successfully.']);
+            if ($deleted) {
+                $this->invalidateCategoryCache($slug);
+                return response()->json(['success' => true, 'message' => 'Record deleted successfully.']);
+            }
+
+            return response()->json(['success' => false, 'message' => 'Record not found.'], 404);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Delete failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Database error: ' . $e->getMessage()
+            ], 500);
         }
-
-        return response()->json(['success' => false, 'message' => 'Record not found.'], 404);
     }
 
     public function bulkDeleteData(Request $request, $slug)
@@ -578,9 +663,55 @@ class CategoryDataUploadController extends Controller
         }
 
         \Illuminate\Support\Facades\Log::info('Deleted count: ' . $totalDeleted);
+        
+        if ($totalDeleted > 0) {
+            $this->invalidateCategoryCache($slug);
+        }
+
         return response()->json([
             'success' => true,
             'message' => $totalDeleted . ' records deleted successfully.'
+        ]);
+    }
+
+    public function clearAllData(Request $request, $slug)
+    {
+        $tableName = 'category_data_' . str_replace('-', '_', $slug);
+        
+        $totalDeleted = 0;
+
+        // Delete all submissions for this category
+        $category = DB::table('categories')->where('slug', $slug)->first();
+        if ($category) {
+            $categoryIds = [$category->id];
+            $this->collectDescendantIds($category->id, $categoryIds);
+            $totalDeleted += \App\Models\CategorySubmission::whereIn('category_id', $categoryIds)->delete();
+        }
+
+        // Truncate the bulk data table if it exists
+        if (Schema::hasTable($tableName)) {
+            try {
+                $count = DB::table($tableName)->count();
+                if ($count > 0) {
+                    DB::table($tableName)->truncate(); // Faster than delete() for the whole table
+                    $totalDeleted += $count;
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Clear all failed: ' . $e->getMessage());
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Server error during clear all: ' . $e->getMessage()
+                ], 500);
+            }
+        }
+
+        if ($totalDeleted > 0) {
+            $this->invalidateCategoryCache($slug);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'All data cleared successfully (' . $totalDeleted . ' records removed).'
         ]);
     }
 
@@ -794,6 +925,8 @@ class CategoryDataUploadController extends Controller
 
         DB::table($tableName)->insert($insertData);
 
+        $this->invalidateCategoryCache($slug);
+
         return response()->json(['success' => true, 'message' => 'Data submitted successfully.', 'reg_number' => $regNumber]);
     }
 
@@ -808,6 +941,8 @@ class CategoryDataUploadController extends Controller
             'is_approved' => true,
             'status' => 'approved'
         ]);
+
+        $this->invalidateCategoryCache($slug);
 
         return response()->json(['success' => true]);
     }
@@ -837,6 +972,8 @@ class CategoryDataUploadController extends Controller
             'status' => 'approved',
             'is_update_proposal' => false
         ]);
+
+        $this->invalidateCategoryCache($slug);
 
         return response()->json(['success' => true]);
     }

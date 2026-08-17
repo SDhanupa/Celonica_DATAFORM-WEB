@@ -1,40 +1,52 @@
-# Server Deployment Guide for Database Fixes
+# Ceylonica Admin - Server Update Guide
 
-This guide walks through the exact steps to safely apply the `CCODE` duplicate fixes to the live Linux production server without modifying any other data or uploaded files.
+This guide covers how to pull the latest performance updates (Redis Caching, Nginx Load Balancing, and 0ms Preloading) to your production Ubuntu server and deploy them with ZERO downtime.
 
-## Prerequisites
-- You must have the correct `update_ccodes_numbered.sql` file on your local machine (the one with the numbers, e.g., `NJHMN1`, not the letters).
-- You must have SSH access to your Linux server (`deploy@CEY-KEY-APP`).
-
-## Step 1: Open a blank file on the Server
-SSH into your server and run this command to open the nano text editor:
+## 1. Connect to the Server
+SSH into your Ubuntu server where the application is hosted:
 ```bash
-nano /home/deploy/update_ccodes.sql
+ssh deploy@<YOUR_SERVER_IP>
 ```
 
-## Step 2: Paste the Correct Code
-1. On your Windows computer, open **`update_ccodes_numbered.sql`**.
-2. Press **Ctrl+A** (select all) and **Ctrl+C** (copy).
-3. Switch back to your server terminal.
-4. **Right-click** anywhere in the terminal to paste all 875 lines into the file.
-
-## Step 3: Save and Exit
-1. Press **Ctrl+O** (the letter O) to save.
-2. Press **Enter** to confirm the filename.
-3. Press **Ctrl+X** to exit the nano editor.
-
-## Step 4: Run the Docker Command
-Since the live server uses Docker, run this command to securely pipe the SQL file directly into the running Laravel backend container:
+## 2. Navigate to the App Directory
 ```bash
-cat /home/deploy/update_ccodes.sql | docker exec -i celonica-web-backend php artisan tinker --execute="DB::unprepared(stream_get_contents(STDIN));"
-```
-*(If the command finishes quietly and returns you to the prompt without any red errors, it executed perfectly!)*
-
-## Step 5: Clean Up
-Once the database is updated successfully, safely remove the temporary SQL file from the server:
-```bash
-rm /home/deploy/update_ccodes.sql
+cd ~/celonica-web
 ```
 
-## Verification
-You can visually verify the fix on the live site. The duplicate CCODEs should now successfully reflect the numbered suffix (e.g., `NJHMN1`) just like your localhost.
+## 3. Pull the Latest Code from GitHub
+Ensure your local copy on the server is exactly synced with the `main` branch.
+```bash
+git fetch --all
+git reset --hard origin/main
+```
+*(Note: Using `reset --hard` ensures any random file changes on the server are wiped and perfectly match GitHub.)*
+
+## 4. Rebuild the Containers
+Because we added a new `redis` container and updated the `nginx` configuration, you need to rebuild the cluster. This will automatically pull the Redis image, build the new Nginx proxy config, and spawn **3 backend replicas** for load balancing.
+
+```bash
+docker compose up -d --build
+```
+
+## 5. Verify the Cluster is Running
+You can check the running containers to ensure you see 3 backend nodes and 1 redis node.
+```bash
+docker ps
+```
+You should see output similar to this:
+- `celonica-web-backend-1`
+- `celonica-web-backend-2`
+- `celonica-web-backend-3`
+- `celonica-web-redis-1`
+- `celonica-web-frontend-1`
+
+## 6. Clear Legacy Laravel Caches (Optional but Recommended)
+Since we switched from `file` caching to `redis` caching, it's good practice to clear the old cache. Because there are 3 backend replicas, you only need to run this command on ONE of them.
+
+```bash
+docker exec -it celonica-web-backend-1 php artisan cache:clear
+docker exec -it celonica-web-backend-1 php artisan config:clear
+```
+
+## 7. You're Done! 🎉
+Go to `https://ceystem.com` and log in. Test the 7.3MB Village List CSV upload again—Nginx will no longer throw a `413 Entity Too Large` error! Open the Location dropdown modal—it will now load instantaneously.
