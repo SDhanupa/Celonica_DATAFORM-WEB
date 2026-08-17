@@ -134,11 +134,11 @@ type Query {
         @field(resolver: "App\\GraphQL\\Queries\\QuestionQueries@myAnswers")
 
     "Get root categories"
-    categories: [Category!]!
+    categories: [Category!]! @cache(maxAge: 3600)
         @field(resolver: "App\\GraphQL\\Queries\\CategoryQueries@categories")
 
     "Get subcategories by parent slug"
-    categoryBySlug(slug: String!): Category
+    categoryBySlug(slug: String!): Category @cache(maxAge: 3600)
         @field(resolver: "App\\GraphQL\\Queries\\CategoryQueries@categoryBySlug")
 
     "Get all answers for questions in a specific category"
@@ -178,15 +178,15 @@ type Query {
         @field(resolver: "App\\GraphQL\\Queries\\TrsAreaQueries@trsAreasByDistrict")
 
     "Grama Niladharis"
-    gramaNiladharis(search: String @builder(method: "App\\Models\\GramaNiladhari@scopeSearch")): [GramaNiladhari!]! @paginate(defaultCount: 50)
-    gramaNiladhari(id: ID! @eq): GramaNiladhari @find
-    gnByCoordinates(lat: Float!, lng: Float!): GramaNiladhari @field(resolver: "App\\GraphQL\\Queries\\GnByCoordinates")
+    gramaNiladharis(search: String @builder(method: "App\\Models\\GramaNiladhari@scopeSearch")): [GramaNiladhari!]! @paginate(defaultCount: 50) @cache(maxAge: 3600)
+    gramaNiladhari(id: ID! @eq): GramaNiladhari @find @cache(maxAge: 3600)
+    gnByCoordinates(lat: Float!, lng: Float!): GramaNiladhari @field(resolver: "App\\GraphQL\\Queries\\GnByCoordinates") @cache(maxAge: 3600)
     "Housing Data Aggregate"
-    housingData(district_id: ID, city_code: String, gn_id: ID): HousingDataAggregate @field(resolver: "App\\GraphQL\\Queries\\HousingDataQuery")
+    housingData(district_id: ID, city_code: String, gn_id: ID): HousingDataAggregate @field(resolver: "App\\GraphQL\\Queries\\HousingDataQuery") @cache(maxAge: 3600)
 
     "Polices"
-    polices(search: String @builder(method: "App\\Models\\Police@scopeSearch")): [Police!]! @paginate(defaultCount: 50)
-    police(id: ID! @eq): Police @find
+    polices(search: String @builder(method: "App\\Models\\Police@scopeSearch")): [Police!]! @paginate(defaultCount: 50) @cache(maxAge: 3600)
+    police(id: ID! @eq): Police @find @cache(maxAge: 3600)
 
     "Users"
     users(search: String @where(operator: "like")): [User!]! 
@@ -196,15 +196,15 @@ type Query {
         @find
 
     "Districts"
-    districts(search: String, first: Int, page: Int): [District!]!
+    districts(search: String, first: Int, page: Int): [District!]! @cache(maxAge: 3600)
         @field(resolver: "App\\GraphQL\\Queries\\DistrictQueries@getDistricts")
 
     "PProvinces"
     pProvinces: [PProvince!]! @all
 
     "PDistricts"
-    pDistricts: [PDistrict!]! @all
-    pDistrict(id: ID! @eq): PDistrict @find
+    pDistricts: [PDistrict!]! @all @cache(maxAge: 3600)
+    pDistrict(id: ID! @eq): PDistrict @find @cache(maxAge: 3600)
 }
 
 type District {

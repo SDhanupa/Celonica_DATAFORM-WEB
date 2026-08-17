@@ -398,6 +398,29 @@ export const GET_P_DISTRICTS = gql`
   }
 `;
 
+export const GET_ALL_LOCATIONS = gql`
+  query GetAllLocations {
+    pDistricts {
+      id
+      admin2NameEn
+      admin2NameSi
+      admin2NameTa
+      gramaNiladharis {
+        id
+        code
+        CCODE
+        nameEn
+        nameSi
+        nameTa
+        dsEn
+        dsSi
+        dsTa
+        divisionalSecretariatCode
+      }
+    }
+  }
+`;
+
 export const GET_P_DISTRICT_WITH_GNS = gql`
   query GetPDistrictWithGns($id: ID!) {
     pDistrict(id: $id) {

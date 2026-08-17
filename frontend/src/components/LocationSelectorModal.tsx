@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, FormControl, CircularProgress, Alert, Dialog, DialogContent, DialogActions, Autocomplete, TextField, Divider, useTheme } from '@mui/material';
 import { useQuery } from '@apollo/client';
-import { GET_P_DISTRICTS, GET_P_DISTRICT_WITH_GNS, GET_GN_BY_COORDINATES } from '../graphql/queries';
+import { GET_ALL_LOCATIONS, GET_GN_BY_COORDINATES } from '../graphql/queries';
 
 interface LocationSelectorModalProps {
   open: boolean;
@@ -27,16 +27,11 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
   const [selectedCity, setSelectedCity] = useState<string>('');
   const [selectedGN, setSelectedGN] = useState<string>('');
 
-  const { data: districtsData, loading: districtsLoading, error: districtsError } = useQuery(GET_P_DISTRICTS, {
+  // Fetch ALL locations at once so everything is 0ms instantaneous when navigating dropdowns.
+  const { data: allLocationsData, loading: allLocationsLoading, error: allLocationsError } = useQuery(GET_ALL_LOCATIONS, {
     fetchPolicy: 'cache-first',
   });
-  if (districtsError) console.error('Districts query error:', districtsError);
-
-  const { data: gnData, loading: gnLoading } = useQuery(GET_P_DISTRICT_WITH_GNS, {
-    variables: { id: selectedDistrict },
-    skip: !selectedDistrict,
-    fetchPolicy: 'cache-first',
-  });
+  if (allLocationsError) console.error('Locations query error:', allLocationsError);
 
   const { data: autoGnData, loading: autoGnLoading } = useQuery(GET_GN_BY_COORDINATES, {
     variables: { lat: location?.lat, lng: location?.lng },
@@ -45,23 +40,30 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
   });
 
   const activeGn = autoGnData?.gnByCoordinates;
+  
+  // Extract the GN data for the selected district instantly from memory
+  const districtGNs = React.useMemo(() => {
+    if (!selectedDistrict || !allLocationsData?.pDistricts) return [];
+    const district = allLocationsData.pDistricts.find((d: any) => d.id === selectedDistrict);
+    return district?.gramaNiladharis || [];
+  }, [allLocationsData, selectedDistrict]);
 
   const uniqueCities = React.useMemo(() => {
-    if (!gnData?.pDistrict?.gramaNiladharis) return [];
+    if (!districtGNs.length) return [];
     const citiesMap = new Map();
-    gnData.pDistrict.gramaNiladharis.forEach((gn: any) => {
+    districtGNs.forEach((gn: any) => {
       if (gn.divisionalSecretariatCode && !citiesMap.has(gn.divisionalSecretariatCode)) {
         citiesMap.set(gn.divisionalSecretariatCode, gn);
       }
     });
     return Array.from(citiesMap.values());
-  }, [gnData]);
+  }, [districtGNs]);
 
   const filteredGNs = React.useMemo(() => {
-    if (!gnData?.pDistrict?.gramaNiladharis) return [];
-    if (!selectedCity) return gnData.pDistrict.gramaNiladharis;
-    return gnData.pDistrict.gramaNiladharis.filter((gn: any) => gn.divisionalSecretariatCode === selectedCity);
-  }, [gnData, selectedCity]);
+    if (!districtGNs.length) return [];
+    if (!selectedCity) return districtGNs;
+    return districtGNs.filter((gn: any) => gn.divisionalSecretariatCode === selectedCity);
+  }, [districtGNs, selectedCity]);
 
   const canContinue = !showManualForm
     ? (location !== null || locationError !== null) && !!activeGn
@@ -253,19 +255,19 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
             <FormControl fullWidth>
               <Autocomplete
-                options={districtsData?.pDistricts || []}
+                options={allLocationsData?.pDistricts || []}
                 getOptionLabel={(option: any) => {
                   if (!option) return '';
                   const name = language === 'en' ? option.admin2NameEn : language === 'si' ? option.admin2NameSi : option.admin2NameTa;
                   return name || option.admin2NameEn || option.id || '';
                 }}
-                value={districtsData?.pDistricts?.find((d: any) => d.id === selectedDistrict) || null}
+                value={allLocationsData?.pDistricts?.find((d: any) => d.id === selectedDistrict) || null}
                 onChange={(event, newValue) => {
                   setSelectedDistrict(newValue ? newValue.id : '');
                   setSelectedCity('');
                   setSelectedGN('');
                 }}
-                loading={districtsLoading}
+                loading={allLocationsLoading}
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -274,7 +276,7 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
                       ...params.InputProps,
                       endAdornment: (
                         <React.Fragment>
-                          {districtsLoading ? <CircularProgress color="inherit" size={20} /> : null}
+                          {allLocationsLoading ? <CircularProgress color="inherit" size={20} /> : null}
                           {params.InputProps.endAdornment}
                         </React.Fragment>
                       ),
@@ -284,7 +286,7 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
               />
             </FormControl>
 
-            <FormControl fullWidth disabled={!selectedDistrict || gnLoading}>
+            <FormControl fullWidth disabled={!selectedDistrict}>
               <Autocomplete
                 options={uniqueCities}
                 getOptionLabel={(option: any) => {
@@ -297,7 +299,7 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
                   setSelectedCity(newValue ? newValue.divisionalSecretariatCode : '');
                   setSelectedGN('');
                 }}
-                loading={gnLoading}
+                loading={false}
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -306,7 +308,6 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
                       ...params.InputProps,
                       endAdornment: (
                         <React.Fragment>
-                          {gnLoading ? <CircularProgress color="inherit" size={20} /> : null}
                           {params.InputProps.endAdornment}
                         </React.Fragment>
                       ),
@@ -316,7 +317,7 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
               />
             </FormControl>
 
-            <FormControl fullWidth disabled={!selectedCity || gnLoading}>
+            <FormControl fullWidth disabled={!selectedCity}>
               <Autocomplete
                 options={filteredGNs}
                 getOptionLabel={(option: any) => {
@@ -324,11 +325,11 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
                   const name = language === 'en' ? option.nameEn : language === 'si' ? option.nameSi : option.nameTa;
                   return name || option.nameEn || option.gnName || option.code || '';
                 }}
-                value={gnData?.pDistrict?.gramaNiladharis?.find((gn: any) => gn.id === selectedGN) || null}
+                value={districtGNs?.find((gn: any) => gn.id === selectedGN) || null}
                 onChange={(event, newValue) => {
                   setSelectedGN(newValue ? newValue.id : '');
                 }}
-                loading={gnLoading}
+                loading={false}
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -337,7 +338,6 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
                       ...params.InputProps,
                       endAdornment: (
                         <React.Fragment>
-                          {gnLoading ? <CircularProgress color="inherit" size={20} /> : null}
                           {params.InputProps.endAdornment}
                         </React.Fragment>
                       ),

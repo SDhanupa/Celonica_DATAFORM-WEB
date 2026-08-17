@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Cache;
 
 class CategoryDataUploadController extends Controller
 {
@@ -237,9 +238,12 @@ class CategoryDataUploadController extends Controller
 
     public function getData(Request $request, $slug)
     {
-        $tableName = 'category_data_' . str_replace('-', '_', $slug);
-        $tableExists = Schema::hasTable($tableName);
-        $data = collect();
+        $cacheKey = 'category_data_' . $slug . '_' . md5(json_encode($request->all()));
+
+        $data = Cache::remember($cacheKey, 3600, function() use ($request, $slug) {
+            $tableName = 'category_data_' . str_replace('-', '_', $slug);
+            $tableExists = Schema::hasTable($tableName);
+            $data = collect();
 
         // Extract GN code early so submissions can be filtered even without a bulk table
         $gnCode = null;
@@ -402,6 +406,9 @@ class CategoryDataUploadController extends Controller
             $data = $data->sortByDesc('created_at')->values();
         }
 
+
+            return $data;
+        });
 
         return response()->json([
             'success' => true,

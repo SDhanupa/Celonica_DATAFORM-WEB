@@ -19,10 +19,12 @@ services:
   backend:
     build:
       context: ./backend
-    container_name: celonica-web-backend
+    deploy:
+      replicas: 3
     depends_on:
       - db
       - keycloak
+      - redis
     restart: unless-stopped
     environment:
       - APP_NAME=Celonica Admin
@@ -44,12 +46,23 @@ services:
       - KEYCLOAK_ADMIN_CLIENT_SECRET=my-super-secret-keycloak-client-secret
       - FRONTEND_URL=https://ceystem.com
       - SUPER_ADMIN_KEYCLOAK_SUB=422df1e2-4287-4ad6-bb97-f551bdad51d9
-      - CACHE_DRIVER=file
-      - SESSION_DRIVER=file
+      - CACHE_DRIVER=redis
+      - SESSION_DRIVER=redis
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=null
+      - REDIS_PORT=6379
       - QUEUE_CONNECTION=sync
     volumes:
       - backend_uploads:/var/www/public/uploads
       - backend_storage:/var/www/storage
+    networks:
+      - celonica_net
+
+  # ─── Redis Caching ──────────────────────────────────────────
+  redis:
+    image: redis:alpine
+    container_name: celonica-web-redis
+    restart: unless-stopped
     networks:
       - celonica_net
 
