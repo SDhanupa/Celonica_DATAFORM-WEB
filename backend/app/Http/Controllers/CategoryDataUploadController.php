@@ -11,11 +11,29 @@ class CategoryDataUploadController extends Controller
 {
     public function upload(Request $request)
     {
-        $request->validate([
-            'slug' => 'required|string|max:255',
-            'name_en' => 'required|string|max:255',
-            'file' => 'required|file|mimes:csv,txt',
-        ]);
+        // Manual validation so we always return JSON (not HTML) on failure.
+        // Laravel's $request->validate() returns an HTML redirect for multipart
+        // form requests when the client doesn't explicitly set Accept: application/json.
+        if (!$request->has('slug') || !$request->input('slug')) {
+            return response()->json(['success' => false, 'message' => 'Category slug is required.'], 422);
+        }
+        if (!$request->has('name_en') || !$request->input('name_en')) {
+            return response()->json(['success' => false, 'message' => 'Category name (EN) is required.'], 422);
+        }
+        if (!$request->hasFile('file')) {
+            return response()->json(['success' => false, 'message' => 'Please select a CSV file to upload.'], 422);
+        }
+
+        // Accept all common MIME types that browsers send for .csv files.
+        // Windows browsers often send text/plain or application/vnd.ms-excel.
+        $allowedMimes = ['text/csv', 'text/plain', 'application/csv', 'application/vnd.ms-excel', 'application/octet-stream'];
+        $file = $request->file('file');
+        $fileMime = $file->getMimeType();
+        $fileExt  = strtolower($file->getClientOriginalExtension());
+
+        if (!in_array($fileMime, $allowedMimes) && !in_array($fileExt, ['csv', 'txt'])) {
+            return response()->json(['success' => false, 'message' => 'Invalid file type. Please upload a .csv file. (Got: ' . $fileMime . ')'], 422);
+        }
 
         $slug = $request->input('slug');
         $tableName = 'category_data_' . str_replace('-', '_', $slug);
