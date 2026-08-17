@@ -56,6 +56,7 @@ Route::middleware(['keycloak.admin', 'super_admin'])->group(function () {
     Route::post('/category-data/{slug}/{id}/image', [\App\Http\Controllers\CategoryDataUploadController::class, 'uploadImage']);
     Route::post('/category-data/{slug}/{id}/approve', [\App\Http\Controllers\CategoryDataUploadController::class, 'approveData']);
     Route::post('/category-data/{slug}/{id}/replace', [\App\Http\Controllers\CategoryDataUploadController::class, 'replaceData']);
+    Route::post('/category-data/{slug}/{id}/generate-reg-number', [\App\Http\Controllers\CategoryDataUploadController::class, 'generateRegNumber']);
 });
 
 

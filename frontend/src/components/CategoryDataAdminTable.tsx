@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, CircularProgress, Alert, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material';
+import { Box, Typography, CircularProgress, Alert, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Snackbar } from '@mui/material';
+import TagIcon from '@mui/icons-material/Tag';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
@@ -29,6 +30,9 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState<any>(null);
   const [actionLoading, setActionLoading] = useState(false);
+
+  // Snackbar for reg number feedback
+  const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({ open: false, message: '', severity: 'success' });
   
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -120,6 +124,37 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
     } finally {
       setActionLoading(false);
     }
+  };
+
+  const handleGenerateRegNumber = async (row: any) => {
+    try {
+      setActionLoading(true);
+      const response = await fetch(`/api/category-data/${slug}/${row.id}/generate-reg-number`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
+        }
+      });
+      const result = await response.json();
+      if (result.success) {
+        setSnackbar({ open: true, message: `✅ ${result.message}`, severity: 'success' });
+        await fetchData();
+      } else {
+        setSnackbar({ open: true, message: `❌ ${result.message}`, severity: 'error' });
+      }
+    } catch (err: any) {
+      setSnackbar({ open: true, message: `Error: ${err.message}`, severity: 'error' });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Check if a row has all required fields to generate a reg number
+  // Button hidden if reg_number already exists (must stay unique)
+  const canGenerateRegNumber = (row: any): boolean => {
+    if (row.reg_number) return false; // already has a code — hide button
+    return !!(row.name_ta && row.province_name && row.district_name && row.ds_name && row.gn_name);
   };
 
   useEffect(() => {
@@ -342,9 +377,9 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
     {
       field: 'actions',
       headerName: 'Actions',
-      width: 250,
+      width: 320,
       renderCell: (params) => (
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', height: '100%' }}>
+        <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center', height: '100%', flexWrap: 'wrap' }}>
           {params.row.is_approved === false ? (
             params.row.is_update_proposal ? (
               <Button size="small" variant="contained" color="warning" onClick={() => handleReplace(params.row)} disabled={actionLoading}>
@@ -356,6 +391,22 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
               </Button>
             )
           ) : null}
+
+          {/* Generate Reg Number button — shown when all required fields filled */}
+          {canGenerateRegNumber(params.row) && (
+            <Button
+              size="small"
+              variant="outlined"
+              color="secondary"
+              startIcon={<TagIcon fontSize="small" />}
+              onClick={() => handleGenerateRegNumber(params.row)}
+              disabled={actionLoading}
+              sx={{ fontSize: '0.7rem', px: 1, py: 0.3, minWidth: 'auto', whiteSpace: 'nowrap' }}
+            >
+              Gen Reg #
+            </Button>
+          )}
+
           <IconButton onClick={() => handleEditClick(params.row)} color="primary" size="small" disabled={actionLoading}>
             <EditIcon fontSize="small" />
           </IconButton>
@@ -551,6 +602,23 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Snackbar for reg number generation feedback */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={5000}
+        onClose={() => setSnackbar(s => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbar(s => ({ ...s, open: false }))}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

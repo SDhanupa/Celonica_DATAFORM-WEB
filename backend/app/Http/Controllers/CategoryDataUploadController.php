@@ -882,20 +882,31 @@ class CategoryDataUploadController extends Controller
             if (!$gnCode && !empty($payload['raw_gn'])) {
                 $gn = DB::table('grama_niladharis')
                     ->where('name_en', $payload['raw_gn'])
+                    ->orWhere('name_si', $payload['raw_gn'])
+                    ->orWhere('name_ta', $payload['raw_gn'])
                     ->orWhere('code', $payload['raw_gn'])
                     ->orWhere('CCODE', $payload['raw_gn'])
                     ->first();
-                $gnCode = $gn ? ($gn->CCODE ?: $gn->code) : 'UNKNOWN';
-            } elseif (!$gnCode) {
-                $gnCode = 'UNKNOWN';
+                $gnCode = $gn ? ($gn->CCODE ?: $gn->code) : null;
             }
-            
-            $category = DB::table('categories')->where('slug', $slug)->first();
-            $cCode = $category ? $category->code : 'CAT';
-            
-            // Get next sequence for this GN
-            $count = DB::table($tableName)->where('reg_number', 'like', $gnCode . '/%')->count() + 1;
-            $regNumber = $gnCode . '/' . $cCode . '/' . str_pad($count, 2, '0', STR_PAD_LEFT);
+
+            // If GN code could not be resolved, do NOT generate — leave reg_number null
+            if ($gnCode) {
+                $category = DB::table('categories')->where('slug', $slug)->first();
+                $cCode = $category ? $category->code : 'CAT';
+
+                // Find the next unique sequence number for this GN
+                $base = $gnCode . '/' . $cCode . '/';
+                $count = DB::table($tableName)->where('reg_number', 'like', $base . '%')->count() + 1;
+                $regNumber = $base . str_pad($count, 2, '0', STR_PAD_LEFT);
+
+                // Guarantee uniqueness — keep incrementing until we find an unused code
+                while (DB::table($tableName)->where('reg_number', $regNumber)->exists()) {
+                    $count++;
+                    $regNumber = $base . str_pad($count, 2, '0', STR_PAD_LEFT);
+                }
+            }
+            // else: gnCode is null → regNumber stays null, no code generated
         }
 
         $insertData = [
@@ -1012,5 +1023,114 @@ class CategoryDataUploadController extends Controller
         });
 
         return response()->json(['success' => true, 'data' => $allSubmissions]);
+    }
+
+    /**
+     * Generate a reg number for a bulk-uploaded row using the same format as user submissions.
+     * Format: {CCODE}/{category.code}/{zero-padded sequence}
+     * If gn_name doesn't match any GN in grama_niladharis, return error and leave reg_number empty.
+     */
+    public function generateRegNumber(Request $request, $slug, $id)
+    {
+        $tableName = 'category_data_' . str_replace('-', '_', $slug);
+
+        if (!Schema::hasTable($tableName)) {
+            return response()->json(['success' => false, 'message' => 'Table not found.'], 404);
+        }
+
+        // Ensure final_* columns exist (older tables may not have them)
+        if (!Schema::hasColumn($tableName, 'final_province')) {
+            Schema::table($tableName, function (Blueprint $table) {
+                $table->string('final_province')->nullable();
+                $table->string('final_district')->nullable();
+                $table->string('final_ds')->nullable();
+                $table->string('final_gn')->nullable();
+            });
+        }
+
+        // Fetch the row with COALESCE aliases (same logic as getData)
+        $row = DB::table($tableName)
+            ->where('id', $id)
+            ->select(
+                $tableName . '.*',
+                DB::raw("COALESCE({$tableName}.final_province, {$tableName}.raw_province) as province_name"),
+                DB::raw("COALESCE({$tableName}.final_district, {$tableName}.raw_district) as district_name"),
+                DB::raw("COALESCE({$tableName}.final_ds, {$tableName}.raw_ds) as ds_name"),
+                DB::raw("COALESCE({$tableName}.final_gn, {$tableName}.raw_gn) as gn_name")
+            )
+            ->first();
+
+        if (!$row) {
+            return response()->json(['success' => false, 'message' => 'Record not found.'], 404);
+        }
+
+        // Verify all required fields are present (using resolved aliases)
+        $requiredFields = [
+            'name_ta'       => $row->name_ta,
+            'Province'      => $row->province_name,
+            'District'      => $row->district_name,
+            'DS Division'   => $row->ds_name,
+            'GN Name'       => $row->gn_name,
+        ];
+        foreach ($requiredFields as $label => $value) {
+            if (empty($value)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Cannot generate reg number: '{$label}' is empty."
+                ], 422);
+            }
+        }
+
+        // Look up GN code from grama_niladharis using resolved gn_name
+        $gnName = trim($row->gn_name);
+        $gn = DB::table('grama_niladharis')
+            ->where('name_en', $gnName)
+            ->orWhere('name_si', $gnName)
+            ->orWhere('name_ta', $gnName)
+            ->orWhere('code', $gnName)
+            ->orWhere('CCODE', $gnName)
+            ->first();
+
+        if (!$gn) {
+            return response()->json([
+                'success' => false,
+                'message' => "GN Division '{$gnName}' was not found in the system. Reg number cannot be generated."
+            ], 422);
+        }
+
+        $gnCode = $gn->CCODE ?: $gn->code;
+
+        if (!$gnCode) {
+            return response()->json([
+                'success' => false,
+                'message' => "GN Division '{$gnName}' does not have a valid code. Reg number cannot be generated."
+            ], 422);
+        }
+
+        // Get category code
+        $category = DB::table('categories')->where('slug', $slug)->first();
+        $cCode = $category ? ($category->code ?? 'CAT') : 'CAT';
+
+        // Get next sequence for this GN (exclude current row to avoid double-counting)
+        $existingCount = DB::table($tableName)
+            ->where('reg_number', 'like', $gnCode . '/%')
+            ->where('id', '!=', $id)
+            ->count();
+        $sequence = $existingCount + 1;
+        $regNumber = $gnCode . '/' . $cCode . '/' . str_pad($sequence, 2, '0', STR_PAD_LEFT);
+
+        // Save to DB
+        DB::table($tableName)->where('id', $id)->update([
+            'reg_number' => $regNumber,
+            'updated_at' => now(),
+        ]);
+
+        $this->invalidateCategoryCache($slug);
+
+        return response()->json([
+            'success'    => true,
+            'reg_number' => $regNumber,
+            'message'    => "Reg number generated: {$regNumber}"
+        ]);
     }
 }
