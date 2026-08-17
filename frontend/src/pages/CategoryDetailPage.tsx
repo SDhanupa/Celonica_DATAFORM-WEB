@@ -51,16 +51,18 @@ const FastBigCardItem = ({ item, idx, tc, catColor, qMap }: any) => {
   const answers: { question: string, answer: string }[] = [];
   if (item.image_path) answers.push({ question: 'Image', answer: String(item.image_path) });
   
-  if (item.reg_number) answers.push({ question: 'Reg Number', answer: String(item.reg_number) });
-  if (item.name_en) answers.push({ question: 'Name (EN)', answer: String(item.name_en) });
-  if (item.name_si) answers.push({ question: 'Name (SI)', answer: String(item.name_si) });
-  if (item.name_ta) answers.push({ question: 'Name (TA)', answer: String(item.name_ta) });
-  
+  // Core fields requested to be shown on the card
+  answers.push({ question: 'Reg Number', answer: item.reg_number ? String(item.reg_number) : '-' });
+  answers.push({ question: 'Name (EN)', answer: item.name_en ? String(item.name_en) : '-' });
+  answers.push({ question: 'Name (SI)', answer: item.name_si ? String(item.name_si) : '-' });
+  answers.push({ question: 'Name (TA)', answer: item.name_ta ? String(item.name_ta) : '-' });
   answers.push({ question: 'National', answer: 'Sri Lanka' });
-  if (item.province_name) answers.push({ question: 'Province', answer: String(item.province_name) });
-  if (item.district_name) answers.push({ question: 'District', answer: String(item.district_name) });
-  if (item.ds_name) answers.push({ question: 'DS Division', answer: String(item.ds_name) });
-  if (item.gn_name) answers.push({ question: 'GN Name', answer: String(item.gn_name) });
+  answers.push({ question: 'Province', answer: item.province_name ? String(item.province_name) : '-' });
+  answers.push({ question: 'District', answer: item.district_name ? String(item.district_name) : '-' });
+  answers.push({ question: 'DS Division', answer: item.ds_name ? String(item.ds_name) : '-' });
+  answers.push({ question: 'GN Name', answer: item.gn_name ? String(item.gn_name) : '-' });
+
+  // Additional details and custom questions
   if (item.address) answers.push({ question: 'Address', answer: String(item.address) });
   if (item.mobile) answers.push({ question: 'Mobile', answer: String(item.mobile) });
 
@@ -77,7 +79,10 @@ const FastBigCardItem = ({ item, idx, tc, catColor, qMap }: any) => {
 
   const title = item.name_en || item.name_si || item.name_ta || `#${idx + 1}`;
   const displayAnswers = answers.filter(a => a.question !== 'Image');
-  const visibleAnswers = displayAnswers.slice(0, 3);
+  
+  // Show exactly the 9 core fields in the card table
+  const coreFields = ['Reg Number', 'Name (EN)', 'Name (SI)', 'Name (TA)', 'National', 'Province', 'District', 'DS Division', 'GN Name'];
+  const visibleAnswers = displayAnswers.filter(a => coreFields.includes(a.question));
 
   const hasMap = item.latitude && item.longitude;
 
