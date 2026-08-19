@@ -1127,6 +1127,141 @@ class CategoryDataUploadController extends Controller
     }
 
     /**
+     * Generate reg numbers for ALL rows in a category that don't have one yet.
+     */
+    public function generateAllRegNumbers(Request $request, $slug)
+    {
+        set_time_limit(300); // Allow up to 5 minutes for bulk generation
+        
+        $tableName = 'category_data_' . str_replace('-', '_', $slug);
+
+        if (!Schema::hasTable($tableName)) {
+            return response()->json(['success' => false, 'message' => 'Table not found.'], 404);
+        }
+
+        // Ensure final_* columns exist (older tables may not have them)
+        if (!Schema::hasColumn($tableName, 'final_province')) {
+            Schema::table($tableName, function (Blueprint $table) {
+                $table->string('final_province')->nullable();
+                $table->string('final_district')->nullable();
+                $table->string('final_ds')->nullable();
+                $table->string('final_gn')->nullable();
+            });
+        }
+
+        $excludeIds = $request->input('exclude_ids', []);
+
+        $rowsQuery = DB::table($tableName)
+            ->whereNull('reg_number');
+            
+        if (!empty($excludeIds)) {
+            $rowsQuery->whereNotIn('id', $excludeIds);
+        }
+
+        $rows = $rowsQuery->select(
+                $tableName . '.*',
+                DB::raw("COALESCE({$tableName}.final_province, {$tableName}.raw_province) as province_name"),
+                DB::raw("COALESCE({$tableName}.final_district, {$tableName}.raw_district) as district_name"),
+                DB::raw("COALESCE({$tableName}.final_ds, {$tableName}.raw_ds) as ds_name"),
+                DB::raw("COALESCE({$tableName}.final_gn, {$tableName}.raw_gn) as gn_name")
+            )
+            ->limit(1000)
+            ->get();
+
+        $category = DB::table('categories')->where('slug', $slug)->first();
+        $cCode = $category ? ($category->code ?? 'CAT') : 'CAT';
+
+        $generatedCount = 0;
+        $skippedNames = [];
+        $skippedIds = [];
+        $gnSequenceMap = [];
+        $gnCache = []; // In-memory cache to avoid repeated DB lookups for the same GN
+
+        DB::beginTransaction();
+        try {
+            foreach ($rows as $row) {
+            $rowName = $row->name_en ?: ($row->name_si ?: ($row->name_ta ?: "ID: {$row->id}"));
+
+            $requiredFields = [
+                'name_ta'       => $row->name_ta,
+                'Province'      => $row->province_name,
+                'District'      => $row->district_name,
+                'DS Division'   => $row->ds_name,
+                'GN Name'       => $row->gn_name,
+            ];
+            
+            $hasMissing = false;
+            foreach ($requiredFields as $label => $value) {
+                if (empty($value)) {
+                    $skippedNames[] = "{$rowName} (Missing required data: {$label})";
+                    $skippedIds[] = $row->id;
+                    $hasMissing = true;
+                    break;
+                }
+            }
+            if ($hasMissing) continue;
+
+            $gnName = trim($row->gn_name);
+            
+            // Use cache to prevent duplicate DB queries
+            $cacheKey = md5($gnName . '|' . $row->ds_name . '|' . $row->district_name . '|' . ($row->gn_id ?? ''));
+            if (array_key_exists($cacheKey, $gnCache)) {
+                $gn = $gnCache[$cacheKey];
+            } else {
+                $gn = $this->resolveGramaNiladhari($gnName, $row->ds_name, $row->district_name, $row->gn_id ?? null);
+                $gnCache[$cacheKey] = $gn;
+            }
+
+            if (!$gn) {
+                $skippedNames[] = "{$rowName} (GN Division '{$gnName}' not found in system)";
+                $skippedIds[] = $row->id;
+                continue;
+            }
+
+            $gnCode = $gn->CCODE ?: $gn->code;
+            if (!$gnCode) {
+                $skippedNames[] = "{$rowName} (GN Division '{$gnName}' lacks valid code)";
+                $skippedIds[] = $row->id;
+                continue;
+            }
+
+            if (!isset($gnSequenceMap[$gnCode])) {
+                $existingCount = DB::table($tableName)
+                    ->where('reg_number', 'like', $gnCode . '/%')
+                    ->count();
+                $gnSequenceMap[$gnCode] = $existingCount + 1;
+            }
+
+            $sequence = $gnSequenceMap[$gnCode]++;
+            $regNumber = $gnCode . '/' . $cCode . '/' . str_pad($sequence, 2, '0', STR_PAD_LEFT);
+
+            DB::table($tableName)->where('id', $row->id)->update([
+                'reg_number' => $regNumber,
+                'updated_at' => now(),
+            ]);
+
+            $generatedCount++;
+        }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], 500);
+        }
+
+        if ($generatedCount > 0) {
+            $this->invalidateCategoryCache($slug);
+        }
+
+        return response()->json([
+            'success'     => true,
+            'generated'   => $generatedCount,
+            'total'       => $rows->count(),
+            'skipped'     => $skippedNames,
+            'skipped_ids' => $skippedIds
+        ]);
+    }
+
+    /**
      * Resolve a Grama Niladhari division by ID, code, or name (case-insensitive) using a fallback chain
      * to narrow down the correct CCODE in case of duplicate or slightly misspelled names.
      */
