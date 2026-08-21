@@ -15,6 +15,8 @@ import { useQuery } from '@apollo/client';
 import { useAuth } from '../auth/AuthProvider';
 import { GET_CATEGORY_BY_SLUG } from '../graphql/queries';
 import GnPageFooter from '../components/GnPageFooter';
+import GlobalSearchBar from '../components/GlobalSearchBar';
+
 
 // ─── Category Config ─────────────────────────────────────────────────────────
 
@@ -437,13 +439,11 @@ const CategoryDetailPage: React.FC = () => {
           }}
         >
           {/* Dark mode & Search */}
-          <Box sx={{ display: 'flex', gap: 0.5 }}>
+          <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
             <IconButton onClick={() => setIsDarkMode(d => !d)} size="small" sx={{ color: isDarkMode ? '#fff' : '#000', p: 0.5 }}>
               {isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
             </IconButton>
-            <IconButton onClick={() => navigate('/gnpage')} size="small" sx={{ color: isDarkMode ? '#fff' : '#000', p: 0.5 }}>
-              <SearchIcon fontSize="small" />
-            </IconButton>
+            <GlobalSearchBar isDarkMode={isDarkMode} activeGn={{ nameEn: gnName || '', CCODE: ccode || '' }} language="en" />
           </Box>
 
           {!isMobile ? (

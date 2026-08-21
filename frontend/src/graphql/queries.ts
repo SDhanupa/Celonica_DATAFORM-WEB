@@ -752,6 +752,7 @@ export const GET_GN_BY_CCODE = gql`
         nameEn
         nameSi
         nameTa
+        disEn
         dsEn
         dsSi
         dsTa

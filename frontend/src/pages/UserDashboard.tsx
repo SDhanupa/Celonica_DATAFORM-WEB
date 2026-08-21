@@ -272,10 +272,11 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   // Sync active GN with District, DS, and Village dropdown selectors
   useEffect(() => {
     if (activeGn) {
+      const activeDistName = (activeGn.pDistrict?.admin2NameEn || activeGn.disEn || '').trim();
       const distId = activeGn.pDistrict?.id ||
         districtsData?.pDistricts?.find((d: any) =>
-          d.admin2NameEn === activeGn.pDistrict?.admin2NameEn ||
-          d.nameEn === activeGn.pDistrict?.admin2NameEn ||
+          (d.admin2NameEn || '').trim() === activeDistName ||
+          (d.nameEn || '').trim() === activeDistName ||
           d.id === activeGn.pDistrict?.id
         )?.id || '';
       if (distId) setSelectedDistrict(distId);
@@ -283,7 +284,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         setSelectedCity(activeGn.divisionalSecretariatCode || activeGn.dsEn);
       }
       if (activeGn.id || activeGn.CCODE) {
-        setSelectedGN(activeGn.id || activeGn.CCODE);
+        setSelectedGN(String(activeGn.id || activeGn.CCODE));
       }
     }
   }, [activeGn, districtsData]);

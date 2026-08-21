@@ -16,6 +16,8 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 import HomeIcon from '@mui/icons-material/Home';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import GlobalSearchBar from './GlobalSearchBar';
+
 
 interface GnTopHeaderBarProps {
   districts: any[];
@@ -191,7 +193,7 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
   const activeCcode = activeGnObj?.CCODE || activeGnObj?.ccode || selectedGN || '';
 
   return (
-    <Box sx={{ width: '100%', mb: 4, display: 'flex', justifyContent: 'center' }}>
+    <Box sx={{ width: '100%', mb: 4, display: 'flex', justifyContent: 'center', position: 'relative', zIndex: 1000 }}>
       <Box
         sx={{
           display: 'flex',
@@ -215,8 +217,13 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
           </Typography>
         </Box>
 
+        {/* ── MIDDLE SEARCH SECTION ── */}
+        <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', px: { xs: 0, md: 2 } }}>
+          <GlobalSearchBar isDarkMode={isDarkMode} activeGn={activeGnObj ? { nameEn: activeGnObj.nameEn, CCODE: activeCcode } : null} language={language} />
+        </Box>
+
         {/* ── RIGHT SECTION (Categories + Selectors) ── */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 1, xl: 2.5 }, flex: 1, minWidth: 0, py: { xs: 0, xl: 1 }, px: { xs: 0, xl: 1 } }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 1, xl: 2.5 }, flex: 1.5, minWidth: 0, py: { xs: 0, xl: 1 }, px: { xs: 0, xl: 1 } }}>
 
           {/* Top Row: Categories */}
           <Box sx={{
