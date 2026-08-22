@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../context/LanguageContext';
 import { Box, Typography, Container, useTheme, useMediaQuery, CircularProgress } from '@mui/material';
 import { useQuery } from '@apollo/client';
 import { GET_HOUSING_DATA } from '../graphql/queries';
@@ -8,7 +9,6 @@ interface Custom3DBarChartProps {
   city_code?: string;
   gn_id?: string | number;
   location_name?: string;
-  language?: 'en' | 'si' | 'ta';
   isDarkMode?: boolean;
 }
 
@@ -51,7 +51,8 @@ const mobileCategoryLabels = [
   { key: 'group_2010s', label: '2010 & Newer', sumKeys: ['y_2010', 'y_2011'] },
 ];
 
-export default function Custom3DBarChart({ isDarkMode = false,  district_id, city_code, gn_id, location_name, language = 'en' }: Custom3DBarChartProps) {
+export default function Custom3DBarChart({ isDarkMode = false,  district_id, city_code, gn_id, location_name}: Custom3DBarChartProps) {
+  const { language } = useLanguage();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 

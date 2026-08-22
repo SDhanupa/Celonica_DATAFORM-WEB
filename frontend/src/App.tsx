@@ -5,6 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { ApolloProvider } from '@apollo/client';
 import theme from './theme/theme';
 import { AuthProvider } from './auth/AuthProvider';
+import { LanguageProvider } from './context/LanguageContext';
 import ProtectedRoute from './auth/ProtectedRoute';
 import AdminLayout from './components/AdminLayout';
 import apolloClient from './api/apolloClient';
@@ -31,15 +32,17 @@ import TrsConnectionsPage from './pages/TrsConnectionsPage';
 import DistrictProvinceConnectionsPage from './pages/DistrictProvinceConnectionsPage';
 import CategoryDetailPage from './pages/CategoryDetailPage';
 import ApprovalsPage from './pages/ApprovalsPage';
+import IndustrySurveyPage from './pages/IndustrySurveyPage';
 
 const App: React.FC = () => {
   return (
     <ApolloProvider client={apolloClient}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Router>
-          <AuthProvider>
-            <Routes>
+      <LanguageProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Router>
+            <AuthProvider>
+              <Routes>
               {/* Public */}
               <Route path="/login" element={<LoginPage />} />
 
@@ -58,6 +61,14 @@ const App: React.FC = () => {
               <Route
                 path="/gnpage/:gnName/:ccode"
                 element={<DashboardPage />}
+              />
+              <Route
+                path="/industry-survey"
+                element={<IndustrySurveyPage />}
+              />
+              <Route
+                path="/industry-survey/:gnName/:ccode"
+                element={<IndustrySurveyPage />}
               />
               {/* Category detail pages — accessible by super admin */}
               <Route
@@ -260,6 +271,7 @@ const App: React.FC = () => {
           </AuthProvider>
         </Router>
       </ThemeProvider>
+      </LanguageProvider>
     </ApolloProvider>
   );
 };

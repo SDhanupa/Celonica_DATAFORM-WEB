@@ -525,6 +525,26 @@ class CategoryDataUploadController extends Controller
         ]);
     }
 
+    public function getAllCategories()
+    {
+        $categories = \App\Models\Category::whereNotNull('parent_id')->get(['slug', 'name_en', 'name_si', 'name_ta', 'parent_id']);
+        
+        $formattedCategories = $categories->map(function($cat) {
+            return [
+                'slug' => $cat->slug,
+                'nameEn' => $cat->name_en,
+                'nameSi' => $cat->name_si,
+                'nameTa' => $cat->name_ta,
+                'parent_id' => $cat->parent_id
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'tables' => $formattedCategories
+        ]);
+    }
+
     public function updateData(Request $request, $slug, $id)
     {
         // Handle user submissions (id prefixed with 'sub_')
@@ -859,6 +879,67 @@ class CategoryDataUploadController extends Controller
             error_log('[searchCategoryData] Query error slug=' . $slug . ': ' . $e->getMessage());
             return response()->json(['success' => false, 'data' => [], 'message' => $e->getMessage()], 500);
         }
+    }
+
+    public function searchAllData(Request $request)
+    {
+        $query = $request->query('q');
+        if (!$query || strlen($query) < 2) {
+            return response()->json(['success' => true, 'data' => []]);
+        }
+
+        $tables = DB::select("SELECT table_name FROM information_schema.tables WHERE table_name LIKE 'category_data_%'");
+        $allMatches = [];
+
+        foreach ($tables as $table) {
+            $tableName = $table->table_name;
+            $slug = str_replace('_', '-', substr($tableName, 14));
+            
+            $dbQuery = DB::table($tableName)
+                ->where('is_approved', true)
+                ->where(function($q) use ($query) {
+                    $q->where('name_en', 'ILIKE', '%' . $query . '%')
+                      ->orWhere('name_si', 'ILIKE', '%' . $query . '%')
+                      ->orWhere('name_ta', 'ILIKE', '%' . $query . '%')
+                      ->orWhere('reg_number', 'ILIKE', '%' . $query . '%');
+                })
+                ->limit(20);
+                
+            $results = $dbQuery->get();
+            
+            foreach ($results as $result) {
+                // Fetch GN context
+                $gn = DB::table('grama_niladharis')->where('id', $result->gn_id)->first();
+                if ($gn) {
+                    $disEn = $gn->dis_en ?? '';
+                    $dsEn = $gn->ds_en ?? '';
+                    $nameEn = $gn->name_en ?? '';
+                    $ccode = $gn->CCODE ?? '';
+                    $gnDisplay = trim("{$disEn} - {$dsEn} - {$nameEn} ({$ccode})", ' -()');
+
+                    $allMatches[] = [
+                        'id' => $result->id,
+                        'slug' => $slug,
+                        'nameEn' => $result->name_en,
+                        'nameSi' => $result->name_si,
+                        'nameTa' => $result->name_ta,
+                        'regNumber' => $result->reg_number,
+                        'gn_id' => $result->gn_id,
+                        'ccode' => $ccode,
+                        'gn_display' => $gnDisplay,
+                        'gn_district' => $disEn,
+                        'gn_ds' => $dsEn,
+                    ];
+                }
+                
+                // Hard limit to avoid huge payload
+                if (count($allMatches) >= 20) {
+                    break 2; // Break both loops
+                }
+            }
+        }
+
+        return response()->json(['success' => true, 'data' => $allMatches]);
     }
 
     public function submitSurveyData(Request $request, $slug)

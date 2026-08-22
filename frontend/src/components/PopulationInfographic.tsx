@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 import { Box, Typography, Fade, useMediaQuery, useTheme } from '@mui/material';
 import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
@@ -20,7 +21,6 @@ const data = [
 
 interface PopulationInfographicProps {
   populationData?: { male: number; female: number; both: number } | null;
-  language?: 'en' | 'si' | 'ta';
   isDarkMode?: boolean;
 }
 
@@ -30,7 +30,8 @@ const translations = {
   ta: { male: 'ஆண்', female: 'பெண்', total: 'மொத்த', population: 'மக்கள் தொகை' }
 };
 
-export default function PopulationInfographic({ populationData, language = 'en', isDarkMode = false }: PopulationInfographicProps) {
+export default function PopulationInfographic({ populationData, isDarkMode = false }: PopulationInfographicProps) {
+  const { language } = useLanguage();
   const [mounted, setMounted] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));

@@ -30,7 +30,7 @@ export const CATEGORIES = [
 ];
 
 interface SearchResult {
-  type: 'gn' | 'category' | 'subcategory';
+  type: 'gn' | 'category' | 'subcategory' | 'data_item';
   id: string;
   display: string;
   icon?: string;
@@ -56,7 +56,7 @@ const GlobalSearchBar: React.FC<GlobalSearchBarProps> = ({ isDarkMode = false, a
 
   // Fetch all subcategories globally to search through them
   useEffect(() => {
-    fetch(`/api/category-data-tables`)
+    fetch(`/api/all-categories`)
       .then(res => res.json())
       .then(data => {
         if (data.success && data.tables) {
@@ -136,6 +136,25 @@ const GlobalSearchBar: React.FC<GlobalSearchBarProps> = ({ isDarkMode = false, a
       console.error("Error searching GNs", err);
     }
 
+    // 4. Search Data Items across all categories
+    try {
+      const response = await fetch(`/api/search-all-data?q=${encodeURIComponent(searchQuery)}`);
+      const data = await response.json();
+      if (data.success && data.data) {
+        const dataResults = data.data.map((item: any) => ({
+          type: 'data_item',
+          id: item.id.toString(),
+          display: `Data: ${item.nameEn || item.nameSi || item.nameTa || item.regNumber} (${item.gn_display})`,
+          icon: '📄',
+          color: '#10b981',
+          data: item
+        }));
+        combinedResults = [...combinedResults, ...dataResults];
+      }
+    } catch (err) {
+      console.error("Error searching data items", err);
+    }
+
     setResults(combinedResults);
     setLoading(false);
   };
@@ -149,18 +168,42 @@ const GlobalSearchBar: React.FC<GlobalSearchBarProps> = ({ isDarkMode = false, a
       window.location.href = `/gnpage/${gnName}/${result.data.ccode}`;
     } else if (result.type === 'category' || result.type === 'subcategory') {
       const slug = result.id;
-      const isAdmin = userInfo?.realm_roles?.includes('super_admin') || userInfo?.realm_roles?.includes('admin') || userInfo?.realm_roles?.includes('moderator');
-      const basePath = isAdmin ? '/categories' : '/user/categories';
       
-      let targetUrl = `${window.location.origin}${basePath}/${slug}`;
-      if (activeGn && activeGn.nameEn && activeGn.CCODE) {
-        const gnName = encodeURIComponent(activeGn.nameEn.replace(/ /g, '-'));
-        targetUrl = `${window.location.origin}${basePath}/${slug}?gnName=${gnName}&ccode=${activeGn.CCODE}`;
-      }
-
       if (!isAuthenticated) {
-        login(targetUrl);
+        // Public routing
+        if (activeGn && activeGn.nameEn && activeGn.CCODE) {
+          const gnName = encodeURIComponent(activeGn.nameEn.replace(/ /g, '-'));
+          window.location.href = `/gnpage/${gnName}/${activeGn.CCODE}/${slug}`;
+        } else {
+          // If no active GN, they need to select one first
+          // We can just take them to gnpage
+          window.location.href = '/gnpage';
+        }
       } else {
+        // Authenticated routing
+        const isAdmin = userInfo?.realm_roles?.includes('super_admin') || userInfo?.realm_roles?.includes('admin') || userInfo?.realm_roles?.includes('moderator');
+        const basePath = isAdmin ? '/categories' : '/user/categories';
+        
+        let targetUrl = `${window.location.origin}${basePath}/${slug}`;
+        if (activeGn && activeGn.nameEn && activeGn.CCODE) {
+          const gnName = encodeURIComponent(activeGn.nameEn.replace(/ /g, '-'));
+          targetUrl = `${window.location.origin}${basePath}/${slug}?gnName=${gnName}&ccode=${activeGn.CCODE}`;
+        }
+        window.location.href = targetUrl;
+      }
+    } else if (result.type === 'data_item') {
+      const slug = result.data.slug;
+      const gnName = encodeURIComponent(result.data.gn_display.replace(/ /g, '-'));
+      
+      if (!isAuthenticated) {
+        // Public routing
+        window.location.href = `/gnpage/${gnName}/${result.data.ccode}/${slug}?dataItemId=${result.data.id}`;
+      } else {
+        // Authenticated routing
+        const isAdmin = userInfo?.realm_roles?.includes('super_admin') || userInfo?.realm_roles?.includes('admin') || userInfo?.realm_roles?.includes('moderator');
+        const basePath = isAdmin ? '/categories' : '/user/categories';
+        
+        const targetUrl = `${window.location.origin}${basePath}/${slug}?gnName=${gnName}&ccode=${result.data.ccode}&dataItemId=${result.data.id}`;
         window.location.href = targetUrl;
       }
     }

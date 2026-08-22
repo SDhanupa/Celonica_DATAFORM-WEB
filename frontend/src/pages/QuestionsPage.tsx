@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -20,6 +21,10 @@ import { GET_QUESTIONS } from '../graphql/queries';
 import { CREATE_QUESTION, UPDATE_QUESTION, DELETE_QUESTION } from '../graphql/mutations';
 
 const QuestionsPage: React.FC = () => {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const sectionFilter = searchParams.get('section');
+
   const { data, loading, error, refetch } = useQuery(GET_QUESTIONS, {
     fetchPolicy: 'network-only'
   });
@@ -33,7 +38,9 @@ const QuestionsPage: React.FC = () => {
   
   const [formData, setFormData] = useState({
     section: 'A',
-    questionText: '',
+    questionTextEn: '',
+    questionTextSi: '',
+    questionTextTa: '',
     inputType: 'text',
     sortOrder: 0
   });
@@ -43,15 +50,19 @@ const QuestionsPage: React.FC = () => {
       setEditingId(question.id);
       setFormData({
         section: question.section,
-        questionText: question.questionText,
+        questionTextEn: question.questionTextEn || '',
+        questionTextSi: question.questionTextSi || '',
+        questionTextTa: question.questionTextTa || '',
         inputType: question.inputType,
         sortOrder: question.sortOrder
       });
     } else {
       setEditingId(null);
       setFormData({
-        section: 'A',
-        questionText: '',
+        section: sectionFilter || 'A',
+        questionTextEn: '',
+        questionTextSi: '',
+        questionTextTa: '',
         inputType: 'text',
         sortOrder: 0
       });
@@ -97,13 +108,14 @@ const QuestionsPage: React.FC = () => {
   };
 
   const columns: GridColDef[] = [
-    { field: 'section', headerName: 'Section', width: 90,
+    { field: 'section', headerName: 'Section', width: 130,
       renderCell: (params: GridRenderCellParams) => (
         <Chip label={params.value} color="primary" size="small" />
       )
     },
     { field: 'sortOrder', headerName: 'Order', width: 90 },
-    { field: 'questionText', headerName: 'Question Text', flex: 1, minWidth: 300 },
+    { field: 'questionTextEn', headerName: 'Question (EN)', flex: 1, minWidth: 200 },
+    { field: 'questionTextSi', headerName: 'Question (SI)', flex: 1, minWidth: 200 },
     { field: 'inputType', headerName: 'Input Type', width: 130 },
     { field: 'actions', headerName: 'Actions', width: 130, sortable: false,
       renderCell: (params: GridRenderCellParams) => (
@@ -129,9 +141,9 @@ const QuestionsPage: React.FC = () => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4" sx={{ fontWeight: 600, color: 'text.primary' }}>
-          Questions Management
+          {sectionFilter === 'INDUSTRY_SURVEY' ? 'Industry Survey Questions' : 'Questions Management'}
         </Typography>
         <Button
           variant="contained"
@@ -148,7 +160,7 @@ const QuestionsPage: React.FC = () => {
 
       <Box sx={{ height: 600, width: '100%', bgcolor: 'background.paper', borderRadius: 2 }}>
         <DataGrid
-          rows={data?.questions || []}
+          rows={(data?.questions || []).filter((q: any) => !sectionFilter || q.section === sectionFilter)}
           columns={columns}
           sx={{
             border: 'none',
@@ -170,8 +182,8 @@ const QuestionsPage: React.FC = () => {
               onChange={handleChange}
               fullWidth
             >
-              {['A', 'B', 'C', 'D', 'E', 'F', 'G'].map((opt) => (
-                <MenuItem key={opt} value={opt}>Section {opt}</MenuItem>
+              {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'INDUSTRY_SURVEY'].map((opt) => (
+                <MenuItem key={opt} value={opt}>{opt === 'INDUSTRY_SURVEY' ? 'Industry Survey' : `Section ${opt}`}</MenuItem>
               ))}
             </TextField>
             <TextField
@@ -183,12 +195,30 @@ const QuestionsPage: React.FC = () => {
               fullWidth
             />
             <TextField
-              label="Question Text (Sinhala)"
-              name="questionText"
-              value={formData.questionText}
+              label="Question Text (English)"
+              name="questionTextEn"
+              value={formData.questionTextEn}
               onChange={handleChange}
               multiline
-              rows={3}
+              rows={2}
+              fullWidth
+            />
+            <TextField
+              label="Question Text (Sinhala)"
+              name="questionTextSi"
+              value={formData.questionTextSi}
+              onChange={handleChange}
+              multiline
+              rows={2}
+              fullWidth
+            />
+            <TextField
+              label="Question Text (Tamil)"
+              name="questionTextTa"
+              value={formData.questionTextTa}
+              onChange={handleChange}
+              multiline
+              rows={2}
               fullWidth
             />
             <TextField

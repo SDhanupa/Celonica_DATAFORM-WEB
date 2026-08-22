@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../context/LanguageContext';
 import { Box, Typography, Container, useTheme, useMediaQuery } from '@mui/material';
 
 interface Age3DBarChartProps {
@@ -9,8 +10,7 @@ interface Age3DBarChartProps {
     age_65_above?: number;
   };
   location_name?: string;
-  language?: 'en' | 'si' | 'ta';
-}
+  }
 
 // 4 Colors for the 4 age bars
 const palette = [
@@ -51,7 +51,8 @@ const categoryKeys = [
   'age_65_above',
 ];
 
-export default function Age3DBarChart({ isDarkMode = false,  data, location_name, language = 'en' }: Age3DBarChartProps) {
+export default function Age3DBarChart({ isDarkMode = false,  data, location_name}: Age3DBarChartProps) {
+  const { language } = useLanguage();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 

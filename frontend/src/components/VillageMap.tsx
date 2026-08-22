@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 import { Box, Typography, IconButton, Tooltip, Divider, useTheme } from '@mui/material';
 import { MapContainer, TileLayer, Polygon, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -76,8 +77,7 @@ export interface VillageMapProps {
   ccode?: string;
   boundary?: any;
   height?: number | string;
-  language?: 'en' | 'si' | 'ta';
-}
+  }
 
 export const VillageMap: React.FC<VillageMapProps> = ({
   gnName,
@@ -86,8 +86,8 @@ export const VillageMap: React.FC<VillageMapProps> = ({
   ccode,
   boundary,
   height = 520,
-  language = 'en',
 }) => {
+  const { language } = useLanguage();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const mapTitle = language === 'si' ? 'ගම් සිතියම' : language === 'ta' ? 'கிராம வரைபடம்' : 'VILLAGE MAP';

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 import {
   Box,
   Typography,
@@ -41,7 +42,6 @@ interface DemographicCardsProps {
   roofData?: any | null;
   religionData?: any | null;
   householdHeadData?: any | null;
-  language?: 'en' | 'si' | 'ta';
   isDarkMode?: boolean;
   onOpenCategory?: (slug: string) => void;
 }
@@ -402,10 +402,10 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
   roofData,
   religionData,
   householdHeadData,
-  language = 'en',
   isDarkMode = false,
   onOpenCategory,
 }) => {
+  const { language } = useLanguage();
   const [selectedSurveyId, setSelectedSurveyId] = useState<string>('village-population');
   const [modalData, setModalData] = useState<ChartModalData | null>(null);
 

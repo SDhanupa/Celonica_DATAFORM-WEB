@@ -3,7 +3,7 @@ import {
   Box, Typography, IconButton, Menu, MenuItem, Divider,
   useTheme, useMediaQuery, CircularProgress, Paper,
   Table, TableBody, TableRow, TableCell, TableContainer,
-  Chip, Grid, Button, Dialog, DialogTitle, DialogContent, DialogActions
+  Chip, Grid, Button, Dialog, DialogTitle, DialogContent, DialogActions, InputBase
 } from '@mui/material';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
@@ -46,8 +46,14 @@ const getThemeColors = (dark: boolean) => ({
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-const FastBigCardItem = ({ item, idx, tc, catColor, qMap }: any) => {
+const FastBigCardItem = ({ item, idx, tc, catColor, qMap, autoOpenId }: any) => {
   const [dialogOpen, setDialogOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    if (autoOpenId && item.id.toString() === autoOpenId) {
+      setDialogOpen(true);
+    }
+  }, [autoOpenId, item.id]);
 
   // Parse Answers dynamically
   const answers: { question: string, answer: string }[] = [];
@@ -295,7 +301,7 @@ const FastBigCardItem = ({ item, idx, tc, catColor, qMap }: any) => {
   );
 };
 
-const FastBigCardList = ({ slug, categoryName, gnId, catColor, parentQuestions }: { slug: string, categoryName: string, gnId: string, catColor: string, parentQuestions: any[] }) => {
+const FastBigCardList = ({ slug, categoryName, gnId, catColor, parentQuestions, searchQuery, autoOpenId }: { slug: string, categoryName: string, gnId: string, catColor: string, parentQuestions: any[], searchQuery?: string, autoOpenId?: string | null }) => {
   const [data, setData] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
   const tc = getThemeColors(false);
@@ -315,7 +321,19 @@ const FastBigCardList = ({ slug, categoryName, gnId, catColor, parentQuestions }
   }, [slug, gnId]);
 
   if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}><CircularProgress sx={{ color: catColor }} /></Box>;
-  if (data.length === 0) return null;
+  
+  let filteredData = data;
+  if (searchQuery) {
+    const lowerQ = searchQuery.toLowerCase();
+    filteredData = data.filter((item: any) => 
+      item.name_en?.toLowerCase().includes(lowerQ) ||
+      item.name_si?.toLowerCase().includes(lowerQ) ||
+      item.name_ta?.toLowerCase().includes(lowerQ) ||
+      item.reg_number?.toLowerCase().includes(lowerQ)
+    );
+  }
+
+  if (filteredData.length === 0) return null;
 
   const qMap: Record<string, string> = {};
   parentQuestions.forEach((q: any) => {
@@ -329,12 +347,12 @@ const FastBigCardList = ({ slug, categoryName, gnId, catColor, parentQuestions }
         <Typography sx={{ fontWeight: 800, fontSize: '1.2rem', color: tc.text, fontFamily: "'Inter', sans-serif" }}>
           {categoryName}
         </Typography>
-        <Chip label={`${data.length}`} size="small" sx={{ bgcolor: `${catColor}15`, color: catColor, fontWeight: 700, fontSize: '0.75rem' }} />
+        <Chip label={`${filteredData.length}`} size="small" sx={{ bgcolor: `${catColor}15`, color: catColor, fontWeight: 700, fontSize: '0.75rem' }} />
       </Box>
 
       <Grid container spacing={1.5}>
-        {data.map((item: any, idx: number) => (
-          <FastBigCardItem key={item.id} item={item} idx={idx} tc={tc} catColor={catColor} qMap={qMap} />
+        {filteredData.map((item: any, idx: number) => (
+          <FastBigCardItem key={item.id} item={item} idx={idx} tc={tc} catColor={catColor} qMap={qMap} autoOpenId={autoOpenId} />
         ))}
       </Grid>
     </Box>
@@ -356,9 +374,11 @@ const CategoryDetailPage: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [mobileMenuAnchor, setMobileMenuAnchor] = useState<null | HTMLElement>(null);
   const [catMenuAnchor, setCatMenuAnchor] = useState<null | HTMLElement>(null);
+  const [localSearchQuery, setLocalSearchQuery] = useState('');
 
   const tc = getThemeColors(isDarkMode);
   const isSuperAdmin = userInfo?.realm_roles?.includes('super_admin');
+  const dataItemId = new URLSearchParams(window.location.search).get('dataItemId');
 
   const category = CATEGORIES.find((c) => c.slug === categorySlug);
   const catName = category?.name ?? categorySlug ?? 'Category';
@@ -558,6 +578,25 @@ const CategoryDetailPage: React.FC = () => {
 
       </Box>
 
+      {/* Local Search Bar */}
+      <Box sx={{ px: { xs: 2, sm: 4, md: 6 }, mt: -2, mb: 2, maxWidth: 1200, mx: 'auto', display: 'flex', justifyContent: 'center' }}>
+        <Box sx={{
+          display: 'flex', alignItems: 'center',
+          bgcolor: isDarkMode ? 'rgba(255,255,255,0.05)' : '#ffffff',
+          border: `1px solid ${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+          borderRadius: 30, px: 2.5, py: 1, width: '100%', maxWidth: 600,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+        }}>
+          <SearchIcon sx={{ color: 'text.secondary', mr: 1.5 }} />
+          <InputBase
+            placeholder="Search items (EN/SI/TA)..."
+            value={localSearchQuery}
+            onChange={(e) => setLocalSearchQuery(e.target.value)}
+            sx={{ flex: 1, color: isDarkMode ? '#fff' : '#000', fontSize: '1.05rem' }}
+          />
+        </Box>
+      </Box>
+
       {/* ── Main Content ─────────────────────────────────────────────────── */}
       <Box sx={{ flex: 1, px: { xs: 2, sm: 4, md: 6 }, pb: 6, maxWidth: 1200, mx: 'auto', width: '100%' }}>
 
@@ -569,17 +608,21 @@ const CategoryDetailPage: React.FC = () => {
             gnId={ccode!}
             catColor={catColor}
             parentQuestions={catData?.categoryBySlug?.questions || []}
+            searchQuery={localSearchQuery}
+            autoOpenId={dataItemId}
           />
 
           {/* Also show any bulk-uploaded subcategory tables */}
-          {subCatTables.filter((s: any) => s.slug !== categorySlug).map((subCat: any) => (
-            <Box key={subCat.slug} sx={{ mb: 2 }}>
+          {subCatTables.map((sub: any) => (
+            <Box key={sub.slug} sx={{ mb: 2 }}>
               <FastBigCardList
-                slug={subCat.slug}
-                categoryName={subCat.nameEn}
-                gnId={ccode!}
+                slug={sub.slug}
+                categoryName={sub.nameEn || sub.nameSi || sub.nameTa}
+                gnId={ccode as string}
                 catColor={catColor}
                 parentQuestions={catData?.categoryBySlug?.questions || []}
+                searchQuery={localSearchQuery}
+                autoOpenId={dataItemId}
               />
             </Box>
           ))}

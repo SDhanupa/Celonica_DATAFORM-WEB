@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 import { Box, Typography, Button, FormControl, CircularProgress, Alert, Dialog, DialogContent, DialogActions, Autocomplete, TextField, Divider, useTheme } from '@mui/material';
 import { useQuery } from '@apollo/client';
 import { GET_ALL_LOCATIONS, GET_GN_BY_COORDINATES } from '../graphql/queries';
@@ -7,11 +8,11 @@ interface LocationSelectorModalProps {
   open: boolean;
   onClose?: () => void;
   onLocationSelected?: (gn: any) => void;
-  language?: 'en' | 'si' | 'ta';
   isDarkMode?: boolean;
 }
 
-const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onClose, onLocationSelected, language = 'en', isDarkMode = false }) => {
+const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onClose, onLocationSelected, isDarkMode = false }) => {
+  const { language } = useLanguage();
   const themeColors = {
     primary: '#00A8FF',
     textMuted: isDarkMode ? '#AAAAAA' : '#666666',

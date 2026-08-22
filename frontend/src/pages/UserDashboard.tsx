@@ -5,6 +5,7 @@ import { Box, Typography, Button, Container, Grid, FormControl, useTheme, useMed
 import { useQuery } from '@apollo/client';
 import { GET_P_DISTRICTS, GET_P_DISTRICT_WITH_GNS, GET_GN_BY_COORDINATES, GET_GN_BY_CCODE } from '../graphql/queries';
 import { useAuth } from '../auth/AuthProvider';
+import { useLanguage } from '../context/LanguageContext';
 import { useNavigate, useParams } from 'react-router-dom';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
@@ -136,6 +137,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const theme = useTheme();
   const isMobileView = useMediaQuery(theme.breakpoints.down('sm'));
   const { login, register, userInfo, isAuthenticated, logout, isLoading } = useAuth();
+  const { language, setLanguage } = useLanguage();
   const navigate = useNavigate();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const themeColors = getThemeColors(isDarkMode);
@@ -156,7 +158,6 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const [selectedCity, setSelectedCity] = useState<string>('');
 
   const [showLocationModal, setShowLocationModal] = useState<boolean>(!ccode);
-  const [language, setLanguage] = useState<'en' | 'si' | 'ta'>('en');
   const t = tChart[language] || tChart.en;
   const [showManualForm, setShowManualForm] = useState(!ccode && !window.matchMedia('(max-width: 600px)').matches);
   const canContinue = !showManualForm
@@ -948,7 +949,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
               const chosen = gnData?.pDistrict?.gramaNiladharis?.find((x: any) => x.id === g || x.CCODE === g);
               if (chosen && chosen.CCODE && chosen.nameEn) navigate(`/gnpage/${encodeURIComponent(chosen.nameEn.replace(/ /g, '-'))}/${encodeURIComponent(chosen.CCODE)}`);
             }}
-            language={language}
+           
             onCycleLanguage={cycleLanguage}
             isDarkMode={isDarkMode}
             onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
@@ -1089,7 +1090,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                 roofData={roofData}
                 religionData={religionData}
                 householdHeadData={householdHeadData}
-                language={language}
+               
                 isDarkMode={isDarkMode}
                 onOpenCategory={(slug) => {
                   const targetGn = (displayGN || activeGn?.nameEn || gnName || 'Pahalagama').replace(/ /g, '-');
@@ -1110,7 +1111,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                   ccode={displayCCODE}
                   boundary={activeGn?.boundary}
                   height={400}
-                  language={language}
+                 
                 />
               </Box>
             </Grid>

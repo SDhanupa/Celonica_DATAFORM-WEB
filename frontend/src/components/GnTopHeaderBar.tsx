@@ -17,48 +17,46 @@ import HomeIcon from '@mui/icons-material/Home';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import GlobalSearchBar from './GlobalSearchBar';
+import { useLanguage } from '../context/LanguageContext';
 
 
 interface GnTopHeaderBarProps {
-  districts: any[];
-  selectedDistrict: string;
-  onDistrictChange: (d: string) => void;
-  dsDivisions: any[];
-  selectedCity: string;
-  onCityChange: (c: string) => void;
-  gramaNiladharis: any[];
-  selectedGN: string;
-  onGNChange: (g: string) => void;
-  language: 'en' | 'si' | 'ta';
-  onCycleLanguage: () => void;
-  isDarkMode: boolean;
-  onToggleDarkMode: () => void;
-  isAuthenticated: boolean;
-  onLoginClick: () => void;
+  districts?: any[];
+  selectedDistrict?: string;
+  onDistrictChange?: (d: string) => void;
+  dsDivisions?: any[];
+  selectedCity?: string;
+  onCityChange?: (c: string) => void;
+  gramaNiladharis?: any[];
+  selectedGN?: string;
+  onGNChange?: (g: string) => void;
+  isDarkMode?: boolean;
+  onToggleDarkMode?: () => void;
+  isAuthenticated?: boolean;
+  onLoginClick?: () => void;
   activeCategorySlug?: string;
   onSelectCategory?: (slug: string) => void;
 }
 
 export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
-  districts,
-  selectedDistrict,
-  onDistrictChange,
-  dsDivisions,
-  selectedCity,
-  onCityChange,
-  gramaNiladharis,
-  selectedGN,
-  onGNChange,
-  language = 'en',
-  onCycleLanguage,
-  isDarkMode,
-  onToggleDarkMode,
-  isAuthenticated,
-  onLoginClick,
+  districts = [],
+  selectedDistrict = '',
+  onDistrictChange = () => {},
+  dsDivisions = [],
+  selectedCity = '',
+  onCityChange = () => {},
+  gramaNiladharis = [],
+  selectedGN = '',
+  onGNChange = () => {},
+  isDarkMode = false,
+  onToggleDarkMode = () => {},
+  isAuthenticated = false,
+  onLoginClick = () => {},
   activeCategorySlug,
-  onSelectCategory,
+  onSelectCategory = () => {},
 }) => {
   const navigate = useNavigate();
+  const { language, setLanguage } = useLanguage();
   const [categoriesMenuAnchor, setCategoriesMenuAnchor] = useState<null | HTMLElement>(null);
 
   const t = {
@@ -139,6 +137,12 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
     flora: 'Flora',
   };
 
+  const handleCycleLanguage = () => {
+    if (language === 'en') setLanguage('si');
+    else if (language === 'si') setLanguage('ta');
+    else setLanguage('en');
+  };
+
   const categories = [
     { label: t.boundaries, slug: 'location-1-1' },
     { label: t.space, slug: 'location-1-2' },
@@ -150,22 +154,6 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
     { label: t.waterBaseSpaces, slug: 'location-1-8' },
     { label: t.lines, slug: 'location-1-9' },
     { label: t.flora, slug: 'location-1-10' },
-  ];
-
-  const surveyCategories = [
-    { name: 'Demographics & Population', slug: 'population' },
-    { name: 'Age Distribution', slug: 'age' },
-    { name: 'Economy & Employment', slug: 'economy' },
-    { name: 'Housing Ownership', slug: 'housing-ownership' },
-    { name: 'Wall Types', slug: 'wall-type' },
-    { name: 'Housing Unit Types', slug: 'unit-type' },
-    { name: 'Toilet Facilities', slug: 'toilet-facilities' },
-    { name: 'Drinking Water Sources', slug: 'drinking-water' },
-    { name: 'Solid Waste Disposal', slug: 'solid-waste' },
-    { name: 'Rooms in Housing', slug: 'rooms' },
-    { name: 'Roof Types', slug: 'roof-type' },
-    { name: 'Religious Composition', slug: 'religion' },
-    { name: 'Household Head Relationship', slug: 'household' },
   ];
 
   // ── Derive Current Village Identity Names ──────────────────────────────
@@ -422,6 +410,26 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
                   return <MenuItem key={gn.id || gn.CCODE || gn.ccode} value={String(gn.id) || gn.CCODE || gn.ccode}>{name}</MenuItem>;
                 })}
               </Select>
+            </Box>
+
+            {/* Quick Actions */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, ml: { md: 'auto' } }}>
+              <Tooltip title="Home">
+                <IconButton onClick={() => {
+                  if (activeGnObj?.nameEn && activeCcode) {
+                    navigate(`/gnpage/${activeGnObj.nameEn.replace(/ /g, '-')}/${activeCcode}`);
+                  } else {
+                    navigate('/gnpage');
+                  }
+                }} sx={{ color: isDarkMode ? '#e2e8f0' : '#475569' }}>
+                  <HomeIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Translate (EN/SI/TA)">
+                <IconButton onClick={handleCycleLanguage} sx={{ color: isDarkMode ? '#e2e8f0' : '#475569' }}>
+                  <TranslateIcon />
+                </IconButton>
+              </Tooltip>
             </Box>
           </Box>
         </Box>

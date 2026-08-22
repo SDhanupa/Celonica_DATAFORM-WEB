@@ -1,11 +1,105 @@
 import React from 'react';
 import { Box, Typography, Container, Grid } from '@mui/material';
+import { Link, useParams } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
 
 interface GnPageFooterProps {
   isDarkMode?: boolean;
 }
 
 const GnPageFooter: React.FC<GnPageFooterProps> = () => {
+  const { gnName, ccode } = useParams<{ gnName?: string, ccode?: string }>();
+  const { language } = useLanguage();
+  
+  let targetUrl = '/industry-survey';
+  if (gnName && ccode) {
+    targetUrl = `/industry-survey/${gnName}/${ccode}`;
+  }
+
+  const t = {
+    en: {
+      desc: 'A modern data intelligence platform delivering regional demographic insights and advanced analytics for the nation.',
+      quickLinks: 'Quick Links',
+      industrySurvey: 'Industry Survey',
+      boundaries: 'Boundaries',
+      land: 'Land',
+      roads: 'Roads',
+      naturalLocation: 'Natural location',
+      flora: 'Flora',
+      categories: 'Categories',
+      space: 'Space',
+      buildingLand: 'Building/Land',
+      waterBase: 'Water base spaces',
+      lines: 'Lines',
+      geoLoc: 'Geographical location',
+      insights: 'Insights',
+      demographics: 'Demographics',
+      housing: 'Housing & Infrastructure',
+      economy: 'Economic Activity',
+      platform: 'Platform',
+      about: 'About Project',
+      methodology: 'Methodology',
+      privacy: 'Privacy Policy',
+      contact: 'Contact Us',
+      rights: `© ${new Date().getFullYear()} Ceylonica Data Platform. All rights reserved.`,
+      designed: 'Designed with precision and care'
+    },
+    si: {
+      desc: 'ජාතිය සඳහා කලාපීය ජනවිකාස තොරතුරු සහ උසස් දත්ත විශ්ලේෂණ සපයන නවීන දත්ත වේදිකාවක්.',
+      quickLinks: 'ඉක්මන් සබැඳි',
+      industrySurvey: 'කර්මාන්ත සමීක්ෂණය',
+      boundaries: 'මායිම්',
+      land: 'ඉඩම්',
+      roads: 'මාර්ග',
+      naturalLocation: 'ස්වාභාවික ස්ථාන',
+      flora: 'ශාක',
+      categories: 'කාණ්ඩ',
+      space: 'අවකාශය',
+      buildingLand: 'ගොඩනැගිලි/ඉඩම්',
+      waterBase: 'ජලය ආශ්‍රිත ස්ථාන',
+      lines: 'රේඛා',
+      geoLoc: 'භූගෝලීය පිහිටීම',
+      insights: 'තොරතුරු',
+      demographics: 'ජනවිකාස',
+      housing: 'නිවාස හා යටිතල පහසුකම්',
+      economy: 'ආර්ථික ක්‍රියාකාරකම්',
+      platform: 'වේදිකාව',
+      about: 'ව්‍යාපෘතිය ගැන',
+      methodology: 'ක්‍රමවේදය',
+      privacy: 'පෞද්ගලිකත්ව ප්‍රතිපත්තිය',
+      contact: 'අප අමතන්න',
+      rights: `© ${new Date().getFullYear()} Ceylonica දත්ත වේදිකාව. සියලුම හිමිකම් ඇවිරිණි.`,
+      designed: 'නිරවද්‍යතාවයෙන් සහ සැලකිල්ලෙන් නිර්මාණය කර ඇත'
+    },
+    ta: {
+      desc: 'நாட்டிற்கான பிராந்திய மக்கள்தொகை நுண்ணறிவு மற்றும் மேம்பட்ட பகுப்பாய்வுகளை வழங்கும் நவீன தரவு தளம்.',
+      quickLinks: 'விரைவு இணைப்புகள்',
+      industrySurvey: 'தொழில் ஆய்வு',
+      boundaries: 'எல்லைகள்',
+      land: 'நிலம்',
+      roads: 'சாலைகள்',
+      naturalLocation: 'இயற்கை இருப்பிடம்',
+      flora: 'தாவரங்கள்',
+      categories: 'வகைகள்',
+      space: 'இடம்',
+      buildingLand: 'கட்டிடம்/நிலம்',
+      waterBase: 'நீர் சார்ந்த இடங்கள்',
+      lines: 'கோடுகள்',
+      geoLoc: 'புவியியல் இருப்பிடம்',
+      insights: 'நுண்ணறிவு',
+      demographics: 'மக்கள்தொகை',
+      housing: 'வீடமைப்பு மற்றும் உள்கட்டமைப்பு',
+      economy: 'பொருளாதார செயல்பாடு',
+      platform: 'தளம்',
+      about: 'திட்டம் பற்றி',
+      methodology: 'முறைமை',
+      privacy: 'தனியுரிமை கொள்கை',
+      contact: 'எங்களை தொடர்பு கொள்ள',
+      rights: `© ${new Date().getFullYear()} சிலோனிகா தரவு தளம். அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.`,
+      designed: 'துல்லியத்துடனும் கவனத்துடனும் வடிவமைக்கப்பட்டுள்ளது'
+    }
+  }[language];
+
   return (
     <Box sx={{
       bgcolor: '#0f172a',
@@ -25,7 +119,7 @@ const GnPageFooter: React.FC<GnPageFooterProps> = () => {
               Ceylonica
             </Typography>
             <Typography variant="body1" sx={{ color: '#94a3b8', lineHeight: 1.6, maxWidth: 400, mx: { xs: 'auto', md: 0 } }}>
-              A modern data intelligence platform delivering regional demographic insights and advanced analytics for the nation.
+              {t.desc}
             </Typography>
           </Grid>
           
@@ -36,9 +130,12 @@ const GnPageFooter: React.FC<GnPageFooterProps> = () => {
               {/* Quick Links */}
               <Grid item xs={6} sm={3}>
                 <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#ffffff', mb: 3, textTransform: 'uppercase', letterSpacing: 1.5 }}>
-                  Quick Links
+                  {t.quickLinks}
                 </Typography>
-                {['Boundaries', 'Land', 'Roads', 'Natural location', 'Flora'].map((item) => (
+                <Typography component={Link} to={targetUrl} variant="body2" sx={{ display: 'block', color: '#38bdf8', mb: 1.5, textDecoration: 'none', cursor: 'pointer', fontWeight: 'bold' }}>
+                  {t.industrySurvey}
+                </Typography>
+                {[t.boundaries, t.land, t.roads, t.naturalLocation, t.flora].map((item) => (
                   <Typography key={item} variant="body2" sx={{ color: '#94a3b8', mb: 1.5, cursor: 'default' }}>
                     {item}
                   </Typography>
@@ -48,9 +145,9 @@ const GnPageFooter: React.FC<GnPageFooterProps> = () => {
               {/* Categories */}
               <Grid item xs={6} sm={3}>
                 <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#ffffff', mb: 3, textTransform: 'uppercase', letterSpacing: 1.5 }}>
-                  Categories
+                  {t.categories}
                 </Typography>
-                {['Space', 'Building/Land', 'Water base spaces', 'Lines', 'Geographical location'].map((item) => (
+                {[t.space, t.buildingLand, t.waterBase, t.lines, t.geoLoc].map((item) => (
                   <Typography key={item} variant="body2" sx={{ color: '#94a3b8', mb: 1.5, cursor: 'default' }}>
                     {item}
                   </Typography>
@@ -60,9 +157,9 @@ const GnPageFooter: React.FC<GnPageFooterProps> = () => {
               {/* Insights */}
               <Grid item xs={6} sm={3}>
                 <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#ffffff', mb: 3, textTransform: 'uppercase', letterSpacing: 1.5 }}>
-                  Insights
+                  {t.insights}
                 </Typography>
-                {['Demographics', 'Housing & Infrastructure', 'Economic Activity'].map((item) => (
+                {[t.demographics, t.housing, t.economy].map((item) => (
                   <Typography key={item} variant="body2" sx={{ color: '#94a3b8', mb: 1.5, cursor: 'pointer', transition: 'color 0.2s', '&:hover': { color: '#38bdf8' } }}>
                     {item}
                   </Typography>
@@ -72,16 +169,16 @@ const GnPageFooter: React.FC<GnPageFooterProps> = () => {
               {/* Platform */}
               <Grid item xs={6} sm={3}>
                 <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#ffffff', mb: 3, textTransform: 'uppercase', letterSpacing: 1.5 }}>
-                  Platform
+                  {t.platform}
                 </Typography>
-                {['About Project', 'Methodology', 'Privacy Policy'].map((item) => (
+                {[t.about, t.methodology, t.privacy].map((item) => (
                   <Typography key={item} variant="body2" sx={{ color: '#94a3b8', mb: 1.5, cursor: 'pointer', transition: 'color 0.2s', '&:hover': { color: '#38bdf8' } }}>
                     {item}
                   </Typography>
                 ))}
                 
                 <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#ffffff', mt: 4, mb: 2, textTransform: 'uppercase', letterSpacing: 1.5 }}>
-                  Contact Us
+                  {t.contact}
                 </Typography>
                 <Typography 
                   component="a" 
@@ -109,10 +206,10 @@ const GnPageFooter: React.FC<GnPageFooterProps> = () => {
           gap: 2
         }}>
           <Typography variant="body2" sx={{ color: '#64748b' }}>
-            &copy; {new Date().getFullYear()} Ceylonica Data Platform. All rights reserved.
+            {t.rights}
           </Typography>
           <Typography variant="body2" sx={{ color: '#475569', fontSize: '0.8rem', pr: { md: 6 } }}>
-            Designed with precision and care
+            {t.designed}
           </Typography>
         </Box>
       </Container>
