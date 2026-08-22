@@ -98,17 +98,20 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
     let loadedGn: any = null;
     if (!showManualForm && activeGn) {
       loadedGn = activeGn;
-    } else if (showManualForm && selectedGN && gnData?.pDistrict?.gramaNiladharis) {
-      const found = gnData.pDistrict.gramaNiladharis.find((x: any) => x.id === selectedGN);
-      if (found) {
-        loadedGn = {
-          ...found,
-          pDistrict: {
-            id: gnData.pDistrict.id,
-            admin2NameEn: gnData.pDistrict.admin2NameEn,
-            pProvince: gnData.pDistrict.pProvince
-          }
-        };
+    } else if (showManualForm && selectedGN && allLocationsData?.pDistricts) {
+      const currentDistrict = allLocationsData.pDistricts.find((d: any) => d.id === selectedDistrict);
+      if (currentDistrict && currentDistrict.gramaNiladharis) {
+        const found = currentDistrict.gramaNiladharis.find((x: any) => x.id === selectedGN);
+        if (found) {
+          loadedGn = {
+            ...found,
+            pDistrict: {
+              id: currentDistrict.id,
+              admin2NameEn: currentDistrict.admin2NameEn,
+              pProvince: currentDistrict.pProvince
+            }
+          };
+        }
       }
     }
 

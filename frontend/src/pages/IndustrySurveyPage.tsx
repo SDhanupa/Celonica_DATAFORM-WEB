@@ -1,21 +1,123 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import GnTopHeaderBar from '../components/GnTopHeaderBar';
-import { Box, Typography, Button, Container, TextField, CircularProgress, Paper } from '@mui/material';
+import { Box, Typography, Button, Container, TextField, CircularProgress, Paper, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, Select, MenuItem, Checkbox, ListItemText, OutlinedInput } from '@mui/material';
 import { useAuth } from '../auth/AuthProvider';
 import { useLanguage } from '../context/LanguageContext';
 import { useQuery } from '@apollo/client';
-import { GET_QUESTIONS } from '../graphql/queries';
-import { useParams } from 'react-router-dom';
+import { GET_QUESTIONS, GET_GN_BY_CCODE } from '../graphql/queries';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import LocationSelectorModal from '../components/LocationSelectorModal';
+
+const extractNICDetails = (nic: string) => {
+  let year = 0;
+  let dayText = 0;
+  const cleanNic = nic.trim().toUpperCase();
+
+  if (cleanNic.length === 10) {
+    year = 1900 + parseInt(cleanNic.substring(0, 2), 10);
+    dayText = parseInt(cleanNic.substring(2, 5), 10);
+  } else if (cleanNic.length === 12) {
+    year = parseInt(cleanNic.substring(0, 4), 10);
+    dayText = parseInt(cleanNic.substring(4, 7), 10);
+  } else if (cleanNic.length === 9) {
+    year = 1900 + parseInt(cleanNic.substring(0, 2), 10);
+    dayText = parseInt(cleanNic.substring(2, 5), 10);
+  } else {
+    return { dob: '', age: '' };
+  }
+
+  if (isNaN(year) || isNaN(dayText)) return { dob: '', age: '' };
+
+  if (dayText > 500) {
+    dayText -= 500;
+  }
+
+  if (dayText < 1 || dayText > 366) {
+      return { dob: '', age: '' };
+  }
+
+  const isLeapYear = (y: number) => (y % 4 === 0 && y % 100 !== 0) || (y % 400 === 0);
+  if (!isLeapYear(year) && dayText > 59) {
+    dayText -= 1;
+  }
+
+  const dob = new Date(year, 0); 
+  dob.setDate(dayText);
+
+  const diff_ms = Date.now() - dob.getTime();
+  const age_dt = new Date(diff_ms); 
+  const age = Math.abs(age_dt.getUTCFullYear() - 1970);
+
+  return { dob: dob.toLocaleDateString(), age: age.toString() };
+};
 
 const IndustrySurveyPage: React.FC = () => {
-  const { isAuthenticated, login } = useAuth();
+  const { isAuthenticated, login, isLoading, userInfo } = useAuth();
   const { language } = useLanguage();
   const { gnName, ccode } = useParams<{ gnName?: string, ccode?: string }>();
+  const navigate = useNavigate();
+  const locationState = useLocation().state as { fromSelector?: boolean };
+
   const { data, loading, error } = useQuery(GET_QUESTIONS, {
     fetchPolicy: 'cache-and-network',
   });
 
+  const { data: gnData, loading: gnLoading } = useQuery(GET_GN_BY_CCODE, {
+    variables: { CCODE: ccode },
+    skip: !ccode,
+  });
+
   const [formValues, setFormValues] = useState<Record<string, string>>({});
+  const [currentStep, setCurrentStep] = useState(0);
+  const [locationConfirmed, setLocationConfirmed] = useState(false);
+  const [showLocationSelector, setShowLocationSelector] = useState(false);
+  const [showMetadataPopup, setShowMetadataPopup] = useState(false);
+  const [showResumePopup, setShowResumePopup] = useState(false);
+  const [showGpsPopup, setShowGpsPopup] = useState(false);
+  const [gpsErrorPopup, setGpsErrorPopup] = useState<string | null>(null);
+  const [surveyStartTime, setSurveyStartTime] = useState<Date | null>(null);
+  const [gpsCoordinates, setGpsCoordinates] = useState<{lat: number, lng: number} | null>(null);
+
+  useEffect(() => {
+    // Reset state on location change
+    setFormValues({});
+    setCurrentStep(0);
+    setSurveyStartTime(null);
+    setShowMetadataPopup(false);
+    setShowResumePopup(false);
+    setShowGpsPopup(false);
+    setGpsCoordinates(null);
+
+    if (!ccode) {
+      setShowLocationSelector(true);
+      setLocationConfirmed(false);
+    } else if (gnName && ccode) {
+      localStorage.setItem('last_gn_url', `/gnpage/${encodeURIComponent(gnName)}/${encodeURIComponent(ccode)}`);
+      
+      if (locationState?.fromSelector) {
+        setLocationConfirmed(true);
+        const draftStr = localStorage.getItem(`survey_draft_${ccode}`);
+        if (draftStr) {
+          setShowResumePopup(true);
+        } else {
+          setShowMetadataPopup(true);
+        }
+      } else {
+        setLocationConfirmed(false);
+      }
+    }
+  }, [ccode, gnName, locationState]);
+
+  useEffect(() => {
+    if (surveyStartTime && ccode) {
+      localStorage.setItem(`survey_draft_${ccode}`, JSON.stringify({
+        formValues,
+        currentStep,
+        surveyStartTime: surveyStartTime.toISOString(),
+        gpsCoordinates,
+      }));
+    }
+  }, [formValues, surveyStartTime, gpsCoordinates, currentStep, ccode]);
 
   const title = {
     en: 'Industry and Business Survey Questionnaire',
@@ -23,21 +125,20 @@ const IndustrySurveyPage: React.FC = () => {
     ta: 'தொழில் மற்றும் வணிக ஆய்வு கேள்வித்தாள்',
   }[language] || 'Industry and Business Survey Questionnaire';
 
-  if (!isAuthenticated) {
-    return (
-      <Box>
-        <GnTopHeaderBar activeCcode={ccode} activeGnObj={gnName ? { nameEn: gnName } : null} />
-        <Container maxWidth="sm" sx={{ mt: 10, textAlign: 'center', minHeight: '80vh' }}>
-          <Typography variant="h4" gutterBottom fontWeight="bold">{title}</Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-            {language === 'en' ? 'You must be logged in to fill out this survey.' : language === 'si' ? 'මෙම සමීක්ෂණය පිරවීමට ඔබ පුරනය වී සිටිය යුතුය.' : 'இந்தக் கணக்கெடுப்பை நிரப்ப நீங்கள் உள்நுழைந்திருக்க வேண்டும்.'}
-          </Typography>
-          <Button variant="contained" size="large" color="primary" onClick={() => login(window.location.href)} sx={{ px: 4, py: 1.5, borderRadius: '30px' }}>
-            {language === 'en' ? 'Login to Fill Survey' : language === 'si' ? 'සමීක්ෂණය පිරවීමට පිවිසෙන්න' : 'உள்நுழைக'}
-          </Button>
-        </Container>
-      </Box>
-    );
+  const subtitle = {
+    en: 'Note: This survey covers all production, services, sales, industries and business establishments within the Grama Niladhari Division. Please answer all questions. Mark "Not Applicable" for irrelevant questions.',
+    si: 'සටහන: මෙම සමීක්ෂණය ග්‍රාම නිලධාරි වසම තුළ ඇති සියලුම නිෂ්පාදන, සේවා, විකුණුම්, කර්මාන්ත හා ව්‍යාපාර ආයතන ආවරණය කරයි. කරුණාකර සියලු ප්‍රශ්නවලට පිළිතුරු සපයන්න. අදාළ නොවන ප්‍රශ්න සඳහා "අදාළ නොවේ" ලෙස සලකුණු කරන්න.',
+    ta: 'குறிப்பு: இந்த கணக்கெடுப்பு கிராம உத்தியோகத்தர் பிரிவுக்குள் உள்ள அனைத்து உற்பத்தி, சேவைகள், விற்பனை, தொழில்கள் மற்றும் வணிக நிறுவனங்களை உள்ளடக்கியது. அனைத்து கேள்விகளுக்கும் பதிலளிக்கவும். பொருத்தமற்ற கேள்விகளுக்கு "பொருந்தாது" என்று குறிக்கவும்.',
+  }[language] || 'Note: This survey covers all production, services, sales, industries and business establishments within the Grama Niladhari Division. Please answer all questions. Mark "Not Applicable" for irrelevant questions.';
+
+  React.useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      login(window.location.href);
+    }
+  }, [isLoading, isAuthenticated, login]);
+
+  if (isLoading || !isAuthenticated) {
+    return <Box display="flex" justifyContent="center" mt={10}><CircularProgress /></Box>;
   }
 
   if (loading) return <Box display="flex" justifyContent="center" mt={10}><CircularProgress /></Box>;
@@ -51,42 +152,841 @@ const IndustrySurveyPage: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Survey submitted successfully!');
+    const endTime = new Date();
+    console.log("Survey Metadata:", {
+      gn: gnData?.gnByCcode?.nameEn,
+      ds: gnData?.gnByCcode?.dsEn,
+      date: new Date().toLocaleDateString(),
+      surveyor: userInfo?.name,
+      startTime: surveyStartTime?.toLocaleTimeString(),
+      endTime: endTime.toLocaleTimeString(),
+      gps: gpsCoordinates,
+    });
+    console.log("Form Values:", formValues);
+    
+    alert(`Survey submitted successfully!\nStart Time: ${surveyStartTime?.toLocaleTimeString()}\nEnd Time: ${endTime.toLocaleTimeString()}`);
+    if (ccode) {
+      localStorage.removeItem(`survey_draft_${ccode}`);
+    }
     // TODO: implement actual submission
   };
 
+  const mockDistricts = gnData?.gnByCcode ? [{ id: 'mock-dist', nameEn: gnData.gnByCcode.disEn }] : [];
+  const mockDs = gnData?.gnByCcode ? [{ divisionalSecretariatCode: 'mock-ds', dsEn: gnData.gnByCcode.dsEn }] : [];
+  const mockGns = gnData?.gnByCcode ? [{ id: ccode, CCODE: ccode, nameEn: gnData.gnByCcode.nameEn }] : [];
+
   return (
       <Box>
-        <GnTopHeaderBar activeCcode={ccode} activeGnObj={gnName ? { nameEn: gnName } : null} />
-        <Container maxWidth="md" sx={{ mt: 4, mb: 8 }}>
-          <Paper elevation={3} sx={{ p: 4, borderRadius: '20px', bgcolor: 'rgba(255, 255, 255, 0.9)', backdropFilter: 'blur(10px)' }}>
-            <Typography variant="h4" gutterBottom fontWeight="bold" textAlign="center" color="primary">{title}</Typography>
-            
-            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 4, display: 'flex', flexDirection: 'column', gap: 3 }}>
-              {questions.map((q: any) => {
-                const qText = language === 'si' ? (q.questionTextSi || q.questionTextEn) : language === 'ta' ? (q.questionTextTa || q.questionTextEn) : q.questionTextEn;
-                return (
-                  <TextField
-                    key={q.id}
-                    label={qText}
-                    variant="outlined"
-                    fullWidth
-                    multiline={qText.length > 50}
-                    rows={qText.length > 50 ? 3 : 1}
-                    value={formValues[q.id] || ''}
-                    onChange={(e) => handleInputChange(q.id, e.target.value)}
-                  />
-                );
-              })}
+        <GnTopHeaderBar 
+          districts={mockDistricts}
+          selectedDistrict={mockDistricts.length ? 'mock-dist' : ''}
+          dsDivisions={mockDs}
+          selectedCity={mockDs.length ? 'mock-ds' : ''}
+          gramaNiladharis={mockGns}
+          selectedGN={mockGns.length ? ccode : ''}
+          // Type assertion to bypass TS error if any, though passing extra props is usually fine in plain JS/React
+          {...{ activeCcode: ccode, activeGnObj: gnName ? { nameEn: gnName } : null }} 
+        />
+        
+        {surveyStartTime && !showGpsPopup && (
+          <Container maxWidth="md" sx={{ mt: 4, mb: 8 }}>
+            <Paper elevation={3} sx={{ p: 4, borderRadius: '20px', bgcolor: 'rgba(255, 255, 255, 0.9)', backdropFilter: 'blur(10px)' }}>
+              <Typography variant="h4" gutterBottom fontWeight="bold" textAlign="center" color="primary">{title}</Typography>
+              <Typography variant="body1" textAlign="center" color="textSecondary" sx={{ mb: 2, px: { xs: 1, sm: 4 } }}>{subtitle}</Typography>
               
-              <Button type="submit" variant="contained" color="primary" size="large" sx={{ mt: 2, borderRadius: '30px', py: 1.5 }}>
-                {language === 'en' ? 'Submit Survey' : language === 'si' ? 'සමීක්ෂණය ඉදිරිපත් කරන්න' : 'கணக்கெடுப்பை சமர்ப்பிக்கவும்'}
-              </Button>
+              <Box component="form" onSubmit={handleSubmit} sx={{ mt: 4, display: 'flex', flexDirection: 'column', gap: 3 }}>
+                
+                {currentStep === 0 && (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                    <Typography variant="h6" fontWeight="bold" color="primary" sx={{ borderBottom: '2px solid', borderColor: 'primary.main', pb: 1, mb: 1 }}>
+                      {language === 'si' ? 'ව්‍යාපාර හිමිකරු පිළිබඳ තොරතුරු' : language === 'ta' ? 'வணிக உரிமையாளர் தகவல்' : 'Business Owner Information'}
+                    </Typography>
+
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? 'හිමිකරුගේ සම්පූර්ණ නම' : language === 'ta' ? 'உரிமையாளரின் முழு பெயர்' : "Owner's Full Name"}
+                      </Typography>
+                      <TextField fullWidth variant="outlined" size="small" value={formValues['q_owner_name'] || ''} onChange={(e) => handleInputChange('q_owner_name', e.target.value)} />
+                    </Box>
+
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? 'ස්ත්‍රී/පුරුෂ භාවය' : language === 'ta' ? 'பாலினம்' : 'Gender'}
+                      </Typography>
+                      <FormControl fullWidth size="small">
+                        <Select value={formValues['q_gender'] || ''} onChange={(e) => handleInputChange('q_gender', e.target.value as string)}>
+                          <MenuItem value="1. පිරිමි">{language === 'si' ? '1. පිරිමි' : language === 'ta' ? '1. ஆண்' : '1. Male'}</MenuItem>
+                          <MenuItem value="2. ගැහැණු">{language === 'si' ? '2. ගැහැණු' : language === 'ta' ? '2. பெண்' : '2. Female'}</MenuItem>
+                          <MenuItem value="3. වෙනත්">{language === 'si' ? '3. වෙනත්' : language === 'ta' ? '3. மற்றவை' : '3. Other'}</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? 'ජාතික හැඳුනුම්පත් අංකය' : language === 'ta' ? 'தேசிய அடையாள அட்டை எண்' : 'National Identity Card Number (NIC)'}
+                      </Typography>
+                      <TextField fullWidth variant="outlined" size="small" value={formValues['q_nic'] || ''} 
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          handleInputChange('q_nic', val);
+                          const { dob, age } = extractNICDetails(val);
+                          handleInputChange('q_dob_age', (dob && age) ? `${dob} / ${age}` : '');
+                        }} 
+                      />
+                    </Box>
+
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? 'උපන් දිනය / වයස' : language === 'ta' ? 'பிறந்த தேதி / வயது' : 'Date of Birth / Age'}
+                      </Typography>
+                      <TextField fullWidth variant="outlined" size="small" value={formValues['q_dob_age'] || ''} disabled sx={{ bgcolor: 'grey.100' }} />
+                    </Box>
+
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? 'වට්ස්ඇප් දුරකථන අංකය' : language === 'ta' ? 'வாட்ஸ்அப் எண்' : 'WhatsApp Number'}
+                      </Typography>
+                      <TextField fullWidth variant="outlined" size="small" type="tel" value={formValues['q_whatsapp'] || ''} onChange={(e) => handleInputChange('q_whatsapp', e.target.value)} />
+                    </Box>
+
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? 'ප්‍රධාන දුරකථන අංකය' : language === 'ta' ? 'முக்கிய தொலைபேசி எண்' : 'Main Phone Number'}
+                      </Typography>
+                      <TextField fullWidth variant="outlined" size="small" type="tel" value={formValues['q_mobile'] || ''} onChange={(e) => handleInputChange('q_mobile', e.target.value)} />
+                    </Box>
+
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? 'විද්‍යුත් තැපැල් ලිපිනය (ඇත්නම්)' : language === 'ta' ? 'மின்னஞ்சல் முகவரி (ஏதேனும் இருந்தால்)' : 'Email Address (if any)'}
+                      </Typography>
+                      <TextField fullWidth variant="outlined" size="small" type="email" value={formValues['q_email'] || ''} onChange={(e) => handleInputChange('q_email', e.target.value)} />
+                    </Box>
+
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? 'නිවැසි ලිපිනය' : language === 'ta' ? 'குடியிருப்பு முகவரி' : 'Residential Address'}
+                      </Typography>
+                      <TextField fullWidth variant="outlined" size="small" multiline rows={2} value={formValues['q_address'] || ''} onChange={(e) => handleInputChange('q_address', e.target.value)} />
+                    </Box>
+
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? 'උසස්ම අධ්‍යාපන සුදුසුකම' : language === 'ta' ? 'மிக உயர்ந்த கல்வித் தகுதி' : 'Highest Educational Qualification'}
+                      </Typography>
+                      <FormControl fullWidth size="small">
+                        <Select value={formValues['q_education'] || ''} onChange={(e) => handleInputChange('q_education', e.target.value as string)}>
+                          <MenuItem value="1. ප්‍රාථමික">{language === 'si' ? '1. ප්‍රාථමික' : '1. Primary'}</MenuItem>
+                          <MenuItem value="2. ද්විතීයික">{language === 'si' ? '2. ද්විතීයික' : '2. Secondary'}</MenuItem>
+                          <MenuItem value="3. උසස් පෙළ">{language === 'si' ? '3. උසස් පෙළ' : '3. A-Level'}</MenuItem>
+                          <MenuItem value="4. ඩිප්ලෝමා">{language === 'si' ? '4. ඩිප්ලෝමා' : '4. Diploma'}</MenuItem>
+                          <MenuItem value="5. උපාධිය">{language === 'si' ? '5. උපාධිය' : '5. Degree'}</MenuItem>
+                          <MenuItem value="6. උපාධියට වඩා ඉහළ">{language === 'si' ? '6. උපාධියට වඩා ඉහළ' : '6. Postgraduate'}</MenuItem>
+                          <MenuItem value="7. විධිමත් අධ්‍යාපනයක් නැත">{language === 'si' ? '7. විධිමත් අධ්‍යාපනයක් නැත' : '7. No formal education'}</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? 'මෙම කර්මාන්තයේ පළපුරුද්ද (වසර)' : language === 'ta' ? 'இந்தத் துறையில் அனுபவம் (ஆண்டுகள்)' : 'Experience in this Industry (Years)'}
+                      </Typography>
+                      <TextField fullWidth variant="outlined" size="small" type="number" value={formValues['q_experience'] || ''} onChange={(e) => handleInputChange('q_experience', e.target.value)} />
+                    </Box>
+
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? 'කර්මාන්තය ආරම්භ කිරීමට පෙර රැකියාව' : language === 'ta' ? 'தொழில் தொடங்கும் முன் வேலைவாய்ப்பு' : 'Occupation before starting the industry'}
+                      </Typography>
+                      <TextField fullWidth variant="outlined" size="small" value={formValues['q_prev_occupation'] || ''} onChange={(e) => handleInputChange('q_prev_occupation', e.target.value)} />
+                    </Box>
+
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+                      <Button variant="contained" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(1)}>
+                        {language === 'si' ? 'ඊළඟ' : language === 'ta' ? 'அடுத்தது' : 'Next'}
+                      </Button>
+                    </Box>
+                  </Box>
+                )}
+
+                
+                {currentStep === 1 && (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                    <Typography variant="h6" fontWeight="bold" color="primary" sx={{ borderBottom: '2px solid', borderColor: 'primary.main', pb: 1, mb: 1 }}>
+                      {language === 'si' ? 'ව්‍යාපාරයේ නීතිමය තත්ත්වය' : language === 'ta' ? 'வணிகத்தின் சட்ட நிலை' : 'Legal Status of the Business'}
+                    </Typography>
+
+                    {/* Legal Status */}
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? 'ව්‍යාපාරයේ නීතිමය ස්වරූපය කුමක්ද?' : language === 'ta' ? 'வணிகத்தின் சட்ட வடிவம் என்ன?' : 'What is the legal form of the business?'}
+                      </Typography>
+                      <FormControl fullWidth size="small">
+                        <Select value={formValues['q_legal_status'] || ''} onChange={(e) => handleInputChange('q_legal_status', e.target.value as string)}>
+                          <MenuItem value="1. තනි හිමිකාරිත්වය">{language === 'si' ? '1. තනි හිමිකාරිත්වය' : '1. Sole Proprietorship'}</MenuItem>
+                          <MenuItem value="2. හවුල් ව්‍යාපාරය">{language === 'si' ? '2. හවුල් ව්‍යාපාරය' : '2. Partnership'}</MenuItem>
+                          <MenuItem value="3. පෞද්ගලික සමාගම (Pvt Ltd)">{language === 'si' ? '3. පෞද්ගලික සමාගම (Pvt Ltd)' : '3. Private Limited (Pvt Ltd)'}</MenuItem>
+                          <MenuItem value="4. පොදු සමාගම (PLC)">{language === 'si' ? '4. පොදු සමාගම (PLC)' : '4. Public Limited (PLC)'}</MenuItem>
+                          <MenuItem value="5. සමුපකාර සමිතිය">{language === 'si' ? '5. සමුපකාර සමිතිය' : '5. Cooperative Society'}</MenuItem>
+                          <MenuItem value="6. ලියාපදිංචි නොකළ ගෘහස්ථ ව්‍යාපාරය">{language === 'si' ? '6. ලියාපදිංචි නොකළ ගෘහස්ථ ව්‍යාපාරය' : '6. Unregistered Home Business'}</MenuItem>
+                          <MenuItem value="7. වෙනත් (සඳහන් කරන්න)">{language === 'si' ? '7. වෙනත් (සඳහන් කරන්න)' : '7. Other (Specify)'}</MenuItem>
+                        </Select>
+                      </FormControl>
+                      {formValues['q_legal_status'] === '7. වෙනත් (සඳහන් කරන්න)' && (
+                        <TextField fullWidth variant="outlined" size="small" placeholder={language === 'si' ? 'වෙනත් ස්වරූපය සඳහන් කරන්න' : 'Specify other form'} value={formValues['q_legal_status_other'] || ''} onChange={(e) => handleInputChange('q_legal_status_other', e.target.value)} sx={{ mt: 1 }} />
+                      )}
+                    </Box>
+
+                    {/* Registration Status */}
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? 'ව්‍යාපාරය ලියාපදිංචි කර තිබේද?' : language === 'ta' ? 'வணிகம் பதிவு செய்யப்பட்டுள்ளதா?' : 'Is the business registered?'}
+                      </Typography>
+                      <FormControl fullWidth size="small">
+                        <Select value={formValues['q_is_registered'] || ''} onChange={(e) => handleInputChange('q_is_registered', e.target.value as string)}>
+                          <MenuItem value="1. ඔව්">{language === 'si' ? '1. ඔව්' : '1. Yes'}</MenuItem>
+                          <MenuItem value="2. ලියාපදිංචි කිරීමේ ක්‍රියාවලියේ">{language === 'si' ? '2. ලියාපදිංචි කිරීමේ ක්‍රියාවලියේ' : '2. In the registration process'}</MenuItem>
+                          <MenuItem value="3. නැත">{language === 'si' ? '3. නැත' : '3. No'}</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+
+                    {/* Registered Agencies */}
+                    {(formValues['q_is_registered'] === '1. ඔව්' || formValues['q_is_registered'] === '2. ලියාපදිංචි කිරීමේ ක්‍රියාවලියේ') && (
+                      <Box>
+                        <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                          {language === 'si' ? 'ලියාපදිංචි කර ඇත්නම්, කුමන ආයතනයක් සමඟද? (බහුවරණය)' : language === 'ta' ? 'பதிவு செய்திருந்தால், எந்த நிறுவனத்துடன்?' : 'If registered, with which agency? (Multiple Choice)'}
+                        </Typography>
+                        <FormControl fullWidth size="small">
+                          <Select 
+                            multiple 
+                            value={formValues['q_registered_agencies'] ? formValues['q_registered_agencies'].split(', ') : []} 
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              const valArray = typeof val === 'string' ? val.split(',') : val;
+                              handleInputChange('q_registered_agencies', valArray.join(', '));
+                            }}
+                            input={<OutlinedInput />}
+                            renderValue={(selected) => (selected as string[]).join(', ')}
+                          >
+                            {['1. ප්‍රාදේශීය සභාව', '2. ප්‍රාදේශීය ලේකම් කාර්යාලය', '3. සමාගම් ලියාපදිංචි කාර්යාලය', '4. බදු දෙපාර්තමේන්තුව', '5. සමාජ සුරක්ෂිත ආයතනය', '6. වෙනත්'].map((name) => (
+                              <MenuItem key={name} value={name}>
+                                <Checkbox checked={formValues['q_registered_agencies'] ? formValues['q_registered_agencies'].split(', ').indexOf(name) > -1 : false} />
+                                <ListItemText primary={
+                                  name === '1. ප්‍රාදේශීය සභාව' ? (language === 'si' ? '1. ප්‍රාදේශීය සභාව' : '1. Local Council') :
+                                  name === '2. ප්‍රාදේශීය ලේකම් කාර්යාලය' ? (language === 'si' ? '2. ප්‍රාදේශීය ලේකම් කාර්යාලය' : '2. Divisional Secretariat') :
+                                  name === '3. සමාගම් ලියාපදිංචි කාර්යාලය' ? (language === 'si' ? '3. සමාගම් ලියාපදිංචි කාර්යාලය' : '3. Registrar of Companies') :
+                                  name === '4. බදු දෙපාර්තමේන්තුව' ? (language === 'si' ? '4. බදු දෙපාර්තමේන්තුව' : '4. Tax Department') :
+                                  name === '5. සමාජ සුරක්ෂිත ආයතනය' ? (language === 'si' ? '5. සමාජ සුරක්ෂිත ආයතනය' : '5. Social Security Board') :
+                                  (language === 'si' ? '6. වෙනත්' : '6. Other')
+                                } />
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                        {formValues['q_registered_agencies'] && formValues['q_registered_agencies'].includes('6. වෙනත්') && (
+                          <TextField fullWidth variant="outlined" size="small" placeholder={language === 'si' ? 'වෙනත් ආයතනය සඳහන් කරන්න' : 'Specify other agency'} value={formValues['q_registered_agencies_other'] || ''} onChange={(e) => handleInputChange('q_registered_agencies_other', e.target.value)} sx={{ mt: 1 }} />
+                        )}
+                      </Box>
+                    )}
+
+                    {/* Registration Number */}
+                    {formValues['q_is_registered'] === '1. ඔව්' && (
+                      <Box>
+                        <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                          {language === 'si' ? 'ලියාපදිංචි අංක(ය)' : language === 'ta' ? 'பதிவு எண்(கள்)' : 'Registration Number(s)'}
+                        </Typography>
+                        <TextField fullWidth variant="outlined" size="small" value={formValues['q_registration_number'] || ''} onChange={(e) => handleInputChange('q_registration_number', e.target.value)} />
+                      </Box>
+                    )}
+
+                    {/* VAT Number */}
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? '(VAT) Number' : '(VAT) Number'}
+                      </Typography>
+                      <FormControl fullWidth size="small">
+                        <Select value={formValues['q_has_vat'] || ''} onChange={(e) => handleInputChange('q_has_vat', e.target.value as string)}>
+                          <MenuItem value="1. ඔව්">{language === 'si' ? '1. ඔව්' : '1. Yes'}</MenuItem>
+                          <MenuItem value="2. නැත">{language === 'si' ? '2. නැත' : '2. No'}</MenuItem>
+                        </Select>
+                      </FormControl>
+                      {formValues['q_has_vat'] === '1. ඔව්' && (
+                        <TextField fullWidth variant="outlined" size="small" placeholder={language === 'si' ? 'VAT අංකය ඇතුළත් කරන්න' : 'Enter VAT Number'} value={formValues['q_vat_number'] || ''} onChange={(e) => handleInputChange('q_vat_number', e.target.value)} sx={{ mt: 1 }} />
+                      )}
+                    </Box>
+
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                      <Button variant="outlined" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(3)}>
+                        {language === 'si' ? 'පෙර' : language === 'ta' ? 'முந்தைய' : 'Previous'}
+                      </Button>
+                      <Button variant="contained" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(2)}>
+                        {language === 'si' ? 'ඊළඟ' : language === 'ta' ? 'அடுத்தது' : 'Next'}
+                      </Button>
+                    </Box>
+                  </Box>
+                )}
+
+                
+                {currentStep === 2 && (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                    <Typography variant="h6" fontWeight="bold" color="primary" sx={{ borderBottom: '2px solid', borderColor: 'primary.main', pb: 1, mb: 1 }}>
+                      {language === 'si' ? 'ස්ථානය හා යටිතල පහසුකම්' : language === 'ta' ? 'இடம் மற்றும் உள்கட்டமைப்பு' : 'Location & Infrastructure'}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary" sx={{ fontStyle: 'italic', mb: 2 }}>
+                      {language === 'si' ? 'මෙම කොටස World Bank Enterprise Surveys හි Section C (Infrastructure and Services) හා ILO QHUEM0_1 ප්‍රශ්න මත පදනම් වේ' : 'This section is based on World Bank Enterprise Surveys Section C (Infrastructure and Services) and ILO QHUEM0_1 questions'}
+                    </Typography>
+                    <Typography variant="subtitle1" fontWeight="bold" color="textSecondary" sx={{ mb: 1 }}>
+                      {language === 'si' ? '2.1 ව්‍යාපාරික ස්ථානය' : language === 'ta' ? '2.1 வணிக இடம்' : '2.1 Business Location'}
+                    </Typography>
+
+                    {/* Business Location Type */}
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? 'ව්‍යාපාරය ක්‍රියාත්මක වන ස්ථානය කුමක්ද?' : language === 'ta' ? 'வணிகம் செயல்படும் இடம் எது?' : 'Where does the business operate?'}
+                      </Typography>
+                      <FormControl fullWidth size="small">
+                        <Select value={formValues['q_business_location_type'] || ''} onChange={(e) => handleInputChange('q_business_location_type', e.target.value as string)}>
+                          <MenuItem value="1. නිවස තුළ (වෙනම ඉඩක් නැතිව)">{language === 'si' ? '1. නිවස තුළ (වෙනම ඉඩක් නැතිව)' : '1. Inside home (no separate space)'}</MenuItem>
+                          <MenuItem value="2. නිවසේ කාමරයක">{language === 'si' ? '2. නිවසේ කාමරයක' : '2. In a room of the house'}</MenuItem>
+                          <MenuItem value="3. නිවසේ වෙනම කොටසක/උඩුමහලේ">{language === 'si' ? '3. නිවසේ වෙනම කොටසක/උඩුමහලේ' : '3. In a separate part/upstairs of the house'}</MenuItem>
+                          <MenuItem value="4. නිවසට යාබදව ඉදිකළ වෙනම ගොඩනැගිල්ලක">{language === 'si' ? '4. නිවසට යාබදව ඉදිකළ වෙනම ගොඩනැගිල්ලක' : '4. In a separate building adjacent to the house'}</MenuItem>
+                          <MenuItem value="5. වෙනම ස්ථිර ස්ථානයක (කුලියට/තමන්ගේ)">{language === 'si' ? '5. වෙනම ස්ථිර ස්ථානයක (කුලියට/තමන්ගේ)' : '5. In a separate permanent location (rented/owned)'}</MenuItem>
+                          <MenuItem value="6. වෙනත් තාවකාලික ස්ථානයක (කුටිය, කියෝස්ක්, වීදි කඩය)">{language === 'si' ? '6. වෙනත් තාවකාලික ස්ථානයක (කුටිය, කියෝස්ක්, වීදි කඩය)' : '6. In a temporary location (booth, kiosk, street stall)'}</MenuItem>
+                          <MenuItem value="7. ගමන් කරන ව්‍යාපාරයක් (හෝකර්, පාරේ විකුණුම්)">{language === 'si' ? '7. ගමන් කරන ව්‍යාපාරයක් (හෝකර්, පාරේ විකුණුම්)' : '7. Traveling business (hawker, street sales)'}</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+
+                    {/* Business Address */}
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? 'ව්‍යාපාරික ස්ථානයේ ලිපිනය' : language === 'ta' ? 'வணிக இடத்தின் முகவரி' : 'Business Location Address'}
+                      </Typography>
+                      <TextField fullWidth variant="outlined" size="small" multiline rows={2} value={formValues['q_business_address'] || ''} onChange={(e) => handleInputChange('q_business_address', e.target.value)} />
+                    </Box>
+
+                    {/* Branch Address */}
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? 'ශාඛා ලිපින(ය) (ඇත්නම්)' : language === 'ta' ? 'கிளை முகவரி(கள்) (ஏதேனும் இருந்தால்)' : 'Branch Address(es) (if any)'}
+                      </Typography>
+                      <TextField fullWidth variant="outlined" size="small" multiline rows={2} value={formValues['q_branch_address'] || ''} onChange={(e) => handleInputChange('q_branch_address', e.target.value)} />
+                    </Box>
+
+                    {/* Location Ownership */}
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? 'ස්ථානයේ හිමිකාරිත්වය' : language === 'ta' ? 'இடத்தின் உரிமை' : 'Location Ownership'}
+                      </Typography>
+                      <FormControl fullWidth size="small">
+                        <Select value={formValues['q_location_ownership'] || ''} onChange={(e) => handleInputChange('q_location_ownership', e.target.value as string)}>
+                          <MenuItem value="1. තමන් සතුය">{language === 'si' ? '1. තමන් සතුය' : '1. Owned'}</MenuItem>
+                          <MenuItem value="2. කුලියට ගෙන ඇත">{language === 'si' ? '2. කුලියට ගෙන ඇත' : '2. Rented'}</MenuItem>
+                          <MenuItem value="3. නොමිලේ භාවිතා කරයි">{language === 'si' ? '3. නොමිලේ භාවිතා කරයි' : '3. Free to use'}</MenuItem>
+                          <MenuItem value="4. වෙනත්">{language === 'si' ? '4. වෙනත්' : '4. Other'}</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+
+                    {/* Rent Amount */}
+                    {formValues['q_location_ownership'] === '2. කුලියට ගෙන ඇත' && (
+                      <Box>
+                        <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                          {language === 'si' ? 'කුලියට ගෙන ඇත්නම්, මාසික කුලී මුදල' : language === 'ta' ? 'வாடகைக்கு எடுக்கப்பட்டிருந்தால், மாதாந்திர வாடகை' : 'If rented, monthly rent amount'}
+                        </Typography>
+                        <TextField 
+                          fullWidth 
+                          variant="outlined" 
+                          size="small" 
+                          type="number"
+                          InputProps={{ startAdornment: <Typography sx={{mr: 1, color: 'text.secondary'}}>LKR</Typography> }}
+                          value={formValues['q_rent_amount'] || ''} 
+                          onChange={(e) => handleInputChange('q_rent_amount', e.target.value)} 
+                        />
+                      </Box>
+                    )}
+
+                    {/* Building Tax */}
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? 'ගොඩනැගිල්ල සඳහා බද්දක් ගෙවන්නේද?' : language === 'ta' ? 'கட்டிடத்திற்கு வரி செலுத்துகிறீர்களா?' : 'Do you pay a tax for the building?'}
+                      </Typography>
+                      <FormControl fullWidth size="small">
+                        <Select value={formValues['q_pay_building_tax'] || ''} onChange={(e) => handleInputChange('q_pay_building_tax', e.target.value as string)}>
+                          <MenuItem value="1. ඔව්">{language === 'si' ? '1. ඔව්' : '1. Yes'}</MenuItem>
+                          <MenuItem value="2. නැත">{language === 'si' ? '2. නැත' : '2. No'}</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+
+                    {/* Building Tax Amount */}
+                    {formValues['q_pay_building_tax'] === '1. ඔව්' && (
+                      <Box>
+                        <Typography variant="subtitle1" fontWeight="600" mb={1} mt={1}>
+                          {language === 'si' ? 'මාසික ගෙවීම' : language === 'ta' ? 'மாதாந்திர கட்டணம்' : 'Monthly Payment'}
+                        </Typography>
+                        <TextField 
+                          fullWidth 
+                          variant="outlined" 
+                          size="small" 
+                          type="number"
+                          InputProps={{ startAdornment: <Typography sx={{mr: 1, color: 'text.secondary'}}>LKR</Typography> }}
+                          value={formValues['q_building_tax_amount'] || ''} 
+                          onChange={(e) => handleInputChange('q_building_tax_amount', e.target.value)} 
+                        />
+                      </Box>
+                    )}
+
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                      <Button variant="outlined" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(1)}>
+                        {language === 'si' ? 'පෙර' : language === 'ta' ? 'முந்தைய' : 'Previous'}
+                      </Button>
+                      <Button variant="contained" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(3)}>
+                        {language === 'si' ? 'ඊළඟ' : language === 'ta' ? 'அடுத்தது' : 'Next'}
+                      </Button>
+                    </Box>
+                  </Box>
+                )}
+
+                
+                {currentStep === 3 && (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                    <Typography variant="h6" fontWeight="bold" color="primary" sx={{ borderBottom: '2px solid', borderColor: 'primary.main', pb: 1, mb: 1 }}>
+                      {language === 'si' ? 'යටිතල පහසුකම් හා සේවා' : language === 'ta' ? 'உள்கட்டமைப்பு மற்றும் சேவைகள்' : 'Infrastructure and Services'}
+                    </Typography>
+
+                    {/* Uses Electricity */}
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? 'විදුලිය භාවිතා කරන්නේද?' : language === 'ta' ? 'மின்சாரம் பயன்படுத்துகிறீர்களா?' : 'Do you use electricity?'}
+                      </Typography>
+                      <FormControl fullWidth size="small">
+                        <Select value={formValues['q_uses_electricity'] || ''} onChange={(e) => handleInputChange('q_uses_electricity', e.target.value as string)}>
+                          <MenuItem value="1. ඔව් (ජාතික විදුලිබල මණ්ඩලයෙන්)">{language === 'si' ? '1. ඔව් (ජාතික විදුලිබල මණ්ඩලයෙන්)' : '1. Yes (National Grid)'}</MenuItem>
+                          <MenuItem value="2. ඔව් (සූර්ය බලයෙන්)">{language === 'si' ? '2. ඔව් (සූර්ය බලයෙන්)' : '2. Yes (Solar Power)'}</MenuItem>
+                          <MenuItem value="3. ඔව් (ජනක යන්ත්‍රයකින්)">{language === 'si' ? '3. ඔව් (ජනක යන්ත්‍රයකින්)' : '3. Yes (Generator)'}</MenuItem>
+                          <MenuItem value="4. නැත">{language === 'si' ? '4. නැත' : '4. No'}</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+
+                    {/* Main Energy Source (Multi) */}
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? 'ප්‍රධාන බලශක්ති ප්‍රභවය කුමක්ද?' : language === 'ta' ? 'முக்கிய ஆற்றல் ஆதாரம் என்ன?' : 'What is the main energy source? (Multiple)'}
+                      </Typography>
+                      <FormControl fullWidth size="small">
+                        <Select 
+                          multiple 
+                          value={formValues['q_main_energy_source'] ? formValues['q_main_energy_source'].split(', ') : []} 
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            const valArray = typeof val === 'string' ? val.split(',') : val;
+                            handleInputChange('q_main_energy_source', valArray.join(', '));
+                          }}
+                          input={<OutlinedInput />}
+                          renderValue={(selected) => (selected as string[]).join(', ')}
+                        >
+                          {['1. විදුලිය', '2. ඩීසල්', '3. භූමිතෙල්', '4. සූර්ය බලය', '5. දර', '6. ගෑස්', '7. වෙනත්'].map((name) => (
+                            <MenuItem key={name} value={name}>
+                              <Checkbox checked={formValues['q_main_energy_source'] ? formValues['q_main_energy_source'].split(', ').indexOf(name) > -1 : false} />
+                              <ListItemText primary={
+                                name === '1. විදුලිය' ? (language === 'si' ? '1. විදුලිය' : '1. Electricity') :
+                                name === '2. ඩීසල්' ? (language === 'si' ? '2. ඩීසල්' : '2. Diesel') :
+                                name === '3. භූමිතෙල්' ? (language === 'si' ? '3. භූමිතෙල්' : '3. Kerosene') :
+                                name === '4. සූර්ය බලය' ? (language === 'si' ? '4. සූර්ය බලය' : '4. Solar') :
+                                name === '5. දර' ? (language === 'si' ? '5. දර' : '5. Firewood') :
+                                name === '6. ගෑස්' ? (language === 'si' ? '6. ගෑස්' : '6. Gas') :
+                                (language === 'si' ? '7. වෙනත්' : '7. Other')
+                              } />
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Box>
+
+                    {/* Power Outages */}
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? 'සතියකට සාමාන්‍යයෙන් විදුලිය ඇනහිටීම් කීයක් සිදුවේද?' : language === 'ta' ? 'வாரத்திற்கு சராசரியாக எத்தனை முறை மின் தடை ஏற்படுகிறது?' : 'How many power outages occur per week on average?'}
+                      </Typography>
+                      <TextField 
+                        fullWidth 
+                        variant="outlined" 
+                        size="small" 
+                        type="number"
+                        InputProps={{ endAdornment: <Typography sx={{ml: 1, color: 'text.secondary', whiteSpace: 'nowrap'}}>{language === 'si' ? 'වාරයක්' : 'Times'}</Typography> }}
+                        value={formValues['q_power_outages'] || ''} 
+                        onChange={(e) => handleInputChange('q_power_outages', e.target.value)} 
+                      />
+                    </Box>
+
+                    {/* Water Source */}
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? 'ජලය ලබා ගන්නේ කෙසේද?' : language === 'ta' ? 'தண்ணீர் எப்படி பெறுவது?' : 'How is water obtained?'}
+                      </Typography>
+                      <FormControl fullWidth size="small">
+                        <Select value={formValues['q_water_source'] || ''} onChange={(e) => handleInputChange('q_water_source', e.target.value as string)}>
+                          <MenuItem value="1. නල ජලය">{language === 'si' ? '1. නල ජලය' : '1. Pipe Water'}</MenuItem>
+                          <MenuItem value="2. ළිඳකින්">{language === 'si' ? '2. ළිඳකින්' : '2. Well'}</MenuItem>
+                          <MenuItem value="3. උල්පතකින්">{language === 'si' ? '3. උල්පතකින්' : '3. Spring'}</MenuItem>
+                          <MenuItem value="4. ටැංකි රථයකින්">{language === 'si' ? '4. ටැංකි රථයකින්' : '4. Water Bowser'}</MenuItem>
+                          <MenuItem value="5. ගඟක්/ඇළක්">{language === 'si' ? '5. ගඟක්/ඇළක්' : '5. River/Stream'}</MenuItem>
+                          <MenuItem value="6. වෙනත්">{language === 'si' ? '6. වෙනත්' : '6. Other'}</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+
+                    {/* Water Storage */}
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? 'ජලය ගබඩා කිරීමේ පහසුකමක් තිබේද?' : language === 'ta' ? 'நீர் சேமிப்பு வசதி உள்ளதா?' : 'Is there a water storage facility?'}
+                      </Typography>
+                      <FormControl fullWidth size="small">
+                        <Select value={formValues['q_water_storage'] || ''} onChange={(e) => handleInputChange('q_water_storage', e.target.value as string)}>
+                          <MenuItem value="1. ඔව්">{language === 'si' ? '1. ඔව්' : '1. Yes'}</MenuItem>
+                          <MenuItem value="2. නැත">{language === 'si' ? '2. නැත' : '2. No'}</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+
+                    {/* Internet Access */}
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? 'අන්තර්ජාල පහසුකම තිබේද?' : language === 'ta' ? 'இணைய வசதி உள்ளதா?' : 'Is there internet access?'}
+                      </Typography>
+                      <FormControl fullWidth size="small">
+                        <Select value={formValues['q_internet_access'] || ''} onChange={(e) => handleInputChange('q_internet_access', e.target.value as string)}>
+                          <MenuItem value="1. ඔව් (ජංගම දත්ත)">{language === 'si' ? '1. ඔව් (ජංගම දත්ත)' : '1. Yes (Mobile Data)'}</MenuItem>
+                          <MenuItem value="2. ඔව් (බ්‍රෝඩ්බෑන්ඩ්)">{language === 'si' ? '2. ඔව් (බ්‍රෝඩ්බෑන්ඩ්)' : '2. Yes (Broadband)'}</MenuItem>
+                          <MenuItem value="3. නැත">{language === 'si' ? '3. නැත' : '3. No'}</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+
+                    {/* Telephone Service (Multi) */}
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight="600" mb={1}>
+                        {language === 'si' ? 'දුරකථන සේවාව තිබේද?' : language === 'ta' ? 'தொலைபேசி சேவை உள்ளதா?' : 'Is there telephone service? (Multiple)'}
+                      </Typography>
+                      <FormControl fullWidth size="small">
+                        <Select 
+                          multiple 
+                          value={formValues['q_telephone_service'] ? formValues['q_telephone_service'].split(', ') : []} 
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            const valArray = typeof val === 'string' ? val.split(',') : val;
+                            handleInputChange('q_telephone_service', valArray.join(', '));
+                          }}
+                          input={<OutlinedInput />}
+                          renderValue={(selected) => (selected as string[]).join(', ')}
+                        >
+                          {['1. ඔව් (ස්ථාවර)', '2. ඔව් (ජංගම)', '3. නැත'].map((name) => (
+                            <MenuItem key={name} value={name}>
+                              <Checkbox checked={formValues['q_telephone_service'] ? formValues['q_telephone_service'].split(', ').indexOf(name) > -1 : false} />
+                              <ListItemText primary={
+                                name === '1. ඔව් (ස්ථාවර)' ? (language === 'si' ? '1. ඔව් (ස්ථාවර)' : '1. Yes (Fixed)') :
+                                name === '2. ඔව් (ජංගම)' ? (language === 'si' ? '2. ඔව් (ජංගම)' : '2. Yes (Mobile)') :
+                                (language === 'si' ? '3. නැත' : '3. No')
+                              } />
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                      <Button variant="outlined" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(2)}>
+                        {language === 'si' ? 'පෙර' : language === 'ta' ? 'முந்தைய' : 'Previous'}
+                      </Button>
+                      <Button variant="contained" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(4)}>
+                        {language === 'si' ? 'ඊළඟ' : language === 'ta' ? 'அடுத்தது' : 'Next'}
+                      </Button>
+                    </Box>
+                  </Box>
+                )}
+
+                {currentStep === 4 && (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                    <Typography variant="h6" fontWeight="bold" color="primary" sx={{ borderBottom: '2px solid', borderColor: 'primary.main', pb: 1, mb: 1 }}>
+                      {language === 'si' ? 'වෙනත් තොරතුරු' : language === 'ta' ? 'பிற தகவல்கள்' : 'Other Information'}
+                    </Typography>
+                    
+                    {questions.map((q: any) => {
+                      const qText = language === 'si' ? (q.questionTextSi || q.questionTextEn) : language === 'ta' ? (q.questionTextTa || q.questionTextEn) : q.questionTextEn;
+                      return (
+                        <Box key={q.id}>
+                          <Typography variant="subtitle1" fontWeight="600" mb={1}>{qText}</Typography>
+                          <TextField
+                            fullWidth
+                            variant="outlined"
+                            size="small"
+                            value={formValues[q.id] || ''}
+                            onChange={(e) => handleInputChange(q.id, e.target.value)}
+                          />
+                        </Box>
+                      );
+                    })}
+
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                      <Button variant="outlined" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(1)}>
+                        {language === 'si' ? 'පෙර' : language === 'ta' ? 'முந்தைய' : 'Previous'}
+                      </Button>
+                      <Button type="submit" variant="contained" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }}>
+                        {language === 'si' ? 'ඉදිරිපත් කරන්න' : language === 'ta' ? 'சமர்ப்பிக்க' : 'Submit Survey'}
+                      </Button>
+                    </Box>
+                  </Box>
+                )}
+              </Box>
+            </Paper>
+          </Container>
+        )}
+
+        {/* Location Confirmation Dialog */}
+        <Dialog open={!!ccode && !locationConfirmed && !showLocationSelector && !!gnData?.gnByCcode} onClose={() => {}}>
+          <DialogTitle sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+            {language === 'si' ? 'ස්ථානය තහවුරු කරන්න' : language === 'ta' ? 'இடத்தை உறுதிப்படுத்தவும்' : 'Confirm Location'}
+          </DialogTitle>
+          <DialogContent>
+            <Typography variant="body1" mb={2}>
+              {language === 'si' ? 'මෙය ඔබගේ නිවැරදි ග්‍රාම නිලධාරී වසම දැයි තහවුරු කරන්න:' : language === 'ta' ? 'இது உங்களின் சரியான கிராம உத்தியோகத்தர் பிரிவு என்பதை உறுதிப்படுத்தவும்:' : 'Are you sure this is your correct Village / GN Division?'}
+            </Typography>
+            <Box sx={{ bgcolor: 'grey.100', p: 2, borderRadius: 2 }}>
+              <Typography variant="body2"><strong>{language === 'si' ? 'දිස්ත්‍රික්කය:' : language === 'ta' ? 'மாவட்டம்:' : 'District:'}</strong> {gnData?.gnByCcode?.disEn}</Typography>
+              <Typography variant="body2"><strong>{language === 'si' ? 'ප්‍රාදේශීය ලේකම් කොට්ඨාසය:' : language === 'ta' ? 'பிரதேச செயலகம்:' : 'DS Division:'}</strong> {gnData?.gnByCcode?.dsEn}</Typography>
+              <Typography variant="body2"><strong>{language === 'si' ? 'ග්‍රාම නිලධාරී වසම:' : language === 'ta' ? 'கிராம உத்தியோகத்தர் பிரிவு:' : 'Village / GN Division:'}</strong> {gnData?.gnByCcode?.nameEn}</Typography>
             </Box>
-          </Paper>
-        </Container>
+          </DialogContent>
+          <DialogActions sx={{ p: 2, pt: 0 }}>
+            <Button 
+              variant="outlined" 
+              color="error" 
+              onClick={() => setShowLocationSelector(true)}
+            >
+              {language === 'si' ? 'නැත, වෙනස් කරන්න' : language === 'ta' ? 'இல்லை, மாற்றவும்' : 'No, Change'}
+            </Button>
+            <Button 
+              variant="contained" 
+              color="primary" 
+              onClick={() => {
+                setLocationConfirmed(true);
+                const draftStr = localStorage.getItem(`survey_draft_${ccode}`);
+                if (draftStr) {
+                  setShowResumePopup(true);
+                } else {
+                  setShowMetadataPopup(true);
+                }
+              }}
+            >
+              {language === 'si' ? 'ඔව්, නිවැරදියි' : language === 'ta' ? 'ஆம், சரியானது' : 'Yes, Proceed'}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Survey Metadata Popup */}
+        <Dialog open={showMetadataPopup && !surveyStartTime} onClose={() => {}}>
+          <DialogTitle sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+            {language === 'si' ? 'සමීක්ෂණ තොරතුරු' : language === 'ta' ? 'கணக்கெடுப்பு தகவல்' : 'Survey Information'}
+          </DialogTitle>
+          <DialogContent>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+              <Typography variant="body1">
+                <strong>{language === 'si' ? 'ග්‍රාම නිලධාරි වසම:' : 'Village / GN Division:'}</strong> {gnData?.gnByCcode?.nameEn}
+              </Typography>
+              <Typography variant="body1">
+                <strong>{language === 'si' ? 'ප්‍රාදේශීය ලේකම් කොට්ඨාශය:' : 'DS Division:'}</strong> {gnData?.gnByCcode?.dsEn}
+              </Typography>
+              <Typography variant="body1">
+                <strong>{language === 'si' ? 'සමීක්ෂණ දිනය:' : 'Survey Date:'}</strong> {new Date().toLocaleDateString()}
+              </Typography>
+              <Typography variant="body1">
+                <strong>{language === 'si' ? 'සමීක්ෂකගේ නම:' : 'Surveyor Name:'}</strong> {userInfo?.name || 'Unknown'}
+              </Typography>
+              <Typography variant="body1">
+                <strong>{language === 'si' ? 'සමීක්ෂණ ආරම්භය:' : 'Start Time:'}</strong> {language === 'si' ? 'ස්වයංක්‍රීයව' : 'Auto'} (____:____)
+              </Typography>
+              <Typography variant="body1">
+                <strong>{language === 'si' ? 'අවසානය:' : 'End Time:'}</strong> {language === 'si' ? 'ස්වයංක්‍රීයව' : 'Auto'} (____:____)
+              </Typography>
+              <Typography variant="body2" color="textSecondary" mt={2}>
+                * {language === 'si' ? 'ඔබ OK බොත්තම ක්ලික් කළ විට ආරම්භක වේලාව සටහන් වේ. අවසන් වේලාව පෝරමය ඉදිරිපත් කිරීමේදී සටහන් වේ.' : 'Start time will be recorded when you click OK. End time will be recorded when you submit the form.'}
+              </Typography>
+            </Box>
+          </DialogContent>
+          <DialogActions sx={{ p: 2, pt: 0 }}>
+            <Button 
+              variant="contained" 
+              color="primary" 
+              onClick={() => {
+                setSurveyStartTime(new Date());
+                setShowMetadataPopup(false);
+                setShowGpsPopup(true);
+              }}
+            >
+              OK
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* GPS Confirmation Popup */}
+        <Dialog open={showGpsPopup} onClose={() => {}}>
+          <DialogTitle sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+            {language === 'si' ? 'භූගෝලීය ඛණ්ඩාංක (GPS)' : language === 'ta' ? 'புவியியல் ஆயத்தொலைவுகள் (GPS)' : 'GPS Coordinates'}
+          </DialogTitle>
+          <DialogContent>
+            <Typography variant="body1">
+              {language === 'si' 
+                ? 'ඔබ දැනට සිටින්නේ නිවැරදි සමීක්ෂණ ස්ථානයේ ද? (ඔව් නම්, ස්ථානය ස්වයංක්‍රීයව සටහන් වේ)' 
+                : 'Are you currently at the correct survey location? (If Yes, location will be recorded automatically)'}
+            </Typography>
+          </DialogContent>
+          <DialogActions sx={{ p: 2, pt: 0 }}>
+            <Button 
+              variant="outlined" 
+              color="error" 
+              onClick={() => {
+                setShowGpsPopup(false);
+              }}
+            >
+              {language === 'si' ? 'නැත' : 'No'}
+            </Button>
+            <Button 
+              variant="contained" 
+              color="primary" 
+              onClick={() => {
+                if (navigator.geolocation) {
+                  navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                      setGpsCoordinates({
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                      });
+                      setShowGpsPopup(false);
+                    },
+                    (error) => {
+                      console.error("Geolocation Error:", error);
+                      let errorMsg = language === 'si' ? 'ස්ථානය ලබා ගැනීමට නොහැකි විය.' : 'Failed to get location.';
+                      
+                      if (error.code === error.PERMISSION_DENIED) {
+                        errorMsg = language === 'si' ? 'ස්ථානය ලබා ගැනීමට අවසර ලබා දී නොමැත. කරුණාකර බ්‍රවුසරයේ සැකසුම් පරීක්ෂා කරන්න (Location permission denied).' : 'Location permission denied. Please check your browser settings.';
+                      } else if (error.code === error.POSITION_UNAVAILABLE) {
+                        errorMsg = language === 'si' ? 'ස්ථාන තොරතුරු ලබා ගත නොහැක (Location unavailable).' : 'Location information is unavailable.';
+                      } else if (error.code === error.TIMEOUT) {
+                        errorMsg = language === 'si' ? 'ස්ථානය ලබා ගැනීමේ කාලය ඉකුත් විය (Timeout).' : 'The request to get user location timed out.';
+                      }
+
+                      setGpsErrorPopup(errorMsg);
+                    },
+                    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+                  );
+                } else {
+                  setGpsErrorPopup(language === 'si' ? 'ඔබගේ බ්‍රවුසරය GPS සඳහා සහය නොදක්වයි.' : 'Geolocation is not supported by this browser.');
+                }
+              }}
+            >
+              {language === 'si' ? 'ඔව්' : 'Yes'}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Resume Draft Popup */}
+        <Dialog open={showResumePopup} onClose={() => {}}>
+          <DialogTitle sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+            {language === 'si' ? 'අසම්පූර්ණ සමීක්ෂණයක් සොයා ගන්නා ලදී' : language === 'ta' ? 'முடிக்கப்படாத கணக்கெடுப்பு' : 'Unfinished Survey Found'}
+          </DialogTitle>
+          <DialogContent>
+            <Typography variant="body1">
+              {language === 'si' 
+                ? 'මෙම ග්‍රාම නිලධාරී වසම සඳහා ඔබ මින් පෙර ආරම්භ කළ අසම්පූර්ණ සමීක්ෂණයක් ඇත. ඔබ එය නැවත ආරම්භ කිරීමට හෝ අලුතින් සමීක්ෂණයක් ආරම්භ කිරීමට කැමතිද?' 
+                : 'There is an unfinished survey for this Village. Do you want to resume where you left off, or start a new survey?'}
+            </Typography>
+          </DialogContent>
+          <DialogActions sx={{ p: 2, pt: 0 }}>
+            <Button 
+              variant="outlined" 
+              color="error" 
+              onClick={() => {
+                localStorage.removeItem(`survey_draft_${ccode}`);
+                setShowResumePopup(false);
+                setShowMetadataPopup(true);
+              }}
+            >
+              {language === 'si' ? 'අලුතින් ආරම්භ කරන්න' : 'Start New'}
+            </Button>
+            <Button 
+              variant="contained" 
+              color="primary" 
+              onClick={() => {
+                const draftStr = localStorage.getItem(`survey_draft_${ccode}`);
+                if (draftStr) {
+                  const draft = JSON.parse(draftStr);
+                  setFormValues(draft.formValues || {});
+                  setGpsCoordinates(draft.gpsCoordinates || null);
+                  if (draft.currentStep !== undefined) {
+                    setCurrentStep(draft.currentStep);
+                  }
+                  if (draft.surveyStartTime) {
+                    setSurveyStartTime(new Date(draft.surveyStartTime));
+                  }
+                }
+                setShowResumePopup(false);
+              }}
+            >
+              {language === 'si' ? 'නැවත ආරම්භ කරන්න' : 'Resume Survey'}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Location Selector Modal */}
+        <LocationSelectorModal 
+          open={showLocationSelector} 
+          onLocationSelected={(gn) => {
+            setShowLocationSelector(false);
+            const formattedGnName = encodeURIComponent(gn.nameEn.replace(/ /g, '-'));
+            navigate(`/industry-survey/${formattedGnName}/${gn.CCODE}`, { state: { fromSelector: true } });
+          }}
+        />
+
+        {/* GPS Error Popup */}
+        <Dialog open={!!gpsErrorPopup} onClose={() => {}}>
+          <DialogTitle sx={{ fontWeight: 'bold', color: 'error.main' }}>
+            {language === 'si' ? 'දෝෂයකි' : language === 'ta' ? 'பிழை' : 'Error'}
+          </DialogTitle>
+          <DialogContent>
+            <Typography variant="body1">
+              {gpsErrorPopup}
+            </Typography>
+            <Typography variant="body2" sx={{ mt: 2 }} color="textSecondary">
+              {language === 'si' ? 'කරුණාකර ඔබගේ බ්‍රවුසරයේ ඉහළ ඇති ලොක් (Lock) අයිකනය ක්ලික් කර "Location" සඳහා අවසර ලබා දී නැවත උත්සාහ කරන්න.' : 'Please click the lock icon in the address bar, allow Location access, and try again.'}
+            </Typography>
+          </DialogContent>
+          <DialogActions sx={{ p: 2, pt: 0 }}>
+            <Button 
+              variant="outlined" 
+              onClick={() => {
+                setGpsErrorPopup(null);
+                setShowGpsPopup(false);
+              }}
+            >
+              {language === 'si' ? 'අවලංගු කරන්න' : 'Cancel'}
+            </Button>
+            <Button 
+              variant="contained" 
+              color="primary" 
+              onClick={() => {
+                setGpsErrorPopup(null);
+              }}
+            >
+              {language === 'si' ? 'නැවත උත්සාහ කරන්න' : 'Try Again'}
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
-  );
+    );
 };
 
 export default IndustrySurveyPage;
