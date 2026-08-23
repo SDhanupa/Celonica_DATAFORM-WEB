@@ -29,15 +29,16 @@ class CategoryQueries
         $root = Category::where('slug', $rootSlug)->first();
         if (!$root) return [];
 
-        // Load ALL categories from DB at once (avoid N+1 queries)
-        $all = Category::all()->keyBy('id');
+        // Load ALL categories from DB at once (avoid N+1 queries) and group them by parent
+        $allCategories = Category::all();
+        $childrenByParent = $allCategories->groupBy('parent_id');
 
         $allDescendants = [];
-        $this->collectDescendants($root, [], $allDescendants, $all);
+        $this->collectDescendants($root, [], $allDescendants, $childrenByParent);
         return $allDescendants;
     }
 
-    private function collectDescendants(Category $category, array $ancestorNames, array &$result, $allById): void
+    private function collectDescendants(Category $category, array $ancestorNames, array &$result, $childrenByParent): void
     {
         $path = array_merge($ancestorNames, [$category->name_en]);
         $result[] = [
@@ -50,11 +51,10 @@ class CategoryQueries
             'breadcrumb' => implode(' > ', $path),
             'depth'      => count($ancestorNames),
         ];
-        // Get children from the preloaded collection (no extra DB queries)
-        $children = $allById->filter(fn($c) => $c->parent_id == $category->id)
-                            ->sortBy('sort_order');
+        // Get children directly from the grouped collection
+        $children = $childrenByParent->get($category->id, collect())->sortBy('sort_order');
         foreach ($children as $child) {
-            $this->collectDescendants($child, $path, $result, $allById);
+            $this->collectDescendants($child, $path, $result, $childrenByParent);
         }
     }
 

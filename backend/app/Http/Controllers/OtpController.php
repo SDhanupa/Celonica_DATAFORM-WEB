@@ -38,10 +38,10 @@ class OtpController extends Controller
 
         try {
             // Send the SMS via TextWare API
-            $response = Http::get(env('TEXTWARE_API_URL'), [
-                'username' => env('TEXTWARE_USERNAME'),
-                'password' => env('TEXTWARE_PASSWORD'),
-                'src' => env('TEXTWARE_SENDER_ID'),
+            $response = Http::get(config('services.textware.api_url'), [
+                'username' => config('services.textware.username'),
+                'password' => config('services.textware.password'),
+                'src' => config('services.textware.sender_id'),
                 'dst' => $mobile,
                 'msg' => $message,
                 'dr' => 1
