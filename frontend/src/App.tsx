@@ -33,6 +33,8 @@ import DistrictProvinceConnectionsPage from './pages/DistrictProvinceConnections
 import CategoryDetailPage from './pages/CategoryDetailPage';
 import ApprovalsPage from './pages/ApprovalsPage';
 import IndustrySurveyPage from './pages/IndustrySurveyPage';
+import AdminIndustrySurveys from './pages/AdminIndustrySurveys';
+
 
 const App: React.FC = () => {
   return (
@@ -266,6 +268,17 @@ const App: React.FC = () => {
 
               {/* Default redirects */}
               <Route path="/dashboard" element={<Navigate to="/gnpage" replace />} />
+              
+              <Route
+                path="/admin/industry-surveys"
+                element={
+                  <ProtectedRoute allowedRoles={['super_admin']}>
+                    <AdminLayout>
+                      <AdminIndustrySurveys />
+                    </AdminLayout>
+                  </ProtectedRoute>
+                }
+              />
               <Route path="*" element={<Navigate to="/gnpage" replace />} />
             </Routes>
           </AuthProvider>

@@ -19,6 +19,45 @@ class CategoryQueries
         return Category::where('slug', $args['slug'])->first();
     }
 
+    /**
+     * Returns a flat list of all descendants under a root slug,
+     * with their full breadcrumb path string included.
+     */
+    public function categoriesByRootSlug($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    {
+        $rootSlug = $args['rootSlug'];
+        $root = Category::where('slug', $rootSlug)->first();
+        if (!$root) return [];
+
+        // Load ALL categories from DB at once (avoid N+1 queries)
+        $all = Category::all()->keyBy('id');
+
+        $allDescendants = [];
+        $this->collectDescendants($root, [], $allDescendants, $all);
+        return $allDescendants;
+    }
+
+    private function collectDescendants(Category $category, array $ancestorNames, array &$result, $allById): void
+    {
+        $path = array_merge($ancestorNames, [$category->name_en]);
+        $result[] = [
+            'id'         => (string) $category->id,
+            'slug'       => $category->slug,
+            'nameEn'     => $category->name_en ?? '',
+            'nameSi'     => $category->name_si ?? $category->name_en ?? '',
+            'nameTa'     => $category->name_ta ?? $category->name_en ?? '',
+            'parentId'   => $category->parent_id ? (string) $category->parent_id : null,
+            'breadcrumb' => implode(' > ', $path),
+            'depth'      => count($ancestorNames),
+        ];
+        // Get children from the preloaded collection (no extra DB queries)
+        $children = $allById->filter(fn($c) => $c->parent_id == $category->id)
+                            ->sortBy('sort_order');
+        foreach ($children as $child) {
+            $this->collectDescendants($child, $path, $result, $allById);
+        }
+    }
+
     public function progress(Category $category, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
         try {

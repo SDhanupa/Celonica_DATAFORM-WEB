@@ -41,6 +41,9 @@ const QuestionsPage: React.FC = () => {
     questionTextEn: '',
     questionTextSi: '',
     questionTextTa: '',
+      explanationEn: '',
+      explanationSi: '',
+      explanationTa: '',
     inputType: 'text',
     sortOrder: 0
   });
@@ -53,6 +56,9 @@ const QuestionsPage: React.FC = () => {
         questionTextEn: question.questionTextEn || '',
         questionTextSi: question.questionTextSi || '',
         questionTextTa: question.questionTextTa || '',
+          explanationEn: question.explanationEn || '',
+          explanationSi: question.explanationSi || '',
+          explanationTa: question.explanationTa || '',
         inputType: question.inputType,
         sortOrder: question.sortOrder
       });
@@ -63,6 +69,9 @@ const QuestionsPage: React.FC = () => {
         questionTextEn: '',
         questionTextSi: '',
         questionTextTa: '',
+      explanationEn: '',
+      explanationSi: '',
+      explanationTa: '',
         inputType: 'text',
         sortOrder: 0
       });
@@ -221,6 +230,34 @@ const QuestionsPage: React.FC = () => {
               rows={2}
               fullWidth
             />
+              <TextField
+                label="Explanation (English)"
+                name="explanationEn"
+                value={formData.explanationEn}
+                onChange={handleChange}
+                multiline
+                rows={2}
+                fullWidth
+              />
+              <TextField
+                label="Explanation (Sinhala)"
+                name="explanationSi"
+                value={formData.explanationSi}
+                onChange={handleChange}
+                multiline
+                rows={2}
+                fullWidth
+              />
+              <TextField
+                label="Explanation (Tamil)"
+                name="explanationTa"
+                value={formData.explanationTa}
+                onChange={handleChange}
+                multiline
+                rows={2}
+                fullWidth
+              />
+
             <TextField
               select
               label="Input Type"
