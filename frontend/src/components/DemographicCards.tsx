@@ -16,6 +16,22 @@ import {
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import CloseIcon from '@mui/icons-material/Close';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
+import GroupsIcon from '@mui/icons-material/Groups';
+import EscalatorWarningIcon from '@mui/icons-material/EscalatorWarning';
+import WorkIcon from '@mui/icons-material/Work';
+import TempleBuddhistIcon from '@mui/icons-material/TempleBuddhist';
+import HolidayVillageIcon from '@mui/icons-material/HolidayVillage';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import AgricultureIcon from '@mui/icons-material/Agriculture';
+import FoundationIcon from '@mui/icons-material/Foundation';
+import ApartmentIcon from '@mui/icons-material/Apartment';
+import WcIcon from '@mui/icons-material/Wc';
+import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
+import WaterDropIcon from '@mui/icons-material/WaterDrop';
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
+import RoofingIcon from '@mui/icons-material/Roofing';
+import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';
+import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 
 interface DemographicCardsProps {
   populationData?: {
@@ -47,7 +63,7 @@ interface DemographicCardsProps {
 }
 
 // ── Reusable SVG Pie Chart Helper ────────────────────────────────────
-const SvgPieChart: React.FC<{
+export const SvgPieChart: React.FC<{
   data: { label: string; value: number; color: string }[];
   isDarkMode: boolean;
   size?: number;
@@ -82,15 +98,22 @@ const SvgPieChart: React.FC<{
       <Box sx={{ width: size, height: size, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
           {slices.map((slice, idx) => (
-            <path key={idx} d={slice.pathData} fill={slice.color} stroke={isDarkMode ? '#1e293b' : '#ffffff'} strokeWidth="2" />
+            <path
+              key={idx}
+              d={slice.pathData}
+              fill={slice.color}
+              stroke={isDarkMode ? '#1e293b' : '#ffffff'}
+              strokeWidth="2"
+              style={{ transformOrigin: 'center', transformBox: 'fill-box' as any, animation: `drawSlice 0.4s ease ${idx * 60}ms both` }}
+            />
           ))}
         </svg>
       </Box>
 
       {/* Right Legend Table */}
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.9, minWidth: { xs: 120, sm: 140 } }}>
-        {data.map((item) => (
-          <Box key={item.label} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1.2 }}>
+        {data.map((item, idx) => (
+          <Box key={item.label} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1.2, animation: `fadeInUp 0.35s ease ${idx * 60 + 100}ms both` }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
               <Box sx={{ width: 10, height: 10, bgcolor: item.color, borderRadius: '3px', flexShrink: 0 }} />
               <Typography sx={{ fontSize: '0.76rem', fontWeight: 600, color: isDarkMode ? '#cbd5e1' : '#475569' }}>
@@ -108,7 +131,7 @@ const SvgPieChart: React.FC<{
 };
 
 // ── Reusable SVG Donut / Solar Chart Helper ──────────────────────────
-const SvgDonutChart: React.FC<{
+export const SvgDonutChart: React.FC<{
   data: { label: string; value: number; color: string }[];
   isDarkMode: boolean;
   size?: number;
@@ -149,15 +172,22 @@ const SvgDonutChart: React.FC<{
       <Box sx={{ width: size, height: size, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
           {slices.map((slice, idx) => (
-            <path key={idx} d={slice.pathData} fill={slice.color} stroke={isDarkMode ? '#1e293b' : '#ffffff'} strokeWidth="2" />
+            <path
+              key={idx}
+              d={slice.pathData}
+              fill={slice.color}
+              stroke={isDarkMode ? '#1e293b' : '#ffffff'}
+              strokeWidth="2"
+              style={{ transformOrigin: 'center', transformBox: 'fill-box' as any, animation: `drawSlice 0.4s ease ${idx * 60}ms both` }}
+            />
           ))}
         </svg>
       </Box>
 
       {/* Right Legend Table */}
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.9, minWidth: { xs: 120, sm: 140 } }}>
-        {data.map((item) => (
-          <Box key={item.label} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1.2 }}>
+        {data.map((item, idx) => (
+          <Box key={item.label} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1.2, animation: `fadeInUp 0.35s ease ${idx * 60 + 100}ms both` }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
               <Box sx={{ width: 10, height: 10, bgcolor: item.color, borderRadius: '3px', flexShrink: 0 }} />
               <Typography sx={{ fontSize: '0.76rem', fontWeight: 600, color: isDarkMode ? '#cbd5e1' : '#475569' }}>
@@ -175,7 +205,7 @@ const SvgDonutChart: React.FC<{
 };
 
 // ── Reusable Bar Chart Helper ─────────────────────────────────────────
-const SvgBarChart: React.FC<{
+export const SvgBarChart: React.FC<{
   bars: { label: string; count: number; color1: string; color2: string; shadowColor: string }[];
   isDarkMode: boolean;
 }> = ({ bars, isDarkMode }) => {
@@ -219,18 +249,29 @@ const SvgBarChart: React.FC<{
         {/* Vertical Bars */}
         <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-around', alignItems: 'flex-end', height: 160, zIndex: 1 }}>
           {bars.map((bar, idx) => (
-            <Box key={idx} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: `${Math.floor(80 / bars.length)}%`, height: '100%', justifyContent: 'flex-end' }}>
+            <Box
+              key={idx}
+              sx={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center',
+                width: `${Math.floor(80 / bars.length)}%`, height: '100%', justifyContent: 'flex-end',
+                animation: `fadeInUp 0.4s ease ${idx * 70}ms both`,
+                '&:hover .bar-fill': { filter: 'brightness(1.08)' },
+              }}
+            >
               <Typography sx={{ fontSize: '0.76rem', fontWeight: 800, mb: 0.5, color: bar.color1 }}>
                 {bar.count.toLocaleString()}
               </Typography>
               <Box
+                className="bar-fill"
                 sx={{
                   width: bars.length <= 2 ? { xs: 38, sm: 48 } : { xs: 26, sm: 34 },
                   height: `${Math.round(Math.max(8, (bar.count / yMax) * 125))}px`,
                   background: `linear-gradient(180deg, ${bar.color1} 0%, ${bar.color2} 100%)`,
                   borderRadius: '6px 6px 0 0',
                   boxShadow: `0 4px 14px ${bar.shadowColor}`,
-                  transition: 'all 0.6s ease',
+                  transformOrigin: 'bottom center',
+                  animation: `growBarY 0.5s cubic-bezier(0.22,1,0.36,1) ${idx * 70 + 60}ms both`,
+                  transition: 'filter 0.2s ease',
                 }}
               />
               <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, mt: 0.8, color: isDarkMode ? '#cbd5e1' : '#334155', textAlign: 'center' }}>
@@ -428,7 +469,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     {
       id: 'village-population',
       slug: 'boundaries',
-      icon: '👥',
+      icon: <GroupsIcon />,
       type: 'bar' as const,
       title: t.villagePopulation,
       shortTitle: language === 'si' ? 'ජනගහනය' : language === 'ta' ? 'மக்கள்தொகை' : 'POPULATION',
@@ -437,7 +478,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     {
       id: 'population-by-age',
       slug: 'boundaries',
-      icon: '📊',
+      icon: <EscalatorWarningIcon />,
       type: 'pie' as const,
       title: language === 'si' ? 'වයස් කාණ්ඩ අනුව ජනගහනය' : language === 'ta' ? 'வயதுக் குழுக்களின்படி மக்கள்தொகை' : 'POPULATION BY AGE GROUPS',
       shortTitle: language === 'si' ? 'වයස' : language === 'ta' ? 'வயது' : 'AGE GROUPS',
@@ -452,7 +493,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     {
       id: 'employment',
       slug: 'economy',
-      icon: '💼',
+      icon: <WorkIcon />,
       type: 'donut' as const,
       title: language === 'si' ? 'රැකියා නියුක්තිය' : language === 'ta' ? 'வேலைவாய்ப்பு' : 'EMPLOYMENT',
       shortTitle: language === 'si' ? 'රැකියාව' : language === 'ta' ? 'வேலைவாய்ப்பு' : 'EMPLOYMENT',
@@ -465,7 +506,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     {
       id: 'religious-affiliation',
       slug: 'religion',
-      icon: '🛕',
+      icon: <TempleBuddhistIcon />,
       type: 'pie' as const,
       title: language === 'si' ? 'ආගමික සංයුතිය' : language === 'ta' ? 'மத ரீதியான இணைப்பு' : 'RELIGIOUS AFFILIATION',
       shortTitle: language === 'si' ? 'ආගම' : language === 'ta' ? 'மதம்' : 'RELIGION',
@@ -479,9 +520,10 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     {
       id: 'housing-ownership',
       slug: 'housing-ownership',
-      icon: '🏠',
+      icon: <HolidayVillageIcon />,
       type: 'donut' as const,
       title: language === 'si' ? 'නිවාස හිමිකාරිත්වය' : language === 'ta' ? 'வீட்டுரிமை நிலை' : 'HOUSING OWNERSHIP STATUS',
+      shortTitle: language === 'si' ? 'හිමිකම' : language === 'ta' ? 'உரிமை' : 'OWNERSHIP',
       donutData: [
         { label: language === 'si' ? 'තමන්ගේම' : 'Owned', value: housingOwnershipData?.owned_by_member || 0, color: '#10b981' },
         { label: language === 'si' ? 'කුලියට' : 'Rented', value: (housingOwnershipData?.rent_gov || 0) + (housingOwnershipData?.rent_private || 0), color: '#3b82f6' },
@@ -492,9 +534,10 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     {
       id: 'construction-year',
       slug: 'construction-year',
-      icon: '📅',
+      icon: <CalendarMonthIcon />,
       type: 'bar' as const,
       title: language === 'si' ? 'ඉදිකිරීම් වර්ෂය අනුව නිවාස' : language === 'ta' ? 'கட்டுமான ஆண்டு' : 'HOUSING UNITS BY CONSTRUCTION YEAR',
+      shortTitle: language === 'si' ? 'වර්ෂය' : language === 'ta' ? 'ஆண்டு' : 'YEAR BUILT',
       bars: [
         { label: '< 1990', count: Math.round(totalCount * 0.28), color1: '#64748b', color2: '#334155', shadowColor: 'rgba(100,116,139,0.4)' },
         { label: '1990-2000', count: Math.round(totalCount * 0.32), color1: '#0ea5e9', color2: '#0284c7', shadowColor: 'rgba(14,165,233,0.4)' },
@@ -505,9 +548,10 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     {
       id: 'economy',
       slug: 'economy',
-      icon: '💼',
+      icon: <AgricultureIcon />,
       type: 'donut' as const,
       title: language === 'si' ? 'ආර්ථිකය සහ ජීවනෝපාය' : language === 'ta' ? 'பொருளாதாரம்' : 'ECONOMY & LIVELIHOOD',
+      shortTitle: language === 'si' ? 'ආර්ථිකය' : language === 'ta' ? 'பொருளாதாரம்' : 'ECONOMY',
       donutData: [
         { label: language === 'si' ? 'කෘෂිකාර්මික' : 'Agriculture', value: Math.round(totalCount * 0.38), color: '#22c55e' },
         { label: language === 'si' ? 'සේවා' : 'Services', value: Math.round(totalCount * 0.32), color: '#3b82f6' },
@@ -518,9 +562,10 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     {
       id: 'wall-type',
       slug: 'wall-type',
-      icon: '🧱',
+      icon: <FoundationIcon />,
       type: 'bar' as const,
       title: language === 'si' ? 'නිවාස බිත්ති වර්ගය' : language === 'ta' ? 'சுவர் வகை' : 'HOUSING WALL TYPE',
+      shortTitle: language === 'si' ? 'බිත්ති' : language === 'ta' ? 'சுவர்' : 'WALL TYPE',
       bars: [
         { label: language === 'si' ? 'ගඩොල්' : 'Brick', count: housingWallData?.brick || 0, color1: '#ea580c', color2: '#c2410c', shadowColor: 'rgba(234,88,12,0.4)' },
         { label: language === 'si' ? 'සිමෙන්ති' : 'Block', count: housingWallData?.cement_block_stone || 0, color1: '#64748b', color2: '#475569', shadowColor: 'rgba(100,116,139,0.4)' },
@@ -531,9 +576,10 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     {
       id: 'unit-type',
       slug: 'unit-type',
-      icon: '🏘️',
+      icon: <ApartmentIcon />,
       type: 'pie' as const,
       title: language === 'si' ? 'නිවාස ඒකක වර්ගය' : language === 'ta' ? 'அலகு வகை' : 'HOUSING UNIT TYPE',
+      shortTitle: language === 'si' ? 'ඒකකය' : language === 'ta' ? 'அலகு' : 'UNIT TYPE',
       pieData: [
         { label: language === 'si' ? 'තනි නිවස' : 'Single', value: housingUnitData?.permanent || 0, color: '#2563eb' },
         { label: language === 'si' ? 'මහල්/පැතලි' : 'Flat/Attached', value: housingUnitData?.semi_permanent || 0, color: '#8b5cf6' },
@@ -544,9 +590,10 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     {
       id: 'toilet-facilities',
       slug: 'toilet-facilities',
-      icon: '🚽',
+      icon: <WcIcon />,
       type: 'donut' as const,
       title: language === 'si' ? 'වැසිකිලි පහසුකම්' : language === 'ta' ? 'மலசலகூட வசதிகள்' : 'TOILET FACILITIES',
+      shortTitle: language === 'si' ? 'වැසිකිලි' : language === 'ta' ? 'கழிப்பறை' : 'TOILETS',
       donutData: [
         { label: language === 'si' ? 'ජල මුද්‍රිත' : 'Water Sealed', value: (toiletFacilityData?.water_seal_piped_sewer || 0) + (toiletFacilityData?.water_seal_septic_tank || 0), color: '#10b981' },
         { label: language === 'si' ? 'වතුර දැමීම' : 'Pour Flush', value: toiletFacilityData?.pour_flush || 0, color: '#06b6d4' },
@@ -557,9 +604,10 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     {
       id: 'rooms',
       slug: 'rooms',
-      icon: '🚪',
+      icon: <MeetingRoomIcon />,
       type: 'bar' as const,
       title: language === 'si' ? 'නිවාස ඒකකයේ කාමර' : language === 'ta' ? 'அறைகள் எண்ணிக்கை' : 'ROOMS IN HOUSING UNIT',
+      shortTitle: language === 'si' ? 'කාමර' : language === 'ta' ? 'அறைகள்' : 'ROOMS',
       bars: [
         { label: '1 - 2 Rooms', count: (roomsData?.room_1 || 0) + (roomsData?.rooms_2 || 0), color1: '#f59e0b', color2: '#d97706', shadowColor: 'rgba(245,158,11,0.4)' },
         { label: '3 - 4 Rooms', count: (roomsData?.rooms_3 || 0) + (roomsData?.rooms_4 || 0), color1: '#3b82f6', color2: '#1d4ed8', shadowColor: 'rgba(59,130,246,0.4)' },
@@ -569,9 +617,10 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     {
       id: 'drinking-water',
       slug: 'drinking-water',
-      icon: '💧',
+      icon: <WaterDropIcon />,
       type: 'donut' as const,
       title: language === 'si' ? 'පානීය ජල මූලාශ්‍රය' : language === 'ta' ? 'குடிநீர் ஆதாரம்' : 'SOURCE OF DRINKING WATER',
+      shortTitle: language === 'si' ? 'ජලය' : language === 'ta' ? 'நீர்' : 'WATER',
       donutData: [
         { label: language === 'si' ? 'ළිඳ' : 'Well', value: (drinkingWaterData?.protected_well_within || 0) + (drinkingWaterData?.protected_well_outside || 0) + (drinkingWaterData?.unprotected_well || 0), color: '#0ea5e9' },
         { label: language === 'si' ? 'නළ ජලය' : 'Tap/Piped', value: (drinkingWaterData?.tap_within_unit || 0) + (drinkingWaterData?.tap_within_premises_outside || 0) + (drinkingWaterData?.tap_outside_premises || 0), color: '#3b82f6' },
@@ -582,9 +631,10 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     {
       id: 'solid-waste',
       slug: 'solid-waste',
-      icon: '♻️',
+      icon: <DeleteSweepIcon />,
       type: 'pie' as const,
       title: language === 'si' ? 'ඝන අපද්‍රව්‍ය බැහැර කිරීම' : language === 'ta' ? 'திடக்கழிவு அகற்றல்' : 'SOLID WASTE DISPOSAL',
+      shortTitle: language === 'si' ? 'අපද්‍රව්‍ය' : language === 'ta' ? 'கழிவு' : 'WASTE',
       pieData: [
         { label: language === 'si' ? 'පළාත් පාලන' : 'Local Auth', value: solidWasteData?.collected_by_local_authorities || 0, color: '#10b981' },
         { label: language === 'si' ? 'පිළිස්සීම' : 'Burned', value: solidWasteData?.occupants_burn || 0, color: '#f59e0b' },
@@ -595,9 +645,10 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     {
       id: 'roof-type',
       slug: 'roof-type',
-      icon: '🛖',
+      icon: <RoofingIcon />,
       type: 'bar' as const,
       title: language === 'si' ? 'නිවාස වහල වර්ගය' : language === 'ta' ? 'கூரை வகை' : 'HOUSING UNIT ROOF TYPE',
+      shortTitle: language === 'si' ? 'වහල' : language === 'ta' ? 'கூரை' : 'ROOF',
       bars: [
         { label: language === 'si' ? 'උළු' : 'Tile', count: roofData?.tile || 0, color1: '#ea580c', color2: '#c2410c', shadowColor: 'rgba(234,88,12,0.4)' },
         { label: language === 'si' ? 'ඇස්බැස්ටස්' : 'Asbestos', count: roofData?.asbestos || 0, color1: '#64748b', color2: '#475569', shadowColor: 'rgba(100,116,139,0.4)' },
@@ -608,9 +659,10 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     {
       id: 'household',
       slug: 'household',
-      icon: '👨‍👩‍👧‍👦',
+      icon: <FamilyRestroomIcon />,
       type: 'pie' as const,
       title: language === 'si' ? 'ගෘහ මූලිකයාට ඇති ඥාතිත්වය' : language === 'ta' ? 'குடும்பத் தலைவருடனான உறவு' : 'RELATIONSHIP TO HOUSEHOLD HEAD',
+      shortTitle: language === 'si' ? 'ගෘහ' : language === 'ta' ? 'குடும்பம்' : 'HOUSEHOLD',
       pieData: [
         { label: language === 'si' ? 'ගෘහ මූලික' : 'Head', value: householdHeadData?.head || 0, color: '#2563eb' },
         { label: language === 'si' ? 'ස්වාමිපුරුෂ/භාර්යාව' : 'Spouse', value: householdHeadData?.wife_husband || 0, color: '#ec4899' },
@@ -632,22 +684,68 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     return survey.pieData || [];
   };
 
+  const totalPopulation = populationData?.both ?? ((populationData?.male ?? 0) + (populationData?.female ?? 0));
+  const totalHouseholds = housingOwnershipData?.total_households || roomsData?.total_housing_units || 0;
+  const employedCount = gnEconomyData?.employed || 0;
+
+  const quickStats = [
+    { label: t.villagePopulation, value: totalPopulation, icon: <GroupsIcon />, color: '#2563eb' },
+    { label: language === 'si' ? 'ගෘහ ඒකක' : language === 'ta' ? 'குடும்பங்கள்' : 'Households', value: totalHouseholds, icon: <HomeRoundedIcon />, color: '#0891b2' },
+    { label: language === 'si' ? 'රැකියා නියුක්ත' : language === 'ta' ? 'வேலைவாய்ப்பு' : 'Employed', value: employedCount, icon: <WorkIcon />, color: '#16a34a' },
+  ];
+
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, width: '100%' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%' }}>
+
+      {/* ── QUICK STATS ROW (at-a-glance KPIs) ── */}
+      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1.5 }}>
+        {quickStats.map((stat, idx) => (
+          <Box
+            key={stat.label}
+            sx={{
+              borderRadius: '16px',
+              p: 1.8,
+              bgcolor: isDarkMode ? '#111827' : '#ffffff',
+              border: isDarkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e5e9f0',
+              boxShadow: isDarkMode ? 'none' : '0 1px 2px rgba(15,23,42,0.04)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 0.6,
+              minWidth: 0,
+              animation: `fadeInUp 0.4s ease ${idx * 80}ms both`,
+              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+              '&:hover': {
+                transform: 'translateY(-2px)',
+                boxShadow: isDarkMode ? 'none' : '0 8px 20px rgba(15,23,42,0.08)',
+              },
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.7, color: stat.color, '& .MuiSvgIcon-root': { fontSize: '1.1rem' } }}>
+              {stat.icon}
+              <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: isDarkMode ? '#94a3b8' : '#64748b', textTransform: 'uppercase', letterSpacing: '0.3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {stat.label}
+              </Typography>
+            </Box>
+            <Typography sx={{ fontSize: '1.5rem', fontWeight: 800, color: isDarkMode ? '#f8fafc' : '#0f172a', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+              {stat.value.toLocaleString()}
+            </Typography>
+          </Box>
+        ))}
+      </Box>
 
       {/* ── CARD 2: SURVEY & CENSUS CHARTS CARD (Side-by-Side Layout) ── */}
       <Box
         sx={{
-          borderRadius: '24px',
+          borderRadius: '20px',
           p: { xs: 2, md: 2.5 },
-          bgcolor: isDarkMode ? 'rgba(15, 23, 42, 0.7)' : 'rgba(0, 0, 0, 0.12)',
-          backdropFilter: 'blur(20px)',
-          border: isDarkMode ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(0,0,0,0.1)',
-          boxShadow: isDarkMode ? '0 12px 32px rgba(0,0,0,0.5)' : '0 12px 32px rgba(0,0,0,0.1)',
+          bgcolor: isDarkMode ? '#111827' : '#ffffff',
+          border: isDarkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e5e9f0',
+          boxShadow: isDarkMode ? 'none' : '0 1px 2px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.04)',
           display: 'flex',
           flexDirection: { xs: 'column', md: 'row' },
           height: { md: 400 },
           gap: 2,
+          animation: 'fadeInUp 0.45s ease 240ms both',
         }}
       >
         {/* Left Side: Chart */}
@@ -666,8 +764,17 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
               }
               sx={{ display: 'flex', alignItems: 'center', gap: 1.2, cursor: 'pointer', overflow: 'hidden' }}
             >
-              <Typography sx={{ fontSize: '1.2rem', flexShrink: 0 }}>{activeSurvey.icon}</Typography>
+              <Box key={`icon-${activeSurvey.id}`} sx={{
+                width: 30, height: 30, borderRadius: '9px', flexShrink: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#2563eb', bgcolor: isDarkMode ? 'rgba(59,130,246,0.16)' : 'rgba(37,99,235,0.08)',
+                '& .MuiSvgIcon-root': { fontSize: '1.1rem' },
+                animation: 'fadeIn 0.25s ease both',
+              }}>
+                {activeSurvey.icon}
+              </Box>
               <Typography
+                key={`title-${activeSurvey.id}`}
                 sx={{
                   fontWeight: 800,
                   fontSize: '0.95rem',
@@ -676,6 +783,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
+                  animation: 'fadeInUp 0.25s ease both',
                 }}
               >
                 {activeSurvey.title}
@@ -713,6 +821,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
 
           {/* Selected Dimension Chart Rendering */}
           <Box
+            key={activeSurvey.id}
             onClick={() =>
               setModalData({
                 title: activeSurvey.title,
@@ -752,12 +861,13 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
             {t.surveyExplorer}
           </Typography>
           <Box sx={{ display: 'flex', flexDirection: { xs: 'row', md: 'column' }, flexWrap: { xs: 'wrap', md: 'nowrap' }, gap: 1, overflowY: 'auto', pr: 0.5, pb: 1, flexGrow: 1 }}>
-            {surveyCategories.map((cat) => {
+            {surveyCategories.map((cat, idx) => {
               const isSelected = cat.id === selectedSurveyId;
               return (
                 <Chip
                   key={cat.id}
-                  label={`${cat.icon} ${(cat as any).shortTitle || cat.title.split(' ')[0]}`}
+                  icon={cat.icon as React.ReactElement}
+                  label={(cat as any).shortTitle || cat.title.split(' ')[0]}
                   onClick={() => setSelectedSurveyId(cat.id)}
                   size="small"
                   sx={{
@@ -770,9 +880,13 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
                     bgcolor: isSelected ? '#2563eb' : isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
                     color: isSelected ? '#ffffff' : isDarkMode ? '#cbd5e1' : '#475569',
                     border: isSelected ? '1px solid #1d4ed8' : 'none',
+                    animation: `fadeInUp 0.3s ease ${idx * 30}ms both`,
+                    transition: 'background-color 0.2s ease, color 0.2s ease, transform 0.15s ease',
+                    '& .MuiChip-icon': { color: isSelected ? '#ffffff' : isDarkMode ? '#94a3b8' : '#64748b', fontSize: '1rem', ml: 1 },
                     '& .MuiChip-label': { pl: 0.5 },
                     '&:hover': {
                       bgcolor: isSelected ? '#1d4ed8' : isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.09)',
+                      transform: 'translateX(2px)',
                     },
                   }}
                 />

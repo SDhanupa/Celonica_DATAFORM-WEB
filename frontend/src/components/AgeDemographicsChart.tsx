@@ -3,6 +3,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { Box, Typography, Container, useTheme, useMediaQuery } from '@mui/material';
 
 interface Age3DBarChartProps {
+  isDarkMode?: boolean;
   data?: {
     age_0_14?: number;
     age_15_59?: number;

@@ -12,6 +12,10 @@ interface AuthContextType {
     sub?: string;
     preferred_username?: string;
     realm_roles?: string[];
+    given_name?: string;
+    family_name?: string;
+    role?: string;
+    id?: string;
   } | null;
   logout: () => void;
   login: (redirectUri?: string) => void;

@@ -3,6 +3,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { Box, Typography, Container, useTheme, useMediaQuery } from '@mui/material';
 
 interface HousingOwnershipChartProps {
+  isDarkMode?: boolean;
   data?: {
     owned_by_member?: number;
     rent_gov?: number;
