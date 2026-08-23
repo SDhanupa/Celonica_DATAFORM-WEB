@@ -9,6 +9,7 @@ interface LocationSelectorModalProps {
   onClose?: () => void;
   onLocationSelected?: (gn: any) => void;
   isDarkMode?: boolean;
+  language?: string;
 }
 
 const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onClose, onLocationSelected, isDarkMode = false }) => {

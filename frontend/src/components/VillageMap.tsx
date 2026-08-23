@@ -70,14 +70,13 @@ function MapCustomControls({
 }
 
 export interface VillageMapProps {
-  gnName: string;
   gnName?: string;
   district?: string;
   dsDivision?: string;
   ccode?: string;
   boundary?: any;
   height?: number | string;
-  }
+}
 
 export const VillageMap: React.FC<VillageMapProps> = ({
   gnName,
@@ -178,13 +177,14 @@ export const VillageMap: React.FC<VillageMapProps> = ({
         position: 'relative',
         width: '100%',
         height: height,
-        borderRadius: '24px',
+        borderRadius: '20px',
         overflow: 'hidden',
         boxShadow: isDark
-          ? '0 16px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.15)'
-          : '0 16px 40px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.1)',
-        bgcolor: isDark ? 'rgba(15, 23, 42, 0.7)' : 'rgba(0, 0, 0, 0.12)',
-        backdropFilter: 'blur(20px)',
+          ? 'none'
+          : '0 1px 2px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.06)',
+        border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e5e9f0',
+        bgcolor: isDark ? '#111827' : '#ffffff',
+        animation: 'fadeIn 0.5s ease both',
       }}
     >
       {/* ── CARD HEADER (VILLAGE MAP / ගම් සිතියම) ────────────────── */}

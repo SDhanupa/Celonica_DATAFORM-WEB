@@ -31,10 +31,12 @@ interface FormData {
 }
 
 interface SurveyPageProps {
-  slug: string;
+  slug?: string;
 }
 
-const SurveyPage: React.FC<SurveyPageProps> = ({ slug }) => {
+const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp }) => {
+  const params = useParams<{ slug: string }>();
+  const slug = slugProp ?? params.slug ?? '';
   const navigate = useNavigate();
   const { token } = useAuth();
   
