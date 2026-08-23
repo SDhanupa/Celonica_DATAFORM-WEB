@@ -12,28 +12,33 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CategoryIcon from '@mui/icons-material/Category';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
+import { MOBILE_CATEGORIES } from './mobile/mobileCategories';
 
 // Categories Configuration (Shared from CategoryDetailPage)
 export const CATEGORIES = [
-  { name: 'Boundaries', slug: 'location-1-1', emoji: '🗺️', color: '#6366f1' },
-  { name: 'Space', slug: 'location-1-2', emoji: '📐', color: '#8b5cf6' },
-  { name: 'Land', slug: 'location-1-3', emoji: '🌾', color: '#22c55e' },
-  { name: 'Building/Land', slug: 'location-1-4', emoji: '🏠', color: '#f59e0b' },
-  { name: 'Roads', slug: 'location-1-5', emoji: '🛣️', color: '#94a3b8' },
-  { name: 'Geographical location', slug: 'location-1-6', emoji: '🌍', color: '#0ea5e9' },
-  { name: 'Natural location', slug: 'location-1-7', emoji: '🏔️', color: '#10b981' },
-  { name: 'Water base spaces', slug: 'location-1-8', emoji: '💧', color: '#38bdf8' },
-  { name: 'Lines', slug: 'location-1-9', emoji: '⚡', color: '#f97316' },
-  { name: 'Flora', slug: 'location-1-10', emoji: '🌿', color: '#84cc16' },
+  { name: 'Boundaries', slug: 'location-1-1', color: '#6366f1' },
+  { name: 'Space', slug: 'location-1-2', color: '#8b5cf6' },
+  { name: 'Land', slug: 'location-1-3', color: '#22c55e' },
+  { name: 'Building/Land', slug: 'location-1-4', color: '#f59e0b' },
+  { name: 'Roads', slug: 'location-1-5', color: '#94a3b8' },
+  { name: 'Geographical location', slug: 'location-1-6', color: '#0ea5e9' },
+  { name: 'Natural location', slug: 'location-1-7', color: '#10b981' },
+  { name: 'Water base spaces', slug: 'location-1-8', color: '#38bdf8' },
+  { name: 'Lines', slug: 'location-1-9', color: '#f97316' },
+  { name: 'Flora', slug: 'location-1-10', color: '#84cc16' },
 ];
+
+const iconForSlug = (slug?: string): React.ReactNode =>
+  MOBILE_CATEGORIES.find((c) => c.slug === slug)?.icon ?? <CategoryIcon fontSize="small" />;
 
 interface SearchResult {
   type: 'gn' | 'category' | 'subcategory' | 'data_item';
   id: string;
   display: string;
-  icon?: string;
+  icon?: React.ReactNode;
   color?: string;
   data: any;
 }
@@ -94,7 +99,7 @@ const GlobalSearchBar: React.FC<GlobalSearchBarProps> = ({ isDarkMode = false, a
           type: 'category',
           id: cat.slug,
           display: cat.name,
-          icon: cat.emoji,
+          icon: iconForSlug(cat.slug),
           color: cat.color,
           data: cat
         });
@@ -112,7 +117,7 @@ const GlobalSearchBar: React.FC<GlobalSearchBarProps> = ({ isDarkMode = false, a
           type: 'subcategory',
           id: sub.slug,
           display: `${parentName} / ${sub.nameEn || sub.nameSi || sub.nameTa}`,
-          icon: parentCat?.emoji || '📋',
+          icon: parentCat ? iconForSlug(parentCat.slug) : <CategoryIcon fontSize="small" />,
           color: parentCat?.color || '#3b82f6',
           data: sub
         });
@@ -145,7 +150,7 @@ const GlobalSearchBar: React.FC<GlobalSearchBarProps> = ({ isDarkMode = false, a
           type: 'data_item',
           id: item.id.toString(),
           display: `Data: ${item.nameEn || item.nameSi || item.nameTa || item.regNumber} (${item.gn_display})`,
-          icon: '📄',
+          icon: <DescriptionOutlinedIcon fontSize="small" />,
           color: '#10b981',
           data: item
         }));

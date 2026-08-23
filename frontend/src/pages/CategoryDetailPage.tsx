@@ -3,50 +3,76 @@ import {
   Box, Typography, IconButton, Menu, MenuItem, Divider,
   useTheme, useMediaQuery, CircularProgress, Paper,
   Table, TableBody, TableRow, TableCell, TableContainer,
-  Chip, Grid, Button, Dialog, DialogTitle, DialogContent, DialogActions, InputBase
+  Chip, Grid, Button, Dialog, DialogTitle, DialogContent, DialogActions, InputBase,
+  Skeleton,
 } from '@mui/material';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import SearchIcon from '@mui/icons-material/Search';
 import MenuIcon from '@mui/icons-material/Menu';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import NorthEastIcon from '@mui/icons-material/NorthEast';
+import PlaceIcon from '@mui/icons-material/Place';
+import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
+import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
+import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
+import CloseIcon from '@mui/icons-material/Close';
+import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
+import TagOutlinedIcon from '@mui/icons-material/TagOutlined';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 import { useAuth } from '../auth/AuthProvider';
 import { GET_CATEGORY_BY_SLUG } from '../graphql/queries';
 import GnPageFooter from '../components/GnPageFooter';
 import GlobalSearchBar from '../components/GlobalSearchBar';
-
+import { MOBILE_CATEGORIES } from '../components/mobile/mobileCategories';
 
 // ─── Category Config ─────────────────────────────────────────────────────────
+// Name/slug kept for compatibility with existing consumers (UserDashboard's
+// Categories menu, GlobalSearchBar). Icons come from MOBILE_CATEGORIES (same slug
+// order) so the icon set is identical across mobile, desktop nav, and this page.
+// This page uses a single brand-blue accent — not per-category colors — so the UI
+// reads as one cohesive system rather than a rainbow of colored badges.
 
 export const CATEGORIES = [
-  { name: 'Boundaries', slug: 'location-1-1', emoji: '🗺️', color: '#6366f1', dbId: '31720' },
-  { name: 'Space', slug: 'location-1-2', emoji: '📐', color: '#8b5cf6', dbId: '31945' },
-  { name: 'Land', slug: 'location-1-3', emoji: '🌾', color: '#22c55e', dbId: '32021' },
-  { name: 'Building/Land', slug: 'location-1-4', emoji: '🏠', color: '#f59e0b', dbId: '32063' },
-  { name: 'Roads', slug: 'location-1-5', emoji: '🛣️', color: '#94a3b8', dbId: '34514' },
-  { name: 'Geographical location', slug: 'location-1-6', emoji: '🌍', color: '#0ea5e9', dbId: '34641' },
-  { name: 'Natural location', slug: 'location-1-7', emoji: '🏔️', color: '#10b981', dbId: '34655' },
-  { name: 'Water base spaces', slug: 'location-1-8', emoji: '💧', color: '#38bdf8', dbId: '34663' },
-  { name: 'Lines', slug: 'location-1-9', emoji: '⚡', color: '#f97316', dbId: '34750' },
-  { name: 'Flora', slug: 'location-1-10', emoji: '🌿', color: '#84cc16', dbId: '34759' },
+  { name: 'Boundaries', slug: 'location-1-1', color: '#6366f1', dbId: '31720' },
+  { name: 'Space', slug: 'location-1-2', color: '#8b5cf6', dbId: '31945' },
+  { name: 'Land', slug: 'location-1-3', color: '#22c55e', dbId: '32021' },
+  { name: 'Building/Land', slug: 'location-1-4', color: '#f59e0b', dbId: '32063' },
+  { name: 'Roads', slug: 'location-1-5', color: '#94a3b8', dbId: '34514' },
+  { name: 'Geographical location', slug: 'location-1-6', color: '#0ea5e9', dbId: '34641' },
+  { name: 'Natural location', slug: 'location-1-7', color: '#10b981', dbId: '34655' },
+  { name: 'Water base spaces', slug: 'location-1-8', color: '#38bdf8', dbId: '34663' },
+  { name: 'Lines', slug: 'location-1-9', color: '#f97316', dbId: '34750' },
+  { name: 'Flora', slug: 'location-1-10', color: '#84cc16', dbId: '34759' },
 ];
+
+const ACCENT = '#2563eb';
+const ACCENT_DARK = '#1d4ed8';
+
+const iconForSlug = (slug?: string): React.ReactNode => {
+  const match = MOBILE_CATEGORIES.find((c) => c.slug === slug);
+  return match?.icon ?? <PlaceIcon />;
+};
 
 // ─── Helper ────────────────────────────────────────────────────────────────
 
 const getThemeColors = (dark: boolean) => ({
-  primary: dark ? '#7c3aed' : '#4f46e5',
-  bg: dark ? '#0f172a' : '#f8fafc',
-  card: dark ? 'rgba(30,41,59,0.9)' : 'rgba(255,255,255,0.9)',
-  text: dark ? '#f1f5f9' : '#1e293b',
+  bg: dark ? '#0b1120' : '#f7f9fc',
+  card: dark ? '#111827' : '#ffffff',
+  text: dark ? '#f1f5f9' : '#0f172a',
   muted: dark ? '#94a3b8' : '#64748b',
-  border: dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+  faint: dark ? '#64748b' : '#94a3b8',
+  border: dark ? 'rgba(255,255,255,0.08)' : '#e6eaf0',
+  tint: dark ? 'rgba(37,99,235,0.16)' : 'rgba(37,99,235,0.08)',
+  chipBg: dark ? 'rgba(255,255,255,0.06)' : '#f1f5f9',
 });
 
-// ─── Component ────────────────────────────────────────────────────────────────
+// ─── Detail Card ────────────────────────────────────────────────────────────
 
-const FastBigCardItem = ({ item, idx, tc, catColor, qMap, autoOpenId }: any) => {
+const FastBigCardItem = ({ item, idx, tc, qMap, autoOpenId, isDarkMode }: any) => {
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
   React.useEffect(() => {
@@ -58,7 +84,7 @@ const FastBigCardItem = ({ item, idx, tc, catColor, qMap, autoOpenId }: any) => 
   // Parse Answers dynamically
   const answers: { question: string, answer: string }[] = [];
   if (item.image_path) answers.push({ question: 'Image', answer: String(item.image_path) });
-  
+
   // Core fields requested to be shown on the card
   answers.push({ question: 'Reg Number', answer: item.reg_number ? String(item.reg_number) : '-' });
   answers.push({ question: 'Name (EN)', answer: item.name_en ? String(item.name_en) : '-' });
@@ -85,185 +111,157 @@ const FastBigCardItem = ({ item, idx, tc, catColor, qMap, autoOpenId }: any) => 
     }
   });
 
-  const title = item.name_en || item.name_si || item.name_ta || `#${idx + 1}`;
   const displayAnswers = answers.filter(a => a.question !== 'Image');
-  
-  // Show exactly the 9 core fields in the card table
-  const coreFields = ['Reg Number', 'Name (EN)', 'Name (SI)', 'Name (TA)', 'National', 'Province', 'District', 'DS Division', 'GN Name'];
-  const visibleAnswers = displayAnswers.filter(a => coreFields.includes(a.question));
-
   const hasMap = item.latitude && item.longitude;
-
-  const namesList = [];
-  if (item.name_en) namesList.push(item.name_en);
-  if (item.name_si) namesList.push(item.name_si);
-  if (item.name_ta) namesList.push(item.name_ta);
-  const namesText = namesList.join(' • ');
-
-  const dateText = item.created_at 
-    ? new Date(item.created_at).toLocaleDateString('en-US') 
+  const dateText = item.created_at
+    ? new Date(item.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
     : '';
-
-  const imageSrc = item.image_path 
+  const imageSrc = item.image_path
     ? `/api/uploads/category_images/${item.image_path}`
     : null;
+  const title = item.name_en || item.name_si || item.name_ta || `Record ${idx + 1}`;
+  const subNames = [item.name_si, item.name_ta].filter(Boolean).join('   •   ');
+  const locationLine = [item.ds_name, item.district_name].filter(Boolean).join(', ');
 
   return (
     <>
       <Grid item xs={12} md={6} key={item.id}>
         <Paper
           elevation={0}
+          onClick={() => setDialogOpen(true)}
+          role="button"
+          tabIndex={0}
+          aria-label={`View details for ${title}`}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setDialogOpen(true);
+            }
+          }}
           sx={{
+            position: 'relative',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
+            gap: 1.6,
             bgcolor: tc.card,
             border: `1px solid ${tc.border}`,
-            borderRadius: 3,
-            p: 1.5,
-            transition: 'all 0.2s',
+            borderRadius: '16px',
+            p: 1.6,
+            pl: 2,
+            cursor: 'pointer',
+            overflow: 'hidden',
+            transition: 'box-shadow 0.22s ease, transform 0.22s ease, border-color 0.22s ease',
+            animation: `fadeInUp 0.4s ease ${(idx % 8) * 50}ms both`,
+            // left accent bar
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              left: 0, top: 0, bottom: 0,
+              width: '3px',
+              bgcolor: ACCENT,
+              opacity: 0.55,
+              transition: 'opacity 0.22s ease',
+            },
+            '&:focus-visible': { outline: `2px solid ${ACCENT}`, outlineOffset: '2px' },
             '&:hover': {
-              boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-              borderColor: catColor,
+              boxShadow: isDarkMode ? '0 10px 26px rgba(0,0,0,0.5)' : '0 12px 28px rgba(15,23,42,0.1)',
+              borderColor: isDarkMode ? 'rgba(59,130,246,0.5)' : 'rgba(37,99,235,0.4)',
+              transform: 'translateY(-2px)',
+              '&::before': { opacity: 1 },
+              '& .rec-cta': { bgcolor: ACCENT, color: '#fff' },
             },
           }}
         >
-          {/* Left & Middle combined names and image */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1, minWidth: 0 }}>
-            {/* Title / Main Name */}
-            <Typography
-              sx={{
-                fontWeight: 600,
-                fontSize: '0.95rem',
-                color: tc.text,
-                minWidth: '120px',
-                maxWidth: '220px',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {item.name_en || item.name_si || item.name_ta || `#${idx + 1}`}
+          {/* Thumbnail / icon avatar */}
+          <Box
+            sx={{
+              width: 48, height: 48, borderRadius: '12px', flexShrink: 0,
+              overflow: 'hidden',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              bgcolor: imageSrc ? 'transparent' : tc.tint,
+              border: imageSrc ? `1px solid ${tc.border}` : 'none',
+            }}
+          >
+            {imageSrc ? (
+              <Box component="img" src={imageSrc} alt="" sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <PlaceOutlinedIcon sx={{ fontSize: '1.4rem', color: ACCENT }} />
+            )}
+          </Box>
+
+          {/* Names + meta */}
+          <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, gap: 0.4 }}>
+            <Typography sx={{ fontSize: '0.95rem', fontWeight: 700, color: tc.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {title}
             </Typography>
-
-            {/* Thumbnail Image */}
-            <Box
-              sx={{
-                width: 48,
-                height: 48,
-                borderRadius: 2,
-                overflow: 'hidden',
-                bgcolor: 'rgba(0,0,0,0.04)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                border: `1px solid ${tc.border}`
-              }}
-            >
-              {imageSrc ? (
-                <Box
-                  component="img"
-                  src={imageSrc}
-                  alt="thumbnail"
-                  sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-              ) : (
-                <Typography sx={{ fontSize: '1.2rem' }}>
-                  📍
-                </Typography>
+            {subNames && (
+              <Typography sx={{ fontSize: '0.8rem', color: tc.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {subNames}
+              </Typography>
+            )}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.4, mt: 0.2, flexWrap: 'wrap' }}>
+              {item.reg_number && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3, color: tc.faint }}>
+                  <TagOutlinedIcon sx={{ fontSize: '0.85rem' }} />
+                  <Typography sx={{ fontSize: '0.72rem', fontWeight: 600 }}>{item.reg_number}</Typography>
+                </Box>
               )}
-            </Box>
-
-            {/* Combined Names stacked vertically with bullets for Sinhala/Tamil */}
-            <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, gap: 0.3 }}>
-              {item.name_en && (
-                <Typography
-                  sx={{
-                    fontSize: '0.88rem',
-                    fontWeight: 650,
-                    color: tc.text,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {item.name_en}
-                </Typography>
+              {locationLine && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3, color: tc.faint, minWidth: 0 }}>
+                  <PlaceOutlinedIcon sx={{ fontSize: '0.85rem' }} />
+                  <Typography sx={{ fontSize: '0.72rem', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{locationLine}</Typography>
+                </Box>
               )}
-              {item.name_si && (
-                <Typography
-                  sx={{
-                    fontSize: '0.84rem',
-                    color: tc.muted,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  • {item.name_si}
-                </Typography>
-              )}
-              {item.name_ta && (
-                <Typography
-                  sx={{
-                    fontSize: '0.84rem',
-                    color: tc.muted,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  • {item.name_ta}
-                </Typography>
-              )}
-              {!item.name_en && !item.name_si && !item.name_ta && (
-                <Typography sx={{ fontSize: '0.85rem', color: tc.muted }}>
-                  -
-                </Typography>
+              {dateText && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3, color: tc.faint }}>
+                  <CalendarTodayOutlinedIcon sx={{ fontSize: '0.8rem' }} />
+                  <Typography sx={{ fontSize: '0.72rem', fontWeight: 500 }}>{dateText}</Typography>
+                </Box>
               )}
             </Box>
           </Box>
 
-          {/* Right Section (Date and View All link) */}
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 0.5, pl: 2, flexShrink: 0 }}>
-            {dateText && (
-              <Typography sx={{ fontSize: '0.78rem', color: tc.muted, fontWeight: 500 }}>
-                {dateText}
-              </Typography>
-            )}
-            <Typography
-              onClick={() => setDialogOpen(true)}
-              sx={{
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                color: catColor,
-                cursor: 'pointer',
-                transition: 'opacity 0.2s',
-                '&:hover': {
-                  opacity: 0.8,
-                  textDecoration: 'underline'
-                }
-              }}
-            >
-              View All
-            </Typography>
+          {/* CTA chevron */}
+          <Box
+            className="rec-cta"
+            sx={{
+              width: 34, height: 34, borderRadius: '10px', flexShrink: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              bgcolor: tc.chipBg, color: ACCENT,
+              transition: 'background-color 0.22s ease, color 0.22s ease',
+            }}
+          >
+            <NorthEastIcon sx={{ fontSize: '1.05rem' }} />
           </Box>
         </Paper>
       </Grid>
 
       {/* Popup Dialog for All Details */}
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
-        <DialogTitle sx={{ fontWeight: 850, color: tc.text, borderBottom: `1px solid ${tc.border}`, px: 3, py: 2 }}>
-          {item.name_en || item.name_si || item.name_ta || `#${idx + 1}`}
+      <Dialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{ sx: { borderRadius: '20px', bgcolor: tc.card, color: tc.text, overflow: 'hidden' } }}
+      >
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1, fontWeight: 800, fontSize: '1.05rem', color: tc.text, borderBottom: `1px solid ${tc.border}`, px: 3, py: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, minWidth: 0 }}>
+            <Box sx={{ width: 30, height: 30, borderRadius: '9px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: tc.tint, color: ACCENT }}>
+              <PlaceOutlinedIcon sx={{ fontSize: '1.05rem' }} />
+            </Box>
+            <Box sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</Box>
+          </Box>
+          <IconButton size="small" onClick={() => setDialogOpen(false)} sx={{ color: tc.muted }}>
+            <CloseIcon fontSize="small" />
+          </IconButton>
         </DialogTitle>
         <DialogContent sx={{ p: 0 }}>
           {imageSrc && (
             <Box
               component="img"
               src={imageSrc}
-              alt="Submission Image"
-              sx={{ width: '100%', maxHeight: 320, objectFit: 'contain', bgcolor: '#000' }}
+              alt="Submission"
+              sx={{ width: '100%', maxHeight: 320, objectFit: 'contain', bgcolor: isDarkMode ? '#000' : '#f1f5f9' }}
             />
           )}
           <TableContainer>
@@ -271,10 +269,10 @@ const FastBigCardItem = ({ item, idx, tc, catColor, qMap, autoOpenId }: any) => 
               <TableBody>
                 {displayAnswers.map((a, aIdx) => (
                   <TableRow key={aIdx} sx={{ '&:last-child td': { borderBottom: 0 } }}>
-                    <TableCell sx={{ fontWeight: 600, fontSize: '0.85rem', color: tc.muted, width: '40%', py: 1.8, pl: 3 }}>
+                    <TableCell sx={{ fontWeight: 600, fontSize: '0.82rem', color: tc.muted, width: '40%', py: 1.6, pl: 3, borderColor: tc.border }}>
                       {a.question}
                     </TableCell>
-                    <TableCell sx={{ fontSize: '0.9rem', color: tc.text, fontWeight: 500, py: 1.8, pr: 3, wordBreak: 'break-word' }}>
+                    <TableCell sx={{ fontSize: '0.88rem', color: tc.text, fontWeight: 500, py: 1.6, pr: 3, wordBreak: 'break-word', borderColor: tc.border }}>
                       {a.answer}
                     </TableCell>
                   </TableRow>
@@ -286,13 +284,18 @@ const FastBigCardItem = ({ item, idx, tc, catColor, qMap, autoOpenId }: any) => 
         <DialogActions sx={{ borderTop: `1px solid ${tc.border}`, p: 2, px: 3 }}>
           {hasMap && (
             <Button
+              startIcon={<PlaceIcon sx={{ fontSize: '1.1rem !important' }} />}
               onClick={() => window.open(`https://maps.google.com/?q=${item.latitude},${item.longitude}`, '_blank')}
-              sx={{ color: '#10b981', fontWeight: 700 }}
+              sx={{ color: '#16a34a', fontWeight: 700, textTransform: 'none' }}
             >
-              📍 Show on Map
+              Show on Map
             </Button>
           )}
-          <Button onClick={() => setDialogOpen(false)} sx={{ color: tc.muted, fontWeight: 700 }}>
+          <Box sx={{ flexGrow: 1 }} />
+          <Button
+            variant="contained" disableElevation onClick={() => setDialogOpen(false)}
+            sx={{ fontWeight: 700, textTransform: 'none', borderRadius: '10px', px: 3, bgcolor: ACCENT, boxShadow: 'none', '&:hover': { bgcolor: ACCENT_DARK, boxShadow: 'none' } }}
+          >
             Close
           </Button>
         </DialogActions>
@@ -301,31 +304,66 @@ const FastBigCardItem = ({ item, idx, tc, catColor, qMap, autoOpenId }: any) => 
   );
 };
 
-const FastBigCardList = ({ slug, categoryName, gnId, catColor, parentQuestions, searchQuery, autoOpenId }: { slug: string, categoryName: string, gnId: string, catColor: string, parentQuestions: any[], searchQuery?: string, autoOpenId?: string | null }) => {
+// ─── Loading skeleton row ───────────────────────────────────────────────────
+
+const SkeletonRow = ({ tc }: any) => (
+  <Grid item xs={12} md={6}>
+    <Paper elevation={0} sx={{ display: 'flex', alignItems: 'center', gap: 1.6, p: 1.6, pl: 2, borderRadius: '16px', border: `1px solid ${tc.border}`, bgcolor: tc.card }}>
+      <Skeleton variant="rounded" width={48} height={48} sx={{ borderRadius: '12px', flexShrink: 0 }} />
+      <Box sx={{ flex: 1 }}>
+        <Skeleton variant="text" width="55%" height={20} />
+        <Skeleton variant="text" width="35%" height={16} />
+      </Box>
+      <Skeleton variant="rounded" width={34} height={34} sx={{ borderRadius: '10px' }} />
+    </Paper>
+  </Grid>
+);
+
+// ─── Section (a single category or subcategory data table) ─────────────────
+
+const FastBigCardList = ({ slug, categoryName, gnId, parentQuestions, searchQuery, autoOpenId, isDarkMode, onLoaded }: {
+  slug: string; categoryName: string; gnId: string; parentQuestions: any[];
+  searchQuery?: string; autoOpenId?: string | null; isDarkMode: boolean; onLoaded?: (slug: string, count: number) => void;
+}) => {
   const [data, setData] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
-  const tc = getThemeColors(false);
+  const tc = getThemeColors(isDarkMode);
 
   React.useEffect(() => {
     const controller = new AbortController();
+    setLoading(true);
     fetch(`/api/category-data/${slug}?gn_id=${gnId}`, { signal: controller.signal })
       .then(res => res.json())
       .then(res => {
-        if (res.success) setData(res.data);
+        const rows = res.success ? res.data : [];
+        setData(rows);
         setLoading(false);
+        onLoaded?.(slug, rows.length);
       })
       .catch(err => {
-        if (err.name !== 'AbortError') setLoading(false);
+        if (err.name !== 'AbortError') {
+          setLoading(false);
+          onLoaded?.(slug, 0);
+        }
       });
     return () => controller.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug, gnId]);
 
-  if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}><CircularProgress sx={{ color: catColor }} /></Box>;
-  
+  if (loading) {
+    return (
+      <Box sx={{ mb: 4 }}>
+        <Grid container spacing={1.5}>
+          {Array.from({ length: 4 }).map((_, i) => <SkeletonRow key={i} tc={tc} />)}
+        </Grid>
+      </Box>
+    );
+  }
+
   let filteredData = data;
   if (searchQuery) {
     const lowerQ = searchQuery.toLowerCase();
-    filteredData = data.filter((item: any) => 
+    filteredData = data.filter((item: any) =>
       item.name_en?.toLowerCase().includes(lowerQ) ||
       item.name_si?.toLowerCase().includes(lowerQ) ||
       item.name_ta?.toLowerCase().includes(lowerQ) ||
@@ -341,23 +379,24 @@ const FastBigCardList = ({ slug, categoryName, gnId, catColor, parentQuestions, 
   });
 
   return (
-    <Box sx={{ mb: 5 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
-        <Box sx={{ width: 4, height: 28, borderRadius: 2, bgcolor: catColor }} />
-        <Typography sx={{ fontWeight: 800, fontSize: '1.2rem', color: tc.text, fontFamily: "'Inter', sans-serif" }}>
+    <Box sx={{ mb: 4 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+        <Typography sx={{ fontWeight: 800, fontSize: '1rem', color: tc.text, letterSpacing: '-0.01em' }}>
           {categoryName}
         </Typography>
-        <Chip label={`${filteredData.length}`} size="small" sx={{ bgcolor: `${catColor}15`, color: catColor, fontWeight: 700, fontSize: '0.75rem' }} />
+        <Chip label={filteredData.length} size="small" sx={{ bgcolor: tc.tint, color: ACCENT, fontWeight: 700, fontSize: '0.72rem', height: 22 }} />
       </Box>
 
       <Grid container spacing={1.5}>
         {filteredData.map((item: any, idx: number) => (
-          <FastBigCardItem key={item.id} item={item} idx={idx} tc={tc} catColor={catColor} qMap={qMap} autoOpenId={autoOpenId} />
+          <FastBigCardItem key={item.id} item={item} idx={idx} tc={tc} qMap={qMap} autoOpenId={autoOpenId} isDarkMode={isDarkMode} />
         ))}
       </Grid>
     </Box>
   );
 };
+
+// ─── Page ────────────────────────────────────────────────────────────────
 
 const CategoryDetailPage: React.FC = () => {
   const { gnName, ccode, categorySlug } = useParams<{
@@ -369,12 +408,13 @@ const CategoryDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated, isLoading, userInfo, logout, login, register } = useAuth();
   const muiTheme = useTheme();
-  const isMobile = useMediaQuery(muiTheme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
 
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [mobileMenuAnchor, setMobileMenuAnchor] = useState<null | HTMLElement>(null);
   const [catMenuAnchor, setCatMenuAnchor] = useState<null | HTMLElement>(null);
   const [localSearchQuery, setLocalSearchQuery] = useState('');
+  const [sectionCounts, setSectionCounts] = useState<Record<string, number>>({});
 
   const tc = getThemeColors(isDarkMode);
   const isSuperAdmin = userInfo?.realm_roles?.includes('super_admin');
@@ -382,25 +422,21 @@ const CategoryDetailPage: React.FC = () => {
 
   const category = CATEGORIES.find((c) => c.slug === categorySlug);
   const catName = category?.name ?? categorySlug ?? 'Category';
-  const catEmoji = category?.emoji ?? '📋';
-  const catColor = category?.color ?? '#4f46e5';
+  const catIcon = iconForSlug(categorySlug);
 
   const gnPageUrl = `/gnpage/${gnName}/${ccode}`;
+  const gnDisplayName = decodeURIComponent(gnName ?? '').replace(/-/g, ' ');
 
   const [subCatTables, setSubCatTables] = useState<any[]>([]);
 
-  // 1. Fetch tables by SLUG instead of dbId
+  // 1. Fetch subcategory tables by slug
   React.useEffect(() => {
     if (!categorySlug) return;
-
+    setSectionCounts({});
     fetch(`/api/category-tables/${categorySlug}`)
       .then(res => res.json())
       .then(data => {
-        if (data.success && data.tables) {
-          setSubCatTables(data.tables);
-        } else {
-          setSubCatTables([]);
-        }
+        setSubCatTables(data.success && data.tables ? data.tables : []);
       })
       .catch(err => {
         console.error('Error fetching category tables:', err);
@@ -414,18 +450,20 @@ const CategoryDetailPage: React.FC = () => {
     skip: !categorySlug,
   });
 
+  const handleSectionLoaded = (slug: string, count: number) => {
+    setSectionCounts((prev) => (prev[slug] === count ? prev : { ...prev, [slug]: count }));
+  };
 
+  const allSectionSlugs = [categorySlug!, ...subCatTables.map((s: any) => s.slug)];
+  const allSectionsReported = allSectionSlugs.every((s) => s in sectionCounts);
+  const totalItems = allSectionSlugs.reduce((sum, s) => sum + (sectionCounts[s] || 0), 0);
+  const showEmptyState = allSectionsReported && totalItems === 0;
 
-  const navTypoSx = (color?: string) => ({
-    cursor: 'pointer',
-    transition: 'opacity 0.2s',
-    fontFamily: "'Inter', sans-serif",
-    fontWeight: 600,
-    color: color ?? (isDarkMode ? '#ffffff' : '#000000'),
-    '&:hover': { opacity: 0.7 },
-  });
-
-  const sepSx = { opacity: 0.4, fontWeight: 300, color: isDarkMode ? '#ffffff' : '#000000' };
+  const navBtnSx = {
+    textTransform: 'none' as const, fontWeight: 600, fontSize: '0.88rem', borderRadius: '10px',
+    color: isDarkMode ? '#cbd5e1' : '#334155', px: 1.5, boxShadow: 'none',
+    '&:hover': { bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)', boxShadow: 'none', transform: 'none' },
+  };
 
   return (
     <Box
@@ -435,223 +473,316 @@ const CategoryDetailPage: React.FC = () => {
         flexDirection: 'column',
         fontFamily: "'Inter', sans-serif",
         bgcolor: tc.bg,
-        transition: 'background 0.3s',
       }}
     >
-      {/* Navigation Navbar (Pill shape) */}
-      <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 3 }, display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, pointerEvents: 'none' }}>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexWrap: 'wrap',
-            gap: { xs: 1.5, sm: 3 },
-            pointerEvents: 'auto',
-            bgcolor: isDarkMode ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.85)',
-            backdropFilter: 'blur(10px)',
-            px: { xs: 2, sm: 3 },
-            py: { xs: 1, sm: 1.5 },
-            borderRadius: 30,
-            color: isDarkMode ? '#ffffff' : '#000000',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-            maxWidth: 'max-content'
-          }}
-        >
-          {/* Dark mode & Search */}
-          <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-            <IconButton onClick={() => setIsDarkMode(d => !d)} size="small" sx={{ color: isDarkMode ? '#fff' : '#000', p: 0.5 }}>
-              {isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
-            </IconButton>
-            <GlobalSearchBar isDarkMode={isDarkMode} activeGn={{ nameEn: gnName || '', CCODE: ccode || '' }} language="en" />
-          </Box>
-
-          {!isMobile ? (
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1.5, flex: 1, flexWrap: 'wrap' }}>
-              <Typography onClick={() => navigate(gnPageUrl)} sx={navTypoSx()}>Home</Typography>
-              <Typography sx={sepSx}>|</Typography>
-
-              {isAuthenticated && (
-                <>
-                  <Typography onClick={() => isSuperAdmin ? navigate('/admins') : navigate('/user')} sx={navTypoSx()}>
-                    {isSuperAdmin ? 'Dashboard' : 'My Account'}
-                  </Typography>
-                  <Typography sx={sepSx}>|</Typography>
-                  <Typography onClick={() => { logout(); navigate('/gnpage'); }} sx={navTypoSx()}>Logout</Typography>
-                  <Typography sx={sepSx}>|</Typography>
-                </>
-              )}
-
-              {/* Categories Dropdown */}
-              <Typography onClick={(e) => setCatMenuAnchor(e.currentTarget)} sx={{ ...navTypoSx(), display: 'flex', alignItems: 'center', gap: 0.3 }}>
-                Categories ▾
-              </Typography>
-              <Menu anchorEl={catMenuAnchor} open={Boolean(catMenuAnchor)} onClose={() => setCatMenuAnchor(null)} PaperProps={{ sx: { borderRadius: 3, mt: 1, boxShadow: '0 8px 32px rgba(0,0,0,0.12)' } }}>
-                {CATEGORIES.map((cat) => (
-                  <MenuItem key={cat.slug} selected={cat.slug === categorySlug} onClick={() => { setCatMenuAnchor(null); navigate(`/gnpage/${gnName}/${ccode}/${cat.slug}`); }}>
-                    {cat.emoji} {cat.name}
-                  </MenuItem>
-                ))}
-              </Menu>
-
-              {/* Back arrow + GN Name */}
-              <Typography sx={sepSx}>|</Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <IconButton onClick={() => navigate(gnPageUrl)} size="small" sx={{ color: catColor, p: 0.3 }}>
-                  <ArrowBackIcon fontSize="small" />
-                </IconButton>
-                <Typography sx={{ ...navTypoSx(catColor), fontSize: '0.9rem' }}>
-                  {decodeURIComponent(gnName ?? '').replace(/-/g, ' ')}
-                </Typography>
-              </Box>
-            </Box>
-          ) : (
-            <Box>
-              <IconButton onClick={(e) => setMobileMenuAnchor(e.currentTarget)} size="small" sx={{ color: isDarkMode ? '#fff' : '#000', p: 0.5 }}>
-                <MenuIcon fontSize="small" />
-              </IconButton>
-              <Menu anchorEl={mobileMenuAnchor} open={Boolean(mobileMenuAnchor)} onClose={() => setMobileMenuAnchor(null)} PaperProps={{ sx: { borderRadius: 3, minWidth: 200 } }}>
-                <MenuItem onClick={() => { setMobileMenuAnchor(null); navigate(gnPageUrl); }}>Home</MenuItem>
-                {isAuthenticated && (
-                  <>
-                    <MenuItem onClick={() => { setMobileMenuAnchor(null); isSuperAdmin ? navigate('/admins') : navigate('/user'); }}>
-                      {isSuperAdmin ? 'Dashboard' : 'My Account'}
-                    </MenuItem>
-                    <MenuItem onClick={() => { setMobileMenuAnchor(null); logout(); navigate('/gnpage'); }}>Logout</MenuItem>
-                  </>
-                )}
-                <>
-                  <Divider />
-                  <MenuItem disabled sx={{ fontWeight: 700, fontSize: '0.8rem', opacity: 0.6 }}>Categories</MenuItem>
-                  {CATEGORIES.map((cat) => (
-                    <MenuItem
-                      key={cat.slug}
-                      selected={cat.slug === categorySlug}
-                      onClick={() => { setMobileMenuAnchor(null); navigate(`/gnpage/${gnName}/${ccode}/${cat.slug}`); }}
-                    >
-                      {cat.name}
-                    </MenuItem>
-                  ))}
-                </>
-              </Menu>
-            </Box>
-          )}
-        </Box>
-      </Box>
-
-      {/* ── Hero Header ─────────────────────────────────────────────────── */}
+      {/* ── STICKY TOP NAVBAR (flat, matches /gnpage) ── */}
       <Box
+        component="header"
         sx={{
-          pt: 12,
-          pb: 5,
-          px: 3,
+          position: 'sticky',
+          top: 0,
+          zIndex: 20,
           display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
+          justifyContent: 'space-between',
           gap: 2,
-          background: `linear-gradient(180deg, ${catColor}15 0%, transparent 100%)`,
+          bgcolor: isDarkMode ? 'rgba(11,17,32,0.9)' : 'rgba(255,255,255,0.9)',
+          backdropFilter: 'blur(14px)',
+          borderBottom: `1px solid ${tc.border}`,
+          px: { xs: 2, md: 4, lg: 6 },
+          py: 1.2,
         }}
       >
-        <Typography sx={{ fontSize: '0.85rem', color: tc.muted, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
-          {decodeURIComponent(gnName ?? '').replace(/-/g, ' ')} / {ccode}
-        </Typography>
+        {/* Wordmark */}
+        <Box onClick={() => navigate(gnPageUrl)} sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer', flexShrink: 0 }}>
+          <Box component="img" src="/logo.png" alt="Ceylonica" sx={{ height: 28, width: 28, objectFit: 'contain' }} />
+          <Typography sx={{ display: { xs: 'none', sm: 'block' }, fontFamily: "'Playfair Display', serif", fontWeight: 800, fontSize: '1.05rem', color: tc.text }}>
+            Ceylonica
+          </Typography>
+        </Box>
 
-        <Typography sx={{ fontSize: { xs: '3rem', sm: '4rem' }, lineHeight: 1 }}>
-          {catEmoji}
-        </Typography>
+        {!isMobile ? (
+          <>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Button onClick={() => navigate(gnPageUrl)} disableRipple sx={navBtnSx}>Home</Button>
+              <Button onClick={(e) => setCatMenuAnchor(e.currentTarget)} disableRipple endIcon={<KeyboardArrowDownIcon sx={{ fontSize: '1.1rem !important' }} />} sx={navBtnSx}>
+                Categories
+              </Button>
+              <Menu
+                anchorEl={catMenuAnchor}
+                open={Boolean(catMenuAnchor)}
+                onClose={() => setCatMenuAnchor(null)}
+                PaperProps={{ sx: { bgcolor: tc.card, border: `1px solid ${tc.border}`, borderRadius: '14px', minWidth: 244, boxShadow: '0 16px 36px rgba(15,23,42,0.14)', mt: 1 } }}
+              >
+                {CATEGORIES.map((cat) => {
+                  const active = cat.slug === categorySlug;
+                  return (
+                    <MenuItem
+                      key={cat.slug}
+                      selected={active}
+                      onClick={() => { setCatMenuAnchor(null); navigate(`/gnpage/${gnName}/${ccode}/${cat.slug}`); }}
+                      sx={{ gap: 1.2, py: 0.9, px: 2, fontSize: '0.88rem', fontWeight: active ? 700 : 500, color: active ? ACCENT : tc.text }}
+                    >
+                      <Box sx={{ width: 26, height: 26, borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: active ? ACCENT : tc.muted, bgcolor: active ? tc.tint : tc.chipBg, '& .MuiSvgIcon-root': { fontSize: '0.95rem' } }}>
+                        {iconForSlug(cat.slug)}
+                      </Box>
+                      {cat.name}
+                    </MenuItem>
+                  );
+                })}
+              </Menu>
+              {isAuthenticated && (
+                <Button onClick={() => (isSuperAdmin ? navigate('/admins') : navigate('/user'))} disableRipple sx={navBtnSx}>
+                  {isSuperAdmin ? 'Dashboard' : 'My Account'}
+                </Button>
+              )}
+            </Box>
 
-        <Typography
-          sx={{
-            fontFamily: "'Inter', sans-serif",
-            fontWeight: 900,
-            fontSize: { xs: '2rem', sm: '3rem' },
-            background: `linear-gradient(135deg, ${catColor}, ${catColor}99)`,
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            textAlign: 'center',
-            letterSpacing: '-1px',
-            lineHeight: 1.1,
-          }}
-        >
-          {catName}
-        </Typography>
+            <Box sx={{ flex: 1, maxWidth: 420, mx: 2 }}>
+              <GlobalSearchBar isDarkMode={isDarkMode} activeGn={{ nameEn: gnName || '', CCODE: ccode || '' }} language="en" />
+            </Box>
 
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, flexShrink: 0 }}>
+              <IconButton onClick={() => setIsDarkMode(d => !d)} size="small" sx={{ width: 34, height: 34, color: tc.muted }}>
+                {isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
+              </IconButton>
+              {isAuthenticated ? (
+                <Button onClick={() => { logout(); navigate('/gnpage'); }} disableRipple sx={{ ...navBtnSx, color: '#dc2626' }}>Logout</Button>
+              ) : !isLoading ? (
+                <>
+                  <Button onClick={() => login(window.location.href)} disableRipple sx={navBtnSx}>Login</Button>
+                  <Button
+                    variant="contained" disableElevation onClick={() => register(window.location.href)}
+                    sx={{ textTransform: 'none', fontWeight: 700, fontSize: '0.85rem', borderRadius: '9px', bgcolor: ACCENT, px: 2, boxShadow: 'none', '&:hover': { bgcolor: ACCENT_DARK, boxShadow: 'none' } }}
+                  >
+                    Join with us
+                  </Button>
+                </>
+              ) : null}
+            </Box>
+          </>
+        ) : (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <IconButton onClick={() => setIsDarkMode(d => !d)} size="small" sx={{ width: 34, height: 34, color: tc.muted }}>
+              {isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
+            </IconButton>
+            <IconButton onClick={(e) => setMobileMenuAnchor(e.currentTarget)} size="small" sx={{ width: 34, height: 34, color: tc.text }}>
+              <MenuIcon fontSize="small" />
+            </IconButton>
+            <Menu anchorEl={mobileMenuAnchor} open={Boolean(mobileMenuAnchor)} onClose={() => setMobileMenuAnchor(null)} PaperProps={{ sx: { borderRadius: '14px', minWidth: 220, bgcolor: tc.card, border: `1px solid ${tc.border}` } }}>
+              <MenuItem onClick={() => { setMobileMenuAnchor(null); navigate(gnPageUrl); }} sx={{ color: tc.text }}>Home</MenuItem>
+              {isAuthenticated && (
+                <>
+                  <MenuItem onClick={() => { setMobileMenuAnchor(null); isSuperAdmin ? navigate('/admins') : navigate('/user'); }} sx={{ color: tc.text }}>
+                    {isSuperAdmin ? 'Dashboard' : 'My Account'}
+                  </MenuItem>
+                  <MenuItem onClick={() => { setMobileMenuAnchor(null); logout(); navigate('/gnpage'); }} sx={{ color: '#dc2626' }}>Logout</MenuItem>
+                </>
+              )}
+              <Divider sx={{ borderColor: tc.border }} />
+              <MenuItem disabled sx={{ fontWeight: 700, fontSize: '0.78rem', opacity: 0.6 }}>Categories</MenuItem>
+              {CATEGORIES.map((cat) => {
+                const active = cat.slug === categorySlug;
+                return (
+                  <MenuItem
+                    key={cat.slug}
+                    selected={active}
+                    onClick={() => { setMobileMenuAnchor(null); navigate(`/gnpage/${gnName}/${ccode}/${cat.slug}`); }}
+                    sx={{ gap: 1.2, color: active ? ACCENT : tc.text }}
+                  >
+                    <Box sx={{ width: 24, height: 24, borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: active ? ACCENT : tc.muted, bgcolor: active ? tc.tint : tc.chipBg, '& .MuiSvgIcon-root': { fontSize: '0.85rem' } }}>
+                      {iconForSlug(cat.slug)}
+                    </Box>
+                    {cat.name}
+                  </MenuItem>
+                );
+              })}
+            </Menu>
+          </Box>
+        )}
       </Box>
 
-      {/* Local Search Bar */}
-      <Box sx={{ px: { xs: 2, sm: 4, md: 6 }, mt: -2, mb: 2, maxWidth: 1200, mx: 'auto', display: 'flex', justifyContent: 'center' }}>
-        <Box sx={{
-          display: 'flex', alignItems: 'center',
-          bgcolor: isDarkMode ? 'rgba(255,255,255,0.05)' : '#ffffff',
-          border: `1px solid ${isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-          borderRadius: 30, px: 2.5, py: 1, width: '100%', maxWidth: 600,
-          boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
-        }}>
-          <SearchIcon sx={{ color: 'text.secondary', mr: 1.5 }} />
-          <InputBase
-            placeholder="Search items (EN/SI/TA)..."
-            value={localSearchQuery}
-            onChange={(e) => setLocalSearchQuery(e.target.value)}
-            sx={{ flex: 1, color: isDarkMode ? '#fff' : '#000', fontSize: '1.05rem' }}
-          />
+      {/* ── HERO PANEL ── */}
+      <Box sx={{ px: { xs: 2, md: 4, lg: 6 }, pt: { xs: 3, md: 4 }, pb: 1, maxWidth: 1160, mx: 'auto', width: '100%' }}>
+        {/* breadcrumb */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 2, animation: 'fadeInUp 0.35s ease both' }}>
+          <IconButton onClick={() => navigate(gnPageUrl)} size="small" sx={{ width: 26, height: 26, color: tc.muted, '&:hover': { color: ACCENT } }}>
+            <ArrowBackIcon sx={{ fontSize: '1rem' }} />
+          </IconButton>
+          <Typography onClick={() => navigate(gnPageUrl)} sx={{ fontSize: '0.8rem', fontWeight: 600, color: tc.muted, cursor: 'pointer', '&:hover': { color: ACCENT } }}>
+            {gnDisplayName || 'Village'}
+          </Typography>
+          <ChevronRightIcon sx={{ fontSize: '0.95rem', color: tc.faint }} />
+          <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: tc.text }}>{catName}</Typography>
+        </Box>
+
+        {/* hero card */}
+        <Box
+          sx={{
+            position: 'relative',
+            overflow: 'hidden',
+            borderRadius: '22px',
+            border: `1px solid ${tc.border}`,
+            bgcolor: tc.card,
+            boxShadow: isDarkMode ? 'none' : '0 1px 2px rgba(15,23,42,0.04), 0 10px 30px rgba(15,23,42,0.05)',
+            p: { xs: 2.5, md: 3 },
+            display: 'flex',
+            flexDirection: { xs: 'column', md: 'row' },
+            alignItems: { xs: 'flex-start', md: 'center' },
+            gap: { xs: 2, md: 3 },
+            animation: 'fadeInUp 0.45s ease 60ms both',
+          }}
+        >
+          {/* subtle accent wash */}
+          <Box aria-hidden sx={{ position: 'absolute', top: -70, right: -40, width: 240, height: 240, borderRadius: '50%', background: `radial-gradient(circle, ${tc.tint} 0%, transparent 70%)`, pointerEvents: 'none' }} />
+
+          <Box sx={{
+            position: 'relative', zIndex: 1, flexShrink: 0,
+            width: 60, height: 60, borderRadius: '18px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#fff', background: `linear-gradient(135deg, ${ACCENT}, ${ACCENT_DARK})`,
+            boxShadow: '0 10px 24px rgba(37,99,235,0.35)',
+            '& .MuiSvgIcon-root': { fontSize: '1.7rem' },
+          }}>
+            {catIcon}
+          </Box>
+
+          <Box sx={{ position: 'relative', zIndex: 1, flex: 1, minWidth: 0 }}>
+            <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: ACCENT, textTransform: 'uppercase', letterSpacing: '0.8px', mb: 0.4 }}>
+              Location Data
+            </Typography>
+            <Typography sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 800, fontSize: { xs: '1.7rem', md: '2.2rem' }, color: tc.text, lineHeight: 1.05 }}>
+              {catName}
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 1, flexWrap: 'wrap' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: tc.muted }}>
+                <PlaceOutlinedIcon sx={{ fontSize: '0.95rem' }} />
+                <Typography sx={{ fontSize: '0.82rem', fontWeight: 600 }}>{gnDisplayName || 'Village'}</Typography>
+              </Box>
+              {allSectionsReported && (
+                <Chip
+                  label={`${totalItems} ${totalItems === 1 ? 'record' : 'records'}`}
+                  size="small"
+                  sx={{ height: 22, fontWeight: 700, fontSize: '0.72rem', bgcolor: tc.tint, color: ACCENT }}
+                />
+              )}
+            </Box>
+          </Box>
+
+          {/* Local Search */}
+          <Box sx={{
+            position: 'relative', zIndex: 1,
+            display: 'flex', alignItems: 'center', gap: 1,
+            bgcolor: isDarkMode ? 'rgba(255,255,255,0.05)' : '#f4f6fb',
+            border: `1px solid ${tc.border}`,
+            borderRadius: '12px', px: 1.6, height: 46, width: { xs: '100%', md: 280 },
+            transition: 'border-color 0.2s ease',
+            '&:focus-within': { borderColor: ACCENT },
+          }}>
+            <SearchIcon sx={{ color: tc.muted, fontSize: '1.2rem' }} />
+            <InputBase
+              placeholder="Search this category..."
+              value={localSearchQuery}
+              onChange={(e) => setLocalSearchQuery(e.target.value)}
+              sx={{ flex: 1, color: tc.text, fontSize: '0.9rem' }}
+            />
+          </Box>
         </Box>
       </Box>
 
       {/* ── Main Content ─────────────────────────────────────────────────── */}
-      <Box sx={{ flex: 1, px: { xs: 2, sm: 4, md: 6 }, pb: 6, maxWidth: 1200, mx: 'auto', width: '100%' }}>
-
+      <Box sx={{ flex: 1, px: { xs: 2, md: 4, lg: 6 }, pt: 3, pb: 6, maxWidth: 1160, mx: 'auto', width: '100%' }}>
         {/* Main category data — always shown (captures user-submitted approved data) */}
-        <Box sx={{ mt: 4 }}>
+        <FastBigCardList
+          slug={categorySlug!}
+          categoryName={catName}
+          gnId={ccode!}
+          parentQuestions={catData?.categoryBySlug?.questions || []}
+          searchQuery={localSearchQuery}
+          autoOpenId={dataItemId}
+          isDarkMode={isDarkMode}
+          onLoaded={handleSectionLoaded}
+        />
+
+        {/* Also show any bulk-uploaded subcategory tables */}
+        {subCatTables.map((sub: any) => (
           <FastBigCardList
-            slug={categorySlug!}
-            categoryName={catName}
-            gnId={ccode!}
-            catColor={catColor}
+            key={sub.slug}
+            slug={sub.slug}
+            categoryName={sub.nameEn || sub.nameSi || sub.nameTa}
+            gnId={ccode as string}
             parentQuestions={catData?.categoryBySlug?.questions || []}
             searchQuery={localSearchQuery}
             autoOpenId={dataItemId}
+            isDarkMode={isDarkMode}
+            onLoaded={handleSectionLoaded}
           />
+        ))}
 
-          {/* Also show any bulk-uploaded subcategory tables */}
-          {subCatTables.map((sub: any) => (
-            <Box key={sub.slug} sx={{ mb: 2 }}>
-              <FastBigCardList
-                slug={sub.slug}
-                categoryName={sub.nameEn || sub.nameSi || sub.nameTa}
-                gnId={ccode as string}
-                catColor={catColor}
-                parentQuestions={catData?.categoryBySlug?.questions || []}
-                searchQuery={localSearchQuery}
-                autoOpenId={dataItemId}
-              />
+        {/* Empty state — shown only once every section has reported in and none has data */}
+        {showEmptyState && (
+          <Box sx={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1.5,
+            py: 9, px: 3, textAlign: 'center',
+            border: `1px dashed ${tc.border}`, borderRadius: '18px', bgcolor: tc.card,
+          }}>
+            <Box sx={{ width: 60, height: 60, borderRadius: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: tc.tint, color: ACCENT }}>
+              <InboxOutlinedIcon sx={{ fontSize: '1.7rem' }} />
             </Box>
-          ))}
-        </Box>
-
+            <Typography sx={{ fontWeight: 700, fontSize: '1.05rem', color: tc.text }}>
+              {localSearchQuery ? 'No matching records' : `No records yet for ${catName}`}
+            </Typography>
+            <Typography sx={{ fontSize: '0.85rem', color: tc.muted, maxWidth: 380 }}>
+              {localSearchQuery
+                ? 'Try a different search term, or clear the search to see all records.'
+                : "Data submitted for this category and village will appear here once it's added."}
+            </Typography>
+          </Box>
+        )}
 
         {/* Navigate to other categories */}
-        <Box sx={{ mt: 6, display: 'flex', flexWrap: 'wrap', gap: 1.5, justifyContent: 'center', maxWidth: 700, mx: 'auto' }}>
-          {CATEGORIES.filter((c) => c.slug !== categorySlug).map((cat) => (
-            <Box
-              key={cat.slug}
-              onClick={() => navigate(`/gnpage/${gnName}/${ccode}/${cat.slug}`)}
-              sx={{
-                display: 'flex', alignItems: 'center', gap: 0.8,
-                px: 2, py: 1, borderRadius: 20,
-                border: `1.5px solid ${cat.color}33`,
-                bgcolor: `${cat.color}11`,
-                cursor: 'pointer', transition: 'all 0.2s',
-                '&:hover': { bgcolor: `${cat.color}22`, transform: 'translateY(-1px)' },
-              }}
-            >
-              <Typography sx={{ fontSize: '1rem' }}>{cat.emoji}</Typography>
-              <Typography sx={{ fontSize: '0.83rem', fontWeight: 600, color: cat.color }}>{cat.name}</Typography>
-            </Box>
-          ))}
+        <Box sx={{ mt: 7 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+            <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: tc.muted, textTransform: 'uppercase', letterSpacing: '0.6px', whiteSpace: 'nowrap' }}>
+              Browse other categories
+            </Typography>
+            <Box sx={{ flex: 1, height: '1px', bgcolor: tc.border }} />
+          </Box>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            {CATEGORIES.filter((c) => c.slug !== categorySlug).map((cat) => (
+              <Box
+                key={cat.slug}
+                onClick={() => navigate(`/gnpage/${gnName}/${ccode}/${cat.slug}`)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    navigate(`/gnpage/${gnName}/${ccode}/${cat.slug}`);
+                  }
+                }}
+                sx={{
+                  display: 'flex', alignItems: 'center', gap: 0.9,
+                  px: 1.6, py: 1, borderRadius: '12px',
+                  bgcolor: tc.card,
+                  border: `1px solid ${tc.border}`,
+                  cursor: 'pointer',
+                  color: tc.muted,
+                  transition: 'background-color 0.2s ease, transform 0.15s ease, border-color 0.2s ease, color 0.2s ease',
+                  '& .MuiSvgIcon-root': { fontSize: '1.1rem', transition: 'color 0.2s ease' },
+                  '&:focus-visible': { outline: `2px solid ${ACCENT}`, outlineOffset: '2px' },
+                  '&:hover': { bgcolor: tc.tint, borderColor: ACCENT, transform: 'translateY(-1px)', color: ACCENT, '& .rec-label': { color: tc.text } },
+                }}
+              >
+                <Box sx={{ display: 'flex', color: 'inherit' }}>{iconForSlug(cat.slug)}</Box>
+                <Typography className="rec-label" sx={{ fontSize: '0.82rem', fontWeight: 600, color: tc.text }}>{cat.name}</Typography>
+              </Box>
+            ))}
+          </Box>
         </Box>
       </Box>
 
-      {/* ── Footer ────────────────────────────────────────────────────────── */} 
+      {/* ── Footer ────────────────────────────────────────────────────────── */}
       <GnPageFooter isDarkMode={isDarkMode} />
     </Box>
   );
