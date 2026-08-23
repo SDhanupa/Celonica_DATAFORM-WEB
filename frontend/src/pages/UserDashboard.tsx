@@ -14,6 +14,11 @@ import MenuIcon from '@mui/icons-material/Menu';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import PinDropRoundedIcon from '@mui/icons-material/PinDropRounded';
+import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
+import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
+import TagRoundedIcon from '@mui/icons-material/TagRounded';
+import Tooltip from '@mui/material/Tooltip';
 import { CATEGORIES } from './CategoryDetailPage';
 import GnPageFooter from '../components/GnPageFooter';
 import { VillageMap } from '../components/VillageMap';
@@ -197,6 +202,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const handleMobileMenuClose = () => { setMobileMenuAnchor(null); };
 
   const [catMenuAnchor, setCatMenuAnchor] = useState<null | HTMLElement>(null);
+  const [copiedCode, setCopiedCode] = useState<boolean>(false);
 
   // Search Logic Queries (Always active so dropdowns are always populated)
   const { data: districtsData, loading: districtsLoading, error: districtsError } = useQuery(GET_P_DISTRICTS, {
@@ -345,7 +351,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
     const g = activeGn;
     displayCity = language === 'en' ? g?.dsEn : language === 'si' ? g?.dsSi : g?.dsTa;
     displayGN = language === 'en' ? g?.nameEn : language === 'si' ? g?.nameSi : g?.nameTa;
-    displayCCODE = g?.CCODE || '';
+    displayCCODE = g?.CCODE || g?.code || ccode || '';
     if (g?.pGn) {
       populationData = {
         both: g.pGn.populationBoth || 0,
@@ -435,7 +441,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         const g = gnData?.pDistrict?.gramaNiladharis?.find((x: any) => String(x.id) === String(selectedGN) || x.CCODE === selectedGN || x.ccode === selectedGN);
         if (g) {
           displayGN = language === 'en' ? g.nameEn : language === 'si' ? g.nameSi : g.nameTa;
-          displayCCODE = g.CCODE || '';
+          displayCCODE = g.CCODE || g.code || g.ccode || selectedGN || '';
           if (g.pGn) {
             populationData = {
               both: g.pGn.populationBoth || 0,
@@ -570,25 +576,17 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             {language}
           </Box>
 
-          {/* Logo */}
-          <Box
-            sx={{
-              width: 88,
-              height: 88,
-              borderRadius: '50%',
-              bgcolor: 'rgba(255,255,255,0.15)',
-              backdropFilter: 'blur(10px)',
-              border: '3px solid rgba(255,255,255,0.5)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-            }}
-          >
+          {/* Plain Transparent PNG Logos */}
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3, my: 0.5 }}>
             <img
               src="/logo.png"
               alt="Ceylonica Logo"
-              style={{ height: '72px', width: '72px', objectFit: 'contain', borderRadius: '50%' }}
+              style={{ height: '56px', width: 'auto', objectFit: 'contain' }}
+            />
+            <img
+              src="/praja.png"
+              alt="Praja Logo"
+              style={{ height: '56px', width: 'auto', objectFit: 'contain' }}
             />
           </Box>
 
@@ -1068,44 +1066,169 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             }}
           />
 
-          {/* ── HERO: BREADCRUMB + GN NAME DISPLAY ── */}
+          {/* ── HERO: BRANDING LOGOS + BREADCRUMB + GN NAME DISPLAY ── */}
           <Box key={displayGN || 'default'} sx={{ mt: 1, mb: { xs: 2, md: 3 }, px: 2, textAlign: 'center' }}>
+            {/* Plain Transparent Branding PNGs (No box, No borders) */}
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: { xs: 2.5, md: 4 }, mb: 1.8, animation: 'fadeInUp 0.35s ease both' }}>
+              <Box
+                component="img"
+                src="/logo.png"
+                alt="Ceylonica Logo"
+                sx={{
+                  height: { xs: 40, md: 54, lg: 60 },
+                  width: 'auto',
+                  objectFit: 'contain',
+                  filter: 'drop-shadow(0 3px 10px rgba(0,0,0,0.1))',
+                  transition: 'transform 0.25s ease',
+                  '&:hover': { transform: 'scale(1.05)' },
+                }}
+              />
+              <Box
+                component="img"
+                src="/praja.png"
+                alt="Praja Logo"
+                sx={{
+                  height: { xs: 40, md: 54, lg: 60 },
+                  width: 'auto',
+                  objectFit: 'contain',
+                  filter: 'drop-shadow(0 3px 10px rgba(0,0,0,0.1))',
+                  transition: 'transform 0.25s ease',
+                  '&:hover': { transform: 'scale(1.05)' },
+                }}
+              />
+            </Box>
+
             {(displayDistrict || displayCity) && (
-              <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: isDarkMode ? '#94a3b8' : '#64748b', textTransform: 'uppercase', letterSpacing: '0.8px', mb: 1.2, animation: 'fadeInUp 0.4s ease both' }}>
+              <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: isDarkMode ? '#94a3b8' : '#64748b', textTransform: 'uppercase', letterSpacing: '0.8px', mb: 1, animation: 'fadeInUp 0.4s ease 40ms both' }}>
                 {[displayDistrict, displayCity].filter(Boolean).join('  ›  ')}
               </Typography>
             )}
 
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: { xs: 1, sm: 1.5, md: 2 }, animation: 'fadeInUp 0.45s ease 60ms both' }}>
-              <Box
-                component="img"
-                src="/logo.png"
-                alt="CDIC Logo"
-                sx={{
-                  height: { md: '3.2rem', lg: '3.6rem' },
-                  width: 'auto',
-                  objectFit: 'contain'
-                }}
-              />
-              <Typography
-                variant="h1"
-                sx={{
-                  fontFamily: '"Playfair Display", "Merriweather", "Georgia", serif',
-                  fontWeight: 800,
-                  fontSize: { md: '2.9rem', lg: '3.4rem' },
-                  color: isDarkMode ? '#f8fafc' : '#0f172a',
-                  lineHeight: 1,
-                  letterSpacing: '-0.02em',
-                  wordBreak: 'break-word',
-                  textAlign: 'center',
-                  mb: 0,
-                }}
-              >
-                {displayGN || 'Sammanthranapura'}
-              </Typography>
-            </Box>
+            <Typography
+              variant="h1"
+              sx={{
+                fontFamily: '"Playfair Display", "Merriweather", "Georgia", serif',
+                fontWeight: 800,
+                fontSize: { xs: '2.2rem', sm: '2.8rem', md: '3.2rem', lg: '3.6rem' },
+                color: isDarkMode ? '#f8fafc' : '#0f172a',
+                lineHeight: 1.05,
+                letterSpacing: '-0.02em',
+                wordBreak: 'break-word',
+                textAlign: 'center',
+                mb: 0,
+                animation: 'fadeInUp 0.45s ease 80ms both',
+              }}
+            >
+              {displayGN || 'Sammanthranapura'}
+            </Typography>
 
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1.5, animation: 'fadeInUp 0.45s ease 110ms both' }}>
+            {/* ── PROMINENT MODERN AREA CODE SHOWCASE ── */}
+            {displayCCODE && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1.8, animation: 'fadeInUp 0.45s ease 90ms both' }}>
+                <Box
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 1.8,
+                    px: { xs: 2, md: 2.8 },
+                    py: { xs: 0.8, md: 1 },
+                    borderRadius: '16px',
+                    background: isDarkMode
+                      ? 'linear-gradient(135deg, rgba(37,99,235,0.22) 0%, rgba(30,58,138,0.35) 100%)'
+                      : 'linear-gradient(135deg, rgba(239,246,255,0.95) 0%, rgba(219,234,254,0.8) 100%)',
+                    border: isDarkMode
+                      ? '1.5px solid rgba(96,165,250,0.5)'
+                      : '1.5px solid rgba(37,99,235,0.35)',
+                    boxShadow: isDarkMode
+                      ? '0 6px 24px rgba(37,99,235,0.28), inset 0 1px 1px rgba(255,255,255,0.15)'
+                      : '0 6px 20px rgba(37,99,235,0.12), inset 0 1px 1px rgba(255,255,255,0.9)',
+                    backdropFilter: 'blur(12px)',
+                    transition: 'all 0.25s ease',
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      boxShadow: isDarkMode
+                        ? '0 8px 30px rgba(37,99,235,0.45)'
+                        : '0 8px 24px rgba(37,99,235,0.2)',
+                    }
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: 36,
+                      height: 36,
+                      borderRadius: '10px',
+                      bgcolor: isDarkMode ? 'rgba(59,130,246,0.35)' : '#2563eb',
+                      color: '#ffffff',
+                      boxShadow: '0 2px 8px rgba(37,99,235,0.3)',
+                    }}
+                  >
+                    <PinDropRoundedIcon sx={{ fontSize: '1.35rem' }} />
+                  </Box>
+
+                  <Box sx={{ textAlign: 'left' }}>
+                    <Typography
+                      sx={{
+                        fontSize: '0.68rem',
+                        fontWeight: 800,
+                        textTransform: 'uppercase',
+                        letterSpacing: '1.2px',
+                        color: isDarkMode ? '#93c5fd' : '#1d4ed8',
+                        lineHeight: 1.1,
+                      }}
+                    >
+                      {language === 'si' ? 'ග්‍රාම නිලධාරී වසම් කේතය (AREA CODE)' : language === 'ta' ? 'கிராம அலுவலர் பிரிவு குறியீடு (AREA CODE)' : 'GN DIVISION AREA CODE'}
+                    </Typography>
+                    <Typography
+                      component="div"
+                      sx={{
+                        fontFamily: "'JetBrains Mono', 'Roboto Mono', 'Plus Jakarta Sans', monospace",
+                        fontWeight: 900,
+                        fontSize: { xs: '1.3rem', md: '1.65rem' },
+                        color: isDarkMode ? '#ffffff' : '#0f172a',
+                        letterSpacing: '2px',
+                        lineHeight: 1.2,
+                        mt: 0.1,
+                      }}
+                    >
+                      {displayCCODE}
+                    </Typography>
+                  </Box>
+
+                  {/* Quick Copy Button */}
+                  <Tooltip title={copiedCode ? (language === 'si' ? 'පිටපත් විය!' : language === 'ta' ? 'நகலெடுக்கப்பட்டது!' : 'Copied to Clipboard!') : (language === 'si' ? 'කේතය පිටපත් කරන්න' : language === 'ta' ? 'குறியீட்டை நகலெடு' : 'Copy Area Code')}>
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        navigator.clipboard.writeText(displayCCODE);
+                        setCopiedCode(true);
+                        setTimeout(() => setCopiedCode(false), 2200);
+                      }}
+                      sx={{
+                        ml: 0.5,
+                        p: 0.75,
+                        color: copiedCode ? '#10b981' : (isDarkMode ? '#93c5fd' : '#2563eb'),
+                        bgcolor: copiedCode
+                          ? (isDarkMode ? 'rgba(16,185,129,0.2)' : 'rgba(16,185,129,0.12)')
+                          : (isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(37,99,235,0.08)'),
+                        borderRadius: '9px',
+                        transition: 'all 0.2s ease',
+                        '&:hover': {
+                          bgcolor: isDarkMode ? 'rgba(255,255,255,0.16)' : 'rgba(37,99,235,0.18)',
+                          transform: 'scale(1.08)',
+                        }
+                      }}
+                    >
+                      {copiedCode ? <CheckRoundedIcon sx={{ fontSize: '1.2rem', color: '#10b981' }} /> : <ContentCopyRoundedIcon sx={{ fontSize: '1.2rem' }} />}
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              </Box>
+            )}
+
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1.8, animation: 'fadeInUp 0.45s ease 110ms both' }}>
               <Button
                 size="small"
                 onClick={() => setIsAboutModalOpen(true)}

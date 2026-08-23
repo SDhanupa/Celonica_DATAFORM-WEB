@@ -10,6 +10,7 @@ import TranslateIcon from '@mui/icons-material/Translate';
 import PlaceIcon from '@mui/icons-material/Place';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import TagRoundedIcon from '@mui/icons-material/TagRounded';
 import CloseIcon from '@mui/icons-material/Close';
 import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
@@ -183,6 +184,12 @@ const MobileDashboard: React.FC<MobileDashboardProps> = (props) => {
 
         {/* Hero */}
         <Box sx={{ textAlign: 'center', pt: 1, pb: 2 }}>
+          {/* Plain Transparent Branding PNGs (No box, No borders) */}
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2.5, mb: 1.5 }}>
+            <Box component="img" src="/logo.png" alt="Ceylonica" sx={{ height: 36, width: 'auto', objectFit: 'contain' }} />
+            <Box component="img" src="/praja.png" alt="Praja" sx={{ height: 36, width: 'auto', objectFit: 'contain' }} />
+          </Box>
+
           {(displayDistrict || displayCity) && (
             <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: textMuted, textTransform: 'uppercase', letterSpacing: '0.6px', mb: 1 }}>
               {[displayDistrict, displayCity].filter(Boolean).join('  ›  ')}
@@ -198,15 +205,39 @@ const MobileDashboard: React.FC<MobileDashboardProps> = (props) => {
 
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mt: 1.5, flexWrap: 'wrap' }}>
             {displayCCODE && (
-              <Chip
-                label={displayCCODE}
-                size="small"
+              <Box
                 sx={{
-                  fontFamily: "'Playfair Display', serif", fontWeight: 800, letterSpacing: '1px',
-                  bgcolor: isDarkMode ? 'rgba(59,130,246,0.16)' : 'rgba(37,99,235,0.1)', color: '#2563eb',
-                  height: 28, borderRadius: '8px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 0.8,
+                  px: 1.5,
+                  py: 0.5,
+                  borderRadius: '10px',
+                  background: isDarkMode
+                    ? 'linear-gradient(135deg, rgba(37,99,235,0.25) 0%, rgba(30,58,138,0.3) 100%)'
+                    : 'linear-gradient(135deg, rgba(239,246,255,0.95) 0%, rgba(219,234,254,0.85) 100%)',
+                  border: isDarkMode
+                    ? '1.5px solid rgba(96,165,250,0.5)'
+                    : '1.5px solid rgba(37,99,235,0.35)',
+                  boxShadow: isDarkMode ? '0 2px 10px rgba(37,99,235,0.2)' : '0 2px 8px rgba(37,99,235,0.1)',
                 }}
-              />
+              >
+                <TagRoundedIcon sx={{ fontSize: '1rem', color: '#2563eb' }} />
+                <Typography sx={{ fontSize: '0.62rem', fontWeight: 800, color: isDarkMode ? '#93c5fd' : '#1d4ed8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  AREA CODE:
+                </Typography>
+                <Typography
+                  sx={{
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontWeight: 900,
+                    fontSize: '0.95rem',
+                    color: isDarkMode ? '#ffffff' : '#0f172a',
+                    letterSpacing: '1px',
+                  }}
+                >
+                  {displayCCODE}
+                </Typography>
+              </Box>
             )}
             <Chip
               icon={<InfoOutlinedIcon sx={{ fontSize: '1rem !important' }} />}
@@ -214,8 +245,9 @@ const MobileDashboard: React.FC<MobileDashboardProps> = (props) => {
               size="small"
               onClick={() => setAboutOpen(true)}
               sx={{
-                height: 28, borderRadius: '8px', fontWeight: 700, fontSize: '0.75rem',
+                height: 32, borderRadius: '10px', fontWeight: 700, fontSize: '0.75rem',
                 color: textMain, bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)',
+                border: isDarkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.06)',
                 '& .MuiChip-icon': { color: textMuted },
               }}
             />

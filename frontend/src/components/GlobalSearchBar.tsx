@@ -233,7 +233,7 @@ const GlobalSearchBar: React.FC<GlobalSearchBarProps> = ({ isDarkMode = false, a
             }
           }}
         >
-          <SearchIcon sx={{ color: textColor, opacity: 0.6, mr: 1, fontSize: 20 }} />
+          <SearchIcon sx={{ color: isDarkMode ? '#cbd5e1' : '#64748b', mr: 1, fontSize: 20 }} />
           <InputBase
             placeholder="Search GNs, Categories, Subcategories..."
             value={query}
@@ -241,16 +241,16 @@ const GlobalSearchBar: React.FC<GlobalSearchBarProps> = ({ isDarkMode = false, a
             onFocus={() => { if (query.trim().length >= 2) setOpen(true); }}
             sx={{
               flex: 1,
-              color: textColor,
+              color: isDarkMode ? '#ffffff' : '#0f172a',
               fontFamily: "'Inter', sans-serif",
               fontSize: '0.95rem',
               '& input::placeholder': {
-                color: textColor,
-                opacity: 0.5,
+                color: isDarkMode ? '#94a3b8' : '#64748b',
+                opacity: 0.9,
               }
             }}
           />
-          {loading && <CircularProgress size={16} sx={{ color: textColor, ml: 1 }} />}
+          {loading && <CircularProgress size={16} sx={{ color: isDarkMode ? '#38bdf8' : '#2563eb', ml: 1 }} />}
         </Box>
 
         {open && results.length > 0 && (
@@ -313,9 +313,16 @@ const GlobalSearchBar: React.FC<GlobalSearchBarProps> = ({ isDarkMode = false, a
                 <Box sx={{ flex: 1, minWidth: 0 }}>
                   {result.type === 'gn' ? (
                     <>
-                      <Typography sx={{ color: isDarkMode ? '#fff' : '#1e293b', fontWeight: 700, fontSize: '0.95rem', fontFamily: "'Inter', sans-serif" }}>
-                        {result.data?.nameEn}
-                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pr: 1 }}>
+                        <Typography sx={{ color: isDarkMode ? '#fff' : '#1e293b', fontWeight: 700, fontSize: '0.95rem', fontFamily: "'Inter', sans-serif" }}>
+                          {result.data?.nameEn}
+                        </Typography>
+                        {(result.data?.CCODE || result.data?.code) && (
+                          <Box component="span" sx={{ fontSize: '0.72rem', fontWeight: 800, fontFamily: 'monospace', bgcolor: isDarkMode ? 'rgba(59,130,246,0.2)' : 'rgba(37,99,235,0.09)', color: '#2563eb', px: 0.8, py: 0.2, borderRadius: '6px' }}>
+                            {result.data?.CCODE || result.data?.code}
+                          </Box>
+                        )}
+                      </Box>
                       <Typography sx={{ color: isDarkMode ? '#94a3b8' : '#64748b', fontSize: '0.75rem', fontWeight: 500, fontFamily: "'Inter', sans-serif", mt: 0.2 }}>
                         {result.data?.disEn} {result.data?.disEn && result.data?.dsEn ? ' › ' : ''} {result.data?.dsEn}
                       </Typography>
