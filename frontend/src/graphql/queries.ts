@@ -175,6 +175,21 @@ export const GET_CATEGORIES = gql`
         id
         slug
         nameEn
+        children {
+          id
+          slug
+          nameEn
+          children {
+            id
+            slug
+            nameEn
+            children {
+              id
+              slug
+              nameEn
+            }
+          }
+        }
       }
     }
   }

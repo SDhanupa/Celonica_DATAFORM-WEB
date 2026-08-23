@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Box, Typography, Container, Button, Grid, Card, CardActionArea, CardMedia, CardContent, CircularProgress, Chip, Avatar, Fade, Stack, Paper, IconButton } from '@mui/material';
+import { Box, Typography, Container, Button, Grid, Card, CardActionArea, CardMedia, CardContent, CircularProgress, Chip, Avatar, Fade, Stack, Paper, IconButton, TextField, InputAdornment, Autocomplete } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import LocationSelectorModal from '../components/LocationSelectorModal';
 import { useQuery } from '@apollo/client';
 import { GET_CATEGORIES } from '../graphql/queries';
+import SearchIcon from '@mui/icons-material/Search';
 
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import ExploreIcon from '@mui/icons-material/Explore';
@@ -28,6 +29,41 @@ const UserPage: React.FC = () => {
   });
 
   const { data: catData, loading: catLoading } = useQuery(GET_CATEGORIES);
+
+  const searchOptions = React.useMemo(() => {
+    if (!catData?.categories) return [];
+    const options: any[] = [];
+    const processChildren = (children: any[], parentPath: string, rootName: string) => {
+      if (!children) return;
+      children.forEach((child: any) => {
+        const fullPath = `${parentPath}/${child.slug}`;
+        options.push({
+          type: 'subcategory',
+          label: child.nameEn || '',
+          labelSi: child.nameSi || '',
+          slug: fullPath,
+          parentName: rootName
+        });
+        if (child.children) {
+          processChildren(child.children, fullPath, rootName);
+        }
+      });
+    };
+
+    catData.categories.forEach((cat: any) => {
+      options.push({
+        type: 'category',
+        label: cat.nameEn || '',
+        labelSi: cat.nameSi || '',
+        slug: cat.slug,
+        parentName: null
+      });
+      if (cat.children) {
+        processChildren(cat.children, cat.slug, cat.nameEn || '');
+      }
+    });
+    return options;
+  }, [catData]);
 
   const handleLocationSelected = (gn: any) => {
     setSelectedLocation(gn);
@@ -250,6 +286,64 @@ const UserPage: React.FC = () => {
                 </Button>
               )}
             </Stack>
+
+            {/* Local Category Search Dropdown */}
+            {selectedLocation && (
+              <Box sx={{ mt: 5, maxWidth: 650, mx: 'auto' }}>
+                <Autocomplete
+                  options={searchOptions}
+                  getOptionLabel={(option) => `${option.label} ${option.labelSi ? `(${option.labelSi})` : ''}`}
+                  filterOptions={(options, state) => {
+                    const keywords = state.inputValue.toLowerCase().split(/\s+/).filter(Boolean);
+                    if (keywords.length === 0) return options;
+                    return options.filter((option) => {
+                      const text = `${option.label} ${option.labelSi} ${option.parentName || ''}`.toLowerCase();
+                      return keywords.every(kw => text.includes(kw));
+                    });
+                  }}
+                  onChange={(event, newValue) => {
+                    if (newValue) {
+                      navigate(`/user/categories/${newValue.slug}`);
+                    }
+                  }}
+                  renderOption={(props, option) => (
+                    <Box component="li" {...props} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', py: 1 }}>
+                      <Typography variant="body1" sx={{ fontWeight: 600, color: '#0f172a' }}>{option.label} {option.labelSi && <span style={{ color: '#64748b', fontSize: '0.9em', fontWeight: 400 }}> - {option.labelSi}</span>}</Typography>
+                      {option.type === 'subcategory' && (
+                        <Typography variant="caption" sx={{ color: '#0ea5e9', fontWeight: 700 }}>
+                          Found in Category: {option.parentName}
+                        </Typography>
+                      )}
+                    </Box>
+                  )}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      fullWidth
+                      placeholder="Search for any category or subcategory..."
+                      variant="outlined"
+                      InputProps={{
+                        ...params.InputProps,
+                        startAdornment: (
+                          <InputAdornment position="start" sx={{ pl: 1 }}>
+                            <SearchIcon sx={{ color: '#94a3b8' }} />
+                          </InputAdornment>
+                        ),
+                        sx: {
+                          ...params.InputProps.sx,
+                          bgcolor: 'rgba(255, 255, 255, 0.9)',
+                          backdropFilter: 'blur(10px)',
+                          borderRadius: '20px',
+                          '& fieldset': { borderColor: '#cbd5e1' },
+                          '&:hover fieldset': { borderColor: '#94a3b8' },
+                          '&.Mui-focused fieldset': { borderColor: '#0ea5e9' },
+                        }
+                      }}
+                    />
+                  )}
+                />
+              </Box>
+            )}
           </Box>
         </Fade>
       </Container>
@@ -272,7 +366,8 @@ const UserPage: React.FC = () => {
             </Box>
             
             <Grid container spacing={3} justifyContent="center">
-              {catData.categories.map((cat: any) => {
+              {catData.categories
+                .map((cat: any) => {
                 const isClickable = cat.children && cat.children.length > 0;
                 return (
                   <Grid item xs={12} sm={6} md={4} lg={3} key={cat.id}>
