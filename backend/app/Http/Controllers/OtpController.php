@@ -14,7 +14,7 @@ class OtpController extends Controller
     public function send(Request $request)
     {
         $request->validate([
-            'mobile' => 'required|string',
+            'mobile' => 'required|string|max:15',
         ]);
 
         $mobile = $request->mobile;
@@ -37,8 +37,14 @@ class OtpController extends Controller
         $message = "Your Ceylonica Industry Survey verification code is: {$otp}. Please do not share this code.";
 
         try {
+            $apiUrl = config('services.textware.api_url');
+            if (empty($apiUrl)) {
+                Log::warning("OTP generated for {$mobile} ({$otp}) but SMS Gateway is not configured in .env");
+                return response()->json(['success' => true, 'message' => 'OTP generated (SMS simulated in dev)']);
+            }
+
             // Send the SMS via TextWare API
-            $response = Http::get(config('services.textware.api_url'), [
+            $response = Http::get($apiUrl, [
                 'username' => config('services.textware.username'),
                 'password' => config('services.textware.password'),
                 'src' => config('services.textware.sender_id'),

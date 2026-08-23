@@ -58,28 +58,36 @@ class CategoryQueries
         }
     }
 
-    public function progress(Category $category, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    public function progress($category, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
     {
         try {
             $user = request()->get('current_user');
             if (!$user) {
-                return null; // Admins or guests: return null (field is now nullable)
+                return null;
             }
 
-            // Skip progress calculation for admins (they don't need it and it's slow)
             $roles = $user['realm_roles'] ?? [];
             if (in_array('super_admin', $roles) || in_array('admin', $roles) || in_array('moderator', $roles)) {
                 return null; 
             }
 
-            $categoryIds = $this->getAllCategoryIds($category);
+            // Statically cache all categories and their hierarchy for this entire request 
+            // to completely eliminate N+1 database query timeouts.
+            static $childrenByParent = null;
+            if ($childrenByParent === null) {
+                $childrenByParent = Category::all()->groupBy('parent_id');
+            }
+
+            // Handle both array representation and eloquent model
+            $categoryId = is_array($category) ? $category['id'] : $category->id;
+            $categoryIds = $this->getAllCategoryIdsFast($categoryId, $childrenByParent);
 
             $totalQuestions = \App\Models\Question::whereIn('category_id', $categoryIds)
                 ->where('is_active', true)
                 ->count();
 
             if ($totalQuestions === 0) {
-                return 100.0; // If no questions, it's 100% complete
+                return 100.0;
             }
 
             $answeredQuestions = \App\Models\UserAnswer::where('user_id', $user->id)
@@ -93,15 +101,16 @@ class CategoryQueries
             return ($answeredQuestions / $totalQuestions) * 100;
         } catch (\Throwable $e) {
             error_log('[CategoryQueries@progress] Error: ' . $e->getMessage());
-            return null; // Don't crash the whole query on progress failure
+            return null;
         }
     }
 
-    private function getAllCategoryIds(Category $category)
+    private function getAllCategoryIdsFast($categoryId, $childrenByParent)
     {
-        $ids = [$category->id];
-        foreach ($category->children as $child) {
-            $ids = array_merge($ids, $this->getAllCategoryIds($child));
+        $ids = [$categoryId];
+        $children = $childrenByParent->get($categoryId, collect());
+        foreach ($children as $child) {
+            $ids = array_merge($ids, $this->getAllCategoryIdsFast($child->id, $childrenByParent));
         }
         return $ids;
     }
