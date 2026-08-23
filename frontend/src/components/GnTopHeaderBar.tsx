@@ -8,6 +8,7 @@ import {
   Tooltip,
 } from '@mui/material';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
+import TagRoundedIcon from '@mui/icons-material/TagRounded';
 import GlobalSearchBar from './GlobalSearchBar';
 import { useLanguage } from '../context/LanguageContext';
 import { MOBILE_CATEGORIES } from './mobile/mobileCategories';
@@ -73,21 +74,22 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
 
   const activeGnObj = gramaNiladharis?.find((g: any) => String(g.id) === String(selectedGN) || g.CCODE === selectedGN || g.ccode === selectedGN);
 
-  const activeCcode = activeGnObj?.CCODE || activeGnObj?.ccode || selectedGN || '';
+  const activeCcode = activeGnObj?.CCODE || activeGnObj?.code || activeGnObj?.ccode || selectedGN || '';
 
   const surface = isDarkMode ? '#111827' : '#ffffff';
-  const border = isDarkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e5e9f0';
-  const textMain = isDarkMode ? '#f1f5f9' : '#0f172a';
-  const textMuted = isDarkMode ? '#94a3b8' : '#64748b';
-  const fieldBg = isDarkMode ? 'rgba(255,255,255,0.05)' : '#f8fafc';
+  const border = isDarkMode ? '1px solid rgba(255,255,255,0.12)' : '1px solid #e5e9f0';
+  const textMain = isDarkMode ? '#ffffff' : '#0f172a';
+  const textMuted = isDarkMode ? '#cbd5e1' : '#64748b';
+  const fieldBg = isDarkMode ? 'rgba(255,255,255,0.08)' : '#f8fafc';
 
   const selectSx = {
     minWidth: 128, height: 36, fontSize: '0.82rem', fontWeight: 600,
     bgcolor: fieldBg, borderRadius: '9px',
     color: textMain,
+    '& .MuiSelect-select': { color: textMain, py: 0.8 },
     '& .MuiSvgIcon-root': { color: textMuted },
-    '& fieldset': { borderColor: isDarkMode ? 'rgba(255,255,255,0.1)' : '#e2e8f0' },
-    '&:hover fieldset': { borderColor: '#2563eb !important' },
+    '& fieldset': { borderColor: isDarkMode ? 'rgba(255,255,255,0.18)' : '#e2e8f0' },
+    '&:hover fieldset': { borderColor: '#3b82f6 !important' },
   };
 
   return (
@@ -113,23 +115,49 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
             flexWrap: 'wrap',
           }}
         >
-          {/* CCODE badge */}
-          <Box
-            sx={{
-              flexShrink: 0,
-              px: 1.4,
-              py: 0.6,
-              borderRadius: '8px',
-              bgcolor: isDarkMode ? 'rgba(59,130,246,0.14)' : 'rgba(37,99,235,0.08)',
-              color: '#2563eb',
-              fontFamily: "'JetBrains Mono', 'Roboto Mono', monospace",
-              fontWeight: 700,
-              fontSize: '0.78rem',
-              letterSpacing: '0.6px',
-            }}
-          >
-            {activeCcode || '—'}
-          </Box>
+          {/* Prominent Area Code Badge */}
+          <Tooltip title={language === 'si' ? 'ග්‍රාම නිලධාරී වසම් කේතය' : language === 'ta' ? 'கிராம அலுவலர் பிரிவு குறியீடு' : 'Grama Niladhari Area Code'}>
+            <Box
+              sx={{
+                flexShrink: 0,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                px: 1.6,
+                py: 0.6,
+                borderRadius: '10px',
+                background: isDarkMode
+                  ? 'linear-gradient(135deg, rgba(37,99,235,0.25) 0%, rgba(30,58,138,0.2) 100%)'
+                  : 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
+                border: isDarkMode ? '1.5px solid rgba(96,165,250,0.45)' : '1.5px solid #93c5fd',
+                boxShadow: isDarkMode ? '0 2px 10px rgba(37,99,235,0.2)' : '0 2px 8px rgba(37,99,235,0.1)',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  transform: 'scale(1.02)',
+                  borderColor: '#2563eb',
+                }
+              }}
+            >
+              <TagRoundedIcon sx={{ fontSize: '1.15rem', color: '#2563eb' }} />
+              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Typography sx={{ fontSize: '0.62rem', fontWeight: 800, color: isDarkMode ? '#93c5fd' : '#1d4ed8', letterSpacing: '0.8px', lineHeight: 1, textTransform: 'uppercase' }}>
+                  {language === 'si' ? 'වසම් කේතය' : language === 'ta' ? 'குறியீடு' : 'AREA CODE'}
+                </Typography>
+                <Typography
+                  sx={{
+                    fontFamily: "'JetBrains Mono', 'Roboto Mono', monospace",
+                    fontWeight: 900,
+                    fontSize: '0.95rem',
+                    color: isDarkMode ? '#ffffff' : '#0f172a',
+                    letterSpacing: '1px',
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {activeCcode || '—'}
+                </Typography>
+              </Box>
+            </Box>
+          </Tooltip>
 
           {/* Search */}
           <Box sx={{ flex: '1 1 260px', minWidth: 200 }}>
@@ -183,17 +211,37 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
               onChange={(e) => onGNChange(e.target.value)}
               displayEmpty
               disabled={!selectedCity || gramaNiladharis.length === 0}
-              sx={selectSx}
+              sx={{ ...selectSx, minWidth: 150 }}
               renderValue={(v) => {
                 if (!v) return <Box component="span" sx={{ color: textMuted, fontWeight: 500 }}>{t.village}</Box>;
                 const g = activeGnObj;
                 const name = language === 'si' ? (g?.nameSi || g?.nameEn) : language === 'ta' ? (g?.nameTa || g?.nameEn) : g?.nameEn;
-                return name || v;
+                const code = g?.CCODE || g?.code || g?.ccode;
+                return (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                    <span>{name || v}</span>
+                    {code && (
+                      <Box component="span" sx={{ fontSize: '0.72rem', fontWeight: 800, bgcolor: isDarkMode ? 'rgba(59,130,246,0.25)' : '#dbeafe', color: '#2563eb', px: 0.6, py: 0.1, borderRadius: '4px', fontFamily: 'monospace' }}>
+                        {code}
+                      </Box>
+                    )}
+                  </Box>
+                );
               }}
             >
               {gramaNiladharis.map((gn: any) => {
                 const name = language === 'si' ? (gn.nameSi || gn.nameEn) : language === 'ta' ? (gn.nameTa || gn.nameEn) : gn.nameEn;
-                return <MenuItem key={gn.id || gn.CCODE || gn.ccode} value={String(gn.id) || gn.CCODE || gn.ccode}>{name}</MenuItem>;
+                const code = gn.CCODE || gn.code || gn.ccode;
+                return (
+                  <MenuItem key={gn.id || gn.CCODE || gn.ccode} value={String(gn.id) || gn.CCODE || gn.ccode} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2, py: 0.8 }}>
+                    <Typography sx={{ fontWeight: 600, fontSize: '0.85rem' }}>{name}</Typography>
+                    {code && (
+                      <Typography sx={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 800, fontSize: '0.75rem', bgcolor: isDarkMode ? 'rgba(59,130,246,0.2)' : 'rgba(37,99,235,0.09)', color: '#2563eb', px: 0.8, py: 0.25, borderRadius: '6px' }}>
+                        {code}
+                      </Typography>
+                    )}
+                  </MenuItem>
+                );
               })}
             </Select>
           </Box>
@@ -224,20 +272,27 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
                 sx={{
                   display: 'flex', alignItems: 'center', gap: 0.7, flexShrink: 0, cursor: 'pointer',
                   px: 1.3, py: 0.7, borderRadius: '9px',
-                  color: isActive ? '#2563eb' : textMuted,
-                  bgcolor: isActive ? (isDarkMode ? 'rgba(59,130,246,0.16)' : 'rgba(37,99,235,0.08)') : 'transparent',
+                  color: isActive ? (isDarkMode ? '#60a5fa' : '#2563eb') : (isDarkMode ? '#f8fafc' : '#475569'),
+                  bgcolor: isActive ? (isDarkMode ? 'rgba(59,130,246,0.22)' : 'rgba(37,99,235,0.08)') : 'transparent',
                   transition: 'background-color 150ms ease, color 150ms ease, transform 150ms ease',
                   animation: `fadeInUp 0.35s ease ${idx * 30}ms both`,
-                  '& .MuiSvgIcon-root': { fontSize: '1.05rem', transition: 'transform 150ms ease' },
+                  '& .MuiSvgIcon-root': {
+                    fontSize: '1.05rem',
+                    color: isActive ? (isDarkMode ? '#60a5fa' : '#2563eb') : (isDarkMode ? '#93c5fd' : '#64748b'),
+                    transition: 'transform 150ms ease, color 150ms ease',
+                  },
                   '&:hover': {
-                    bgcolor: isActive ? (isDarkMode ? 'rgba(59,130,246,0.2)' : 'rgba(37,99,235,0.1)') : (isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.045)'),
-                    color: isActive ? '#2563eb' : textMain,
-                    '& .MuiSvgIcon-root': { transform: 'scale(1.1)' },
+                    bgcolor: isActive ? (isDarkMode ? 'rgba(59,130,246,0.3)' : 'rgba(37,99,235,0.12)') : (isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(15,23,42,0.05)'),
+                    color: isActive ? (isDarkMode ? '#93c5fd' : '#1d4ed8') : (isDarkMode ? '#ffffff' : '#0f172a'),
+                    '& .MuiSvgIcon-root': {
+                      transform: 'scale(1.15)',
+                      color: isDarkMode ? '#ffffff' : '#1e293b',
+                    },
                   },
                 }}
               >
                 {cat.icon}
-                <Typography sx={{ fontSize: '0.8rem', fontWeight: isActive ? 700 : 600, whiteSpace: 'nowrap' }}>
+                <Typography sx={{ fontSize: '0.8rem', fontWeight: isActive ? 700 : 600, whiteSpace: 'nowrap', color: 'inherit' }}>
                   {categoryLabels[cat.slug]}
                 </Typography>
               </Box>
@@ -256,7 +311,7 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
                 }
               }}
               size="small"
-              sx={{ width: 32, height: 32, color: textMuted, flexShrink: 0 }}
+              sx={{ width: 32, height: 32, color: isDarkMode ? '#e2e8f0' : '#64748b', flexShrink: 0, '&:hover': { color: isDarkMode ? '#ffffff' : '#0f172a' } }}
             >
               <HomeRoundedIcon sx={{ fontSize: '1.1rem' }} />
             </IconButton>

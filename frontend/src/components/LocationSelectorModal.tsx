@@ -161,24 +161,17 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
           position: 'relative',
         }}
       >
-        <Box
-          sx={{
-            width: 88,
-            height: 88,
-            borderRadius: '50%',
-            bgcolor: 'rgba(255,255,255,0.15)',
-            backdropFilter: 'blur(10px)',
-            border: '3px solid rgba(255,255,255,0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-          }}
-        >
+        {/* Plain Transparent PNG Logos (No border, No box) */}
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3, my: 0.5 }}>
           <img
             src="/logo.png"
             alt="Ceylonica Logo"
-            style={{ height: '72px', width: '72px', objectFit: 'contain', borderRadius: '50%' }}
+            style={{ height: '56px', width: 'auto', objectFit: 'contain' }}
+          />
+          <img
+            src="/praja.png"
+            alt="Praja Logo"
+            style={{ height: '56px', width: 'auto', objectFit: 'contain' }}
           />
         </Box>
 
