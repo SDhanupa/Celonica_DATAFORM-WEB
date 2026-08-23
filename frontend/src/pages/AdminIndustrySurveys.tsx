@@ -95,7 +95,7 @@ const AdminIndustrySurveys: React.FC = () => {
       if (filterDS)       params.append('ds_division', filterDS);
       if (filterGN)       params.append('gn_name', filterGN);
 
-      const res = await fetch(`http://localhost:8000/api/industry-surveys?${params.toString()}`, {
+      const res = await fetch(`/api/industry-surveys?${params.toString()}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -114,7 +114,7 @@ const AdminIndustrySurveys: React.FC = () => {
     setApproveError('');
     setApproveSuccess('');
     try {
-      const res = await fetch(`http://localhost:8000/api/industry-surveys/${id}/approve`, {
+      const res = await fetch(`/api/industry-surveys/${id}/approve`, {
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${token}` }
       });

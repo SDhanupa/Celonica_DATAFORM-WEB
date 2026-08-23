@@ -224,7 +224,7 @@ const IndustrySurveyPage: React.FC = () => {
   useEffect(() => {
     if (!ccode || !selectedCategory?.slug || formValues['b_reg_no']) return;
     let cancelled = false;
-    fetch('http://localhost:8000/api/industry-survey/generate-reg-number', {
+    fetch('/api/industry-survey/generate-reg-number', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ccode, category_slug: selectedCategory.slug }),
@@ -340,7 +340,7 @@ const IndustrySurveyPage: React.FC = () => {
         payload.id = parseInt(existingId, 10);
       }
       
-      const res = await fetch('http://localhost:8000/api/industry-survey', {
+      const res = await fetch('/api/industry-survey', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -415,7 +415,7 @@ const IndustrySurveyPage: React.FC = () => {
     }
     setOtpSending(true);
     try {
-      const res = await fetch('http://localhost:8000/api/otp/send', {
+      const res = await fetch('/api/otp/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({ mobile })
@@ -441,7 +441,7 @@ const IndustrySurveyPage: React.FC = () => {
     }
     setOtpVerifying(true);
     try {
-      const res = await fetch('http://localhost:8000/api/otp/verify', {
+      const res = await fetch('/api/otp/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({ mobile, code: otpCode })
@@ -532,7 +532,7 @@ const IndustrySurveyPage: React.FC = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:8000/api/industry-survey', {
+      const response = await fetch('/api/industry-survey', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
