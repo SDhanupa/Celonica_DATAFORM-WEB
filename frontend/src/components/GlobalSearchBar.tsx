@@ -40,6 +40,7 @@ interface SearchResult {
   display: string;
   icon?: React.ReactNode;
   color?: string;
+  subtitle?: string;
   data: any;
 }
 
@@ -116,7 +117,8 @@ const GlobalSearchBar: React.FC<GlobalSearchBarProps> = ({ isDarkMode = false, a
         combinedResults.push({
           type: 'subcategory',
           id: sub.slug,
-          display: `${parentName} / ${sub.nameEn || sub.nameSi || sub.nameTa}`,
+          display: `${sub.nameEn || sub.nameSi || sub.nameTa}`,
+          subtitle: parentName,
           icon: parentCat ? iconForSlug(parentCat.slug) : <CategoryIcon fontSize="small" />,
           color: parentCat?.color || '#3b82f6',
           data: sub
@@ -357,7 +359,7 @@ const GlobalSearchBar: React.FC<GlobalSearchBarProps> = ({ isDarkMode = false, a
                       mt: 0.2
                     }}
                   >
-                    {result.type === 'gn' ? 'Grama Niladhari' : result.type === 'category' ? 'Main Category' : 'Subcategory'}
+                    {result.subtitle ? result.subtitle : (result.type === 'gn' ? 'Grama Niladhari' : result.type === 'category' ? 'Main Category' : 'Subcategory')}
                   </Typography>
                 </Box>
               </Box>
