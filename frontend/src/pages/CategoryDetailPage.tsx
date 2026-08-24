@@ -321,9 +321,9 @@ const SkeletonRow = ({ tc }: any) => (
 
 // ─── Section (a single category or subcategory data table) ─────────────────
 
-const FastBigCardList = ({ slug, categoryName, gnId, parentQuestions, searchQuery, autoOpenId, isDarkMode, onLoaded }: {
+const FastBigCardList = ({ slug, categoryName, gnId, parentQuestions, searchQuery, autoOpenId, isDarkMode, isSuperAdmin, onLoaded }: {
   slug: string; categoryName: string; gnId: string; parentQuestions: any[];
-  searchQuery?: string; autoOpenId?: string | null; isDarkMode: boolean; onLoaded?: (slug: string, count: number) => void;
+  searchQuery?: string; autoOpenId?: string | null; isDarkMode: boolean; isSuperAdmin?: boolean; onLoaded?: (slug: string, count: number) => void;
 }) => {
   const [data, setData] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -332,7 +332,8 @@ const FastBigCardList = ({ slug, categoryName, gnId, parentQuestions, searchQuer
   React.useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
-    fetch(`/api/category-data/${slug}?gn_id=${gnId}`, { signal: controller.signal })
+    const url = `/api/category-data/${slug}?gn_id=${gnId}${isSuperAdmin ? '&is_admin=true' : ''}`;
+    fetch(url, { signal: controller.signal })
       .then(res => res.json())
       .then(res => {
         const rows = res.success ? res.data : [];
@@ -701,6 +702,7 @@ const CategoryDetailPage: React.FC = () => {
           searchQuery={localSearchQuery}
           autoOpenId={dataItemId}
           isDarkMode={isDarkMode}
+          isSuperAdmin={isSuperAdmin}
           onLoaded={handleSectionLoaded}
         />
 
@@ -715,6 +717,7 @@ const CategoryDetailPage: React.FC = () => {
             searchQuery={localSearchQuery}
             autoOpenId={dataItemId}
             isDarkMode={isDarkMode}
+            isSuperAdmin={isSuperAdmin}
             onLoaded={handleSectionLoaded}
           />
         ))}
