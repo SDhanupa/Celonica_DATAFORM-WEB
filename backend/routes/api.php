@@ -17,6 +17,8 @@ use App\Http\Controllers\ImageUploadController;
 // Health check
 Route::get('/health', fn() => response()->json(['status' => 'ok', 'service' => 'Ceylonica Admin API']));
 
+use App\Http\Controllers\IndustrySurveyController;
+
 // Public API Endpoints
 Route::middleware('throttle:30,1')->get('/guest-token', function() {
     $token = bin2hex(random_bytes(32));
@@ -35,6 +37,15 @@ Route::middleware('throttle:120,1')->group(function () {
     Route::post('/upload-survey-image', [\App\Http\Controllers\CategoryDataUploadController::class, 'uploadSurveyImage']);
     Route::get('/search-category-data/{slug}', [\App\Http\Controllers\CategoryDataUploadController::class, 'searchCategoryData']);
     Route::post('/submit-survey-data/{slug}', [\App\Http\Controllers\CategoryDataUploadController::class, 'submitSurveyData']);
+    
+    // Industry Survey Routes
+    Route::post('/industry-survey', [IndustrySurveyController::class, 'store']);
+    Route::post('/industry-survey/generate-reg-number', [IndustrySurveyController::class, 'generateRegNumber']);
+
+    
+    // OTP Routes for mobile verification
+    Route::post('/otp/send', [\App\Http\Controllers\OtpController::class, 'send']);
+    Route::post('/otp/verify', [\App\Http\Controllers\OtpController::class, 'verify']);
 });
 
 Route::middleware(['throttle:120,1', 'keycloak.admin'])->group(function () {
@@ -51,6 +62,9 @@ Route::middleware(['keycloak.admin'])->get('/locations', function () {
 
 // Protected API Endpoints (Super Admin Only)
 Route::middleware(['keycloak.admin', 'super_admin'])->group(function () {
+    Route::get('/industry-surveys', [IndustrySurveyController::class, 'index']);
+    Route::patch('/industry-surveys/{id}/approve', [IndustrySurveyController::class, 'approve']);
+    
     Route::post('/upload-category-image', [ImageUploadController::class, 'upload']);
     Route::post('/upload-category-data', [\App\Http\Controllers\CategoryDataUploadController::class, 'upload']);
     Route::put('/category-data/{slug}/{id}', [\App\Http\Controllers\CategoryDataUploadController::class, 'updateData']);

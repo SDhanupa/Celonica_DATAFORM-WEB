@@ -79,6 +79,7 @@ class CategoryDataUploadController extends Controller
                 $table->string('image_path')->nullable();
                 $table->unsignedBigInteger('added_by_user_id')->nullable();
                 $table->boolean('is_approved')->default(true);
+                $table->string('status')->default('pending');
                 $table->boolean('coordinate_mismatch')->default(false);
                 $table->boolean('is_update_proposal')->default(false);
                 $table->timestamps();
@@ -286,8 +287,8 @@ class CategoryDataUploadController extends Controller
         if ($tableExists) {
         $query = DB::table($tableName);
 
-        // Only show approved bulk records on the public GN page
-        if (Schema::hasColumn($tableName, 'is_approved')) {
+        // Only show approved bulk records on the public GN page, admins see everything
+        if (Schema::hasColumn($tableName, 'is_approved') && !$request->has('is_admin')) {
             $query->where($tableName . '.is_approved', true);
         }
 
@@ -420,8 +421,11 @@ class CategoryDataUploadController extends Controller
             $categoryIds = [$category->id];
             $this->collectDescendantIds($category->id, $categoryIds);
 
-            $submissionsQuery = \App\Models\CategorySubmission::whereIn('category_id', $categoryIds)
-                ->where('status', 'approved');
+            $submissionsQuery = \App\Models\CategorySubmission::whereIn('category_id', $categoryIds);
+            
+            if (!$request->has('is_admin')) {
+                $submissionsQuery->where('status', 'approved');
+            }
 
             if ($gnCode !== null) {
                 $submissionsQuery->where('gn_code', $gnCode);
@@ -947,9 +951,38 @@ class CategoryDataUploadController extends Controller
         $tableName = 'category_data_' . str_replace('-', '_', $slug);
 
         if (!Schema::hasTable($tableName)) {
-            // Need to create the table structure if this is the first submission
-            // But usually the category is created with an empty table. Let's fail if it doesn't exist.
-            return response()->json(['success' => false, 'message' => 'Table does not exist.'], 400);
+            Schema::create($tableName, function (Blueprint $table) {
+                $table->id();
+                $table->string('district_id')->nullable();
+                $table->string('ds_division_code')->nullable();
+                $table->string('gn_id')->nullable();
+                $table->string('raw_province')->nullable();
+                $table->string('raw_district')->nullable();
+                $table->string('raw_ds')->nullable();
+                $table->string('raw_gn')->nullable();
+                $table->string('final_province')->nullable();
+                $table->string('final_district')->nullable();
+                $table->string('final_ds')->nullable();
+                $table->string('final_gn')->nullable();
+                $table->string('reg_number')->nullable();
+                $table->string('name_si')->nullable();
+                $table->string('name_en')->nullable();
+                $table->string('name_ta')->nullable();
+                $table->string('name_singlish')->nullable();
+                $table->string('longitude')->nullable();
+                $table->string('latitude')->nullable();
+                $table->string('mobile')->nullable();
+                $table->text('description')->nullable();
+                $table->string('contact_person_name')->nullable();
+                $table->text('address')->nullable();
+                $table->string('image_path')->nullable();
+                $table->unsignedBigInteger('added_by_user_id')->nullable();
+                $table->boolean('is_approved')->default(true);
+                $table->string('status')->default('pending');
+                $table->boolean('coordinate_mismatch')->default(false);
+                $table->boolean('is_update_proposal')->default(false);
+                $table->timestamps();
+            });
         }
 
         $payload = $request->all();
@@ -957,9 +990,18 @@ class CategoryDataUploadController extends Controller
         
         $regNumber = $payload['reg_number'] ?? null;
         
+        $mappedGnId = null;
+        $mappedDsCode = null;
+        $mappedDistrictId = null;
+        $finalProvince = null;
+        $finalDistrict = null;
+        $finalDs = null;
+        $finalGn = null;
+
         // Generate new Reg Number if not provided
         if (!$regNumber) {
             $gnCode = $payload['gn_code'] ?? null;
+            $gn = null;
             if (!$gnCode && !empty($payload['raw_gn'])) {
                 $gn = $this->resolveGramaNiladhari(
                     $payload['raw_gn'],
@@ -967,6 +1009,22 @@ class CategoryDataUploadController extends Controller
                     $payload['raw_district'] ?? null
                 );
                 $gnCode = $gn ? ($gn->CCODE ?: $gn->code) : null;
+            } elseif ($gnCode) {
+                // If gn_code was passed directly, try to resolve it to get mapping info
+                $gn = DB::table('grama_niladharis')
+                        ->where('CCODE', $gnCode)
+                        ->orWhere('code', $gnCode)
+                        ->first();
+            }
+
+            if ($gn) {
+                $mappedGnId = $gn->id;
+                $mappedDsCode = $gn->divisional_secretariat_code;
+                $mappedDistrictId = $gn->district_code;
+                $finalProvince = $gn->pro_en;
+                $finalDistrict = $gn->dis_en;
+                $finalDs = $gn->ds_en;
+                $finalGn = $gn->name_en;
             }
 
             // If GN code could not be resolved, do NOT generate — leave reg_number null
@@ -989,6 +1047,13 @@ class CategoryDataUploadController extends Controller
         }
 
         $insertData = [
+            'gn_id' => $mappedGnId,
+            'district_id' => $mappedDistrictId,
+            'ds_division_code' => $mappedDsCode,
+            'final_province' => $finalProvince,
+            'final_district' => $finalDistrict,
+            'final_ds' => $finalDs,
+            'final_gn' => $finalGn,
             'reg_number' => $regNumber,
             'name_en' => $payload['name_en'] ?? null,
             'name_si' => $payload['name_si'] ?? null,

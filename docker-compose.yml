@@ -52,6 +52,10 @@ services:
       - REDIS_PASSWORD=null
       - REDIS_PORT=6379
       - QUEUE_CONNECTION=sync
+      - TEXTWARE_USERNAME=${TEXTWARE_USERNAME}
+      - TEXTWARE_PASSWORD=${TEXTWARE_PASSWORD}
+      - TEXTWARE_SENDER_ID=${TEXTWARE_SENDER_ID}
+      - TEXTWARE_API_URL=${TEXTWARE_API_URL}
     volumes:
       - backend_uploads:/var/www/public/uploads
       - backend_storage:/var/www/storage
@@ -122,7 +126,7 @@ services:
       KC_HOSTNAME_URL: http://localhost:8081
       KC_HOSTNAME_ADMIN_URL: http://localhost:8081
     ports:
-      - "8081:8080"
+      - "${KC_PORT:-8081}:8080"
     volumes:
       - ./keycloak:/opt/keycloak/data/import
       - ./keycloak/themes/ceylonica:/opt/keycloak/themes/ceylonica

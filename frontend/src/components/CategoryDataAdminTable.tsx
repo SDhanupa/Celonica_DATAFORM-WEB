@@ -65,6 +65,7 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
       if (searchQuery) params.append('search', searchQuery);
       params.append('limit', paginationModel.pageSize.toString());
       params.append('offset', (paginationModel.page * paginationModel.pageSize).toString());
+      params.append('is_admin', 'true');
       
       const queryString = params.toString() ? '?' + params.toString() : '';
 

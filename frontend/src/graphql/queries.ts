@@ -106,11 +106,35 @@ export const GET_QUESTIONS = gql`
       questionTextEn
       questionTextSi
       questionTextTa
+      explanationEn
+      explanationSi
+      explanationTa
       inputType
       sortOrder
       isActive
       isStandard
       createdAt
+    }
+  }
+`;
+
+export const UPDATE_QUESTION = gql`
+  mutation UpdateQuestion(
+    $id: ID!
+    $explanationEn: String
+    $explanationSi: String
+    $explanationTa: String
+  ) {
+    updateQuestion(
+      id: $id
+      explanationEn: $explanationEn
+      explanationSi: $explanationSi
+      explanationTa: $explanationTa
+    ) {
+      id
+      explanationEn
+      explanationSi
+      explanationTa
     }
   }
 `;
@@ -151,6 +175,21 @@ export const GET_CATEGORIES = gql`
         id
         slug
         nameEn
+        children {
+          id
+          slug
+          nameEn
+          children {
+            id
+            slug
+            nameEn
+            children {
+              id
+              slug
+              nameEn
+            }
+          }
+        }
       }
     }
   }
@@ -1062,6 +1101,21 @@ export const GET_APPROVED_SUBMISSIONS = gql`
       latitude
       longitude
       created_at
+    }
+  }
+`;
+
+export const GET_CATEGORIES_BY_ROOT_SLUG = gql`
+  query GetCategoriesByRootSlug($rootSlug: String!) {
+    categoriesByRootSlug(rootSlug: $rootSlug) {
+      id
+      slug
+      nameEn
+      nameSi
+      nameTa
+      parentId
+      breadcrumb
+      depth
     }
   }
 `;
