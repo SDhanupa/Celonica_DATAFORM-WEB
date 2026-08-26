@@ -129,12 +129,6 @@ html, body {
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06));
 }
 
-.brand-divider {
-    width: 1px;
-    height: 22px;
-    background: rgba(0, 0, 0, 0.12);
-}
-
 /* Page Title Area */
 .page-title-area {
     margin-bottom: 18px;
