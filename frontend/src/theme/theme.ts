@@ -45,7 +45,7 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'DM Sans', 'Noto Sans Sinhala', 'Noto Sans Tamil', sans-serif",
     h1: { fontSize: 'clamp(2.25rem, 4vw, 3.5rem)', fontWeight: 700, letterSpacing: '-0.04em', color: colors.text },
     h2: { fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', fontWeight: 700, letterSpacing: '-0.035em', color: colors.text },
     h3: { fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.025em', color: colors.text },
@@ -74,7 +74,7 @@ const theme = createTheme({
           backgroundColor: colors.background,
           color: colors.text,
           minHeight: '100vh',
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "'DM Sans', 'Noto Sans Sinhala', 'Noto Sans Tamil', sans-serif",
         },
       },
     },
