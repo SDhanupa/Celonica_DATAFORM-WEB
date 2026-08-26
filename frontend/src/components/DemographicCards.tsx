@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import VillageQuickStats from './VillageQuickStats';
 import {
   Box,
   Typography,
@@ -60,6 +61,14 @@ interface DemographicCardsProps {
   householdHeadData?: any | null;
   isDarkMode?: boolean;
   onOpenCategory?: (slug: string) => void;
+  /** Hidden when the hero band already shows the KPI tiles. */
+  showQuickStats?: boolean;
+  /**
+   * `wide`   = chart and category rail side by side (full-width container).
+   * `narrow` = chart stacked above a wrapped category rail, card fills its
+   *            parent's height — for use as one column of a multi-column row.
+   */
+  layout?: 'wide' | 'narrow';
 }
 
 // ── Reusable SVG Pie Chart Helper ────────────────────────────────────
@@ -208,7 +217,13 @@ export const SvgDonutChart: React.FC<{
 export const SvgBarChart: React.FC<{
   bars: { label: string; count: number; color1: string; color2: string; shadowColor: string }[];
   isDarkMode: boolean;
-}> = ({ bars, isDarkMode }) => {
+  /** Shorter plot + no legend, for narrow multi-column layouts. */
+  compact?: boolean;
+}> = ({ bars, isDarkMode, compact = false }) => {
+  // Bars and gridlines must share one scale or they drift apart.
+  const scale = compact ? 84 : 125;
+  const plotHeight = compact ? 152 : 210;
+  const barsHeight = compact ? 112 : 160;
   const maxVal = Math.max(...bars.map((b) => b.count), 10);
   const step = maxVal <= 100 ? 25 : maxVal <= 300 ? 50 : maxVal <= 600 ? 100 : maxVal <= 1500 ? 200 : maxVal <= 3000 ? 500 : 1000;
   const yMax = Math.max(step * 4, Math.ceil(maxVal / step) * step);
@@ -222,10 +237,10 @@ export const SvgBarChart: React.FC<{
   return (
     <Box>
       {/* Chart Grid */}
-      <Box sx={{ position: 'relative', height: 210, width: '100%', display: 'flex', alignItems: 'flex-end', pb: 3, pl: 5 }}>
+      <Box sx={{ position: 'relative', height: plotHeight, width: '100%', display: 'flex', alignItems: 'flex-end', pb: 3, pl: 5 }}>
         {/* Dynamic Y Axis Grid & Labels */}
         {yTicks.map((val, idx) => {
-          const bottomPercent = (val / yMax) * 125;
+          const bottomPercent = (val / yMax) * scale;
           return (
             <Box
               key={idx}
@@ -247,7 +262,7 @@ export const SvgBarChart: React.FC<{
         })}
 
         {/* Vertical Bars */}
-        <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-around', alignItems: 'flex-end', height: 160, zIndex: 1 }}>
+        <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-around', alignItems: 'flex-end', height: barsHeight, zIndex: 1 }}>
           {bars.map((bar, idx) => (
             <Box
               key={idx}
@@ -265,7 +280,7 @@ export const SvgBarChart: React.FC<{
                 className="bar-fill"
                 sx={{
                   width: bars.length <= 2 ? { xs: 38, sm: 48 } : { xs: 26, sm: 34 },
-                  height: `${Math.round(Math.max(8, (bar.count / yMax) * 125))}px`,
+                  height: `${Math.round(Math.max(8, (bar.count / yMax) * scale))}px`,
                   background: `linear-gradient(180deg, ${bar.color1} 0%, ${bar.color2} 100%)`,
                   borderRadius: '6px 6px 0 0',
                   boxShadow: `0 4px 14px ${bar.shadowColor}`,
@@ -282,8 +297,8 @@ export const SvgBarChart: React.FC<{
         </Box>
       </Box>
 
-      {/* Bottom Legend */}
-      <Box sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 2, mt: 1, pt: 1.5, borderTop: isDarkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.06)' }}>
+      {/* Bottom Legend — redundant when compact, since each bar is labelled */}
+      <Box sx={{ display: compact ? 'none' : 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 2, mt: 1, pt: 1.5, borderTop: isDarkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.06)' }}>
         {bars.map((bar, idx) => (
           <Box key={idx} sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
             <Box sx={{ width: 12, height: 12, bgcolor: bar.color1, borderRadius: '3px' }} />
@@ -445,7 +460,10 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
   householdHeadData,
   isDarkMode = false,
   onOpenCategory,
+  showQuickStats = true,
+  layout = 'wide',
 }) => {
+  const isNarrow = layout === 'narrow';
   const { language } = useLanguage();
   const [selectedSurveyId, setSelectedSurveyId] = useState<string>('village-population');
   const [modalData, setModalData] = useState<ChartModalData | null>(null);
@@ -684,54 +702,19 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     return survey.pieData || [];
   };
 
-  const totalPopulation = populationData?.both ?? ((populationData?.male ?? 0) + (populationData?.female ?? 0));
-  const totalHouseholds = housingOwnershipData?.total_households || roomsData?.total_housing_units || 0;
-  const employedCount = gnEconomyData?.employed || 0;
-
-  const quickStats = [
-    { label: t.villagePopulation, value: totalPopulation, icon: <GroupsIcon />, color: '#2563eb' },
-    { label: language === 'si' ? 'ගෘහ ඒකක' : language === 'ta' ? 'குடும்பங்கள்' : 'Households', value: totalHouseholds, icon: <HomeRoundedIcon />, color: '#0891b2' },
-    { label: language === 'si' ? 'රැකියා නියුක්ත' : language === 'ta' ? 'வேலைவாய்ப்பு' : 'Employed', value: employedCount, icon: <WorkIcon />, color: '#16a34a' },
-  ];
-
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%', height: isNarrow ? '100%' : 'auto', minHeight: 0 }}>
 
       {/* ── QUICK STATS ROW (at-a-glance KPIs) ── */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1.5 }}>
-        {quickStats.map((stat, idx) => (
-          <Box
-            key={stat.label}
-            sx={{
-              borderRadius: '16px',
-              p: 1.8,
-              bgcolor: isDarkMode ? '#111827' : '#ffffff',
-              border: isDarkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e5e9f0',
-              boxShadow: isDarkMode ? 'none' : '0 1px 2px rgba(15,23,42,0.04)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 0.6,
-              minWidth: 0,
-              animation: `fadeInUp 0.4s ease ${idx * 80}ms both`,
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-              '&:hover': {
-                transform: 'translateY(-2px)',
-                boxShadow: isDarkMode ? 'none' : '0 8px 20px rgba(15,23,42,0.08)',
-              },
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.7, color: stat.color, '& .MuiSvgIcon-root': { fontSize: '1.1rem' } }}>
-              {stat.icon}
-              <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: isDarkMode ? '#94a3b8' : '#64748b', textTransform: 'uppercase', letterSpacing: '0.3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {stat.label}
-              </Typography>
-            </Box>
-            <Typography sx={{ fontSize: '1.5rem', fontWeight: 800, color: isDarkMode ? '#f8fafc' : '#0f172a', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
-              {stat.value.toLocaleString()}
-            </Typography>
-          </Box>
-        ))}
-      </Box>
+      {showQuickStats && (
+        <VillageQuickStats
+          populationData={populationData}
+          gnEconomyData={gnEconomyData}
+          housingOwnershipData={housingOwnershipData}
+          roomsData={roomsData}
+          isDarkMode={isDarkMode}
+        />
+      )}
 
       {/* ── CARD 2: SURVEY & CENSUS CHARTS CARD (Side-by-Side Layout) ── */}
       <Box
@@ -742,14 +725,33 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
           border: isDarkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e5e9f0',
           boxShadow: isDarkMode ? 'none' : '0 1px 2px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.04)',
           display: 'flex',
-          flexDirection: { xs: 'column', md: 'row' },
-          height: { md: 400 },
-          gap: 2,
+          flexDirection: isNarrow ? 'column' : { xs: 'column', md: 'row' },
+          height: isNarrow ? '100%' : { md: 400 },
+          minHeight: 0,
+          overflow: isNarrow ? 'hidden' : 'visible',
+          gap: isNarrow ? 1.5 : 2,
           animation: 'fadeInUp 0.45s ease 240ms both',
         }}
       >
         {/* Left Side: Chart */}
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, pr: { md: 2 }, borderRight: { md: isDarkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.06)' } }}>
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            minWidth: 0,
+            minHeight: 0,
+            ...(isNarrow
+              ? {
+                  pb: 1.5,
+                  borderBottom: isDarkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.06)',
+                }
+              : {
+                  pr: { md: 2 },
+                  borderRight: { md: isDarkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.06)' },
+                }),
+          }}
+        >
           {/* Dynamic Category Header */}
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
             <Box
@@ -839,12 +841,15 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
               cursor: 'pointer',
               transition: 'all 0.2s ease',
               '&:hover': { opacity: 0.9 },
-              overflow: 'hidden',
-              minHeight: 140,
+              // Narrow columns: let a legend-heavy chart scroll inside its pane
+              // instead of pushing the card past its rounded border.
+              overflowY: isNarrow ? 'auto' : 'hidden',
+              overflowX: 'hidden',
+              minHeight: isNarrow ? 120 : 140,
             }}
           >
             {activeSurvey.type === 'bar' && activeSurvey.bars && (
-              <SvgBarChart bars={activeSurvey.bars} isDarkMode={isDarkMode} />
+              <SvgBarChart bars={activeSurvey.bars} isDarkMode={isDarkMode} compact={isNarrow} />
             )}
             {activeSurvey.type === 'pie' && activeSurvey.pieData && (
               <SvgPieChart data={activeSurvey.pieData} isDarkMode={isDarkMode} />
@@ -856,42 +861,164 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
         </Box>
 
         {/* Right Side: Switcher Pills */}
-        <Box sx={{ flex: '0 0 35%', display: 'flex', flexDirection: 'column', pl: { md: 1 } }}>
+        <Box
+          sx={{
+            flex: isNarrow ? '0 0 auto' : '0 0 35%',
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: 0,
+            pl: isNarrow ? 0 : { md: 1 },
+          }}
+        >
           <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: isDarkMode ? '#94a3b8' : '#64748b', mb: 1, letterSpacing: '0.4px', textTransform: 'uppercase' }}>
             {t.surveyExplorer}
           </Typography>
-          <Box sx={{ display: 'flex', flexDirection: { xs: 'row', md: 'column' }, flexWrap: { xs: 'wrap', md: 'nowrap' }, gap: 1, overflowY: 'auto', pr: 0.5, pb: 1, flexGrow: 1 }}>
-            {surveyCategories.map((cat, idx) => {
-              const isSelected = cat.id === selectedSurveyId;
-              return (
-                <Chip
-                  key={cat.id}
-                  icon={cat.icon as React.ReactElement}
-                  label={(cat as any).shortTitle || cat.title.split(' ')[0]}
-                  onClick={() => setSelectedSurveyId(cat.id)}
-                  size="small"
-                  sx={{
-                    justifyContent: 'flex-start',
-                    px: 0.5,
-                    py: 2,
-                    fontWeight: isSelected ? 800 : 600,
-                    fontSize: '0.75rem',
-                    borderRadius: '10px',
-                    bgcolor: isSelected ? '#2563eb' : isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
-                    color: isSelected ? '#ffffff' : isDarkMode ? '#cbd5e1' : '#475569',
-                    border: isSelected ? '1px solid #1d4ed8' : 'none',
-                    animation: `fadeInUp 0.3s ease ${idx * 30}ms both`,
-                    transition: 'background-color 0.2s ease, color 0.2s ease, transform 0.15s ease',
-                    '& .MuiChip-icon': { color: isSelected ? '#ffffff' : isDarkMode ? '#94a3b8' : '#64748b', fontSize: '1rem', ml: 1 },
-                    '& .MuiChip-label': { pl: 0.5 },
-                    '&:hover': {
-                      bgcolor: isSelected ? '#1d4ed8' : isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.09)',
-                      transform: 'translateX(2px)',
-                    },
-                  }}
-                />
-              );
-            })}
+          {/* Narrow: a uniform tile grid reads far cleaner than ragged wrapped
+              chips. Wide: keep the original vertical chip list. */}
+          <Box sx={{ position: 'relative', flexGrow: 1, minHeight: 0, display: 'flex' }}>
+            <Box
+              sx={{
+                width: '100%',
+                overflowY: 'auto',
+                pr: 0.5,
+                pb: isNarrow ? 0.5 : 1,
+                minHeight: 0,
+                ...(isNarrow
+                  ? {
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+                      gap: 0.85,
+                      alignContent: 'start',
+                      maxHeight: 148,
+                    }
+                  : {
+                      display: 'flex',
+                      flexDirection: { xs: 'row', md: 'column' },
+                      flexWrap: { xs: 'wrap', md: 'nowrap' },
+                      gap: 1,
+                    }),
+                '&::-webkit-scrollbar': { width: 4 },
+                '&::-webkit-scrollbar-track': { background: 'transparent' },
+                '&::-webkit-scrollbar-thumb': {
+                  background: isDarkMode ? 'rgba(255,255,255,0.16)' : 'rgba(15,23,42,0.14)',
+                  borderRadius: 4,
+                },
+              }}
+            >
+              {surveyCategories.map((cat, idx) => {
+                const isSelected = cat.id === selectedSurveyId;
+                const label = (cat as any).shortTitle || cat.title.split(' ')[0];
+
+                if (isNarrow) {
+                  return (
+                    <Box
+                      key={cat.id}
+                      role="button"
+                      tabIndex={0}
+                      aria-pressed={isSelected}
+                      onClick={() => setSelectedSurveyId(cat.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedSurveyId(cat.id); }
+                      }}
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 0.4,
+                        px: 0.5,
+                        py: 0.9,
+                        minWidth: 0,
+                        minHeight: 46,
+                        borderRadius: '11px',
+                        cursor: 'pointer',
+                        userSelect: 'none',
+                        bgcolor: isSelected ? '#2563eb' : isDarkMode ? 'rgba(255,255,255,0.05)' : '#f8fafc',
+                        border: `1px solid ${isSelected ? '#2563eb' : isDarkMode ? 'rgba(255,255,255,0.08)' : '#e5e9f0'}`,
+                        color: isSelected ? '#ffffff' : isDarkMode ? '#cbd5e1' : '#475569',
+                        boxShadow: isSelected ? '0 4px 12px rgba(37,99,235,0.24)' : 'none',
+                        animation: `fadeInUp 0.3s ease ${idx * 25}ms both`,
+                        transition: 'background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease',
+                        '& .MuiSvgIcon-root': {
+                          fontSize: '1.05rem',
+                          color: isSelected ? '#ffffff' : isDarkMode ? '#94a3b8' : '#64748b',
+                          transition: 'color 0.2s ease',
+                        },
+                        '&:hover': {
+                          transform: 'translateY(-1px)',
+                          borderColor: '#2563eb',
+                          bgcolor: isSelected ? '#1d4ed8' : isDarkMode ? 'rgba(255,255,255,0.09)' : '#eff6ff',
+                        },
+                      }}
+                    >
+                      {cat.icon}
+                      <Typography
+                        sx={{
+                          width: '100%',
+                          fontSize: '0.58rem',
+                          fontWeight: isSelected ? 800 : 700,
+                          lineHeight: 1.15,
+                          textAlign: 'center',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.2px',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          color: 'inherit',
+                        }}
+                      >
+                        {label}
+                      </Typography>
+                    </Box>
+                  );
+                }
+
+                return (
+                  <Chip
+                    key={cat.id}
+                    icon={cat.icon as React.ReactElement}
+                    label={label}
+                    onClick={() => setSelectedSurveyId(cat.id)}
+                    size="small"
+                    sx={{
+                      justifyContent: 'flex-start',
+                      px: 0.5,
+                      py: 2,
+                      fontWeight: isSelected ? 800 : 600,
+                      fontSize: '0.75rem',
+                      borderRadius: '10px',
+                      bgcolor: isSelected ? '#2563eb' : isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
+                      color: isSelected ? '#ffffff' : isDarkMode ? '#cbd5e1' : '#475569',
+                      border: isSelected ? '1px solid #1d4ed8' : 'none',
+                      animation: `fadeInUp 0.3s ease ${idx * 30}ms both`,
+                      transition: 'background-color 0.2s ease, color 0.2s ease, transform 0.15s ease',
+                      '& .MuiChip-icon': { color: isSelected ? '#ffffff' : isDarkMode ? '#94a3b8' : '#64748b', fontSize: '1rem', ml: 1 },
+                      '& .MuiChip-label': { pl: 0.5 },
+                      '&:hover': {
+                        bgcolor: isSelected ? '#1d4ed8' : isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.09)',
+                        transform: 'translateX(2px)',
+                      },
+                    }}
+                  />
+                );
+              })}
+            </Box>
+
+            {/* Scroll affordance: fades the last row so it reads as "more below" */}
+            {isNarrow && (
+              <Box
+                aria-hidden
+                sx={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 4,
+                  bottom: 0,
+                  height: 20,
+                  pointerEvents: 'none',
+                  background: `linear-gradient(180deg, transparent 0%, ${isDarkMode ? '#111827' : '#ffffff'} 90%)`,
+                }}
+              />
+            )}
           </Box>
         </Box>
       </Box>
