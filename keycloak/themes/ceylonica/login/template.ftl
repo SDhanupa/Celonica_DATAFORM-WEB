@@ -39,8 +39,6 @@
                 <div class="brand-header">
                     <div class="brand-logos">
                         <img src="${url.resourcesPath}/img/logo.png" alt="Ceylonica" class="brand-logo" />
-                        <span class="brand-divider"></span>
-                        <img src="${url.resourcesPath}/img/praja.png" alt="Praja" class="brand-logo" />
                     </div>
                 </div>
 

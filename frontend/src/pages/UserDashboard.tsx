@@ -24,6 +24,7 @@ import GnPageFooter from '../components/GnPageFooter';
 import { VillageMap } from '../components/VillageMap';
 import { GnTopHeaderBar } from '../components/GnTopHeaderBar';
 import { DemographicCards } from '../components/DemographicCards';
+import VillageQuickStats from '../components/VillageQuickStats';
 import MobileDashboard from '../components/mobile/MobileDashboard';
 
 
@@ -583,11 +584,6 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
               alt="Ceylonica Logo"
               style={{ height: '56px', width: 'auto', objectFit: 'contain' }}
             />
-            <img
-              src="/praja.png"
-              alt="Praja Logo"
-              style={{ height: '56px', width: 'auto', objectFit: 'contain' }}
-            />
           </Box>
 
           <Typography
@@ -1066,29 +1062,65 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             }}
           />
 
-          {/* ── HERO: BRANDING LOGOS + BREADCRUMB + GN NAME DISPLAY ── */}
-          <Box key={displayGN || 'default'} sx={{ mt: 1, mb: { xs: 2, md: 3 }, px: 2, textAlign: 'center' }}>
+          {/* ── SINGLE INLINE ROW: CHARTS · VILLAGE IDENTITY + KPIs · MAP ──
+              All three panels share one viewport row so nothing needs scrolling. */}
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', md: '1fr 0.85fr 1fr', lg: '1.05fr 0.92fr 1.05fr' },
+              gap: { xs: 2.5, lg: 3 },
+              alignItems: 'stretch',
+              mt: 0.5,
+              mb: 6,
+              minHeight: { md: 420, lg: 440 },
+            }}
+          >
+            {/* ── 1 · SURVEY & CENSUS CHARTS ── */}
+            <Box sx={{ display: 'flex', minWidth: 0, animation: 'fadeInUp 0.5s ease 160ms both' }}>
+              <DemographicCards
+                populationData={populationData}
+                gnEconomyData={gnEconomyData}
+                housingOwnershipData={housingOwnershipData}
+                housingWallData={housingWallData}
+                housingUnitData={housingUnitData}
+                toiletFacilityData={toiletFacilityData}
+                drinkingWaterData={drinkingWaterData}
+                solidWasteData={solidWasteData}
+                roomsData={roomsData}
+                roofData={roofData}
+                religionData={religionData}
+                householdHeadData={householdHeadData}
+                isDarkMode={isDarkMode}
+                layout="narrow"
+                showQuickStats={false}
+                onOpenCategory={(slug) => {
+                  const targetGn = (displayGN || activeGn?.nameEn || gnName || 'Pahalagama').replace(/ /g, '-');
+                  const targetCcode = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'RATPA';
+                  navigate(`/gnpage/${encodeURIComponent(targetGn)}/${encodeURIComponent(targetCcode)}/${slug}`);
+                }}
+              />
+            </Box>
+
+            {/* ── 2 · VILLAGE IDENTITY + KPIs ── */}
+          <Box
+            key={displayGN || 'default'}
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              minWidth: 0,
+              width: '100%',
+              textAlign: 'center',
+            }}
+          >
             {/* Plain Transparent Branding PNGs (No box, No borders) */}
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: { xs: 2.5, md: 4 }, mb: 1.8, animation: 'fadeInUp 0.35s ease both' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: { xs: 2.5, md: 3 }, mb: 1.6, animation: 'fadeInUp 0.35s ease both' }}>
               <Box
                 component="img"
                 src="/logo.png"
                 alt="Ceylonica Logo"
                 sx={{
-                  height: { xs: 40, md: 54, lg: 60 },
-                  width: 'auto',
-                  objectFit: 'contain',
-                  filter: 'drop-shadow(0 3px 10px rgba(0,0,0,0.1))',
-                  transition: 'transform 0.25s ease',
-                  '&:hover': { transform: 'scale(1.05)' },
-                }}
-              />
-              <Box
-                component="img"
-                src="/praja.png"
-                alt="Praja Logo"
-                sx={{
-                  height: { xs: 40, md: 54, lg: 60 },
+                  height: { xs: 36, md: 40, lg: 44 },
                   width: 'auto',
                   objectFit: 'contain',
                   filter: 'drop-shadow(0 3px 10px rgba(0,0,0,0.1))',
@@ -1109,12 +1141,12 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
               sx={{
                 fontFamily: '"Playfair Display", "Merriweather", "Georgia", serif',
                 fontWeight: 800,
-                fontSize: { xs: '2.2rem', sm: '2.8rem', md: '3.2rem', lg: '3.6rem' },
+                fontSize: { xs: '2rem', sm: '2.2rem', md: '2rem', lg: '2.4rem' },
                 color: isDarkMode ? '#f8fafc' : '#0f172a',
                 lineHeight: 1.05,
                 letterSpacing: '-0.02em',
                 wordBreak: 'break-word',
-                textAlign: 'center',
+                textAlign: 'inherit',
                 mb: 0,
                 animation: 'fadeInUp 0.45s ease 80ms both',
               }}
@@ -1123,16 +1155,26 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             </Typography>
 
             {/* ── PROMINENT MODERN AREA CODE SHOWCASE ── */}
-            {displayCCODE && (
-              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1.8, animation: 'fadeInUp 0.45s ease 90ms both' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                gap: 1,
+                justifyContent: 'center',
+                mt: 1.2,
+                animation: 'fadeInUp 0.45s ease 90ms both',
+              }}
+            >
+              {displayCCODE && (
                 <Box
                   sx={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: 1.8,
-                    px: { xs: 2, md: 2.8 },
-                    py: { xs: 0.8, md: 1 },
-                    borderRadius: '16px',
+                    gap: 1.1,
+                    px: { xs: 1.5, md: 1.8 },
+                    py: { xs: 0.65, md: 0.7 },
+                    borderRadius: '14px',
                     background: isDarkMode
                       ? 'linear-gradient(135deg, rgba(37,99,235,0.22) 0%, rgba(30,58,138,0.35) 100%)'
                       : 'linear-gradient(135deg, rgba(239,246,255,0.95) 0%, rgba(219,234,254,0.8) 100%)',
@@ -1157,15 +1199,15 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      width: 36,
-                      height: 36,
-                      borderRadius: '10px',
+                      width: 30,
+                      height: 30,
+                      borderRadius: '9px',
                       bgcolor: isDarkMode ? 'rgba(59,130,246,0.35)' : '#2563eb',
                       color: '#ffffff',
                       boxShadow: '0 2px 8px rgba(37,99,235,0.3)',
                     }}
                   >
-                    <PinDropRoundedIcon sx={{ fontSize: '1.35rem' }} />
+                    <PinDropRoundedIcon sx={{ fontSize: '1.15rem' }} />
                   </Box>
 
                   <Box sx={{ textAlign: 'left' }}>
@@ -1186,7 +1228,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                       sx={{
                         fontFamily: "'JetBrains Mono', 'Roboto Mono', 'Plus Jakarta Sans', monospace",
                         fontWeight: 900,
-                        fontSize: { xs: '1.3rem', md: '1.65rem' },
+                        fontSize: { xs: '1.1rem', md: '1.3rem' },
                         color: isDarkMode ? '#ffffff' : '#0f172a',
                         letterSpacing: '2px',
                         lineHeight: 1.2,
@@ -1225,10 +1267,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                     </IconButton>
                   </Tooltip>
                 </Box>
-              </Box>
-            )}
+              )}
 
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1.8, animation: 'fadeInUp 0.45s ease 110ms both' }}>
               <Button
                 size="small"
                 onClick={() => setIsAboutModalOpen(true)}
@@ -1252,8 +1292,21 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                   }
                 }}
               >
-                {language === 'si' ? 'ගම පිළිබඳව' : language === 'ta' ? 'கிராமத்தைப் பற்றி' : 'About Village'}
+                {language === 'si' ? 'ගම පිළිබඳව' : language === 'ta' ? 'கிராමத்தைப் பற்றி' : 'About Village'}
               </Button>
+            </Box>
+
+            {/* ── AT-A-GLANCE KPIs (lifted into the hero so they sit above the fold) ── */}
+            <Box sx={{ mt: { xs: 1.8, md: 2 }, animation: 'fadeInUp 0.5s ease 140ms both' }}>
+              <VillageQuickStats
+                populationData={populationData}
+                gnEconomyData={gnEconomyData}
+                housingOwnershipData={housingOwnershipData}
+                roomsData={roomsData}
+                isDarkMode={isDarkMode}
+                variant="compact"
+                orientation="column"
+              />
             </Box>
 
             <Dialog
@@ -1304,49 +1357,20 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             </Dialog>
           </Box>
 
-          {/* ── 2-COLUMN RESPONSIVE DASHBOARD LAYOUT ── */}
-          <Grid container spacing={4} alignItems="stretch" sx={{ mb: 6 }}>
-            {/* Left Column (Now Demographics): Demographic Cards (Village Population & Survey Census Categories) */}
-            <Grid item xs={12} md={6} lg={6} sx={{ display: 'flex', flexDirection: 'column', animation: 'fadeInUp 0.5s ease 160ms both' }}>
-              <DemographicCards
-                populationData={populationData}
-                gnEconomyData={gnEconomyData}
-                housingOwnershipData={housingOwnershipData}
-                housingWallData={housingWallData}
-                housingUnitData={housingUnitData}
-                toiletFacilityData={toiletFacilityData}
-                drinkingWaterData={drinkingWaterData}
-                solidWasteData={solidWasteData}
-                roomsData={roomsData}
-                roofData={roofData}
-                religionData={religionData}
-                householdHeadData={householdHeadData}
-               
-                isDarkMode={isDarkMode}
-                onOpenCategory={(slug) => {
-                  const targetGn = (displayGN || activeGn?.nameEn || gnName || 'Pahalagama').replace(/ /g, '-');
-                  const targetCcode = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'RATPA';
-                  navigate(`/gnpage/${encodeURIComponent(targetGn)}/${encodeURIComponent(targetCcode)}/${slug}`);
-                }}
-              />
-            </Grid>
-
-            {/* Right Column (Now Map): Village Map Card */}
-            <Grid item xs={12} md={6} lg={6} sx={{ display: 'flex', flexDirection: 'column', gap: 3, animation: 'fadeInUp 0.5s ease 220ms both' }}>
-              {/* Village Map Card */}
-              <Box sx={{ width: '100%', maxWidth: '95%', mx: 'auto' }}>
+            {/* ── 3 · VILLAGE MAP ── */}
+            <Box sx={{ display: 'flex', minWidth: 0, animation: 'fadeInUp 0.5s ease 240ms both' }}>
+              <Box sx={{ width: '100%', height: { xs: 300, sm: 360, md: '100%' }, minHeight: { md: 420, lg: 440 } }}>
                 <VillageMap
                   gnName={displayGN}
                   district={displayDistrict}
                   dsDivision={displayCity}
                   ccode={displayCCODE}
                   boundary={activeGn?.boundary}
-                  height={400}
-                 
+                  height="100%"
                 />
               </Box>
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </Container>
       </Box>
 
