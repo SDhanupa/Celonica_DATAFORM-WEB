@@ -774,46 +774,6 @@ const IndustrySurveyPage: React.FC = () => {
                     <TextField fullWidth variant="outlined" size="small" value={formValues['b_name'] || ''} onChange={(e) => handleInputChange('b_name', e.target.value)} />
                   </Box>
 
-                  <Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 1 }}>
-                      <QuestionLabel fieldKey="b_reg_no" text={getDynamicLabel('b_reg_no', 'Business Registration Number', 'ව්‍යාපාර ලියාපදිංචි අංකය', 'வணிக பதிவு எண்')} />
-
-                      {formValues['b_reg_no'] && selectedCategory && (
-                        <Chip
-                          label={language === 'si' ? '⚡ ස්වයංක්‍රීය' : '⚡ Auto'}
-                          size="small"
-                          color="success"
-                          sx={{ fontSize: '0.65rem', height: 20, ml: -0.5 }}
-                        />
-                      )}
-                    </Box>
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      size="small"
-                      value={formValues['b_reg_no'] || ''}
-                      onChange={(e) => handleInputChange('b_reg_no', e.target.value)}
-                      placeholder={
-                        !selectedCategory
-                          ? (language === 'si' ? 'ව්‍යාපාර වර්ගය තෝරන්න...' : 'Select business type first...')
-                          : (!ccode ? (language === 'si' ? 'ස්ථානය තෝරන්න...' : 'Select location first...') : '')
-                      }
-                      helperText={
-                        formValues['b_reg_no']
-                          ? (language === 'si' ? 'ස්වයංක්‍රීයව ජනනය කෙරිණ — ඔබ වෙනස් කළ හැක' : 'Auto-generated — you can edit this')
-                          : (!selectedCategory ? (language === 'si' ? 'ව්‍යාපාර වර්ගය තෝරන විට ස්වයංක්‍රීය අංකයක් ලැබේ' : 'A number will be generated when you select a business type') : '')
-                      }
-                      sx={{
-                        '& .MuiOutlinedInput-root': formValues['b_reg_no'] ? {
-                          bgcolor: 'success.50',
-                          '& fieldset': { borderColor: 'success.300' },
-                        } : {},
-                      }}
-                      InputProps={{
-                        sx: { fontFamily: 'monospace', fontWeight: formValues['b_reg_no'] ? 700 : 400, letterSpacing: formValues['b_reg_no'] ? 1 : 0 }
-                      }}
-                    />
-                  </Box>
 
 
                   <Box>
