@@ -168,11 +168,6 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
             alt="Ceylonica Logo"
             style={{ height: '56px', width: 'auto', objectFit: 'contain' }}
           />
-          <img
-            src="/praja.png"
-            alt="Praja Logo"
-            style={{ height: '56px', width: 'auto', objectFit: 'contain' }}
-          />
         </Box>
 
         <Typography

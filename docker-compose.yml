@@ -31,7 +31,7 @@ services:
       - APP_ENV=production
       - APP_KEY=base64:X4iEGmSPk6StQmdKtF3u8zgrjNYSOOuK59t4gCMrERs=
       - APP_DEBUG=false
-      - APP_URL=https://back.ceystem.com
+      - APP_URL=http://localhost:8000
       - DB_CONNECTION=pgsql
       - DB_HOST=db
       - DB_PORT=5432
@@ -39,13 +39,13 @@ services:
       - DB_USERNAME=celonica_user
       - DB_PASSWORD=celonica_pass
       - KEYCLOAK_BASE_URL=http://celonica-web-keycloak:8080
-      - KEYCLOAK_PUBLIC_URL=https://auth.ceystem.com
-      - KEYCLOAK_REALM=ceylonica-admin
-      - KEYCLOAK_CLIENT_ID=ceylonica-frontend
+      - KEYCLOAK_PUBLIC_URL=http://localhost:8081
+      - KEYCLOAK_REALM=celonica-admin
+      - KEYCLOAK_CLIENT_ID=celonica-frontend
       - KEYCLOAK_ADMIN_CLIENT_ID=admin-cli
       - KEYCLOAK_ADMIN_CLIENT_SECRET=my-super-secret-keycloak-client-secret
-      - FRONTEND_URL=https://ceystem.com
-      - SUPER_ADMIN_KEYCLOAK_SUB=422df1e2-4287-4ad6-bb97-f551bdad51d9
+      - FRONTEND_URL=http://localhost:3001
+      - SUPER_ADMIN_KEYCLOAK_SUB=51050c63-27d4-40ff-9474-fa4d2ce6a6be
       - CACHE_DRIVER=redis
       - SESSION_DRIVER=redis
       - REDIS_HOST=redis
@@ -123,12 +123,13 @@ services:
       KC_HOSTNAME_STRICT_HTTPS: "false"
       KC_HTTP_ENABLED: "true"
       KC_PROXY_HEADERS: xforwarded
-      KC_HOSTNAME_URL: ${KC_HOSTNAME_URL:-https://auth.ceystem.com}
-      KC_HOSTNAME_ADMIN_URL: ${KC_HOSTNAME_ADMIN_URL:-https://auth.ceystem.com}
+      KC_HOSTNAME_URL: http://localhost:8081
+      KC_HOSTNAME_ADMIN_URL: http://localhost:8081
     ports:
       - "${KC_PORT:-8081}:8080"
     volumes:
       - ./keycloak:/opt/keycloak/data/import
+      - ./keycloak/themes/ceylonica:/opt/keycloak/themes/ceylonica
     depends_on:
       keycloak-db:
         condition: service_healthy

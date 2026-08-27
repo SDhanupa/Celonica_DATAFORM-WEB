@@ -187,7 +187,6 @@ const MobileDashboard: React.FC<MobileDashboardProps> = (props) => {
           {/* Plain Transparent Branding PNGs (No box, No borders) */}
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2.5, mb: 1.5 }}>
             <Box component="img" src="/logo.png" alt="Ceylonica" sx={{ height: 36, width: 'auto', objectFit: 'contain' }} />
-            <Box component="img" src="/praja.png" alt="Praja" sx={{ height: 36, width: 'auto', objectFit: 'contain' }} />
           </Box>
 
           {(displayDistrict || displayCity) && (
