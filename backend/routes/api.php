@@ -88,3 +88,8 @@ Route::get('/uploads/{path}', function($path) {
     }
     abort(404);
 })->where('path', '.*');
+
+    Route::get('/business-survey-questions', [App\Http\Controllers\Api\BusinessSurveyQuestionController::class, 'index']);
+    Route::post('/business-survey-questions', [App\Http\Controllers\Api\BusinessSurveyQuestionController::class, 'store']);
+    Route::put('/business-survey-questions/{id}', [App\Http\Controllers\Api\BusinessSurveyQuestionController::class, 'update']);
+    Route::delete('/business-survey-questions/{id}', [App\Http\Controllers\Api\BusinessSurveyQuestionController::class, 'destroy']);

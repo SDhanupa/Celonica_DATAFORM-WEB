@@ -34,6 +34,7 @@ import CategoryDetailPage from './pages/CategoryDetailPage';
 import ApprovalsPage from './pages/ApprovalsPage';
 import IndustrySurveyPage from './pages/IndustrySurveyPage';
 import AdminIndustrySurveys from './pages/AdminIndustrySurveys';
+import AdminIndustrySurveysQuestions from './pages/AdminIndustrySurveysQuestions';
 
 
 const App: React.FC = () => {
@@ -130,6 +131,16 @@ const App: React.FC = () => {
                   <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator']}>
                     <AdminLayout>
                       <QuestionsPage />
+                    </AdminLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/industry-survey-questions"
+                element={
+                  <ProtectedRoute allowedRoles={['super_admin', 'admin']}>
+                    <AdminLayout>
+                      <AdminIndustrySurveysQuestions />
                     </AdminLayout>
                   </ProtectedRoute>
                 }

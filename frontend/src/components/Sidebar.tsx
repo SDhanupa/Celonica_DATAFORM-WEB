@@ -42,7 +42,7 @@ const navItems = [
   { label: 'Approvals', icon: <ReportsIcon />, path: '/approvals', roles: ['super_admin', 'admin', 'moderator'] },
   { label: 'User Submissions', icon: <ReportsIcon />, path: '/user-submissions', roles: ['super_admin', 'admin', 'moderator', 'user'] },
   { label: 'Questions', icon: <QuestionsIcon />, path: '/questions', roles: ['super_admin', 'admin', 'moderator'] },
-  { label: 'Industry Survey Builder', icon: <QuestionsIcon />, path: '/questions?section=INDUSTRY_SURVEY', roles: ['super_admin', 'admin'] },
+  { label: 'Industry Survey Builder', icon: <QuestionsIcon />, path: '/admin/industry-survey-questions', roles: ['super_admin', 'admin'] },
   { label: 'Industry Survey Data', icon: <ReportsIcon />, path: '/admin/industry-surveys', roles: ['super_admin', 'admin'] },
   { label: 'Reports', icon: <ReportsIcon />, path: '/reports', roles: ['super_admin', 'admin', 'moderator'] },
   { label: 'Categories', icon: <CategoryIcon />, path: '/categories', roles: ['super_admin'] },
