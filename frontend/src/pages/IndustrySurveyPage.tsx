@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import GnTopHeaderBar from '../components/GnTopHeaderBar';
 import GnPageFooter from '../components/GnPageFooter';
 import { Box, Typography, Button, Container, TextField, CircularProgress, Paper, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, Select, MenuItem, Checkbox, ListItemText, OutlinedInput, Autocomplete, Table, TableBody, TableCell, TableHead, TableRow, Chip } from '@mui/material';
@@ -919,14 +919,6 @@ const IndustrySurveyPage: React.FC = () => {
 
 
               {[2, 3, 4, 5, 6, 7, 8].includes(currentStep) && renderDynamicStep(currentStep)}
-                        <MenuItem value="2. නැත">2. නැත</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                </Box>
-              )}
               {currentStep === 13 && (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                   <Typography variant="h6" fontWeight="bold" color="primary" sx={{ borderBottom: '2px solid', borderColor: 'primary.main', pb: 1, mb: 1 }}>11 වන කොටස: අනාගත අවශ්‍යතා සහ ලොජිස්ටික්ස් (Future Needs & Logistics)</Typography>
