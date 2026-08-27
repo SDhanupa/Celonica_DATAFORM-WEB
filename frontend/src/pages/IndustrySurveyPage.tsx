@@ -365,7 +365,7 @@ const IndustrySurveyPage: React.FC = () => {
   const [loadingDynamicQuestions, setLoadingDynamicQuestions] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/business-survey-questions')
+    fetch('/api/business-survey-questions')
       .then(res => res.json())
       .then(data => {
         if (data.success) {
@@ -445,7 +445,202 @@ const IndustrySurveyPage: React.FC = () => {
   const [isMobileVerified, setIsMobileVerified] = useState(false);
   const [otpSending, setOtpSending] = useState(false);
   const [otpVerifying, setOtpVerifying] = useState(false);
-  const [submitSuccessData, setSubmitSuccessData] = useState<{ startTime: string, endTime: string } | null>(null);
+  const [submitSuccessData, setSubmitSuccessData] = useState<{ startTime: string, endTime: string, regNumber: string } | null>(null);
+  const [locationConfirmed, setLocationConfirmed] = useState(false);
+  const [showLocationSelector, setShowLocationSelector] = useState(false);
+  const [showMetadataPopup, setShowMetadataPopup] = useState(false);
+  const [showResumePopup, setShowResumePopup] = useState(false);
+  const [saveDraftDialogOpen, setSaveDraftDialogOpen] = useState(false);
+  const [showGpsPopup, setShowGpsPopup] = useState(false);
+  const [gpsErrorPopup, setGpsErrorPopup] = useState<string | null>(null);
+  const [surveyStartTime, setSurveyStartTime] = useState<Date | null>(null);
+  const [gpsCoordinates, setGpsCoordinates] = useState<{ lat: number, lng: number } | null>(null);
+  const [gpsChecking, setGpsChecking] = useState(false);
+  const [gpsWrongLocationPopup, setGpsWrongLocationPopup] = useState<{ lat: number, lng: number } | null>(null);
+
+  // Universal draft key works with or without ccode
+  const draftKey = ccode ? `survey_draft_${ccode}` : `survey_draft_user_${userInfo?.sub || 'anon'}`;
+
+  useEffect(() => {
+    // On route change: check for existing draft and silently resume
+    const draftStr = localStorage.getItem(draftKey);
+    if (draftStr) {
+      try {
+        const draft = JSON.parse(draftStr);
+        if (draft.formValues && Object.keys(draft.formValues).length > 0) {
+          setFormValues(draft.formValues);
+          if (draft.currentStep !== undefined) setCurrentStep(draft.currentStep);
+          if (draft.gpsCoordinates) setGpsCoordinates(draft.gpsCoordinates);
+          if (draft.surveyStartTime) setSurveyStartTime(new Date(draft.surveyStartTime));
+          // Skip all popups, go straight to form
+          setLocationConfirmed(true);
+          setShowLocationSelector(false);
+          return;
+        }
+      } catch { }
+    }
+
+    // No draft — normal flow
+    setFormValues({});
+    setCurrentStep(0);
+    setSurveyStartTime(null);
+    setShowMetadataPopup(false);
+    setShowResumePopup(false);
+    setShowGpsPopup(false);
+    setGpsCoordinates(null);
+
+    if (!ccode) {
+      setShowLocationSelector(true);
+      setLocationConfirmed(false);
+    } else if (gnName && ccode) {
+      localStorage.setItem('last_gn_url', `/gnpage/${encodeURIComponent(gnName)}/${encodeURIComponent(ccode)}`);
+      if (locationState?.fromSelector) {
+        setLocationConfirmed(true);
+        setShowMetadataPopup(true);
+      } else {
+        setLocationConfirmed(false);
+      }
+    }
+  }, [ccode, gnName, locationState]);
+
+  // Auto-save draft on every change
+  useEffect(() => {
+    if (Object.keys(formValues).length > 0 || currentStep > 0) {
+      localStorage.setItem(draftKey, JSON.stringify({
+        formValues,
+        currentStep,
+        surveyStartTime: surveyStartTime?.toISOString() || new Date().toISOString(),
+        gpsCoordinates,
+      }));
+    }
+  }, [formValues, currentStep, surveyStartTime, gpsCoordinates, draftKey]);
+
+  const handleSaveDraft = async () => {
+    const draftData = {
+      formValues,
+      currentStep,
+      surveyStartTime: surveyStartTime?.toISOString() || new Date().toISOString(),
+      gpsCoordinates,
+    };
+
+    // Save to local storage for instant resume
+    localStorage.setItem(draftKey, JSON.stringify(draftData));
+
+    // Sync draft to backend
+    try {
+      const existingId = localStorage.getItem(`${draftKey}_db_id`);
+      const payload: any = {
+        ccode: ccode || 'unknown',
+        district: gnData?.gnByCcode?.districtEn,
+        ds_division: gnData?.gnByCcode?.dsEn,
+        gn_name: gnData?.gnByCcode?.nameEn,
+        latitude: gpsCoordinates?.lat,
+        longitude: gpsCoordinates?.lng,
+        form_data: draftData,
+        status: 'draft',
+      };
+      if (existingId) {
+        payload.id = parseInt(existingId, 10);
+      }
+
+      const res = await fetch('/api/industry-survey', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.survey?.id) {
+          localStorage.setItem(`${draftKey}_db_id`, data.survey.id.toString());
+        }
+      }
+    } catch (err) {
+      console.error('Failed to sync draft to server', err);
+    }
+
+    setSaveDraftDialogOpen(true);
+  };
+
+  const title = {
+    en: 'Industry and Business Survey Questionnaire',
+    si: 'කර්මාන්ත හා ව්‍යාපාර සමීක්ෂණ ප්‍රශ්නාවලිය',
+    ta: 'தொழில் மற்றும் வணிக ஆய்வு கேள்வித்தாள்',
+  }[language] || 'Industry and Business Survey Questionnaire';
+
+  const subtitle = {
+    en: 'Note: This survey covers all production, services, sales, industries and business establishments within the Grama Niladhari Division. Please answer all questions. Mark "Not Applicable" for irrelevant questions.',
+    si: 'සටහන: මෙම සමීක්ෂණය ග්‍රාම නිලධාරි වසම තුළ ඇති සියලුම නිෂ්පාදන, සේවා, විකුණුම්, කර්මාන්ත හා ව්‍යාපාර ආයතන ආවරණය කරයි. කරුණාකර සියලු ප්‍රශ්නවලට පිළිතුරු සපයන්න. අදාළ නොවන ප්‍රශ්න සඳහා "අදාළ නොවේ" ලෙස සලකුණු කරන්න.',
+    ta: 'குறிப்பு: இந்த கணக்கெடுப்பு கிராம உத்தியோகத்தர் பிரிவுக்குள் உள்ள அனைத்து உற்பத்தி, சேவைகள், விற்பனை, தொழில்கள் மற்றும் வணிக நிறுவனங்களை உள்ளடக்கியது. அனைத்து கேள்விகளுக்கும் பதிலளிக்கவும். பொருத்தமற்ற கேள்விகளுக்கு "பொருந்தாது" என்று குறிக்கவும்.',
+  }[language] || 'Note: This survey covers all production, services, sales, industries and business establishments within the Grama Niladhari Division. Please answer all questions. Mark "Not Applicable" for irrelevant questions.';
+
+  React.useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      login(window.location.href);
+    }
+  }, [isLoading, isAuthenticated, login]);
+
+const stepTitles: Record<number, any> = {
+    2: { en: 'Legal Status of the Business', si: 'ව්‍යාපාරයේ නීතිමය තත්ත්වය', ta: 'வணிகத்தின் சட்ட நிலை' },
+    3: { en: 'Location & Infrastructure', si: 'ස්ථානය හා යටිතල පහසුකම්', ta: 'இடம் மற்றும் உள்கட்டமைப்பு' },
+    4: { en: 'Infrastructure and Services', si: 'යටිතල පහසුකම් හා සේවා', ta: 'உள்கட்டமைப்பு மற்றும் சேவைகள்' },
+    5: { en: 'Capital Sources', si: '3 වන කොටස: ප්‍රාග්ධන මූලාශ්‍ර', ta: '3 வது பகுதி: மூலதன ஆதாரங்கள்' },
+    6: { en: 'Workforce & Human Resources', si: '4 වන කොටස: ශ්‍රම බලකාය හා මානව සම්පත්', ta: '4 வது பகுதி: பணியாளர்கள் & மனித வளங்கள்' },
+    7: { en: 'Production & Operations', si: '5 වන කොටස: නිෂ්පාදනය හා මෙහෙයුම්', ta: '5 வது பகுதி: உற்பத்தி & செயல்பாடுகள்' },
+    8: { en: 'Finance & Accounting', si: '6 වන කොටස: මූල්‍ය හා ගිණුම්කරණය', ta: '6 வது பகுதி: நிதி & கணக்கியல்' },
+  };
+
+  const renderDynamicStep = (stepIndex: number) => {
+    const stepQuestions = dynamicQuestions.filter(q => q.step_index === stepIndex).sort((a, b) => a.sort_order - b.sort_order);
+
+    if (stepQuestions.length === 0) {
+      if (loadingDynamicQuestions) {
+        return <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}><CircularProgress /></Box>;
+      }
+      return <Typography>No questions found for this step.</Typography>;
+    }
+
+    const titleObj = stepTitles[stepIndex];
+
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        {titleObj && (
+          <Typography variant="h6" fontWeight="bold" color="primary" sx={{ borderBottom: '2px solid', borderColor: 'primary.main', pb: 1, mb: 1 }}>
+            {language === 'si' ? titleObj.si : language === 'ta' ? titleObj.ta : titleObj.en}
+          </Typography>
+        )}
+        {stepQuestions.map(q => (
+          <DynamicQuestionRenderer
+            key={q.field_key}
+            question={q}
+            language={language}
+            formValues={formValues}
+            handleInputChange={handleInputChange}
+          />
+        ))}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+          <Button variant="outlined" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(stepIndex - 1)}>
+            {language === 'si' ? 'පෙර' : language === 'ta' ? 'முந்தைய' : 'Previous'}
+          </Button>
+          <Button variant="contained" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(stepIndex + 1)}>
+            {language === 'si' ? 'ඊළඟ' : language === 'ta' ? 'அடுத்தது' : 'Next'}
+          </Button>
+          <Button variant="outlined" color="secondary" size="small" sx={{ borderRadius: '20px', py: 1, fontWeight: 'bold', width: '100%', mt: 1 }} onClick={handleSaveDraft}>
+            💾 {language === 'si' ? 'සුරකින්න හා පසුව දිගටම කරන්න' : language === 'ta' ? 'சேமி & பின்னர் தொடரவும்' : 'Save & Continue Later'}
+          </Button>
+        </Box>
+      </Box>
+    );
+  };
+
+
+  const [isMobileVerified, setIsMobileVerified] = useState(false);
+  const [otpSending, setOtpSending] = useState(false);
+  const [otpVerifying, setOtpVerifying] = useState(false);
+  const [submitSuccessData, setSubmitSuccessData] = useState<{ startTime: string, endTime: string, regNumber: string } | null>(null);
   const [locationConfirmed, setLocationConfirmed] = useState(false);
   const [showLocationSelector, setShowLocationSelector] = useState(false);
   const [showMetadataPopup, setShowMetadataPopup] = useState(false);
@@ -629,86 +824,15 @@ const IndustrySurveyPage: React.FC = () => {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        setOtpDialogOpen(true);
+        setIsMobileVerified(true);
+        alert(language === 'si' ? 'සාර්ථකයි' : 'Success');
       } else {
-        alert('Error: ' + (data.error || 'Failed to send OTP'));
+        alert(language === 'si' ? 'අසාර්ථකයි' : 'Failed');
       }
-    } catch (e) {
-      alert('Error sending OTP.');
+    } catch {
+      alert(language === 'si' ? 'දෝෂයක් ඇතිවිය' : 'Error');
     } finally {
       setOtpSending(false);
-    }
-  };
-
-  const handleVerifyOtp = async () => {
-    const mobile = formValues['b_mobile'];
-    if (!otpCode || otpCode.length !== 6) {
-      alert('Please enter the 6-digit code.');
-      return;
-    }
-    setOtpVerifying(true);
-    try {
-      const res = await fetch('/api/otp/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({ mobile, code: otpCode })
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setIsMobileVerified(true);
-        setOtpDialogOpen(false);
-        setOtpCode('');
-      } else {
-        alert('Verification failed: ' + (data.error || 'Invalid OTP'));
-      }
-    } catch (e) {
-      alert('Error verifying OTP.');
-    } finally {
-      setOtpVerifying(false);
-    }
-  };
-
-  const handleInputChange = (id: string, val: string) => {
-    if (id === 'b_mobile') {
-      setIsMobileVerified(false);
-    }
-    setFormValues(prev => ({ ...prev, [id]: val }));
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
-    if (e.key === 'Enter') {
-      // Prevent form submission on Enter
-      e.preventDefault();
-
-      const form = e.currentTarget;
-      const focusableElements = Array.from(
-        form.querySelectorAll(
-          'input, select, textarea, button[type="button"], button[type="submit"]'
-        )
-      ) as HTMLElement[];
-      const activeElement = document.activeElement as HTMLElement;
-
-      const currentIndex = focusableElements.indexOf(activeElement);
-      if (currentIndex > -1 && currentIndex < focusableElements.length - 1) {
-        let nextIndex = currentIndex + 1;
-        let nextElement = focusableElements[nextIndex];
-
-        // Skip hidden, disabled, or specific MUI wrapper elements
-        while (
-          nextElement &&
-          (nextElement.hidden ||
-            (nextElement as any).disabled ||
-            nextElement.getAttribute('type') === 'hidden' ||
-            nextElement.tabIndex === -1)
-        ) {
-          nextIndex++;
-          nextElement = focusableElements[nextIndex];
-        }
-
-        if (nextElement) {
-          nextElement.focus();
-        }
-      }
     }
   };
 
@@ -716,6 +840,7 @@ const IndustrySurveyPage: React.FC = () => {
     e.preventDefault();
     const endTime = new Date();
     const existingId = localStorage.getItem(`${draftKey}_db_id`);
+    const regNumber = formValues['b_reg_no'] || '';
     const payload: any = {
       ccode: ccode || 'unknown',
       district: gnData?.gnByCcode?.districtEn,
@@ -726,6 +851,7 @@ const IndustrySurveyPage: React.FC = () => {
       status: 'submitted',
       form_data: {
         ...formValues,
+        b_reg_no: regNumber,
         survey_metadata: {
           date: new Date().toISOString(),
           surveyor: userInfo?.name,
@@ -754,7 +880,8 @@ const IndustrySurveyPage: React.FC = () => {
 
       setSubmitSuccessData({
         startTime: surveyStartTime?.toLocaleTimeString() || '',
-        endTime: endTime.toLocaleTimeString()
+        endTime: endTime.toLocaleTimeString(),
+        regNumber,
       });
       setSuccessDialogOpen(true);
 
@@ -779,7 +906,6 @@ const IndustrySurveyPage: React.FC = () => {
         selectedCity={mockDs.length ? 'mock-ds' : ''}
         gramaNiladharis={mockGns}
         selectedGN={mockGns.length ? ccode : ''}
-        // Type assertion to bypass TS error if any, though passing extra props is usually fine in plain JS/React
         {...{ activeCcode: ccode, activeGnObj: gnName ? { nameEn: gnName } : null }}
       />
 
@@ -789,7 +915,7 @@ const IndustrySurveyPage: React.FC = () => {
             <Typography variant="h4" gutterBottom fontWeight="bold" textAlign="center" color="primary">{title}</Typography>
             <Typography variant="body1" textAlign="center" color="textSecondary" sx={{ mb: 2, px: { xs: 1, sm: 4 } }}>{subtitle}</Typography>
 
-            <Box component="form" onSubmit={handleSubmit} onKeyDown={handleKeyDown} sx={{ mt: 4, display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 4, display: 'flex', flexDirection: 'column', gap: 3 }}>
 
               {currentStep === 0 && (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -1103,418 +1229,12 @@ const IndustrySurveyPage: React.FC = () => {
 
 
               {[2, 3, 4, 5, 6, 7, 8].includes(currentStep) && renderDynamicStep(currentStep)}
-              {currentStep === 9 && (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <Typography variant="h6" fontWeight="bold" color="primary" sx={{ borderBottom: '2px solid', borderColor: 'primary.main', pb: 1, mb: 1 }}>7 වන කොටස: වෙළඳපොළ හා අලෙවිකරණය (Market & Marketing)</Typography>
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '7.1.1 ප්‍රධාන ගැනුම්කරුවන් කවුද?' : '7.1.1 ප්‍රධාන ගැනුම්කරුවන් කවුද?'} />
-                    <FormControl fullWidth size="small">
-                      <Select
-                        multiple
-                        value={formValues['q_customers'] ? formValues['q_customers'].split(', ') : []}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          handleInputChange('q_customers', (typeof val === 'string' ? val.split(',') : val).join(', '));
-                        }}
-                        input={<OutlinedInput />}
-                        renderValue={(selected) => (selected as string[]).join(', ')}
-                      >
-                        {["1. ප්‍රදේශයේ පාරිභෝගිකයින්", "2. ප්‍රදේශයෙන් පිටත පාරිභෝගිකයින්", "3. වෙනත් ව්‍යාපාරිකයින් (B2B)", "4. අතරමැදියන්/තොග වෙළඳුන්", "5. රජයේ ආයතන", "6. අපනයනය සඳහා"].map((name) => (
-                          <MenuItem key={name} value={name}>
-                            <Checkbox checked={formValues['q_customers'] ? formValues['q_customers'].split(', ').indexOf(name) > -1 : false} />
-                            <ListItemText primary={name} />
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '7.1.2 වෙළඳපොළේ පැතිරීම' : '7.1.2 වෙළඳපොළේ පැතිරීම'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_market_extent'] || ''} onChange={(e) => handleInputChange('q_market_extent', e.target.value as string)}>
-                        <MenuItem value="1. ගමට පමණයි">1. ගමට පමණයි</MenuItem>
-                        <MenuItem value="2. ප්‍රාදේශීය ලේකම් කොට්ඨාසයට">2. ප්‍රාදේශීය ලේකම් කොට්ඨාසයට</MenuItem>
-                        <MenuItem value="3. දිස්ත්‍රික්කයට">3. දිස්ත්‍රික්කයට</MenuItem>
-                        <MenuItem value="4. පළාතට">4. පළාතට</MenuItem>
-                        <MenuItem value="5. රට පුරා">5. රට පුරා</MenuItem>
-                        <MenuItem value="6. ජාත්‍යන්තර">6. ජාත්‍යන්තර</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '7.1.3 පාරිභෝගිකයින්ගේ ප්‍රවණතාවය' : '7.1.3 පාරිභෝගිකයින්ගේ ප්‍රවණතාවය'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_customer_trend'] || ''} onChange={(e) => handleInputChange('q_customer_trend', e.target.value as string)}>
-                        <MenuItem value="1. වැඩි වෙමින් පවතී">1. වැඩි වෙමින් පවතී</MenuItem>
-                        <MenuItem value="2. අඩු වෙමින් පවතී">2. අඩු වෙමින් පවතී</MenuItem>
-                        <MenuItem value="3. වෙනසක් නැත">3. වෙනසක් නැත</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '7.2.1 තරඟකරුවන් සිටීද?' : '7.2.1 තරඟකරුවන් සිටීද?'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_has_competitors'] || ''} onChange={(e) => handleInputChange('q_has_competitors', e.target.value as string)}>
-                        <MenuItem value="1. ඔව්, බොහෝ දෙනෙක්">1. ඔව්, බොහෝ දෙනෙක්</MenuItem>
-                        <MenuItem value="2. ඔව්, කීප දෙනෙක්">2. ඔව්, කීප දෙනෙක්</MenuItem>
-                        <MenuItem value="3. නැත">3. නැත</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  {formValues['q_has_competitors'] === '1. ඔව්, බොහෝ දෙනෙක්' || formValues['q_has_competitors'] === '2. ඔව්, කීප දෙනෙක්' && (
-                    <Box>
-                      <QuestionLabel text={language === 'si' ? '7.2.2 තරඟකරුවන්ගෙන් වන බලපෑම' : '7.2.2 තරඟකරුවන්ගෙන් වන බලපෑම'} />
-                      <FormControl fullWidth size="small">
-                        <Select value={formValues['q_competitor_influence'] || ''} onChange={(e) => handleInputChange('q_competitor_influence', e.target.value as string)}>
-                          <MenuItem value="1. විශාලයි">1. විශාලයි</MenuItem>
-                          <MenuItem value="2. මධ්‍යමයි">2. මධ්‍යමයි</MenuItem>
-                          <MenuItem value="3. අඩුයි">3. අඩුයි</MenuItem>
-                          <MenuItem value="4. බලපෑමක් නැත">4. බලපෑමක් නැත</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Box>
-                  )}
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '7.3.1 අලෙවිකරණ ක්‍රම' : '7.3.1 අලෙවිකරණ ක්‍රම'} />
-                    <FormControl fullWidth size="small">
-                      <Select
-                        multiple
-                        value={formValues['q_marketing_methods'] ? formValues['q_marketing_methods'].split(', ') : []}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          handleInputChange('q_marketing_methods', (typeof val === 'string' ? val.split(',') : val).join(', '));
-                        }}
-                        input={<OutlinedInput />}
-                        renderValue={(selected) => (selected as string[]).join(', ')}
-                      >
-                        {["1. පෝස්ටර්/බැනර්", "2. සමාජ මාධ්‍ය (Facebook, WhatsApp)", "3. වෙබ් අඩවියක් මගින්", "4. මුද්‍රිත මාධ්‍ය (පුවත්පත්)", "5. රූපවාහිනී/ගුවන් විදුලි", "6. පාරිභෝගිකයින්ගේ දැනුම්දීම (Word of mouth)", "7. ප්‍රදර්ශන/පොළවල්", "8. අලෙවිකරණයක් නොකරයි"].map((name) => (
-                          <MenuItem key={name} value={name}>
-                            <Checkbox checked={formValues['q_marketing_methods'] ? formValues['q_marketing_methods'].split(', ').indexOf(name) > -1 : false} />
-                            <ListItemText primary={name} />
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '7.3.2 භාණ්ඩ සඳහා වෙළඳ නාමයක් (Brand) තිබේද?' : '7.3.2 භාණ්ඩ සඳහා වෙළඳ නාමයක් (Brand) තිබේද?'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_has_brand'] || ''} onChange={(e) => handleInputChange('q_has_brand', e.target.value as string)}>
-                        <MenuItem value="1. ඔව්">1. ඔව්</MenuItem>
-                        <MenuItem value="2. නැත">2. නැත</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                    <Button variant="outlined" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(8)}>
-                      {language === 'si' ? 'පෙර' : language === 'ta' ? 'முந்தைய' : 'Previous'}
-                    </Button>
-                    <Button variant="contained" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(10)}>
-                      {language === 'si' ? 'ඊළඟ' : language === 'ta' ? 'அடுத்தது' : 'Next'}
-                    </Button>
-                    <Button variant="outlined" color="secondary" size="small" sx={{ borderRadius: '20px', py: 1, fontWeight: 'bold', width: '100%', mt: 1 }} onClick={handleSaveDraft}>
-                      💾 {language === 'si' ? 'සුරකින්න හා පසුව දිගටම කරන්න' : language === 'ta' ? 'சேமி & பின்னர் தொடரவும்' : 'Save & Continue Later'}
-                    </Button>
-                  </Box>
-                </Box>
-              )}
-              {currentStep === 10 && (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <Typography variant="h6" fontWeight="bold" color="primary" sx={{ borderBottom: '2px solid', borderColor: 'primary.main', pb: 1, mb: 1 }}>8 වන කොටස: නවෝත්පාදන හා තාක්ෂණය (Innovation & Technology)</Typography>
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '8.1.1 පසුගිය වසර 3 තුළ නව නිෂ්පාදන/සේවා හඳුන්වා දුන්නේද?' : '8.1.1 පසුගිය වසර 3 තුළ නව නිෂ්පාදන/සේවා හඳුන්වා දුන්නේද?'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_new_products'] || ''} onChange={(e) => handleInputChange('q_new_products', e.target.value as string)}>
-                        <MenuItem value="1. ඔව්">1. ඔව්</MenuItem>
                         <MenuItem value="2. නැත">2. නැත</MenuItem>
                       </Select>
                     </FormControl>
                   </Box>
 
                   <Box>
-                    <QuestionLabel text={language === 'si' ? '8.1.2 පසුගිය වසර 3 තුළ නව තාක්ෂණයක් භාවිතා කළේද?' : '8.1.2 පසුගිය වසර 3 තුළ නව තාක්ෂණයක් භාවිතා කළේද?'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_new_tech'] || ''} onChange={(e) => handleInputChange('q_new_tech', e.target.value as string)}>
-                        <MenuItem value="1. ඔව්">1. ඔව්</MenuItem>
-                        <MenuItem value="2. නැත">2. නැත</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '8.2.1 භාවිතා කරන තාක්ෂණික උපකරණ' : '8.2.1 භාවිතා කරන තාක්ෂණික උපකරණ'} />
-                    <FormControl fullWidth size="small">
-                      <Select
-                        multiple
-                        value={formValues['q_tech_devices'] ? formValues['q_tech_devices'].split(', ') : []}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          handleInputChange('q_tech_devices', (typeof val === 'string' ? val.split(',') : val).join(', '));
-                        }}
-                        input={<OutlinedInput />}
-                        renderValue={(selected) => (selected as string[]).join(', ')}
-                      >
-                        {["1. ස්මාර්ට් දුරකථනය", "2. පරිගණකය/ලැප්ටොප්", "3. අන්තර්ජාල පහසුකම්", "4. කිසිවක් නැත"].map((name) => (
-                          <MenuItem key={name} value={name}>
-                            <Checkbox checked={formValues['q_tech_devices'] ? formValues['q_tech_devices'].split(', ').indexOf(name) > -1 : false} />
-                            <ListItemText primary={name} />
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '8.2.2 අන්තර්ජාලය ව්‍යාපාරික කටයුතු සඳහා භාවිතා කරන්නේද?' : '8.2.2 අන්තර්ජාලය ව්‍යාපාරික කටයුතු සඳහා භාවිතා කරන්නේද?'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_uses_internet_for_business'] || ''} onChange={(e) => handleInputChange('q_uses_internet_for_business', e.target.value as string)}>
-                        <MenuItem value="1. ඔව්">1. ඔව්</MenuItem>
-                        <MenuItem value="2. නැත">2. නැත</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '8.2.3 ඩිජිටල් ගෙවීම් ක්‍රම භාවිතා කරන්නේද?' : '8.2.3 ඩිජිටල් ගෙවීම් ක්‍රම භාවිතා කරන්නේද?'} />
-                    <FormControl fullWidth size="small">
-                      <Select
-                        multiple
-                        value={formValues['q_digital_payments'] ? formValues['q_digital_payments'].split(', ') : []}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          handleInputChange('q_digital_payments', (typeof val === 'string' ? val.split(',') : val).join(', '));
-                        }}
-                        input={<OutlinedInput />}
-                        renderValue={(selected) => (selected as string[]).join(', ')}
-                      >
-                        {["1. ඔව් (බැංකු හරහා - Online Banking)", "2. ඔව් (LankaQR / Mobile Wallets)", "3. කාඩ්පත් මගින් (POS)", "4. නැත, මුදල් (Cash) පමණයි"].map((name) => (
-                          <MenuItem key={name} value={name}>
-                            <Checkbox checked={formValues['q_digital_payments'] ? formValues['q_digital_payments'].split(', ').indexOf(name) > -1 : false} />
-                            <ListItemText primary={name} />
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                    <Button variant="outlined" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(9)}>
-                      {language === 'si' ? 'පෙර' : language === 'ta' ? 'முந்தைய' : 'Previous'}
-                    </Button>
-                    <Button variant="contained" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(11)}>
-                      {language === 'si' ? 'ඊළඟ' : language === 'ta' ? 'அடுத்தது' : 'Next'}
-                    </Button>
-                    <Button variant="outlined" color="secondary" size="small" sx={{ borderRadius: '20px', py: 1, fontWeight: 'bold', width: '100%', mt: 1 }} onClick={handleSaveDraft}>
-                      💾 {language === 'si' ? 'සුරකින්න හා පසුව දිගටම කරන්න' : language === 'ta' ? 'சேமி & பின்னர் தொடரவும்' : 'Save & Continue Later'}
-                    </Button>
-                  </Box>
-                </Box>
-              )}
-              {currentStep === 11 && (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <Typography variant="h6" fontWeight="bold" color="primary" sx={{ borderBottom: '2px solid', borderColor: 'primary.main', pb: 1, mb: 1 }}>9 වන කොටස: ව්‍යාපාරික පරිසරය හා රාජ්‍ය මැදිහත්වීම (Business Environment & Government)</Typography>
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '9.1.1 ව්‍යාපාරය සතු ලියාපදිංචි සහතික' : '9.1.1 ව්‍යාපාරය සතු ලියාපදිංචි සහතික'} />
-                    <FormControl fullWidth size="small">
-                      <Select
-                        multiple
-                        value={formValues['q_reg_certificates'] ? formValues['q_reg_certificates'].split(', ') : []}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          handleInputChange('q_reg_certificates', (typeof val === 'string' ? val.split(',') : val).join(', '));
-                        }}
-                        input={<OutlinedInput />}
-                        renderValue={(selected) => (selected as string[]).join(', ')}
-                      >
-                        {["1. ප්‍රාදේශීය ලේකම් ලියාපදිංචිය (BR)", "2. සමාගම් මැදුරේ ලියාපදිංචිය", "3. පළාත් සභා/ප්‍රාදේශීය සභා අනුමැතිය", "4. පරිසර ආරක්ෂණ බලපත්‍රය (EPL)", "5. සෞඛ්‍ය වෛද්‍ය නිලධාරී (MOH) සහතිකය", "6. ප්‍රමිති ආයතනයේ සහතිකය (SLSI)", "7. අපනයන සංවර්ධන මණ්ඩලයේ (EDB) ලියාපදිංචිය", "8. වෙනත්", "9. කිසිවක් නැත"].map((name) => (
-                          <MenuItem key={name} value={name}>
-                            <Checkbox checked={formValues['q_reg_certificates'] ? formValues['q_reg_certificates'].split(', ').indexOf(name) > -1 : false} />
-                            <ListItemText primary={name} />
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '9.1.2 ගෙවන බදු වර්ග' : '9.1.2 ගෙවන බදු වර්ග'} />
-                    <FormControl fullWidth size="small">
-                      <Select
-                        multiple
-                        value={formValues['q_taxes_paid'] ? formValues['q_taxes_paid'].split(', ') : []}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          handleInputChange('q_taxes_paid', (typeof val === 'string' ? val.split(',') : val).join(', '));
-                        }}
-                        input={<OutlinedInput />}
-                        renderValue={(selected) => (selected as string[]).join(', ')}
-                      >
-                        {["1. ආදායම් බදු", "2. එකතු කළ අගය මත බදු (VAT)", "3. ප්‍රාදේශීය සභා බදු", "4. කිසිවක් නැත"].map((name) => (
-                          <MenuItem key={name} value={name}>
-                            <Checkbox checked={formValues['q_taxes_paid'] ? formValues['q_taxes_paid'].split(', ').indexOf(name) > -1 : false} />
-                            <ListItemText primary={name} />
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '9.2.1 රජයෙන් ලැබී ඇති සහාය' : '9.2.1 රජයෙන් ලැබී ඇති සහාය'} />
-                    <FormControl fullWidth size="small">
-                      <Select
-                        multiple
-                        value={formValues['q_gov_support_received'] ? formValues['q_gov_support_received'].split(', ') : []}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          handleInputChange('q_gov_support_received', (typeof val === 'string' ? val.split(',') : val).join(', '));
-                        }}
-                        input={<OutlinedInput />}
-                        renderValue={(selected) => (selected as string[]).join(', ')}
-                      >
-                        {["1. මූල්‍ය ආධාර (ණය/ප්‍රතිපාදන)", "2. පුහුණු වැඩසටහන්", "3. උපදේශන සේවා", "4. අමුද්‍රව්‍ය/උපකරණ", "5. ප්‍රදර්ශන සඳහා අවස්ථා", "6. කිසිදු සහායක් ලැබී නැත"].map((name) => (
-                          <MenuItem key={name} value={name}>
-                            <Checkbox checked={formValues['q_gov_support_received'] ? formValues['q_gov_support_received'].split(', ').indexOf(name) > -1 : false} />
-                            <ListItemText primary={name} />
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <Typography variant="h6" fontWeight="bold" color="primary" sx={{ borderBottom: '2px solid', borderColor: 'primary.main', pb: 1, mb: 1, mt: 2 }}>9.3 ව්‍යාපාරික පරිසරයේ බාධක (1=බාධකයක් නොවේ, 5=ඉතා විශාල බාධකයක්)</Typography>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? 'මූල්‍ය පහසුකම් ලබා ගැනීම' : 'මූල්‍ය පහසුකම් ලබා ගැනීම'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_barrier_finance'] || ''} onChange={(e) => handleInputChange('q_barrier_finance', e.target.value as string)}>
-                        <MenuItem value="1">1</MenuItem>
-                        <MenuItem value="2">2</MenuItem>
-                        <MenuItem value="3">3</MenuItem>
-                        <MenuItem value="4">4</MenuItem>
-                        <MenuItem value="5">5</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? 'යටිතල පහසුකම් (විදුලිය/ජලය)' : 'යටිතල පහසුකම් (විදුලිය/ජලය)'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_barrier_infrastructure'] || ''} onChange={(e) => handleInputChange('q_barrier_infrastructure', e.target.value as string)}>
-                        <MenuItem value="1">1</MenuItem>
-                        <MenuItem value="2">2</MenuItem>
-                        <MenuItem value="3">3</MenuItem>
-                        <MenuItem value="4">4</MenuItem>
-                        <MenuItem value="5">5</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? 'බදු අනුපාත' : 'බදු අනුපාත'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_barrier_taxes'] || ''} onChange={(e) => handleInputChange('q_barrier_taxes', e.target.value as string)}>
-                        <MenuItem value="1">1</MenuItem>
-                        <MenuItem value="2">2</MenuItem>
-                        <MenuItem value="3">3</MenuItem>
-                        <MenuItem value="4">4</MenuItem>
-                        <MenuItem value="5">5</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? 'පුහුණු ශ්‍රමිකයින් සොයා ගැනීම' : 'පුහුණු ශ්‍රමිකයින් සොයා ගැනීම'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_barrier_labor'] || ''} onChange={(e) => handleInputChange('q_barrier_labor', e.target.value as string)}>
-                        <MenuItem value="1">1</MenuItem>
-                        <MenuItem value="2">2</MenuItem>
-                        <MenuItem value="3">3</MenuItem>
-                        <MenuItem value="4">4</MenuItem>
-                        <MenuItem value="5">5</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? 'නීති හා රෙගුලාසි ක්‍රියා පටිපාටිය' : 'නීති හා රෙගුලාසි ක්‍රියා පටිපාටිය'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_barrier_laws'] || ''} onChange={(e) => handleInputChange('q_barrier_laws', e.target.value as string)}>
-                        <MenuItem value="1">1</MenuItem>
-                        <MenuItem value="2">2</MenuItem>
-                        <MenuItem value="3">3</MenuItem>
-                        <MenuItem value="4">4</MenuItem>
-                        <MenuItem value="5">5</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                    <Button variant="outlined" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(10)}>
-                      {language === 'si' ? 'පෙර' : language === 'ta' ? 'முந்தைய' : 'Previous'}
-                    </Button>
-                    <Button variant="contained" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(12)}>
-                      {language === 'si' ? 'ඊළඟ' : language === 'ta' ? 'அடுத்தது' : 'Next'}
-                    </Button>
-                    <Button variant="outlined" color="secondary" size="small" sx={{ borderRadius: '20px', py: 1, fontWeight: 'bold', width: '100%', mt: 1 }} onClick={handleSaveDraft}>
-                      💾 {language === 'si' ? 'සුරකින්න හා පසුව දිගටම කරන්න' : language === 'ta' ? 'சேமி & பின்னர் தொடரவும்' : 'Save & Continue Later'}
-                    </Button>
-                  </Box>
-                </Box>
-              )}
-              {currentStep === 12 && (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <Typography variant="h6" fontWeight="bold" color="primary" sx={{ borderBottom: '2px solid', borderColor: 'primary.main', pb: 1, mb: 1 }}>10 වන කොටස: පාරිසරික හා සමාජීය බලපෑම (Environmental & Social Impact)</Typography>
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '10.1.1 පරිසරයට වන බලපෑම තක්සේරු කර තිබේද?' : '10.1.1 පරිසරයට වන බලපෑම තක්සේරු කර තිබේද?'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_env_impact_assessed'] || ''} onChange={(e) => handleInputChange('q_env_impact_assessed', e.target.value as string)}>
-                        <MenuItem value="1. ඔව්">1. ඔව්</MenuItem>
-                        <MenuItem value="2. නැත">2. නැත</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '10.1.2 බලශක්තිය/ජලය ඉතිරි කිරීමට පියවර ගෙන තිබේද?' : '10.1.2 බලශක්තිය/ජලය ඉතිරි කිරීමට පියවර ගෙන තිබේද?'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_energy_saving'] || ''} onChange={(e) => handleInputChange('q_energy_saving', e.target.value as string)}>
-                        <MenuItem value="1. ඔව්">1. ඔව්</MenuItem>
-                        <MenuItem value="2. නැත">2. නැත</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '10.2.1 ප්‍රජාව වෙනුවෙන් සමාජ සත්කාර (CSR) සිදු කරන්නේද?' : '10.2.1 ප්‍රජාව වෙනුවෙන් සමාජ සත්කාර (CSR) සිදු කරන්නේද?'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_social_responsibility'] || ''} onChange={(e) => handleInputChange('q_social_responsibility', e.target.value as string)}>
-                        <MenuItem value="1. ඔව්">1. ඔව්</MenuItem>
-                        <MenuItem value="2. නැත">2. නැත</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                    <Button variant="outlined" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(11)}>
-                      {language === 'si' ? 'පෙර' : language === 'ta' ? 'முந்தைய' : 'Previous'}
-                    </Button>
-                    <Button variant="contained" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(13)}>
-                      {language === 'si' ? 'ඊළඟ' : language === 'ta' ? 'அடுத்தது' : 'Next'}
-                    </Button>
-                    <Button variant="outlined" color="secondary" size="small" sx={{ borderRadius: '20px', py: 1, fontWeight: 'bold', width: '100%', mt: 1 }} onClick={handleSaveDraft}>
-                      💾 {language === 'si' ? 'සුරකින්න හා පසුව දිගටම කරන්න' : language === 'ta' ? 'சேமி & பின்னர் தொடரவும்' : 'Save & Continue Later'}
-                    </Button>
-                  </Box>
                 </Box>
               )}
               {currentStep === 13 && (

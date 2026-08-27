@@ -209,14 +209,14 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const { data: districtsData, loading: districtsLoading, error: districtsError } = useQuery(GET_P_DISTRICTS, {
     fetchPolicy: 'cache-first',
   });
-  console.log('Districts query:', { districtsData, districtsLoading, districtsError });
+
 
   const { data: gnData, loading: gnLoading, error: gnError } = useQuery(GET_P_DISTRICT_WITH_GNS, {
     variables: { id: selectedDistrict },
     skip: !selectedDistrict,
     fetchPolicy: 'cache-first',
   });
-  console.log('GN Data query:', { gnData, gnLoading, gnError });
+
 
   const uniqueCities = React.useMemo(() => {
     if (!gnData?.pDistrict?.gramaNiladharis) return [];

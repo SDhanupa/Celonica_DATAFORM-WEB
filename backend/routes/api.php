@@ -19,7 +19,7 @@ Route::get('/health', fn() => response()->json(['status' => 'ok', 'service' => '
 
 use App\Http\Controllers\IndustrySurveyController;
 
-// Public API Endpoints
+// Public API Endpoints — read-only + survey submission (throttled)
 Route::middleware('throttle:30,1')->get('/guest-token', function() {
     $token = bin2hex(random_bytes(32));
     \Illuminate\Support\Facades\Cache::put('guest_token_' . $token, true, now()->addHours(24));
@@ -37,19 +37,18 @@ Route::middleware('throttle:120,1')->group(function () {
     Route::post('/upload-survey-image', [\App\Http\Controllers\CategoryDataUploadController::class, 'uploadSurveyImage']);
     Route::get('/search-category-data/{slug}', [\App\Http\Controllers\CategoryDataUploadController::class, 'searchCategoryData']);
     Route::post('/submit-survey-data/{slug}', [\App\Http\Controllers\CategoryDataUploadController::class, 'submitSurveyData']);
-    
-    // Industry Survey Routes
+
+    // Public read: the survey form needs to load questions without auth
+    Route::get('/business-survey-questions', [App\Http\Controllers\Api\BusinessSurveyQuestionController::class, 'index']);
+});
+
+// Industry Survey submission — public but tightly throttled (20/min to prevent spam) [C-02]
+Route::middleware('throttle:20,1')->group(function () {
     Route::post('/industry-survey', [IndustrySurveyController::class, 'store']);
     Route::post('/industry-survey/generate-reg-number', [IndustrySurveyController::class, 'generateRegNumber']);
-
-    
     // OTP Routes for mobile verification
     Route::post('/otp/send', [\App\Http\Controllers\OtpController::class, 'send']);
     Route::post('/otp/verify', [\App\Http\Controllers\OtpController::class, 'verify']);
-});
-
-Route::middleware(['throttle:120,1', 'keycloak.admin'])->group(function () {
-    Route::get('/user-submissions', [\App\Http\Controllers\CategoryDataUploadController::class, 'getUserSubmissions']);
 });
 
 
@@ -64,7 +63,9 @@ Route::middleware(['keycloak.admin'])->get('/locations', function () {
 Route::middleware(['keycloak.admin', 'super_admin'])->group(function () {
     Route::get('/industry-surveys', [IndustrySurveyController::class, 'index']);
     Route::patch('/industry-surveys/{id}/approve', [IndustrySurveyController::class, 'approve']);
-    
+
+    Route::get('/user-submissions', [\App\Http\Controllers\CategoryDataUploadController::class, 'getUserSubmissions']);
+
     Route::post('/upload-category-image', [ImageUploadController::class, 'upload']);
     Route::post('/upload-category-data', [\App\Http\Controllers\CategoryDataUploadController::class, 'upload']);
     Route::put('/category-data/{slug}/{id}', [\App\Http\Controllers\CategoryDataUploadController::class, 'updateData']);
@@ -76,8 +77,12 @@ Route::middleware(['keycloak.admin', 'super_admin'])->group(function () {
     Route::post('/category-data/{slug}/{id}/replace', [\App\Http\Controllers\CategoryDataUploadController::class, 'replaceData']);
     Route::post('/category-data/{slug}/generate-all-reg-numbers', [\App\Http\Controllers\CategoryDataUploadController::class, 'generateAllRegNumbers']);
     Route::post('/category-data/{slug}/{id}/generate-reg-number', [\App\Http\Controllers\CategoryDataUploadController::class, 'generateRegNumber']);
-});
 
+    // [C-01 FIX] Business Survey Questions write operations — super_admin only
+    Route::post('/business-survey-questions', [App\Http\Controllers\Api\BusinessSurveyQuestionController::class, 'store']);
+    Route::put('/business-survey-questions/{id}', [App\Http\Controllers\Api\BusinessSurveyQuestionController::class, 'update']);
+    Route::delete('/business-survey-questions/{id}', [App\Http\Controllers\Api\BusinessSurveyQuestionController::class, 'destroy']);
+});
 
 
 // Serve images through PHP since frontend Nginx container doesn't share the volume
@@ -88,8 +93,3 @@ Route::get('/uploads/{path}', function($path) {
     }
     abort(404);
 })->where('path', '.*');
-
-    Route::get('/business-survey-questions', [App\Http\Controllers\Api\BusinessSurveyQuestionController::class, 'index']);
-    Route::post('/business-survey-questions', [App\Http\Controllers\Api\BusinessSurveyQuestionController::class, 'store']);
-    Route::put('/business-survey-questions/{id}', [App\Http\Controllers\Api\BusinessSurveyQuestionController::class, 'update']);
-    Route::delete('/business-survey-questions/{id}', [App\Http\Controllers\Api\BusinessSurveyQuestionController::class, 'destroy']);
