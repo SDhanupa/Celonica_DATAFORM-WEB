@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import GnTopHeaderBar from '../components/GnTopHeaderBar';
 import GnPageFooter from '../components/GnPageFooter';
 import { Box, Typography, Button, Container, TextField, CircularProgress, Paper, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, Select, MenuItem, Checkbox, ListItemText, OutlinedInput, Autocomplete, Table, TableBody, TableCell, TableHead, TableRow, Chip } from '@mui/material';
@@ -563,6 +563,113 @@ const IndustrySurveyPage: React.FC = () => {
     }
 
     setSaveDraftDialogOpen(true);
+  };
+
+  const handleSendOtp = async () => {
+    const mobile = formValues['b_mobile'];
+    if (!mobile) {
+      alert(language === 'si' ? 'කරුණාකර මොබයිල් අංකය ඇතුළත් කරන්න' : 'Please enter a mobile number first.');
+      return;
+    }
+    setOtpSending(true);
+    try {
+      const res = await fetch('/api/otp/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ mobile })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setOtpDialogOpen(true);
+      } else {
+        alert(language === 'si' ? 'අසාර්ථකයි' : 'Failed');
+      }
+    } catch {
+      alert(language === 'si' ? 'දෝෂයක් ඇතිවිය' : 'Error');
+    } finally {
+      setOtpSending(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    const mobile = formValues['b_mobile'];
+    setOtpVerifying(true);
+    try {
+      const res = await fetch('/api/otp/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ mobile, otp: otpCode })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setIsMobileVerified(true);
+        setOtpDialogOpen(false);
+        alert(language === 'si' ? 'සාර්ථකයි' : 'Success');
+      } else {
+        alert(language === 'si' ? 'වැරදි කේතයකි' : 'Invalid OTP');
+      }
+    } catch {
+      alert(language === 'si' ? 'දෝෂයක් ඇතිවිය' : 'Error');
+    } finally {
+      setOtpVerifying(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const endTime = new Date();
+    const existingId = localStorage.getItem(`${draftKey}_db_id`);
+    const regNumber = formValues['b_reg_no'] || '';
+    const payload: any = {
+      ccode: ccode || 'unknown',
+      district: gnData?.gnByCcode?.districtEn,
+      ds_division: gnData?.gnByCcode?.dsEn,
+      gn_name: gnData?.gnByCcode?.nameEn,
+      latitude: gpsCoordinates?.lat,
+      longitude: gpsCoordinates?.lng,
+      status: 'submitted',
+      form_data: {
+        ...formValues,
+        b_reg_no: regNumber,
+        survey_metadata: {
+          date: new Date().toISOString(),
+          surveyor: userInfo?.name,
+          startTime: surveyStartTime?.toISOString(),
+          endTime: endTime.toISOString(),
+        }
+      }
+    };
+    if (existingId) {
+      payload.id = parseInt(existingId, 10);
+    }
+
+    try {
+      const response = await fetch('/api/industry-survey', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit survey');
+      }
+
+      setSubmitSuccessData({
+        startTime: surveyStartTime?.toLocaleTimeString() || '',
+        endTime: endTime.toLocaleTimeString(),
+        regNumber,
+      });
+      setSuccessDialogOpen(true);
+
+      localStorage.removeItem(draftKey);
+      localStorage.removeItem(`${draftKey}_db_id`);
+    } catch (error) {
+      console.error('Submission error:', error);
+      alert('Failed to submit the survey. Please try again.');
+    }
   };
 
   const title = {
