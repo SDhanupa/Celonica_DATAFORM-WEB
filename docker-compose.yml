@@ -40,7 +40,7 @@ services:
       - DB_PASSWORD=celonica_pass
       - KEYCLOAK_BASE_URL=http://celonica-web-keycloak:8080
       - KEYCLOAK_PUBLIC_URL=http://localhost:8081
-      - KEYCLOAK_REALM=celonica-admin
+      - KEYCLOAK_REALM=ceylonica-admin
       - KEYCLOAK_CLIENT_ID=celonica-frontend
       - KEYCLOAK_ADMIN_CLIENT_ID=admin-cli
       - KEYCLOAK_ADMIN_CLIENT_SECRET=my-super-secret-keycloak-client-secret
