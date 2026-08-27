@@ -565,6 +565,29 @@ const IndustrySurveyPage: React.FC = () => {
     setSaveDraftDialogOpen(true);
   };
 
+  const questions = data?.questions || [];
+
+  const QuestionLabel = ({ text, fieldKey }: { text: string, fieldKey?: string }) => {
+    const dq = fieldKey ? dynamicQuestions.find((q: any) => q.field_key === fieldKey) : null;
+    const q = questions.find((q: any) => q.questionTextEn === text || q.questionTextSi === text || q.questionTextTa === text);
+    let explanation = "Explanation will be added soon";
+    if (dq) {
+      const exp = language === 'si' ? dq.explanation_si : language === 'ta' ? dq.explanation_ta : dq.explanation_en;
+      if (exp) explanation = exp;
+    } else if (q) {
+      const exp = language === 'si' ? q.explanationSi : language === 'ta' ? q.explanationTa : q.explanationEn;
+      if (exp) explanation = exp;
+    }
+    return (
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+        <Typography variant="subtitle1" fontWeight="600" mb={0}>{text}</Typography>
+        <Tooltip title={explanation} arrow>
+          <IconButton size="small" sx={{ ml: 0.5, p: 0 }}><HelpOutlineIcon fontSize="small" color="action" /></IconButton>
+        </Tooltip>
+      </Box>
+    );
+  };
+
   const handleSendOtp = async () => {
     const mobile = formValues['b_mobile'];
     if (!mobile) {
