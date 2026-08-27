@@ -313,6 +313,10 @@ const IndustrySurveyPage: React.FC = () => {
   });
 
   const [formValues, setFormValues] = useState<Record<string, string>>({});
+
+  const handleInputChange = (key: string, value: string) => {
+    setFormValues(prev => ({ ...prev, [key]: value }));
+  };
   const [currentStep, setCurrentStep] = useState(0);
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
