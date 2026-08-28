@@ -36,6 +36,7 @@ import {
   Lock as LockIcon,
   Info as InfoIcon,
 } from '@mui/icons-material';
+import { useAuth } from '../auth/AuthProvider';
 
 const STEP_LABELS: Record<number, { en: string; badge: string; locked?: boolean }> = {
   0: { en: 'Business Information', badge: 'Step 0', locked: true },
@@ -84,11 +85,16 @@ const AdminIndustrySurveysQuestions: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({ ...EMPTY_FORM });
   const [expandedStep, setExpandedStep] = useState<number | false>(0);
+  const { token } = useAuth();
 
   const fetchQuestions = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/business-survey-questions');
+      const res = await fetch('/api/business-survey-questions', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       const data = await res.json();
       if (data.success) {
         setQuestions(data.data || []);
@@ -154,7 +160,7 @@ const AdminIndustrySurveysQuestions: React.FC = () => {
 
       const url = editingId ? `/api/business-survey-questions/${editingId}` : `/api/business-survey-questions`;
       const method = editingId ? 'PUT' : 'POST';
-      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(payload) });
       const data = await res.json();
       if (res.ok && data.success) {
         fetchQuestions();
@@ -172,7 +178,7 @@ const AdminIndustrySurveysQuestions: React.FC = () => {
   const handleDelete = async (id: string, fieldKey: string) => {
     if (window.confirm(`Delete question "${fieldKey}"? This cannot be undone.`)) {
       try {
-        const res = await fetch(`/api/business-survey-questions/${id}`, { method: 'DELETE' });
+        const res = await fetch(`/api/business-survey-questions/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
         if (res.ok) fetchQuestions();
         else alert('Failed to delete question');
       } catch { alert('Network error deleting.'); }
