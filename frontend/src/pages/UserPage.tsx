@@ -330,7 +330,6 @@ const UserPage: React.FC = () => {
                           </InputAdornment>
                         ),
                         sx: {
-                          ...params.InputProps.sx,
                           bgcolor: 'rgba(255, 255, 255, 0.9)',
                           backdropFilter: 'blur(10px)',
                           borderRadius: '20px',

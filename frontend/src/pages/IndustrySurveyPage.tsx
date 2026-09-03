@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import GnTopHeaderBar from '../components/GnTopHeaderBar';
 import GnPageFooter from '../components/GnPageFooter';
-import { Box, Typography, Button, Container, TextField, CircularProgress, Paper, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, Select, MenuItem, Checkbox, ListItemText, OutlinedInput, Autocomplete, Table, TableBody, TableCell, TableHead, TableRow, Chip } from '@mui/material';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import { Box, Typography, Button, Container, TextField, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, Select, MenuItem, Checkbox, ListItemText, OutlinedInput, Autocomplete, Table, TableBody, TableCell, TableHead, TableRow, Chip } from '@mui/material';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -14,6 +13,38 @@ import { useQuery, useLazyQuery } from '@apollo/client';
 import { GET_QUESTIONS, GET_GN_BY_CCODE, GET_CATEGORIES_BY_ROOT_SLUG } from '../graphql/queries';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import LocationSelectorModal from '../components/LocationSelectorModal';
+
+/* ── Survey design system ─────────────────────────────────────────────────── */
+import {
+  T, SurveyKeyframes, SurveyErrorContext, QuestionField, SText, SDropdown, ChipMultiSelect,
+} from '../components/survey/SurveyKit';
+import SurveyProgress, { SurveySection } from '../components/survey/SurveyProgress';
+import {
+  extractNICDetails, getStepErrors, getFirstInvalidStep, isDynamicStep, TOTAL_STEPS,
+} from '../components/survey/surveyValidation';
+
+/* Section icons — one per step, shown in the sticky progress header */
+import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
+import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
+import GavelRoundedIcon from '@mui/icons-material/GavelRounded';
+import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
+import BoltOutlinedIcon from '@mui/icons-material/BoltOutlined';
+import SavingsOutlinedIcon from '@mui/icons-material/SavingsOutlined';
+import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
+import PrecisionManufacturingOutlinedIcon from '@mui/icons-material/PrecisionManufacturingOutlined';
+import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
+import CampaignOutlinedIcon from '@mui/icons-material/CampaignOutlined';
+import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
+import PolicyOutlinedIcon from '@mui/icons-material/PolicyOutlined';
+import ParkOutlinedIcon from '@mui/icons-material/ParkOutlined';
+import RocketLaunchOutlinedIcon from '@mui/icons-material/RocketLaunchOutlined';
+
+/* UI icons */
+import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
+import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
+import BookmarkAddOutlinedIcon from '@mui/icons-material/BookmarkAddOutlined';
+import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded';
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 
 // ─── Reusable Photo Uploader Component ───────────────────────────────────────
 interface PhotoUploaderProps {
@@ -132,48 +163,6 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({ fieldKey, value, multiple
 };
 // ──────────────────────────────────────────────────────────────────────────────
 
-const extractNICDetails = (nic: string) => {
-  let year = 0;
-  let dayText = 0;
-  const cleanNic = nic.trim().toUpperCase();
-
-  if (cleanNic.length === 10) {
-    year = 1900 + parseInt(cleanNic.substring(0, 2), 10);
-    dayText = parseInt(cleanNic.substring(2, 5), 10);
-  } else if (cleanNic.length === 12) {
-    year = parseInt(cleanNic.substring(0, 4), 10);
-    dayText = parseInt(cleanNic.substring(4, 7), 10);
-  } else if (cleanNic.length === 9) {
-    year = 1900 + parseInt(cleanNic.substring(0, 2), 10);
-    dayText = parseInt(cleanNic.substring(2, 5), 10);
-  } else {
-    return { dob: '', age: '' };
-  }
-
-  if (isNaN(year) || isNaN(dayText)) return { dob: '', age: '' };
-
-  if (dayText > 500) {
-    dayText -= 500;
-  }
-
-  if (dayText < 1 || dayText > 366) {
-    return { dob: '', age: '' };
-  }
-
-  const isLeapYear = (y: number) => (y % 4 === 0 && y % 100 !== 0) || (y % 400 === 0);
-  if (!isLeapYear(year) && dayText > 59) {
-    dayText -= 1;
-  }
-
-  const dob = new Date(year, 0);
-  dob.setDate(dayText);
-
-  const diff_ms = Date.now() - dob.getTime();
-  const age_dt = new Date(diff_ms);
-  const age = Math.abs(age_dt.getUTCFullYear() - 1970);
-
-  return { dob: dob.toLocaleDateString(), age: age.toString() };
-};
 
 // ─── Dynamic Question Renderer ──────────────────────────────────────────────
 interface DynamicQuestionRendererProps {
@@ -183,6 +172,19 @@ interface DynamicQuestionRendererProps {
   handleInputChange: (key: string, value: string) => void;
 }
 
+/**
+ * A DB-driven question is shown only when its `depends_on` ("field:1,2") is
+ * satisfied. Shared by the renderer and the validator so the two can never
+ * disagree about which questions are actually on screen.
+ */
+const isQuestionVisible = (question: any, formValues: Record<string, string>): boolean => {
+  if (!question?.depends_on) return true;
+  const [depKey, depValsStr] = question.depends_on.split(':');
+  const depVals = (depValsStr || '').split(',');
+  const currentVal = formValues[depKey] || '';
+  return depVals.some((v: string) => currentVal.includes(v) || currentVal === v);
+};
+
 const DynamicQuestionRenderer: React.FC<DynamicQuestionRendererProps> = ({ question, language, formValues, handleInputChange }) => {
   const langKey = language === 'si' ? 'question_si' : language === 'ta' ? 'question_ta' : 'question_en';
   const label = question[langKey] || question.question_en;
@@ -191,13 +193,7 @@ const DynamicQuestionRenderer: React.FC<DynamicQuestionRendererProps> = ({ quest
   const explanation = question[expKey] || question.explanation_en;
 
   // Check dependencies
-  if (question.depends_on) {
-    const [depKey, depValsStr] = question.depends_on.split(':');
-    const depVals = depValsStr.split(',');
-    const currentVal = formValues[depKey] || '';
-    const isMatched = depVals.some(v => currentVal.includes(v) || currentVal === v);
-    if (!isMatched) return null;
-  }
+  if (!isQuestionVisible(question, formValues)) return null;
 
   const getOptions = () => {
     if (!question.options_json) return [];
@@ -205,94 +201,51 @@ const DynamicQuestionRenderer: React.FC<DynamicQuestionRendererProps> = ({ quest
     return opts || [];
   };
 
+  const key = question.field_key;
+  const val = formValues[key] || '';
+  const set = (v: string) => handleInputChange(key, v);
+
+  /* Option lists are authored as "1. Label"; the stored value is the numeric
+     prefix, which is also what `depends_on` matches against. */
+  const opts = getOptions().map((opt: string) => ({ value: opt.split('.')[0], label: opt }));
+
   const renderInput = () => {
     switch (question.type) {
       case 'text':
       case 'email':
       case 'tel':
-        return (
-          <TextField
-            fullWidth
-            variant="outlined"
-            size="small"
-            type={question.type}
-            value={formValues[question.field_key] || ''}
-            onChange={(e) => handleInputChange(question.field_key, e.target.value)}
-          />
-        );
+        return <SText value={val} onChange={set} type={question.type} inputMode={question.type === 'tel' ? 'tel' : undefined} />;
       case 'number':
-        return (
-          <TextField
-            fullWidth
-            variant="outlined"
-            size="small"
-            type="number"
-            value={formValues[question.field_key] || ''}
-            onChange={(e) => handleInputChange(question.field_key, e.target.value)}
-          />
-        );
+        return <SText value={val} onChange={set} type="number" inputMode="numeric" />;
+      case 'textarea':
+        return <SText value={val} onChange={set} multiline rows={3} />;
       case 'select':
-        return (
-          <Select
-            fullWidth
-            size="small"
-            value={formValues[question.field_key] || ''}
-            onChange={(e) => handleInputChange(question.field_key, e.target.value as string)}
-          >
-            {getOptions().map((opt: string, idx: number) => (
-              <MenuItem key={idx} value={opt.split('.')[0]}>{opt}</MenuItem>
-            ))}
-          </Select>
-        );
+        return <SDropdown value={val} onChange={set} options={opts} />;
       case 'multiselect':
-        const selected = formValues[question.field_key] ? formValues[question.field_key].split(', ') : [];
-        return (
-          <Select
-            fullWidth
-            size="small"
-            multiple
-            value={selected}
-            onChange={(e) => {
-              const val = e.target.value;
-              handleInputChange(question.field_key, (typeof val === 'string' ? val.split(',') : val).join(', '));
-            }}
-            input={<OutlinedInput />}
-            renderValue={(selected: string[]) => (
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                {selected.map((val) => {
-                  const optLabel = getOptions().find((o: string) => o.startsWith(val + '.')) || val;
-                  return <Chip key={val} label={optLabel} size="small" />;
-                })}
-              </Box>
-            )}
-          >
-            {getOptions().map((opt: string, idx: number) => (
-              <MenuItem key={idx} value={opt.split('.')[0]}>
-                <Checkbox checked={selected.indexOf(opt.split('.')[0]) > -1} />
-                <ListItemText primary={opt} />
-              </MenuItem>
-            ))}
-          </Select>
-        );
+        return <ChipMultiSelect value={val} onChange={set} options={opts} />;
       default:
         return null;
     }
   };
 
   return (
-    <Box sx={{ mb: 2 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-        <Typography variant="body1" sx={{ fontWeight: 600 }}>{label}</Typography>
-        {explanation && (
-          <Tooltip title={explanation} arrow placement="right">
-            <IconButton size="small" sx={{ ml: 1, color: 'text.secondary' }}>
-              <HelpOutlineIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        )}
-      </Box>
+    <QuestionField
+      id={key}
+      label={
+        <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.25 }}>
+          {label}
+          {explanation && (
+            <Tooltip title={explanation} arrow placement="top">
+              <IconButton size="small" sx={{ color: T.faint, p: 0.25 }} aria-label="More information">
+                <HelpOutlineIcon sx={{ fontSize: '1rem' }} />
+              </IconButton>
+            </Tooltip>
+          )}
+        </Box>
+      }
+    >
       {renderInput()}
-    </Box>
+    </QuestionField>
   );
 };
 // ────────────────────────────────────────────────────────────────────────────
@@ -402,6 +355,112 @@ const IndustrySurveyPage: React.FC = () => {
     8: { en: 'Finance & Accounting', si: '6 වන කොටස: මූල්‍ය හා ගිණුම්කරණය', ta: '6 வது பகுதி: நிதி & கணக்கியல்' },
   };
 
+  /* ── Localisation helper ─────────────────────────────────────────────────── */
+  const L = React.useCallback(
+    (en: string, si: string, ta?: string) => (language === 'si' ? si : language === 'ta' ? (ta || en) : en),
+    [language],
+  );
+
+  /* ── Section metadata for the sticky progress header ─────────────────────── */
+  const SECTIONS: SurveySection[] = React.useMemo(() => {
+    const t = (i: number, en: string, si: string, ta: string) => {
+      const fromTitles = stepTitles[i];
+      return fromTitles ? (language === 'si' ? fromTitles.si : language === 'ta' ? fromTitles.ta : fromTitles.en) : L(en, si, ta);
+    };
+    return [
+      { icon: <StorefrontOutlinedIcon />, title: t(0, 'Basic Information', 'මූලික තොරතුරු', 'அடிப்படை தகவல்கள்'), short: L('Basics', 'මූලික', 'அடிப்படை') },
+      { icon: <PersonOutlineRoundedIcon />, title: t(1, 'Business Owner', 'ව්‍යාපාර හිමිකරු', 'வணிக உரிமையாளர்'), short: L('Owner', 'හිමිකරු', 'உரிமையாளர்') },
+      { icon: <GavelRoundedIcon />, title: t(2, 'Legal Status', 'නීතිමය තත්ත්වය', 'சட்ட நிலை'), short: L('Legal', 'නීතිය', 'சட்டம்') },
+      { icon: <PlaceOutlinedIcon />, title: t(3, 'Location & Infrastructure', 'ස්ථානය හා යටිතල පහසුකම්', 'இடம் & உள்கட்டமைப்பு'), short: L('Location', 'ස්ථානය', 'இடம்') },
+      { icon: <BoltOutlinedIcon />, title: t(4, 'Infrastructure & Services', 'යටිතල පහසුකම් හා සේවා', 'உள்கட்டமைப்பு & சேவைகள்'), short: L('Utilities', 'සේවා', 'சேவைகள்') },
+      { icon: <SavingsOutlinedIcon />, title: t(5, 'Capital Sources', 'ප්‍රාග්ධන මූලාශ්‍ර', 'மூலதன ஆதாரங்கள்'), short: L('Capital', 'ප්‍රාග්ධන', 'மூலதனம்') },
+      { icon: <GroupsOutlinedIcon />, title: t(6, 'Workforce', 'ශ්‍රම බලකාය', 'பணியாளர்கள்'), short: L('Workforce', 'ශ්‍රමය', 'பணியாளர்') },
+      { icon: <PrecisionManufacturingOutlinedIcon />, title: t(7, 'Production & Operations', 'නිෂ්පාදනය හා මෙහෙයුම්', 'உற்பத்தி & செயல்பாடுகள்'), short: L('Production', 'නිෂ්පාදන', 'உற்பத்தி') },
+      { icon: <PaymentsOutlinedIcon />, title: t(8, 'Finance & Accounting', 'මූල්‍ය හා ගිණුම්කරණය', 'நிதி & கணக்கியல்'), short: L('Finance', 'මූල්‍ය', 'நிதி') },
+      { icon: <CampaignOutlinedIcon />, title: L('Market & Marketing', 'වෙළඳපොළ හා අලෙවිකරණය', 'சந்தை & சந்தைப்படுத்தல்'), short: L('Market', 'වෙළඳපොළ', 'சந்தை') },
+      { icon: <LightbulbOutlinedIcon />, title: L('Innovation & Technology', 'නවෝත්පාදන හා තාක්ෂණය', 'புதுமை & தொழில்நுட்பம்'), short: L('Innovation', 'නවෝත්පාදන', 'புதுமை') },
+      { icon: <PolicyOutlinedIcon />, title: L('Business Environment & Government', 'ව්‍යාපාරික පරිසරය හා රාජ්‍ය මැදිහත්වීම', 'வணிகச் சூழல் & அரசு'), short: L('Environment', 'පරිසරය', 'சூழல்') },
+      { icon: <ParkOutlinedIcon />, title: L('Environmental & Social Impact', 'පාරිසරික හා සමාජීය බලපෑම', 'சுற்றுச்சூழல் & சமூக தாக்கம்'), short: L('Impact', 'බලපෑම', 'தாக்கம்') },
+      { icon: <RocketLaunchOutlinedIcon />, title: L('Future Needs & Logistics', 'අනාගත අවශ්‍යතා සහ ලොජිස්ටික්ස්', 'எதிர்கால தேவைகள் & தளவாடங்கள்'), short: L('Future', 'අනාගත', 'எதிர்காலம்') },
+    ];
+  }, [language, L, dynamicQuestions]);
+
+  /* ── Validation state ────────────────────────────────────────────────────── */
+  const [showErr, setShowErr] = useState(false);
+  const [maxReached, setMaxReached] = useState(0);
+
+  /** Field keys currently rendered on a DB-driven step (after depends_on). */
+  const visibleDynamicKeys = React.useCallback(
+    (step: number): string[] =>
+      dynamicQuestions
+        .filter(q => q.step_index === step && isQuestionVisible(q, formValues))
+        .map(q => q.field_key),
+    [dynamicQuestions, formValues],
+  );
+
+  const dynamicKeysByStep = React.useMemo(() => {
+    const map: Record<number, string[]> = {};
+    for (let s = 0; s < TOTAL_STEPS; s++) if (isDynamicStep(s)) map[s] = visibleDynamicKeys(s);
+    return map;
+  }, [visibleDynamicKeys]);
+
+  const stepErrors = React.useMemo(
+    () => getStepErrors(currentStep, formValues, L, isDynamicStep(currentStep) ? visibleDynamicKeys(currentStep) : undefined),
+    [currentStep, formValues, L, visibleDynamicKeys],
+  );
+  const errorCount = Object.keys(stepErrors).length;
+
+  const scrollToFirstError = () => {
+    requestAnimationFrame(() => {
+      const el = document.querySelector('[data-invalid="true"], [data-sk-invalid="true"]');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      else window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  };
+
+  /**
+   * Submit gate: sweep every section, and if any is incomplete jump the user to
+   * the first offending one with its errors revealed, rather than letting the
+   * confirm dialog open over an invalid form.
+   */
+  const handleAttemptSubmit = () => {
+    const bad = getFirstInvalidStep(formValues, L, dynamicKeysByStep);
+    if (bad >= 0) {
+      setShowErr(true);
+      if (bad !== currentStep) {
+        setCurrentStep(bad);
+        setMaxReached(prev => Math.max(prev, bad));
+      }
+      scrollToFirstError();
+      return;
+    }
+    setShowErr(false);
+    setSubmitDialogOpen(true);
+  };
+
+  const goToStep = (next: number) => {
+    setShowErr(false);
+    setCurrentStep(next);
+    setMaxReached(prev => Math.max(prev, next));
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  };
+
+  /** Advance only when the current section validates; otherwise reveal errors. */
+  const goNext = (next: number, before?: () => void) => {
+    if (errorCount > 0) {
+      setShowErr(true);
+      scrollToFirstError();
+      return;
+    }
+    before?.();
+    goToStep(next);
+  };
+
+  const goPrev = (prev: number) => goToStep(prev);
+
+  /* Keep the furthest-reached marker in step with a restored draft. */
+  useEffect(() => { setMaxReached(prev => Math.max(prev, currentStep)); }, [currentStep]);
+
   const renderDynamicStep = (stepIndex: number) => {
     const stepQuestions = dynamicQuestions.filter(q => q.step_index === stepIndex).sort((a, b) => a.sort_order - b.sort_order);
 
@@ -417,7 +476,7 @@ const IndustrySurveyPage: React.FC = () => {
     return (
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         {titleObj && (
-          <Typography variant="h6" fontWeight="bold" color="primary" sx={{ borderBottom: '2px solid', borderColor: 'primary.main', pb: 1, mb: 1 }}>
+          <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.muted, pb: 1.25, mb: 0.5, borderBottom: `1px solid ${T.lineSoft}` }}>
             {language === 'si' ? titleObj.si : language === 'ta' ? titleObj.ta : titleObj.en}
           </Typography>
         )}
@@ -430,17 +489,7 @@ const IndustrySurveyPage: React.FC = () => {
             handleInputChange={handleInputChange}
           />
         ))}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-          <Button variant="outlined" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(stepIndex - 1)}>
-            {language === 'si' ? 'පෙර' : language === 'ta' ? 'முந்தைய' : 'Previous'}
-          </Button>
-          <Button variant="contained" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(stepIndex + 1)}>
-            {language === 'si' ? 'ඊළඟ' : language === 'ta' ? 'அடுத்தது' : 'Next'}
-          </Button>
-          <Button variant="outlined" color="secondary" size="small" sx={{ borderRadius: '20px', py: 1, fontWeight: 'bold', width: '100%', mt: 1 }} onClick={handleSaveDraft}>
-            💾 {language === 'si' ? 'සුරකින්න හා පසුව දිගටම කරන්න' : language === 'ta' ? 'சேமி & பின்னர் தொடரவும்' : 'Save & Continue Later'}
-          </Button>
-        </Box>
+        <StepNav prev={stepIndex - 1} next={stepIndex + 1} />
       </Box>
     );
   };
@@ -571,10 +620,31 @@ const IndustrySurveyPage: React.FC = () => {
 
   const questions = data?.questions || [];
 
+  /**
+   * Fields that error on an empty form are, by definition, the required ones —
+   * so the asterisk is derived from the validation rules rather than duplicated
+   * by hand, and the two can never fall out of sync.
+   */
+  const requiredIds = React.useMemo(
+    () => new Set(Object.keys(getStepErrors(currentStep, {}, L, dynamicKeysByStep[currentStep]))),
+    [currentStep, L, dynamicKeysByStep],
+  );
+
+  /**
+   * Label for the hardcoded steps. Renders the kit's label treatment, the
+   * required marker and the inline validation message, and tags itself with
+   * `data-sk-invalid` so the sibling control is painted red by the form-level
+   * style block. The message sits between label and control on purpose — it is
+   * announced before the user reaches the input.
+   */
   const QuestionLabel = ({ text, fieldKey }: { text: string, fieldKey?: string }) => {
+    const { show, errors } = React.useContext(SurveyErrorContext);
+    const message = fieldKey && show ? errors[fieldKey] : undefined;
+    const required = !!fieldKey && requiredIds.has(fieldKey);
+
     const dq = fieldKey ? dynamicQuestions.find((q: any) => q.field_key === fieldKey) : null;
     const q = questions.find((q: any) => q.questionTextEn === text || q.questionTextSi === text || q.questionTextTa === text);
-    let explanation = "Explanation will be added soon";
+    let explanation = '';
     if (dq) {
       const exp = language === 'si' ? dq.explanation_si : language === 'ta' ? dq.explanation_ta : dq.explanation_en;
       if (exp) explanation = exp;
@@ -582,15 +652,128 @@ const IndustrySurveyPage: React.FC = () => {
       const exp = language === 'si' ? q.explanationSi : language === 'ta' ? q.explanationTa : q.explanationEn;
       if (exp) explanation = exp;
     }
+
     return (
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-        <Typography variant="subtitle1" fontWeight="600" mb={0}>{text}</Typography>
-        <Tooltip title={explanation} arrow>
-          <IconButton size="small" sx={{ ml: 0.5, p: 0 }}><HelpOutlineIcon fontSize="small" color="action" /></IconButton>
-        </Tooltip>
+      <Box
+        id={fieldKey}
+        data-sk-invalid={message ? 'true' : undefined}
+        sx={{ scrollMarginTop: 140 }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25, mb: message ? 0.5 : 1 }}>
+          <Typography
+            component="label"
+            sx={{ fontSize: { xs: '0.9rem', sm: '0.95rem' }, fontWeight: 700, color: T.ink, lineHeight: 1.4 }}
+          >
+            {text}
+            {required && <Box component="span" sx={{ color: T.danger, ml: 0.4 }}>*</Box>}
+          </Typography>
+          {explanation && (
+            <Tooltip title={explanation} arrow placement="top">
+              <IconButton size="small" sx={{ p: 0.25, color: T.faint }} aria-label="More information">
+                <HelpOutlineIcon sx={{ fontSize: '1rem' }} />
+              </IconButton>
+            </Tooltip>
+          )}
+        </Box>
+        {message && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
+            <Box component="span" sx={{ width: 5, height: 5, borderRadius: '50%', bgcolor: T.danger, flexShrink: 0 }} />
+            <Typography sx={{ fontSize: '0.78rem', fontWeight: 600, color: T.danger, lineHeight: 1.4 }}>{message}</Typography>
+          </Box>
+        )}
       </Box>
     );
   };
+
+  /**
+   * Section footer: Previous / Next (or Submit) + Save draft.
+   * Replaces the per-step button blocks, which mixed a `space-between` row with
+   * a full-width third button and so laid out inconsistently between steps.
+   */
+  /* Shared surface for every dialog on the page, so the modals read as part of
+     the same system as the form card rather than default MUI paper. */
+  const dialogPaperProps = {
+    sx: {
+      borderRadius: `${T.radius}px`,
+      border: `1px solid ${T.line}`,
+      boxShadow: '0 24px 64px rgba(15,23,42,0.18)',
+      '& .MuiDialogTitle-root': { fontWeight: 800, color: T.ink, letterSpacing: '-0.01em' },
+      '& .MuiButton-root': { borderRadius: `${T.field}px`, textTransform: 'none', fontWeight: 700 },
+      '& .MuiOutlinedInput-root': { borderRadius: `${T.field}px` },
+    },
+  };
+
+  const StepNav = ({ prev, next, submit, before }: { prev?: number; next?: number; submit?: boolean; before?: () => void }) => (
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.25, mt: 1 }}>
+      {showErr && errorCount > 0 && (
+        <Box
+          role="alert"
+          sx={{
+            display: 'flex', alignItems: 'center', gap: 1,
+            bgcolor: '#fef2f2', border: '1px solid #fecaca',
+            borderRadius: `${T.field}px`, px: 1.75, py: 1.25,
+            animation: 'sk-shake .4s ease',
+          }}
+        >
+          <ErrorOutlineRoundedIcon sx={{ color: T.danger, fontSize: '1.15rem' }} />
+          <Typography sx={{ fontSize: '0.83rem', fontWeight: 600, color: '#991b1b' }}>
+            {errorCount === 1
+              ? L('1 question needs your attention', 'ප්‍රශ්න 1ක් නිවැරදි කරන්න', '1 கேள்வியை சரிபார்க்கவும்')
+              : L(`${errorCount} questions need your attention`, `ප්‍රශ්න ${errorCount}ක් නිවැරදි කරන්න`, `${errorCount} கேள்விகளை சரிபார்க்கவும்`)}
+          </Typography>
+        </Box>
+      )}
+
+      <Box sx={{ display: 'flex', gap: 1.25 }}>
+        {prev !== undefined && (
+          <Button
+            variant="outlined"
+            startIcon={<ArrowBackRoundedIcon />}
+            onClick={() => goPrev(prev)}
+            sx={{
+              flex: '0 0 auto', minWidth: { xs: 0, sm: 150 }, px: { xs: 2, sm: 3 }, py: 1.35,
+              borderRadius: `${T.field}px`, textTransform: 'none', fontWeight: 700,
+              color: T.body, borderColor: T.line, bgcolor: '#fff',
+              '&:hover': { borderColor: T.brand, color: T.brand, bgcolor: T.brandSoft },
+            }}
+          >
+            {L('Previous', 'පෙර', 'முந்தைய')}
+          </Button>
+        )}
+        <Button
+          type="button"
+          variant="contained"
+          disableElevation
+          endIcon={submit ? <CheckCircleRoundedIcon /> : <ArrowForwardRoundedIcon />}
+          onClick={() => (submit ? handleAttemptSubmit() : next !== undefined && goNext(next, before))}
+          sx={{
+            flex: 1, py: 1.35, borderRadius: `${T.field}px`, textTransform: 'none',
+            fontWeight: 800, fontSize: '0.95rem',
+            background: submit
+              ? `linear-gradient(135deg, ${T.accent} 0%, #047857 100%)`
+              : `linear-gradient(135deg, ${T.brand} 0%, ${T.brandDark} 100%)`,
+            boxShadow: submit ? '0 8px 20px rgba(5,150,105,0.28)' : '0 8px 20px rgba(37,99,235,0.26)',
+            '&:hover': { filter: 'brightness(1.06)' },
+          }}
+        >
+          {submit ? L('Review & Submit', 'සමාලෝචනය කර ඉදිරිපත් කරන්න', 'மதிப்பாய்வு & சமர்ப்பி') : L('Next', 'ඊළඟ', 'அடுத்தது')}
+        </Button>
+      </Box>
+
+      <Button
+        variant="text"
+        startIcon={<BookmarkAddOutlinedIcon />}
+        onClick={handleSaveDraft}
+        sx={{
+          alignSelf: 'center', textTransform: 'none', fontWeight: 700,
+          fontSize: '0.84rem', color: T.muted, borderRadius: `${T.field}px`,
+          '&:hover': { color: T.brand, bgcolor: T.brandSoft },
+        }}
+      >
+        {L('Save & continue later', 'සුරකින්න හා පසුව දිගටම කරන්න', 'சேமித்து பின்னர் தொடரவும்')}
+      </Button>
+    </Box>
+  );
 
   const handleSendOtp = async () => {
     const mobile = formValues['b_mobile'];
@@ -733,17 +916,84 @@ const IndustrySurveyPage: React.FC = () => {
         {...{ activeCcode: ccode, activeGnObj: gnName ? { nameEn: gnName } : null }}
       />
 
-      {surveyStartTime && !showGpsPopup && (
-        <Container maxWidth="md" sx={{ mt: 4, mb: 8 }}>
-          <Paper elevation={3} sx={{ p: 4, borderRadius: '20px', bgcolor: 'rgba(255, 255, 255, 0.9)', backdropFilter: 'blur(10px)' }}>
-            <Typography variant="h4" gutterBottom fontWeight="bold" textAlign="center" color="primary">{title}</Typography>
-            <Typography variant="body1" textAlign="center" color="textSecondary" sx={{ mb: 2, px: { xs: 1, sm: 4 } }}>{subtitle}</Typography>
+      <SurveyKeyframes />
 
-            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 4, display: 'flex', flexDirection: 'column', gap: 3 }}>
+      {surveyStartTime && !showGpsPopup && (
+        <Box sx={{ background: `linear-gradient(180deg, ${T.canvasTop} 0%, ${T.canvasBottom} 100%)`, py: { xs: 3, sm: 5 } }}>
+          <Container maxWidth="md" sx={{ px: { xs: 1.5, sm: 3 } }}>
+
+            {/* Intro */}
+            <Box sx={{ textAlign: 'center', mb: { xs: 2.5, sm: 3.5 }, animation: 'sk-rise .4s ease both' }}>
+              <Typography
+                component="h1"
+                sx={{
+                  fontSize: { xs: '1.5rem', sm: '2rem' }, fontWeight: 800,
+                  color: T.ink, letterSpacing: '-0.02em', lineHeight: 1.2, mb: 1,
+                }}
+              >
+                {title}
+              </Typography>
+              <Typography sx={{ fontSize: { xs: '0.82rem', sm: '0.88rem' }, color: T.muted, lineHeight: 1.6, maxWidth: 640, mx: 'auto' }}>
+                {subtitle}
+              </Typography>
+            </Box>
+
+            {/* Survey card */}
+            <Box
+              sx={{
+                bgcolor: T.surface,
+                borderRadius: `${T.radius}px`,
+                border: `1px solid ${T.line}`,
+                boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 12px 32px rgba(15,23,42,0.06)',
+                overflow: 'hidden',
+              }}
+            >
+              <SurveyProgress
+                sections={SECTIONS}
+                current={Math.min(currentStep, SECTIONS.length - 1)}
+                maxReached={maxReached}
+                onJump={goToStep}
+              />
+
+              <SurveyErrorContext.Provider value={{ show: showErr, errors: stepErrors }}>
+                <Box
+                  component="form"
+                  onSubmit={(e: React.FormEvent) => { e.preventDefault(); handleAttemptSubmit(); }}
+                  sx={{
+                    px: { xs: 2, sm: 3.5 },
+                    py: { xs: 2.5, sm: 3.5 },
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 3,
+
+                    /* Field styling applied form-wide, so every control — the
+                       hardcoded ones and the DB-driven ones alike — matches
+                       without each call site repeating `sx`. */
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: `${T.field}px`,
+                      bgcolor: '#fff',
+                      transition: 'box-shadow .18s ease, border-color .18s ease',
+                      '& fieldset': { borderColor: T.line },
+                      '&:hover fieldset': { borderColor: '#c7d2e2' },
+                      '&.Mui-focused fieldset': { borderColor: T.brand, borderWidth: '1.5px' },
+                      '&.Mui-focused': { boxShadow: '0 0 0 4px rgba(37,99,235,0.10)' },
+                    },
+                    '& .MuiInputBase-input': { color: T.ink, fontWeight: 500 },
+
+                    /* An invalid label paints its following control red. The
+                       message itself is rendered by QuestionLabel. */
+                    '& [data-sk-invalid="true"] ~ * .MuiOutlinedInput-notchedOutline': {
+                      borderColor: `${T.danger} !important`,
+                    },
+                    '& [data-sk-invalid="true"] ~ * .sk-choice': {
+                      borderColor: '#fca5a5 !important',
+                    },
+                  }}
+                >
 
               {currentStep === 0 && (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <Typography variant="h6" fontWeight="bold" color="primary" sx={{ borderBottom: '2px solid', borderColor: 'primary.main', pb: 1, mb: 1 }}>
+                  <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.muted, pb: 1.25, mb: 0.5, borderBottom: `1px solid ${T.lineSoft}` }}>
                     {language === 'si' ? 'මූලික තොරතුරු (Basic Information)' : language === 'ta' ? 'அடிப்படை தகவல்கள்' : 'Basic Information'}
                   </Typography>
 
@@ -795,7 +1045,14 @@ const IndustrySurveyPage: React.FC = () => {
                           {otpSending ? <CircularProgress size={24} color="inherit" /> : (language === 'si' ? 'තහවුරු කරන්න' : 'Verify')}
                         </Button>
                       ) : (
-                        <Button variant="contained" color="success" sx={{ minWidth: '120px', pointerEvents: 'none' }}>Verified ✓</Button>
+                        <Button
+                          variant="contained"
+                          color="success"
+                          startIcon={<CheckCircleRoundedIcon />}
+                          sx={{ minWidth: '120px', pointerEvents: 'none', borderRadius: `${T.field}px`, textTransform: 'none', fontWeight: 700 }}
+                        >
+                          {L('Verified', 'තහවුරුයි', 'சரிபார்க்கப்பட்டது')}
+                        </Button>
                       )}
                     </Box>
                   </Box>
@@ -890,8 +1147,9 @@ const IndustrySurveyPage: React.FC = () => {
                     />
                   </Box>
 
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 2 }}>
-                    <Button variant="contained" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '100%' }} onClick={() => {
+                  <StepNav
+                    next={1}
+                    before={() => {
                       if (!formValues['q_owner_name'] && formValues['b_owner_name']) {
                         setFormValues(prev => ({ ...prev, q_owner_name: prev['b_owner_name'] }));
                       }
@@ -903,19 +1161,13 @@ const IndustrySurveyPage: React.FC = () => {
                           q_dob_age: (dob && age) ? `${dob} / ${age}` : '',
                         }));
                       }
-                      setCurrentStep(1);
-                    }}>
-                      {language === 'si' ? 'ඊළඟ' : language === 'ta' ? 'அடுத்து' : 'Next'}
-                    </Button>
-                    <Button variant="outlined" color="secondary" size="small" sx={{ borderRadius: '20px', py: 1, fontWeight: 'bold', width: '100%' }} onClick={handleSaveDraft}>
-                      💾 {language === 'si' ? 'සුරකින්න හා පසුව දිගටම කරන්න' : language === 'ta' ? 'சேமி & பின்னர் தொடரவும்' : 'Save & Continue Later'}
-                    </Button>
-                  </Box>
+                    }}
+                  />
                 </Box>
               )}
               {currentStep === 1 && (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <Typography variant="h6" fontWeight="bold" color="primary" sx={{ borderBottom: '2px solid', borderColor: 'primary.main', pb: 1, mb: 1 }}>
+                  <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.muted, pb: 1.25, mb: 0.5, borderBottom: `1px solid ${T.lineSoft}` }}>
                     {language === 'si' ? 'ව්‍යාපාර හිමිකරු පිළිබඳ තොරතුරු' : language === 'ta' ? 'வணிக உரிமையாளர் தகவல்' : 'Business Owner Information'}
                   </Typography>
 
@@ -997,25 +1249,15 @@ const IndustrySurveyPage: React.FC = () => {
                     <TextField fullWidth variant="outlined" size="small" value={formValues['q_prev_occupation'] || ''} onChange={(e) => handleInputChange('q_prev_occupation', e.target.value)} />
                   </Box>
 
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                    <Button variant="outlined" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(0)}>
-                      {language === 'si' ? 'පෙර' : language === 'ta' ? 'முந்தைய' : 'Previous'}
-                    </Button>
-                    <Button variant="contained" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(2)}>
-                      {language === 'si' ? 'ඊළඟ' : language === 'ta' ? 'அடுத்தது' : 'Next'}
-                    </Button>
-                    <Button variant="outlined" color="secondary" size="small" sx={{ borderRadius: '20px', py: 1, fontWeight: 'bold', width: '100%', mt: 1 }} onClick={handleSaveDraft}>
-                      💾 {language === 'si' ? 'සුරකින්න හා පසුව දිගටම කරන්න' : language === 'ta' ? 'சேமி & பின்னர் தொடரவும்' : 'Save & Continue Later'}
-                    </Button>
-                  </Box>
+                  <StepNav prev={0} next={2} />
                 </Box>
               )}
 
 
               {[2, 3, 4, 5, 6, 7, 8].includes(currentStep) && renderDynamicStep(currentStep)}
-              ﻿              {currentStep === 9 && (
+                            {currentStep === 9 && (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <Typography variant="h6" fontWeight="bold" color="primary" sx={{ borderBottom: '2px solid', borderColor: 'primary.main', pb: 1, mb: 1 }}>7 වන කොටස: වෙළඳපොළ හා අලෙවිකරණය (Market & Marketing)</Typography>
+                  <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.muted, pb: 1.25, mb: 0.5, borderBottom: `1px solid ${T.lineSoft}` }}>7 වන කොටස: වෙළඳපොළ හා අලෙවිකරණය (Market & Marketing)</Typography>
                   <Box>
                     <QuestionLabel text={language === 'si' ? '7.1.1 ප්‍රධාන ගැනුම්කරුවන් කවුද?' : '7.1.1 ප්‍රධාන ගැනුම්කරුවන් කවුද?'} />
                     <FormControl fullWidth size="small">
@@ -1122,22 +1364,12 @@ const IndustrySurveyPage: React.FC = () => {
                     </FormControl>
                   </Box>
 
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                    <Button variant="outlined" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(8)}>
-                      {language === 'si' ? 'පෙර' : language === 'ta' ? 'முந்தைய' : 'Previous'}
-                    </Button>
-                    <Button variant="contained" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(10)}>
-                      {language === 'si' ? 'ඊළඟ' : language === 'ta' ? 'அடுத்தது' : 'Next'}
-                    </Button>
-                    <Button variant="outlined" color="secondary" size="small" sx={{ borderRadius: '20px', py: 1, fontWeight: 'bold', width: '100%', mt: 1 }} onClick={handleSaveDraft}>
-                      💾 {language === 'si' ? 'සුරකින්න හා පසුව දිගටම කරන්න' : language === 'ta' ? 'சேமி & பின்னர் தொடரவும்' : 'Save & Continue Later'}
-                    </Button>
-                  </Box>
+                  <StepNav prev={8} next={10} />
                 </Box>
               )}
               {currentStep === 10 && (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <Typography variant="h6" fontWeight="bold" color="primary" sx={{ borderBottom: '2px solid', borderColor: 'primary.main', pb: 1, mb: 1 }}>8 වන කොටස: නවෝත්පාදන හා තාක්ෂණය (Innovation & Technology)</Typography>
+                  <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.muted, pb: 1.25, mb: 0.5, borderBottom: `1px solid ${T.lineSoft}` }}>8 වන කොටස: නවෝත්පාදන හා තාක්ෂණය (Innovation & Technology)</Typography>
                   <Box>
                     <QuestionLabel text={language === 'si' ? '8.1.1 පසුගිය වසර 3 තුළ නව නිෂ්පාදන/සේවා හඳුන්වා දුන්නේද?' : '8.1.1 පසුගිය වසර 3 තුළ නව නිෂ්පාදන/සේවා හඳුන්වා දුන්නේද?'} />
                     <FormControl fullWidth size="small">
@@ -1214,22 +1446,12 @@ const IndustrySurveyPage: React.FC = () => {
                     </FormControl>
                   </Box>
 
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                    <Button variant="outlined" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(9)}>
-                      {language === 'si' ? 'පෙර' : language === 'ta' ? 'முந்தைய' : 'Previous'}
-                    </Button>
-                    <Button variant="contained" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(11)}>
-                      {language === 'si' ? 'ඊළඟ' : language === 'ta' ? 'அடுத்தது' : 'Next'}
-                    </Button>
-                    <Button variant="outlined" color="secondary" size="small" sx={{ borderRadius: '20px', py: 1, fontWeight: 'bold', width: '100%', mt: 1 }} onClick={handleSaveDraft}>
-                      💾 {language === 'si' ? 'සුරකින්න හා පසුව දිගටම කරන්න' : language === 'ta' ? 'சேமி & பின்னர் தொடரவும்' : 'Save & Continue Later'}
-                    </Button>
-                  </Box>
+                  <StepNav prev={9} next={11} />
                 </Box>
               )}
               {currentStep === 11 && (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <Typography variant="h6" fontWeight="bold" color="primary" sx={{ borderBottom: '2px solid', borderColor: 'primary.main', pb: 1, mb: 1 }}>9 වන කොටස: ව්‍යාපාරික පරිසරය හා රාජ්‍ය මැදිහත්වීම (Business Environment & Government)</Typography>
+                  <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.muted, pb: 1.25, mb: 0.5, borderBottom: `1px solid ${T.lineSoft}` }}>9 වන කොටස: ව්‍යාපාරික පරිසරය හා රාජ්‍ය මැදිහත්වීම (Business Environment & Government)</Typography>
                   <Box>
                     <QuestionLabel text={language === 'si' ? '9.1.1 ව්‍යාපාරය සතු ලියාපදිංචි සහතික' : '9.1.1 ව්‍යාපාරය සතු ලියාපදිංචි සහතික'} />
                     <FormControl fullWidth size="small">
@@ -1368,22 +1590,12 @@ const IndustrySurveyPage: React.FC = () => {
                     </FormControl>
                   </Box>
 
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                    <Button variant="outlined" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(10)}>
-                      {language === 'si' ? 'පෙර' : language === 'ta' ? 'முந்தைய' : 'Previous'}
-                    </Button>
-                    <Button variant="contained" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(12)}>
-                      {language === 'si' ? 'ඊළඟ' : language === 'ta' ? 'அடுத்தது' : 'Next'}
-                    </Button>
-                    <Button variant="outlined" color="secondary" size="small" sx={{ borderRadius: '20px', py: 1, fontWeight: 'bold', width: '100%', mt: 1 }} onClick={handleSaveDraft}>
-                      💾 {language === 'si' ? 'සුරකින්න හා පසුව දිගටම කරන්න' : language === 'ta' ? 'சேமி & பின்னர் தொடரவும்' : 'Save & Continue Later'}
-                    </Button>
-                  </Box>
+                  <StepNav prev={10} next={12} />
                 </Box>
               )}
               {currentStep === 12 && (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <Typography variant="h6" fontWeight="bold" color="primary" sx={{ borderBottom: '2px solid', borderColor: 'primary.main', pb: 1, mb: 1 }}>10 වන කොටස: පාරිසරික හා සමාජීය බලපෑම (Environmental & Social Impact)</Typography>
+                  <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.muted, pb: 1.25, mb: 0.5, borderBottom: `1px solid ${T.lineSoft}` }}>10 වන කොටස: පාරිසරික හා සමාජීය බලපෑම (Environmental & Social Impact)</Typography>
                   <Box>
                     <QuestionLabel text={language === 'si' ? '10.1.1 පරිසරයට වන බලපෑම තක්සේරු කර තිබේද?' : '10.1.1 පරිසරයට වන බලපෑම තක්සේරු කර තිබේද?'} />
                     <FormControl fullWidth size="small">
@@ -1414,23 +1626,13 @@ const IndustrySurveyPage: React.FC = () => {
                     </FormControl>
                   </Box>
 
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                    <Button variant="outlined" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(11)}>
-                      {language === 'si' ? 'පෙර' : language === 'ta' ? 'முந்தைய' : 'Previous'}
-                    </Button>
-                    <Button variant="contained" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(13)}>
-                      {language === 'si' ? 'ඊළඟ' : language === 'ta' ? 'அடுத்தது' : 'Next'}
-                    </Button>
-                    <Button variant="outlined" color="secondary" size="small" sx={{ borderRadius: '20px', py: 1, fontWeight: 'bold', width: '100%', mt: 1 }} onClick={handleSaveDraft}>
-                      💾 {language === 'si' ? 'සුරකින්න හා පසුව දිගටම කරන්න' : language === 'ta' ? 'சேமி & பின்னர் தொடரவும்' : 'Save & Continue Later'}
-                    </Button>
-                  </Box>
+                  <StepNav prev={11} next={13} />
                 </Box>
               )}
 
               {currentStep === 13 && (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <Typography variant="h6" fontWeight="bold" color="primary" sx={{ borderBottom: '2px solid', borderColor: 'primary.main', pb: 1, mb: 1 }}>11 වන කොටස: අනාගත අවශ්‍යතා සහ ලොජිස්ටික්ස් (Future Needs & Logistics)</Typography>
+                  <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.muted, pb: 1.25, mb: 0.5, borderBottom: `1px solid ${T.lineSoft}` }}>11 වන කොටස: අනාගත අවශ්‍යතා සහ ලොජිස්ටික්ස් (Future Needs & Logistics)</Typography>
                   <Box>
                     <QuestionLabel text={language === 'si' ? '11.1.1 ව්‍යාපාරය දියුණු කිරීමට ඇති සැලසුම්' : '11.1.1 ව්‍යාපාරය දියුණු කිරීමට ඇති සැලසුම්'} />
                     <FormControl fullWidth size="small">
@@ -1482,23 +1684,18 @@ const IndustrySurveyPage: React.FC = () => {
                     <TextField fullWidth variant="outlined" size="small" multiline rows={3} value={formValues['q_additional_comments'] || ''} onChange={(e) => handleInputChange('q_additional_comments', e.target.value)} />
                   </Box>
 
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                    <Button variant="outlined" color="primary" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setCurrentStep(12)}>
-                      {language === 'si' ? 'පෙර' : language === 'ta' ? 'முந்தைய' : 'Previous'}
-                    </Button>
-                    <Button variant="contained" color="success" size="large" sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold', width: '48%' }} onClick={() => setSubmitDialogOpen(true)}>
-                      {language === 'si' ? 'ඉදිරිපත් කරන්න' : language === 'ta' ? 'சமர்ப்பி' : 'Submit Survey'}
-                    </Button>
-                  </Box>
+                  <StepNav prev={12} submit />
                 </Box>
               )}
+                </Box>
+              </SurveyErrorContext.Provider>
             </Box>
-          </Paper>
-        </Container>
+          </Container>
+        </Box>
       )}
 
       {/* Success Dialog */}
-      <Dialog open={successDialogOpen} onClose={() => setSuccessDialogOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog PaperProps={dialogPaperProps} open={successDialogOpen} onClose={() => setSuccessDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ fontWeight: 'bold', color: 'success.main', display: 'flex', alignItems: 'center', gap: 1 }}>
           {language === 'si' ? 'සාර්ථකයි!' : language === 'ta' ? 'வெற்றி!' : 'Success!'}
         </DialogTitle>
@@ -1525,7 +1722,7 @@ const IndustrySurveyPage: React.FC = () => {
       </Dialog>
 
       {/* Location Confirmation Dialog */}
-      <Dialog open={!!ccode && !locationConfirmed && !showLocationSelector && !!gnData?.gnByCcode} onClose={() => { }}>
+      <Dialog PaperProps={dialogPaperProps} open={!!ccode && !locationConfirmed && !showLocationSelector && !!gnData?.gnByCcode} onClose={() => { }}>
         <DialogTitle sx={{ fontWeight: 'bold', color: 'primary.main' }}>
           {language === 'si' ? 'ස්ථානය තහවුරු කරන්න' : language === 'ta' ? 'இடத்தை உறுதிப்படுத்தவும்' : 'Confirm Location'}
         </DialogTitle>
@@ -1566,7 +1763,7 @@ const IndustrySurveyPage: React.FC = () => {
       </Dialog>
 
       {/* Survey Metadata Popup */}
-      <Dialog open={showMetadataPopup && !surveyStartTime} onClose={() => { }}>
+      <Dialog PaperProps={dialogPaperProps} open={showMetadataPopup && !surveyStartTime} onClose={() => { }}>
         <DialogTitle sx={{ fontWeight: 'bold', color: 'primary.main' }}>
           {language === 'si' ? 'සමීක්ෂණ තොරතුරු' : language === 'ta' ? 'கணக்கெடுப்பு தகவல்' : 'Survey Information'}
         </DialogTitle>
@@ -1611,7 +1808,7 @@ const IndustrySurveyPage: React.FC = () => {
       </Dialog>
 
       {/* GPS Confirmation Popup */}
-      <Dialog open={showGpsPopup} onClose={() => { }}>
+      <Dialog PaperProps={dialogPaperProps} open={showGpsPopup} onClose={() => { }}>
         <DialogTitle sx={{ fontWeight: 'bold', color: 'primary.main', display: 'flex', alignItems: 'center', gap: 1 }}>
           📍 {language === 'si' ? 'භූගෝලීය ඛණ්ඩාංක (GPS)' : language === 'ta' ? 'புவியியல் ஆயத்தொலைவுகள் (GPS)' : 'GPS Coordinates'}
         </DialogTitle>
@@ -1737,7 +1934,7 @@ const IndustrySurveyPage: React.FC = () => {
       </Dialog>
 
       {/* Wrong Location Warning Popup */}
-      <Dialog open={!!gpsWrongLocationPopup} onClose={() => { }} maxWidth="sm" fullWidth>
+      <Dialog PaperProps={dialogPaperProps} open={!!gpsWrongLocationPopup} onClose={() => { }} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ fontWeight: 'bold', color: 'warning.dark', display: 'flex', alignItems: 'center', gap: 1 }}>
           ⚠️ {language === 'si' ? 'ස්ථානය නිවැරදි නොවේ' : language === 'ta' ? 'தவறான இடம்' : 'Wrong Location'}
         </DialogTitle>
@@ -1804,9 +2001,9 @@ const IndustrySurveyPage: React.FC = () => {
       </Dialog>
 
       {/* Save Draft Success Dialog */}
-      <Dialog open={saveDraftDialogOpen} onClose={() => setSaveDraftDialogOpen(false)} maxWidth="xs" fullWidth>
+      <Dialog PaperProps={dialogPaperProps} open={saveDraftDialogOpen} onClose={() => setSaveDraftDialogOpen(false)} maxWidth="xs" fullWidth>
         <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold', color: 'success.main', pt: 3 }}>
-          💾 {language === 'si' ? 'ෆෝරමය සේව් කෙරිණ!' : language === 'ta' ? 'படிவம் சேமிக்கப்பட்டது!' : 'Progress Saved!'}
+          {language === 'si' ? 'ෆෝරමය සේව් කෙරිණ!' : language === 'ta' ? 'படிவம் சேமிக்கப்பட்டது!' : 'Progress Saved!'}
         </DialogTitle>
         <DialogContent sx={{ textAlign: 'center', pb: 1 }}>
           <Typography variant="body1" sx={{ mb: 1 }}>
@@ -1846,7 +2043,7 @@ const IndustrySurveyPage: React.FC = () => {
       </Dialog>
 
       {/* Resume Draft Popup */}
-      <Dialog open={showResumePopup} onClose={() => { }}>
+      <Dialog PaperProps={dialogPaperProps} open={showResumePopup} onClose={() => { }}>
         <DialogTitle sx={{ fontWeight: 'bold', color: 'primary.main' }}>
           {language === 'si' ? 'අසම්පූර්ණ සමීක්ෂණයක් සොයා ගන්නා ලදී' : language === 'ta' ? 'முடிக்கப்படாத கணக்கெடுப்பு' : 'Unfinished Survey Found'}
         </DialogTitle>
@@ -1904,7 +2101,7 @@ const IndustrySurveyPage: React.FC = () => {
       />
 
 
-      <Dialog open={submitDialogOpen} onClose={() => setSubmitDialogOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog PaperProps={dialogPaperProps} open={submitDialogOpen} onClose={() => setSubmitDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ fontWeight: 'bold', color: 'primary.main' }}>
           {language === 'si' ? 'තහවුරු කරන්න' : 'Confirm Submission'}
         </DialogTitle>
@@ -1932,7 +2129,7 @@ const IndustrySurveyPage: React.FC = () => {
       </Dialog>
 
       {/* OTP Verification Dialog */}
-      <Dialog open={otpDialogOpen} onClose={() => { }}>
+      <Dialog PaperProps={dialogPaperProps} open={otpDialogOpen} onClose={() => { }}>
         <DialogTitle sx={{ fontWeight: 'bold' }}>
           {language === 'si' ? 'OTP අංකය ඇතුළත් කරන්න' : 'Enter 6-Digit OTP'}
         </DialogTitle>
@@ -1961,7 +2158,7 @@ const IndustrySurveyPage: React.FC = () => {
       </Dialog>
 
       {/* GPS Error Popup */}
-      <Dialog open={!!gpsErrorPopup} onClose={() => { }}>
+      <Dialog PaperProps={dialogPaperProps} open={!!gpsErrorPopup} onClose={() => { }}>
         <DialogTitle sx={{ fontWeight: 'bold', color: 'error.main' }}>
           {language === 'si' ? 'දෝෂයකි' : language === 'ta' ? 'பிழை' : 'Error'}
         </DialogTitle>
