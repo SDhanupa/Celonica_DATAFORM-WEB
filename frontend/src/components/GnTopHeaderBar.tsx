@@ -93,7 +93,7 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
   };
 
   return (
-    <Box sx={{ width: '100%', mb: 3 }}>
+    <Box sx={{ width: '100%', mb: 3, position: 'relative', zIndex: 9999 }}>
       <Box
         sx={{
           borderRadius: '18px',

@@ -482,7 +482,7 @@ const CategoryDetailPage: React.FC = () => {
         sx={{
           position: 'sticky',
           top: 0,
-          zIndex: 20,
+          zIndex: 9999,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',

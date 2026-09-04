@@ -43,3 +43,6 @@ Thumbs.db
 *.csv
 Gemini_Generated_Image*
 නිර්මානය.png
+
+# ─── Chat History ────────────────────────────────────────
+chats/
