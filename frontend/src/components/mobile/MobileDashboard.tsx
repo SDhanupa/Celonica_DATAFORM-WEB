@@ -106,23 +106,44 @@ const MobileDashboard: React.FC<MobileDashboardProps> = (props) => {
     onOpenCategory(slug);
   };
 
-  return (
-    <Box sx={{ position: 'relative', minHeight: '100vh', bgcolor: isDarkMode ? '#0b1120' : '#f5f8ff', overflowX: 'hidden' }}>
-      {/* Decorative aurora gradient */}
-      <Box sx={{
-        position: 'absolute', top: 0, left: 0, right: 0, height: 380, pointerEvents: 'none', zIndex: 0,
-        background: isDarkMode
-          ? 'radial-gradient(120% 80% at 50% -10%, rgba(37,99,235,0.35) 0%, rgba(11,17,32,0) 60%)'
-          : 'radial-gradient(120% 80% at 50% -10%, rgba(59,130,246,0.28) 0%, rgba(245,248,255,0) 62%)',
-      }} />
+  const breadcrumb = [displayDistrict, displayCity].filter(Boolean).join('  ›  ');
 
-      {/* ── STICKY APP BAR ── */}
+  return (
+    <Box sx={{ position: 'relative', minHeight: '100dvh', bgcolor: isDarkMode ? '#0b1120' : '#eef3fb', overflowX: 'hidden' }}>
+
+      {/* ── IMMERSIVE MAP BACKGROUND (fixed, interactive) ─────────────── */}
       <Box sx={{
-        position: 'sticky', top: 0, zIndex: 1100,
+        position: 'fixed', top: 0, left: 0, right: 0,
+        height: '60dvh', zIndex: 0,
+        bgcolor: isDarkMode ? '#0b1120' : '#e8eef7',
+      }}>
+        <VillageMap
+          immersive
+          height="100%"
+          gnName={displayGN || ''}
+          district={displayDistrict}
+          dsDivision={displayCity}
+          ccode={displayCCODE}
+          boundary={activeGn?.boundary}
+        />
+        {/* Top scrim so the app bar stays legible over the map */}
+        <Box sx={{
+          position: 'absolute', top: 0, left: 0, right: 0, height: 130, pointerEvents: 'none',
+          background: isDarkMode
+            ? 'linear-gradient(180deg, rgba(11,17,32,0.6) 0%, rgba(11,17,32,0) 100%)'
+            : 'linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 100%)',
+        }} />
+      </Box>
+
+      {/* ── FIXED GLASS APP BAR ───────────────────────────────────────── */}
+      <Box sx={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1100,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        px: 2, py: 1,
-        bgcolor: elevated ? (isDarkMode ? 'rgba(11,17,32,0.85)' : 'rgba(255,255,255,0.85)') : 'transparent',
-        backdropFilter: elevated ? 'blur(20px)' : 'none',
+        px: 2, pb: 1, pt: 'calc(env(safe-area-inset-top, 0px) + 8px)',
+        bgcolor: elevated
+          ? (isDarkMode ? 'rgba(11,17,32,0.85)' : 'rgba(255,255,255,0.85)')
+          : (isDarkMode ? 'rgba(11,17,32,0.5)' : 'rgba(255,255,255,0.55)'),
+        backdropFilter: 'blur(20px)',
         borderBottom: elevated ? (isDarkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(15,23,42,0.06)') : '1px solid transparent',
         transition: 'background 0.3s ease, border-color 0.3s ease',
       }}>
@@ -179,228 +200,215 @@ const MobileDashboard: React.FC<MobileDashboardProps> = (props) => {
         </Box>
       </Box>
 
-      {/* ── SCROLLABLE CONTENT ── */}
-      <Box sx={{ position: 'relative', zIndex: 1, px: 2, pt: 1, pb: 'calc(env(safe-area-inset-bottom, 0px) + 84px)' }}>
+      {/* ── SCROLLING CONTENT OVER THE MAP ────────────────────────────── */}
+      {/* The wrapper is pointer-events:none so taps in the spacer region fall
+          through to the fixed map and its floating controls beneath it. Only the
+          floating pill and the sheet opt back in (pointer-events is inherited,
+          so descendants inherit 'none' unless they set 'auto'). Without this the
+          full-height wrapper would sit over the map at z-index 10 and swallow
+          every tap on the zoom/layer controls. */}
+      <Box sx={{ position: 'relative', zIndex: 10, pointerEvents: 'none' }}>
 
-        {/* Hero */}
-        <Box sx={{ textAlign: 'center', pt: 1, pb: 2 }}>
-          {/* Plain Transparent Branding PNGs (No box, No borders) */}
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2.5, mb: 1.5 }}>
-            <Box component="img" src="/logo.png" alt="Ceylonica" sx={{ height: 36, width: 'auto', objectFit: 'contain' }} />
-          </Box>
-
-          {(displayDistrict || displayCity) && (
-            <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: textMuted, textTransform: 'uppercase', letterSpacing: '0.6px', mb: 1 }}>
-              {[displayDistrict, displayCity].filter(Boolean).join('  ›  ')}
-            </Typography>
-          )}
-          <Typography sx={{
-            fontFamily: "'Playfair Display', serif", fontWeight: 900,
-            fontSize: 'clamp(2rem, 9vw, 2.9rem)', lineHeight: 1.05, color: textMain,
-            letterSpacing: '-0.02em', wordBreak: 'break-word',
-          }}>
-            {displayGN || L('Select a Village', 'ගමක් තෝරන්න', 'கிராமத்தைத் தேர்வுசெய்க')}
-          </Typography>
-
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mt: 1.5, flexWrap: 'wrap' }}>
-            {displayCCODE && (
-              <Box
-                sx={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 0.8,
-                  px: 1.5,
-                  py: 0.5,
-                  borderRadius: '10px',
-                  background: isDarkMode
-                    ? 'linear-gradient(135deg, rgba(37,99,235,0.25) 0%, rgba(30,58,138,0.3) 100%)'
-                    : 'linear-gradient(135deg, rgba(239,246,255,0.95) 0%, rgba(219,234,254,0.85) 100%)',
-                  border: isDarkMode
-                    ? '1.5px solid rgba(96,165,250,0.5)'
-                    : '1.5px solid rgba(37,99,235,0.35)',
-                  boxShadow: isDarkMode ? '0 2px 10px rgba(37,99,235,0.2)' : '0 2px 8px rgba(37,99,235,0.1)',
-                }}
-              >
-                <TagRoundedIcon sx={{ fontSize: '1rem', color: '#2563eb' }} />
-                <Typography sx={{ fontSize: '0.62rem', fontWeight: 800, color: isDarkMode ? '#93c5fd' : '#1d4ed8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  AREA CODE:
-                </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontWeight: 900,
-                    fontSize: '0.95rem',
-                    color: isDarkMode ? '#ffffff' : '#0f172a',
-                    letterSpacing: '1px',
-                  }}
-                >
-                  {displayCCODE}
-                </Typography>
-              </Box>
-            )}
-            <Chip
-              icon={<InfoOutlinedIcon sx={{ fontSize: '1rem !important' }} />}
-              label={L('About Village', 'ගම පිළිබඳව', 'கிராமம் பற்றி')}
-              size="small"
-              onClick={() => setAboutOpen(true)}
-              sx={{
-                height: 32, borderRadius: '10px', fontWeight: 700, fontSize: '0.75rem',
-                color: textMain, bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)',
-                border: isDarkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.06)',
-                '& .MuiChip-icon': { color: textMuted },
-              }}
-            />
-          </Box>
-
-          {/* Change location button */}
+        {/* Transparent spacer reveals the map; taps pass through to keep the map
+            pannable. The floating pill re-enables pointer events for itself. */}
+        <Box sx={{ height: '42dvh', pointerEvents: 'none', position: 'relative' }}>
           <Box
             onClick={() => setLocationOpen(true)}
             role="button"
+            aria-label={L('Change location', 'ස්ථානය වෙනස් කරන්න', 'இடத்தை மாற்று')}
             sx={{
-              mt: 2, mx: 'auto', maxWidth: 320,
-              display: 'flex', alignItems: 'center', gap: 1.2, cursor: 'pointer',
-              px: 2, py: 1.2, borderRadius: '16px',
-              bgcolor: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.9)',
-              border: isDarkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(15,23,42,0.08)',
-              boxShadow: isDarkMode ? 'none' : '0 6px 18px rgba(15,23,42,0.06)',
-              '&:active': { transform: 'scale(0.99)' },
+              pointerEvents: 'auto',
+              position: 'absolute', left: '50%', bottom: 22, transform: 'translateX(-50%)',
+              display: 'inline-flex', alignItems: 'center', gap: 1, cursor: 'pointer',
+              maxWidth: 'calc(100vw - 48px)',
+              px: 1.6, py: 0.9, borderRadius: '999px',
+              bgcolor: isDarkMode ? 'rgba(11,17,32,0.7)' : 'rgba(255,255,255,0.82)',
+              backdropFilter: 'blur(18px)',
+              border: isDarkMode ? '1px solid rgba(255,255,255,0.14)' : '1px solid rgba(15,23,42,0.08)',
+              boxShadow: '0 10px 30px rgba(15,23,42,0.18)',
+              '&:active': { transform: 'translateX(-50%) scale(0.98)' },
             }}
           >
-            <Box sx={{ width: 34, height: 34, borderRadius: '10px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', background: 'linear-gradient(135deg,#3b82f6,#2563eb)' }}>
-              <PlaceIcon fontSize="small" />
+            <Box sx={{ width: 26, height: 26, borderRadius: '999px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', background: 'linear-gradient(135deg,#3b82f6,#2563eb)' }}>
+              <PlaceIcon sx={{ fontSize: '1rem' }} />
             </Box>
-            <Box sx={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
-              <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: textMuted, textTransform: 'uppercase', letterSpacing: '0.4px' }}>
-                {L('Current location', 'වත්මන් ස්ථානය', 'தற்போதைய இடம்')}
-              </Typography>
-              <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: textMain, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {displayGN || L('Tap to choose', 'තෝරන්න ස්පර්ශ කරන්න', 'தேர்வுசெய்ய')}
-              </Typography>
-            </Box>
-            <KeyboardArrowRightIcon sx={{ color: textMuted }} />
-          </Box>
-        </Box>
-
-        {/* Search */}
-        <Box sx={{ mb: 2.5, display: 'flex', justifyContent: 'center' }}>
-          <Box sx={{ width: '100%', maxWidth: '100%' }}>
-            <GlobalSearchBar isDarkMode={isDarkMode} activeGn={activeGn ? { nameEn: activeGn.nameEn, CCODE: displayCCODE || activeGn.CCODE } : null} language={language} />
-          </Box>
-        </Box>
-
-        {/* Category rail */}
-        <Box sx={{ mb: 2.5 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1, px: 0.5 }}>
-            <Typography sx={{ fontWeight: 800, fontSize: '1.05rem', color: textMain, letterSpacing: '-0.01em' }}>
-              {L('Explore Categories', 'ප්‍රවර්ග ගවේෂණය', 'வகைகளை ஆராயுங்கள்')}
+            <Typography sx={{ fontSize: '0.82rem', fontWeight: 700, color: textMain, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {breadcrumb || L('Explore the map', 'සිතියම ගවේෂණය', 'வரைபடத்தை ஆராயுங்கள்')}
             </Typography>
-            <Typography onClick={() => setCategoriesOpen(true)} sx={{ fontSize: '0.78rem', fontWeight: 700, color: '#2563eb', cursor: 'pointer' }}>
-              {L('See all', 'සියල්ල', 'அனைத்தும்')}
-            </Typography>
-          </Box>
-          <Box sx={{
-            display: 'flex', gap: 1.2, overflowX: 'auto', pb: 1, px: 0.5,
-            scrollSnapType: 'x proximity',
-            '&::-webkit-scrollbar': { display: 'none' }, scrollbarWidth: 'none',
-          }}>
-            {MOBILE_CATEGORIES.map((cat) => (
-              <Box
-                key={cat.slug}
-                onClick={() => onOpenCategory(cat.slug)}
-                role="button"
-                sx={{
-                  flexShrink: 0, scrollSnapAlign: 'start', width: 92,
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.8,
-                  p: 1.2, borderRadius: '18px', cursor: 'pointer',
-                  bgcolor: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.92)',
-                  border: isDarkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(15,23,42,0.06)',
-                  boxShadow: isDarkMode ? 'none' : '0 4px 14px rgba(15,23,42,0.05)',
-                  '&:active': { transform: 'scale(0.96)' },
-                  transition: 'transform 0.15s ease',
-                }}
-              >
-                <Box sx={{
-                  width: 46, height: 46, borderRadius: '14px',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: cat.color, bgcolor: `${cat.color}1f`,
-                  '& .MuiSvgIcon-root': { fontSize: '1.5rem' },
-                }}>
-                  {cat.icon}
-                </Box>
-                <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: textMain, textAlign: 'center', lineHeight: 1.15 }}>
-                  {catLabel(cat, language)}
-                </Typography>
-              </Box>
-            ))}
+            <KeyboardArrowRightIcon sx={{ color: textMuted, fontSize: '1.1rem', flexShrink: 0 }} />
           </Box>
         </Box>
 
-        {/* Population highlight card */}
+        {/* ── BOTTOM SHEET ────────────────────────────────────────────── */}
+        {/* Opts back into pointer events (wrapper is 'none') so the sheet is
+            interactive and covers/blocks the map beneath it. */}
         <Box sx={{
-          mb: 2.5, borderRadius: '24px', p: 2.5, position: 'relative', overflow: 'hidden',
-          background: 'linear-gradient(135deg,#2563eb 0%,#1d4ed8 55%,#1e40af 100%)',
-          boxShadow: '0 18px 44px rgba(37,99,235,0.4)',
+          position: 'relative',
+          pointerEvents: 'auto',
+          borderTopLeftRadius: '30px', borderTopRightRadius: '30px',
+          bgcolor: surface,
+          boxShadow: isDarkMode ? '0 -14px 44px rgba(0,0,0,0.5)' : '0 -14px 44px rgba(15,23,42,0.16)',
+          minHeight: '58dvh',
+          px: 2, pt: 0.5,
+          pb: 'calc(env(safe-area-inset-bottom, 0px) + 96px)',
         }}>
-          <Box sx={{ position: 'absolute', top: -30, right: -30, width: 140, height: 140, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.12)', filter: 'blur(6px)' }} />
-          <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-            <GroupsIcon sx={{ color: 'rgba(255,255,255,0.9)' }} />
-            <Typography sx={{ color: 'rgba(255,255,255,0.85)', fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
-              {L('Village Population', 'ග්‍රාමීය ජනගහනය', 'கிராம மக்கள்தொகை')}
+          {/* Grab handle */}
+          <Box sx={{ display: 'flex', justifyContent: 'center', pt: 1.2, pb: 1.5 }}>
+            <Box sx={{ width: 44, height: 5, borderRadius: 3, bgcolor: isDarkMode ? 'rgba(255,255,255,0.18)' : 'rgba(15,23,42,0.14)' }} />
+          </Box>
+
+          {/* Hero: village identity */}
+          <Box sx={{ textAlign: 'center', mb: 2 }}>
+            {breadcrumb && (
+              <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: textMuted, textTransform: 'uppercase', letterSpacing: '0.6px', mb: 0.8 }}>
+                {breadcrumb}
+              </Typography>
+            )}
+            <Typography sx={{
+              fontFamily: "'Playfair Display', serif", fontWeight: 900,
+              fontSize: 'clamp(1.9rem, 8vw, 2.7rem)', lineHeight: 1.05, color: textMain,
+              letterSpacing: '-0.02em', wordBreak: 'break-word',
+            }}>
+              {displayGN || L('Select a Village', 'ගමක් තෝරන්න', 'கிராமத்தைத் தேர்வுசெய்க')}
             </Typography>
-          </Box>
-          <Typography sx={{ position: 'relative', color: '#fff', fontWeight: 900, fontSize: '2.6rem', lineHeight: 1, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>
-            {totalPop.toLocaleString()}
-          </Typography>
 
-          {/* Male/Female split bar */}
-          <Box sx={{ position: 'relative', mt: 2 }}>
-            <Box sx={{ display: 'flex', height: 10, borderRadius: 6, overflow: 'hidden', bgcolor: 'rgba(255,255,255,0.2)' }}>
-              <Box sx={{ width: `${malePct}%`, background: 'linear-gradient(90deg,#60a5fa,#93c5fd)' }} />
-              <Box sx={{ width: `${femalePct}%`, background: 'linear-gradient(90deg,#f9a8d4,#f472b6)' }} />
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mt: 1.4, flexWrap: 'wrap' }}>
+              {displayCCODE && (
+                <Box sx={{
+                  display: 'inline-flex', alignItems: 'center', gap: 0.8, px: 1.5, py: 0.5, borderRadius: '10px',
+                  background: isDarkMode
+                    ? 'linear-gradient(135deg, rgba(37,99,235,0.25) 0%, rgba(30,58,138,0.3) 100%)'
+                    : 'linear-gradient(135deg, rgba(239,246,255,0.95) 0%, rgba(219,234,254,0.85) 100%)',
+                  border: isDarkMode ? '1.5px solid rgba(96,165,250,0.5)' : '1.5px solid rgba(37,99,235,0.35)',
+                  boxShadow: isDarkMode ? '0 2px 10px rgba(37,99,235,0.2)' : '0 2px 8px rgba(37,99,235,0.1)',
+                }}>
+                  <TagRoundedIcon sx={{ fontSize: '1rem', color: '#2563eb' }} />
+                  <Typography sx={{ fontSize: '0.62rem', fontWeight: 800, color: isDarkMode ? '#93c5fd' : '#1d4ed8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    AREA CODE:
+                  </Typography>
+                  <Typography sx={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 900, fontSize: '0.95rem', color: isDarkMode ? '#ffffff' : '#0f172a', letterSpacing: '1px' }}>
+                    {displayCCODE}
+                  </Typography>
+                </Box>
+              )}
+              <Chip
+                icon={<InfoOutlinedIcon sx={{ fontSize: '1rem !important' }} />}
+                label={L('About Village', 'ගම පිළිබඳව', 'கிராமம் பற்றி')}
+                size="small"
+                onClick={() => setAboutOpen(true)}
+                sx={{
+                  height: 32, borderRadius: '10px', fontWeight: 700, fontSize: '0.75rem',
+                  color: textMain, bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)',
+                  border: isDarkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.06)',
+                  '& .MuiChip-icon': { color: textMuted },
+                }}
+              />
             </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1.2 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
-                <MaleIcon sx={{ color: '#bfdbfe', fontSize: '1.1rem' }} />
-                <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: '0.82rem' }}>
-                  {L('Male', 'පුරුෂ', 'ஆண்')} {male.toLocaleString()}
-                </Typography>
+          </Box>
+
+          {/* Search */}
+          <Box sx={{ mb: 2.5, display: 'flex', justifyContent: 'center' }}>
+            <Box sx={{ width: '100%', maxWidth: '100%' }}>
+              <GlobalSearchBar isDarkMode={isDarkMode} activeGn={activeGn ? { nameEn: activeGn.nameEn, CCODE: displayCCODE || activeGn.CCODE } : null} language={language} />
+            </Box>
+          </Box>
+
+          {/* Category rail */}
+          <Box sx={{ mb: 2.5 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1, px: 0.5 }}>
+              <Typography sx={{ fontWeight: 800, fontSize: '1.05rem', color: textMain, letterSpacing: '-0.01em' }}>
+                {L('Explore Categories', 'ප්‍රවර්ග ගවේෂණය', 'வகைகளை ஆராயுங்கள்')}
+              </Typography>
+              <Typography onClick={() => setCategoriesOpen(true)} sx={{ fontSize: '0.78rem', fontWeight: 700, color: '#2563eb', cursor: 'pointer' }}>
+                {L('See all', 'සියල්ල', 'அனைத்தும்')}
+              </Typography>
+            </Box>
+            <Box sx={{
+              display: 'flex', gap: 1.2, overflowX: 'auto', pb: 1, px: 0.5,
+              scrollSnapType: 'x proximity',
+              '&::-webkit-scrollbar': { display: 'none' }, scrollbarWidth: 'none',
+            }}>
+              {MOBILE_CATEGORIES.map((cat) => (
+                <Box
+                  key={cat.slug}
+                  onClick={() => onOpenCategory(cat.slug)}
+                  role="button"
+                  sx={{
+                    flexShrink: 0, scrollSnapAlign: 'start', width: 92,
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.8,
+                    p: 1.2, borderRadius: '18px', cursor: 'pointer',
+                    bgcolor: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(15,23,42,0.03)',
+                    border: isDarkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(15,23,42,0.06)',
+                    boxShadow: isDarkMode ? 'none' : '0 4px 14px rgba(15,23,42,0.05)',
+                    '&:active': { transform: 'scale(0.96)' },
+                    transition: 'transform 0.15s ease',
+                  }}
+                >
+                  <Box sx={{
+                    width: 46, height: 46, borderRadius: '14px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: cat.color, bgcolor: `${cat.color}1f`,
+                    '& .MuiSvgIcon-root': { fontSize: '1.5rem' },
+                  }}>
+                    {cat.icon}
+                  </Box>
+                  <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: textMain, textAlign: 'center', lineHeight: 1.15 }}>
+                    {catLabel(cat, language)}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          </Box>
+
+          {/* Population highlight card */}
+          <Box sx={{
+            mb: 2.5, borderRadius: '24px', p: 2.5, position: 'relative', overflow: 'hidden',
+            background: 'linear-gradient(135deg,#2563eb 0%,#1d4ed8 55%,#1e40af 100%)',
+            boxShadow: '0 18px 44px rgba(37,99,235,0.4)',
+          }}>
+            <Box sx={{ position: 'absolute', top: -30, right: -30, width: 140, height: 140, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.12)', filter: 'blur(6px)' }} />
+            <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              <GroupsIcon sx={{ color: 'rgba(255,255,255,0.9)' }} />
+              <Typography sx={{ color: 'rgba(255,255,255,0.85)', fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                {L('Village Population', 'ග්‍රාමීය ජනගහනය', 'கிராம மக்கள்தொகை')}
+              </Typography>
+            </Box>
+            <Typography sx={{ position: 'relative', color: '#fff', fontWeight: 900, fontSize: '2.6rem', lineHeight: 1, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>
+              {totalPop.toLocaleString()}
+            </Typography>
+
+            <Box sx={{ position: 'relative', mt: 2 }}>
+              <Box sx={{ display: 'flex', height: 10, borderRadius: 6, overflow: 'hidden', bgcolor: 'rgba(255,255,255,0.2)' }}>
+                <Box sx={{ width: `${malePct}%`, background: 'linear-gradient(90deg,#60a5fa,#93c5fd)' }} />
+                <Box sx={{ width: `${femalePct}%`, background: 'linear-gradient(90deg,#f9a8d4,#f472b6)' }} />
               </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
-                <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: '0.82rem' }}>
-                  {female.toLocaleString()} {L('Female', 'ස්ත්‍රී', 'பெண்')}
-                </Typography>
-                <FemaleIcon sx={{ color: '#fbcfe8', fontSize: '1.1rem' }} />
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1.2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
+                  <MaleIcon sx={{ color: '#bfdbfe', fontSize: '1.1rem' }} />
+                  <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: '0.82rem' }}>
+                    {L('Male', 'පුරුෂ', 'ஆண்')} {male.toLocaleString()}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
+                  <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: '0.82rem' }}>
+                    {female.toLocaleString()} {L('Female', 'ස්ත්‍රී', 'பெண்')}
+                  </Typography>
+                  <FemaleIcon sx={{ color: '#fbcfe8', fontSize: '1.1rem' }} />
+                </Box>
               </Box>
             </Box>
           </Box>
-        </Box>
 
-        {/* Survey carousel */}
-        <Box sx={{ mb: 2.5 }}>
-          <MobileSurveyCarousel {...props} isDarkMode={isDarkMode} onOpenCategory={onOpenCategory} />
-        </Box>
+          {/* Survey carousel */}
+          <Box sx={{ mb: 1 }}>
+            <MobileSurveyCarousel {...props} isDarkMode={isDarkMode} onOpenCategory={onOpenCategory} />
+          </Box>
 
-        {/* Village map */}
-        <Box sx={{ mb: 1 }}>
-          <Typography sx={{ fontWeight: 800, fontSize: '1.05rem', color: textMain, mb: 1, px: 0.5, letterSpacing: '-0.01em' }}>
-            {L('Village Map', 'ගම් සිතියම', 'கிராம வரைபடம்')}
-          </Typography>
-          <Box sx={{ borderRadius: '24px', overflow: 'hidden', boxShadow: isDarkMode ? '0 16px 40px rgba(0,0,0,0.5)' : '0 16px 40px rgba(15,23,42,0.1)' }}>
-            <VillageMap
-              gnName={displayGN || ''}
-              district={displayDistrict}
-              dsDivision={displayCity}
-              ccode={displayCCODE}
-              boundary={activeGn?.boundary}
-              height={320}
-            />
+          {/* Footer inside the sheet */}
+          <Box sx={{ mx: -2, mt: 2 }}>
+            <GnPageFooter isDarkMode={isDarkMode} />
           </Box>
         </Box>
-      </Box>
-
-      {/* Footer */}
-      <Box sx={{ pb: 'calc(env(safe-area-inset-bottom, 0px) + 68px)' }}>
-        <GnPageFooter isDarkMode={isDarkMode} />
       </Box>
 
       {/* Bottom nav */}
