@@ -45,6 +45,36 @@ export const T = {
    ────────────────────────────────────────────────────────────────────────── */
 export const SurveyErrorContext = React.createContext<{ show: boolean; errors: Record<string, string> }>({ show: false, errors: {} });
 
+/**
+ * Fades whichever edge of a horizontal scroller still has content beyond it, so
+ * a rail that overflows (step dots, category chips) reads as scrollable instead
+ * of looking like a clipped element. Returns a `mask-image` value for the
+ * scroller's `sx`; edges with nothing past them are left solid.
+ */
+export function useEdgeFadeMask(ref: React.RefObject<HTMLElement | null>, fadePx = 20) {
+  const [edges, setEdges] = React.useState({ start: false, end: false });
+
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const update = () => {
+      const max = el.scrollWidth - el.clientWidth;
+      setEdges({ start: el.scrollLeft > 2, end: el.scrollLeft < max - 2 });
+    };
+    update();
+    el.addEventListener('scroll', update, { passive: true });
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(update) : null;
+    ro?.observe(el);
+    return () => {
+      el.removeEventListener('scroll', update);
+      ro?.disconnect();
+    };
+  }, [ref]);
+
+  if (!edges.start && !edges.end) return undefined;
+  return `linear-gradient(to right, ${edges.start ? 'transparent' : '#000'} 0px, #000 ${fadePx}px, #000 calc(100% - ${fadePx}px), ${edges.end ? 'transparent' : '#000'} 100%)`;
+}
+
 /* Shared field styling for outlined inputs/selects */
 const fieldSx = {
   bgcolor: '#fff',

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, Tooltip } from '@mui/material';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
-import { T } from './SurveyKit';
+import { T, useEdgeFadeMask } from './SurveyKit';
 
 export type SurveySection = {
   icon: React.ReactNode;
@@ -18,6 +18,24 @@ const SurveyProgress: React.FC<{
   const total = sections.length;
   const pct = Math.round(((current + 1) / total) * 100);
   const active = sections[current];
+  const dotsRef = React.useRef<HTMLDivElement | null>(null);
+  const dotsMask = useEdgeFadeMask(dotsRef);
+
+  /* With 14 sections the dot rail overflows a phone screen, so bring the
+     active step back into view whenever it changes. */
+  React.useEffect(() => {
+    const rail = dotsRef.current;
+    const dot = rail?.querySelector(`[data-step="${current}"]`);
+    if (!rail || !dot) return;
+    const r = rail.getBoundingClientRect();
+    const d = dot.getBoundingClientRect();
+    if (d.left < r.left || d.right > r.right) {
+      rail.scrollTo({
+        left: rail.scrollLeft + (d.left - r.left) - r.width / 2 + d.width / 2,
+        behavior: 'smooth',
+      });
+    }
+  }, [current]);
 
   return (
     <Box
@@ -98,14 +116,20 @@ const SurveyProgress: React.FC<{
 
       {/* Step dots — clickable up to the furthest reached section */}
       <Box
+        ref={dotsRef}
         sx={{
           display: 'flex',
           alignItems: 'center',
-          gap: 0.75,
+          gap: { xs: 0.5, sm: 0.75 },
           overflowX: 'auto',
+          /* Stop a sideways flick here from triggering browser back-nav. */
+          overscrollBehaviorX: 'contain',
+          WebkitOverflowScrolling: 'touch',
           pb: 0.5,
           '&::-webkit-scrollbar': { height: 0 },
           scrollbarWidth: 'none',
+          maskImage: dotsMask,
+          WebkitMaskImage: dotsMask,
         }}
       >
         {sections.map((s, i) => {
@@ -114,30 +138,50 @@ const SurveyProgress: React.FC<{
           const reachable = i <= maxReached;
           return (
             <Tooltip key={i} title={s.short} arrow>
+              {/* Padded wrapper carries the tap area (>=44px on touch) while the
+                  inner chip keeps its compact visual size. */}
               <Box
                 role="button"
+                tabIndex={reachable ? 0 : -1}
                 aria-label={s.short}
+                aria-current={isCurrent ? 'step' : undefined}
+                data-step={i}
                 onClick={() => reachable && onJump(i)}
+                onKeyDown={(e) => { if (reachable && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onJump(i); } }}
                 sx={{
                   flexShrink: 0,
                   cursor: reachable ? 'pointer' : 'default',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: isCurrent ? 30 : 26,
-                  height: isCurrent ? 30 : 26,
-                  borderRadius: '9px',
-                  fontSize: '0.72rem',
-                  fontWeight: 800,
-                  transition: 'all .2s ease',
-                  color: isCurrent ? '#fff' : done ? '#fff' : reachable ? T.muted : T.faint,
-                  bgcolor: isCurrent ? T.brand : done ? T.accent : reachable ? '#fff' : '#f1f5f9',
-                  border: `1.5px solid ${isCurrent ? T.brand : done ? T.accent : T.line}`,
-                  boxShadow: isCurrent ? '0 0 0 4px rgba(37,99,235,0.14)' : 'none',
-                  '&:hover': reachable && !isCurrent ? { borderColor: T.brand, color: T.brand } : {},
+                  minWidth: { xs: 44, sm: 'auto' },
+                  minHeight: { xs: 44, sm: 'auto' },
+                  px: { xs: 0.25, sm: 0 },
+                  WebkitTapHighlightColor: 'transparent',
                 }}
               >
-                {done ? <CheckRoundedIcon sx={{ fontSize: '0.95rem' }} /> : i + 1}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: isCurrent ? { xs: 34, sm: 30 } : { xs: 30, sm: 26 },
+                    height: isCurrent ? { xs: 34, sm: 30 } : { xs: 30, sm: 26 },
+                    borderRadius: '9px',
+                    fontSize: { xs: '0.78rem', sm: '0.72rem' },
+                    fontWeight: 800,
+                    transition: 'all .2s ease',
+                    color: isCurrent ? '#fff' : done ? '#fff' : reachable ? T.muted : T.faint,
+                    bgcolor: isCurrent ? T.brand : done ? T.accent : reachable ? '#fff' : '#f1f5f9',
+                    border: `1.5px solid ${isCurrent ? T.brand : done ? T.accent : T.line}`,
+                    boxShadow: isCurrent ? '0 0 0 4px rgba(37,99,235,0.14)' : 'none',
+                    '@media (hover: hover)': {
+                      '&:hover': reachable && !isCurrent ? { borderColor: T.brand, color: T.brand } : {},
+                    },
+                  }}
+                >
+                  {done ? <CheckRoundedIcon sx={{ fontSize: '0.95rem' }} /> : i + 1}
+                </Box>
               </Box>
             </Tooltip>
           );

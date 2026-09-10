@@ -584,7 +584,7 @@ const IndustrySurveyPage: React.FC = () => {
       const existingId = localStorage.getItem(`${draftKey}_db_id`);
       const payload: any = {
         ccode: ccode || 'unknown',
-        district: gnData?.gnByCcode?.districtEn,
+        district: gnData?.gnByCcode?.disEn,
         ds_division: gnData?.gnByCcode?.dsEn,
         gn_name: gnData?.gnByCcode?.nameEn,
         latitude: gpsCoordinates?.lat,
@@ -697,8 +697,36 @@ const IndustrySurveyPage: React.FC = () => {
       borderRadius: `${T.radius}px`,
       border: `1px solid ${T.line}`,
       boxShadow: '0 24px 64px rgba(15,23,42,0.18)',
-      '& .MuiDialogTitle-root': { fontWeight: 800, color: T.ink, letterSpacing: '-0.01em' },
-      '& .MuiButton-root': { borderRadius: `${T.field}px`, textTransform: 'none', fontWeight: 700 },
+
+      /* Phones: near-full-bleed with a small inset, and `dvh` so the sheet is
+         not cut off by mobile browser chrome. */
+      m: { xs: 1.5, sm: 4 },
+      width: { xs: 'calc(100% - 24px)', sm: 'auto' },
+      maxWidth: { xs: 'calc(100% - 24px)', sm: undefined },
+      maxHeight: { xs: 'calc(100dvh - 24px)', sm: 'calc(100% - 64px)' },
+
+      '& .MuiDialogTitle-root': {
+        fontWeight: 800, color: T.ink, letterSpacing: '-0.01em',
+        fontSize: { xs: '1.05rem', sm: '1.25rem' },
+        px: { xs: 2, sm: 3 },
+      },
+      '& .MuiDialogContent-root': { px: { xs: 2, sm: 3 } },
+
+      /* Actions stack on phones so each button keeps a full-width, 48px target
+         instead of three cramped buttons fighting for one row. */
+      '& .MuiDialogActions-root': {
+        flexDirection: { xs: 'column-reverse', sm: 'row' },
+        alignItems: { xs: 'stretch', sm: 'center' },
+        gap: 1,
+        px: { xs: 2, sm: 3 },
+        pb: { xs: 'calc(16px + env(safe-area-inset-bottom, 0px))', sm: 2 },
+        '& > :not(style) ~ :not(style)': { ml: { xs: 0, sm: 1 } },
+      },
+      '& .MuiButton-root': {
+        borderRadius: `${T.field}px`, textTransform: 'none', fontWeight: 700,
+        minHeight: { xs: 48, sm: 40 },
+        width: { xs: '100%', sm: 'auto' },
+      },
       '& .MuiOutlinedInput-root': { borderRadius: `${T.field}px` },
     },
   };
@@ -724,17 +752,25 @@ const IndustrySurveyPage: React.FC = () => {
         </Box>
       )}
 
-      <Box sx={{ display: 'flex', gap: 1.25 }}>
+      {/* 8px gap and a 48px minimum keep both controls comfortably tappable */}
+      <Box sx={{ display: 'flex', gap: { xs: 1, sm: 1.25 } }}>
         {prev !== undefined && (
           <Button
             variant="outlined"
             startIcon={<ArrowBackRoundedIcon />}
             onClick={() => goPrev(prev)}
             sx={{
-              flex: '0 0 auto', minWidth: { xs: 0, sm: 150 }, px: { xs: 2, sm: 3 }, py: 1.35,
+              flex: { xs: '0 0 auto', sm: '0 0 auto' },
+              minWidth: { xs: 108, sm: 150 },
+              minHeight: { xs: 48, sm: 46 },
+              px: { xs: 1.5, sm: 3 },
               borderRadius: `${T.field}px`, textTransform: 'none', fontWeight: 700,
+              fontSize: { xs: '0.88rem', sm: '0.92rem' },
               color: T.body, borderColor: T.line, bgcolor: '#fff',
-              '&:hover': { borderColor: T.brand, color: T.brand, bgcolor: T.brandSoft },
+              WebkitTapHighlightColor: 'transparent',
+              '& .MuiButton-startIcon': { mr: { xs: 0.5, sm: 1 } },
+              '&:active': { bgcolor: T.brandSoft },
+              '@media (hover: hover)': { '&:hover': { borderColor: T.brand, color: T.brand, bgcolor: T.brandSoft } },
             }}
           >
             {L('Previous', 'පෙර', 'முந்தைய')}
@@ -747,13 +783,19 @@ const IndustrySurveyPage: React.FC = () => {
           endIcon={submit ? <CheckCircleRoundedIcon /> : <ArrowForwardRoundedIcon />}
           onClick={() => (submit ? handleAttemptSubmit() : next !== undefined && goNext(next, before))}
           sx={{
-            flex: 1, py: 1.35, borderRadius: `${T.field}px`, textTransform: 'none',
-            fontWeight: 800, fontSize: '0.95rem',
+            flex: 1, minWidth: 0,
+            minHeight: { xs: 48, sm: 46 },
+            borderRadius: `${T.field}px`, textTransform: 'none',
+            fontWeight: 800, fontSize: { xs: '0.92rem', sm: '0.95rem' },
+            px: { xs: 1.5, sm: 2 },
             background: submit
               ? `linear-gradient(135deg, ${T.accent} 0%, #047857 100%)`
               : `linear-gradient(135deg, ${T.brand} 0%, ${T.brandDark} 100%)`,
             boxShadow: submit ? '0 8px 20px rgba(5,150,105,0.28)' : '0 8px 20px rgba(37,99,235,0.26)',
-            '&:hover': { filter: 'brightness(1.06)' },
+            WebkitTapHighlightColor: 'transparent',
+            '& .MuiButton-label, & span': { minWidth: 0 },
+            '&:active': { filter: 'brightness(0.96)' },
+            '@media (hover: hover)': { '&:hover': { filter: 'brightness(1.06)' } },
           }}
         >
           {submit ? L('Review & Submit', 'සමාලෝචනය කර ඉදිරිපත් කරන්න', 'மதிப்பாய்வு & சமர்ப்பி') : L('Next', 'ඊළඟ', 'அடுத்தது')}
@@ -766,11 +808,14 @@ const IndustrySurveyPage: React.FC = () => {
         onClick={handleSaveDraft}
         sx={{
           alignSelf: 'center', textTransform: 'none', fontWeight: 700,
+          minHeight: 44, px: 2,
           fontSize: '0.84rem', color: T.muted, borderRadius: `${T.field}px`,
-          '&:hover': { color: T.brand, bgcolor: T.brandSoft },
+          WebkitTapHighlightColor: 'transparent',
+          '&:active': { bgcolor: T.brandSoft },
+          '@media (hover: hover)': { '&:hover': { color: T.brand, bgcolor: T.brandSoft } },
         }}
       >
-        {L('Save & continue later', 'සුරකින්න හා පසුව දිගටම කරන්න', 'சேமித்து பின்னர் தொடரவும்')}
+        {L('Save & continue later', 'සුරකින්න හා පසුව දිගටම කරන්න', 'சேமித்து பින்னர் தொடரவும்')}
       </Button>
     </Box>
   );
@@ -832,7 +877,7 @@ const IndustrySurveyPage: React.FC = () => {
     const regNumber = formValues['b_reg_no'] || '';
     const payload: any = {
       ccode: ccode || 'unknown',
-      district: gnData?.gnByCcode?.districtEn,
+      district: gnData?.gnByCcode?.disEn,
       ds_division: gnData?.gnByCcode?.dsEn,
       gn_name: gnData?.gnByCcode?.nameEn,
       latitude: gpsCoordinates?.lat,
@@ -919,8 +964,17 @@ const IndustrySurveyPage: React.FC = () => {
       <SurveyKeyframes />
 
       {surveyStartTime && !showGpsPopup && (
-        <Box sx={{ background: `linear-gradient(180deg, ${T.canvasTop} 0%, ${T.canvasBottom} 100%)`, py: { xs: 3, sm: 5 } }}>
-          <Container maxWidth="md" sx={{ px: { xs: 1.5, sm: 3 } }}>
+        <Box
+          sx={{
+            background: `linear-gradient(180deg, ${T.canvasTop} 0%, ${T.canvasBottom} 100%)`,
+            pt: { xs: 2, sm: 5 },
+            /* Clear the gesture-nav home indicator on phones. */
+            pb: { xs: 'calc(24px + env(safe-area-inset-bottom, 0px))', sm: 5 },
+            /* Nothing inside the survey may widen the page. */
+            overflowX: 'hidden',
+          }}
+        >
+          <Container maxWidth="md" sx={{ px: { xs: 1.5, sm: 3 }, minWidth: 0 }}>
 
             {/* Intro */}
             <Box sx={{ textAlign: 'center', mb: { xs: 2.5, sm: 3.5 }, animation: 'sk-rise .4s ease both' }}>
@@ -960,11 +1014,15 @@ const IndustrySurveyPage: React.FC = () => {
                   component="form"
                   onSubmit={(e: React.FormEvent) => { e.preventDefault(); handleAttemptSubmit(); }}
                   sx={{
-                    px: { xs: 2, sm: 3.5 },
-                    py: { xs: 2.5, sm: 3.5 },
+                    px: { xs: 1.75, sm: 3.5 },
+                    py: { xs: 2.25, sm: 3.5 },
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 3,
+                    gap: { xs: 2.5, sm: 3 },
+                    minWidth: 0,
+                    /* Any control that insists on being wide scrolls itself
+                       rather than pushing the page sideways. */
+                    '& .MuiTable-root': { minWidth: 0 },
 
                     /* Field styling applied form-wide, so every control — the
                        hardcoded ones and the DB-driven ones alike — matches
@@ -1038,18 +1096,39 @@ const IndustrySurveyPage: React.FC = () => {
 
                   <Box>
                     <QuestionLabel fieldKey="b_mobile" text={getDynamicLabel('b_mobile', 'WhatsApp / Mobile Number', 'වට්ස්ඇප්/ මොබයිල් අංකය', 'வாட்ஸ்அப்/ மொபைல் எண்')} />
-                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                      <TextField fullWidth variant="outlined" size="small" type="tel" value={formValues['b_mobile'] || ''} onChange={(e) => handleInputChange('b_mobile', e.target.value)} />
+                    {/* Stacks on phones — a 120px button beside the field left
+                        too little room for a full number at 375px. */}
+                    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: { xs: 1, sm: 2 }, alignItems: { xs: 'stretch', sm: 'center' } }}>
+                      <TextField
+                        fullWidth
+                        variant="outlined"
+                        size="small"
+                        type="tel"
+                        inputProps={{ inputMode: 'tel', autoComplete: 'tel' }}
+                        value={formValues['b_mobile'] || ''}
+                        onChange={(e) => handleInputChange('b_mobile', e.target.value)}
+                      />
                       {!isMobileVerified ? (
-                        <Button variant="contained" onClick={handleSendOtp} disabled={otpSending || !formValues['b_mobile']} sx={{ minWidth: '120px' }}>
-                          {otpSending ? <CircularProgress size={24} color="inherit" /> : (language === 'si' ? 'තහවුරු කරන්න' : 'Verify')}
+                        <Button
+                          variant="contained"
+                          onClick={handleSendOtp}
+                          disabled={otpSending || !formValues['b_mobile']}
+                          sx={{
+                            minWidth: { xs: '100%', sm: '120px' }, minHeight: { xs: 48, sm: 40 }, flexShrink: 0,
+                            borderRadius: `${T.field}px`, textTransform: 'none', fontWeight: 700,
+                          }}
+                        >
+                          {otpSending ? <CircularProgress size={22} color="inherit" /> : (language === 'si' ? 'තහවුරු කරන්න' : language === 'ta' ? 'சரிபார்' : 'Verify')}
                         </Button>
                       ) : (
                         <Button
                           variant="contained"
                           color="success"
                           startIcon={<CheckCircleRoundedIcon />}
-                          sx={{ minWidth: '120px', pointerEvents: 'none', borderRadius: `${T.field}px`, textTransform: 'none', fontWeight: 700 }}
+                          sx={{
+                            minWidth: { xs: '100%', sm: '120px' }, minHeight: { xs: 48, sm: 40 }, flexShrink: 0,
+                            pointerEvents: 'none', borderRadius: `${T.field}px`, textTransform: 'none', fontWeight: 700,
+                          }}
                         >
                           {L('Verified', 'තහවුරුයි', 'சரிபார்க்கப்பட்டது')}
                         </Button>
@@ -1105,9 +1184,18 @@ const IndustrySurveyPage: React.FC = () => {
                         />
                       )}
                     />
+                    {/* Breadcrumb scrolls inside its own box so a long trail can
+                        never widen the page on a phone. */}
                     {selectedCategory && (
-                      <Box sx={{ mt: 1, border: '1px solid', borderColor: 'divider', borderRadius: 1, overflow: 'hidden' }}>
-                        <Table size="small">
+                      <Box
+                        sx={{
+                          mt: 1, border: '1px solid', borderColor: 'divider',
+                          borderRadius: `${T.field}px`, overflow: 'hidden',
+                          maxWidth: '100%',
+                        }}
+                      >
+                        <Box sx={{ overflowX: 'auto', overscrollBehaviorX: 'contain' }}>
+                        <Table size="small" sx={{ minWidth: 320 }}>
                           <TableHead>
                             <TableRow sx={{ bgcolor: 'primary.main' }}>
                               <TableCell sx={{ color: 'white', fontWeight: 700, width: '40%' }}>{language === 'si' ? 'මට්ටම' : language === 'ta' ? 'நிலை' : 'Level'}</TableCell>
@@ -1127,13 +1215,21 @@ const IndustrySurveyPage: React.FC = () => {
                             ))}
                           </TableBody>
                         </Table>
+                        </Box>
                       </Box>
                     )}
                   </Box>
 
                   <Box>
                     <QuestionLabel fieldKey="b_nic" text={getDynamicLabel('b_nic', 'NIC', 'NIC', 'தேசிய அடையாள அட்டை')} />
-                    <TextField fullWidth variant="outlined" size="small" value={formValues['b_nic'] || ''} onChange={(e) => handleInputChange('b_nic', e.target.value)} />
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      size="small"
+                      inputProps={{ inputMode: 'text', autoCapitalize: 'characters', autoComplete: 'off' }}
+                      value={formValues['b_nic'] || ''}
+                      onChange={(e) => handleInputChange('b_nic', e.target.value)}
+                    />
                   </Box>
 
                   <Box>
@@ -1206,17 +1302,17 @@ const IndustrySurveyPage: React.FC = () => {
 
                   <Box>
                     <QuestionLabel fieldKey="q_whatsapp" text={getDynamicLabel('q_whatsapp', 'WhatsApp Number', 'වට්ස්ඇප් දුරකථන අංකය', 'வாட்ஸ்அப் எண்')} />
-                    <TextField fullWidth variant="outlined" size="small" type="tel" value={formValues['q_whatsapp'] || ''} onChange={(e) => handleInputChange('q_whatsapp', e.target.value)} />
+                    <TextField fullWidth variant="outlined" size="small" type="tel" inputProps={{ inputMode: 'tel', autoComplete: 'tel' }} value={formValues['q_whatsapp'] || ''} onChange={(e) => handleInputChange('q_whatsapp', e.target.value)} />
                   </Box>
 
                   <Box>
                     <QuestionLabel fieldKey="q_mobile" text={getDynamicLabel('q_mobile', 'Main Phone Number', 'ප්‍රධාන දුරකථන අංකය', 'முக்கிய தொலைபேசி எண்')} />
-                    <TextField fullWidth variant="outlined" size="small" type="tel" value={formValues['q_mobile'] || ''} onChange={(e) => handleInputChange('q_mobile', e.target.value)} />
+                    <TextField fullWidth variant="outlined" size="small" type="tel" inputProps={{ inputMode: 'tel', autoComplete: 'tel' }} value={formValues['q_mobile'] || ''} onChange={(e) => handleInputChange('q_mobile', e.target.value)} />
                   </Box>
 
                   <Box>
                     <QuestionLabel fieldKey="q_email" text={getDynamicLabel('q_email', 'Email Address (if any)', 'විද්‍යුත් තැපැල් ලිපිනය (ඇත්නම්)', 'மின்னஞ்சல் முகவரி (ஏதேனும் இருந்தால்)')} />
-                    <TextField fullWidth variant="outlined" size="small" type="email" value={formValues['q_email'] || ''} onChange={(e) => handleInputChange('q_email', e.target.value)} />
+                    <TextField fullWidth variant="outlined" size="small" type="email" inputProps={{ inputMode: 'email', autoComplete: 'email' }} value={formValues['q_email'] || ''} onChange={(e) => handleInputChange('q_email', e.target.value)} />
                   </Box>
 
                   <Box>
@@ -1241,7 +1337,7 @@ const IndustrySurveyPage: React.FC = () => {
 
                   <Box>
                     <QuestionLabel fieldKey="q_experience" text={getDynamicLabel('q_experience', 'Experience in this Industry (Years)', 'මෙම කර්මාන්තයේ පළපුරුද්ද (වසර)', 'இந்தத் துறையில் அனுபவம் (ஆண்டுகள்)')} />
-                    <TextField fullWidth variant="outlined" size="small" type="number" value={formValues['q_experience'] || ''} onChange={(e) => handleInputChange('q_experience', e.target.value)} />
+                    <TextField fullWidth variant="outlined" size="small" type="number" inputProps={{ inputMode: 'numeric', min: 0 }} value={formValues['q_experience'] || ''} onChange={(e) => handleInputChange('q_experience', e.target.value)} />
                   </Box>
 
                   <Box>
