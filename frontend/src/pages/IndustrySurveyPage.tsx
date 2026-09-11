@@ -239,16 +239,21 @@ const DynamicQuestionRenderer: React.FC<DynamicQuestionRendererProps> = ({ quest
       label={
         <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.25 }}>
           {label}
-          {explanation && (
+          {explanation ? (
             <Tooltip title={explanation} arrow placement="top">
               <IconButton size="small" sx={{ color: T.faint, p: 0.25 }} aria-label="More information">
                 <HelpOutlineIcon sx={{ fontSize: '1rem' }} />
               </IconButton>
             </Tooltip>
-          )}
+          ) : null}
         </Box>
       }
     >
+      {question.explanation_image_url ? (
+        <Box sx={{ mb: 2, borderRadius: 2, overflow: 'hidden', border: '1px solid', borderColor: 'divider', bgcolor: 'grey.50', display: 'flex', justifyContent: 'center', p: 1 }}>
+          <img src={question.explanation_image_url} alt="Example" style={{ maxWidth: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 4 }} />
+        </Box>
+      ) : null}
       {renderInput()}
     </QuestionField>
   );
@@ -281,6 +286,17 @@ const IndustrySurveyPage: React.FC = () => {
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
   const [otpDialogOpen, setOtpDialogOpen] = useState(false);
   const [otpCode, setOtpCode] = useState('');
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      setShowLoginPopup(true);
+    }
+  }, [isLoading, isAuthenticated]);
+
+  const handleLoginClick = () => {
+    login(window.location.href);
+  };
 
   // Business category search
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
@@ -730,22 +746,22 @@ const IndustrySurveyPage: React.FC = () => {
             sx={{ fontSize: { xs: '0.9rem', sm: '0.95rem' }, fontWeight: 700, color: T.ink, lineHeight: 1.4 }}
           >
             {text}
-            {required && <Box component="span" sx={{ color: T.danger, ml: 0.4 }}>*</Box>}
+            {required ? <Box component="span" sx={{ color: T.danger, ml: 0.4 }}>*</Box> : null}
           </Typography>
-          {explanation && (
+          {explanation ? (
             <Tooltip title={explanation} arrow placement="top">
               <IconButton size="small" sx={{ p: 0.25, color: T.faint }} aria-label="More information">
                 <HelpOutlineIcon sx={{ fontSize: '1rem' }} />
               </IconButton>
             </Tooltip>
-          )}
+          ) : null}
         </Box>
-        {message && (
+        {message ? (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
             <Box component="span" sx={{ width: 5, height: 5, borderRadius: '50%', bgcolor: T.danger, flexShrink: 0 }} />
             <Typography sx={{ fontSize: '0.78rem', fontWeight: 600, color: T.danger, lineHeight: 1.4 }}>{message}</Typography>
           </Box>
-        )}
+        ) : null}
       </Box>
     );
   };
@@ -1969,6 +1985,28 @@ const IndustrySurveyPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Login Required Dialog */}
+      <Dialog open={showLoginPopup} disableEscapeKeyDown>
+        <DialogTitle sx={{ fontWeight: 'bold', color: 'error.main' }}>
+          {language === 'si' ? 'ලොග් වීම අවශ්‍යයි' : language === 'ta' ? 'உள்நுழைவு தேவை' : 'Login Required'}
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
+            {language === 'si' 
+              ? 'මෙම පිටුවට පිවිසීමට කරුණාකර ඔබගේ ගිණුමට ලොග් වන්න.' 
+              : language === 'ta' 
+              ? 'இப்பக்கத்தை அணுக தயவுசெய்து உங்கள் கணக்கில் உள்நுழையவும்.' 
+              : 'Please log in to your account to access this page.'}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, pt: 0 }}>
+          <Button variant="contained" color="primary" onClick={handleLoginClick} fullWidth>
+            {language === 'si' ? 'ලොග් වන්න' : language === 'ta' ? 'உள்நுழைக' : 'Login Now'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <GnPageFooter />
     </Box>
   );

@@ -35,6 +35,8 @@ import {
   HelpOutline as HelpOutlineIcon,
   Lock as LockIcon,
   Info as InfoIcon,
+  Image as ImageIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../auth/AuthProvider';
 
@@ -69,11 +71,16 @@ const EMPTY_FORM = {
   explanation_en: '',
   explanation_si: '',
   explanation_ta: '',
-  options_json: '',
   depends_on: '',
   is_active: true,
   sort_order: 0,
 };
+
+interface Option {
+  en: string;
+  si: string;
+  ta: string;
+}
 
 const AdminIndustrySurveysQuestions: React.FC = () => {
   const [questions, setQuestions] = useState<any[]>([]);
@@ -83,7 +90,12 @@ const AdminIndustrySurveysQuestions: React.FC = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'question' | 'description' | 'options'>('question');
   const [saving, setSaving] = useState(false);
+  
   const [formData, setFormData] = useState({ ...EMPTY_FORM });
+  const [optionsList, setOptionsList] = useState<Option[]>([]);
+  const [explanationImageFile, setExplanationImageFile] = useState<File | null>(null);
+  const [explanationImageUrl, setExplanationImageUrl] = useState<string | null>(null);
+  
   const [expandedStep, setExpandedStep] = useState<number | false>(0);
   const { token } = useAuth();
 
@@ -123,15 +135,41 @@ const AdminIndustrySurveysQuestions: React.FC = () => {
         explanation_en: question.explanation_en || '',
         explanation_si: question.explanation_si || '',
         explanation_ta: question.explanation_ta || '',
-        options_json: question.options_json ? JSON.stringify(question.options_json, null, 2) : '',
         depends_on: question.depends_on || '',
         is_active: question.is_active === undefined ? true : question.is_active,
         sort_order: question.sort_order || 0,
       });
+
+      // Parse options
+      let parsedOpts: Option[] = [];
+      if (question.options_json) {
+        try {
+          const o = typeof question.options_json === 'string' ? JSON.parse(question.options_json) : question.options_json;
+          const enArr = Array.isArray(o.en) ? o.en : (o.en ? o.en.split(' ') : []); // handle old format safely
+          const siArr = Array.isArray(o.si) ? o.si : (o.si ? o.si.split(' ') : []);
+          const taArr = Array.isArray(o.ta) ? o.ta : (o.ta ? o.ta.split(' ') : []);
+          
+          const len = Math.max(enArr.length, siArr.length, taArr.length);
+          for (let i = 0; i < len; i++) {
+            parsedOpts.push({
+              en: enArr[i] || '',
+              si: siArr[i] || '',
+              ta: taArr[i] || '',
+            });
+          }
+        } catch(e) {
+          console.error("Error parsing options", e);
+        }
+      }
+      setOptionsList(parsedOpts);
+      setExplanationImageUrl(question.explanation_image_url || null);
     } else {
       setEditingId(null);
       setFormData({ ...EMPTY_FORM });
+      setOptionsList([]);
+      setExplanationImageUrl(null);
     }
+    setExplanationImageFile(null);
     setActiveTab('question');
     setOpen(true);
   };
@@ -144,32 +182,87 @@ const AdminIndustrySurveysQuestions: React.FC = () => {
     }));
   };
 
+  const handleOptionChange = (index: number, lang: keyof Option, value: string) => {
+    const newOpts = [...optionsList];
+    newOpts[index][lang] = value;
+    setOptionsList(newOpts);
+  };
+
+  const handleAddOption = () => {
+    setOptionsList([...optionsList, { en: '', si: '', ta: '' }]);
+  };
+
+  const handleRemoveOption = (index: number) => {
+    setOptionsList(optionsList.filter((_, i) => i !== index));
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setExplanationImageFile(e.target.files[0]);
+      setExplanationImageUrl(URL.createObjectURL(e.target.files[0]));
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setExplanationImageFile(null);
+    setExplanationImageUrl(null);
+  };
+
   const handleSubmit = async () => {
     setSaving(true);
     try {
-      const payload: any = { ...formData };
-      if (payload.options_json) {
-        try { payload.options_json = JSON.parse(payload.options_json); }
-        catch { alert('Invalid JSON format in Options field. Please fix it before saving.'); setSaving(false); return; }
-      } else {
-        payload.options_json = null;
-      }
-      if (!payload.explanation_en) payload.explanation_en = null;
-      if (!payload.explanation_si) payload.explanation_si = null;
-      if (!payload.explanation_ta) payload.explanation_ta = null;
+      const fd = new FormData();
+      Object.entries(formData).forEach(([k, v]) => {
+        if (v !== null && v !== undefined) {
+          fd.append(k, String(v));
+        }
+      });
 
-      const url = editingId ? `/api/business-survey-questions/${editingId}` : `/api/business-survey-questions`;
-      const method = editingId ? 'PUT' : 'POST';
-      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(payload) });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        fetchQuestions();
-        setOpen(false);
-      } else {
-        alert('Error saving: ' + (data.message || JSON.stringify(data.errors)));
+      // Format options JSON properly as array format
+      if ((formData.type === 'select' || formData.type === 'multiselect') && optionsList.length > 0) {
+        const finalOpts = {
+          en: optionsList.map(o => o.en).filter(Boolean),
+          si: optionsList.map(o => o.si).filter(Boolean),
+          ta: optionsList.map(o => o.ta).filter(Boolean),
+        };
+        fd.append('options_json', JSON.stringify(finalOpts));
       }
-    } catch {
-      alert('Network error saving question.');
+
+      if (explanationImageFile) {
+        fd.append('explanation_image', explanationImageFile);
+      }
+
+      let url = '/api/business-survey-questions';
+      if (editingId) {
+        url = `/api/business-survey-questions/${editingId}`;
+        fd.append('_method', 'PUT'); // Laravel requires this for multipart/form-data PUT requests
+      }
+
+      const res = await fetch(url, { 
+        method: 'POST', // Always POST, let _method=PUT handle updates
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
+        }, 
+        body: fd 
+      });
+
+      const contentType = res.headers.get('content-type');
+      if (contentType && contentType.indexOf('application/json') !== -1) {
+        const data = await res.json();
+        if (res.ok && data.success) {
+          fetchQuestions();
+          setOpen(false);
+        } else {
+          alert('Error saving: ' + (data.message || JSON.stringify(data.errors) || 'Unknown error.'));
+        }
+      } else {
+        const text = await res.text();
+        console.error('Non-JSON response from server:', text);
+        alert('Server returned an unexpected response. Please check the console or contact an administrator. Status: ' + res.status);
+      }
+    } catch (err: any) {
+      alert('Network error saving question: ' + err.message);
     } finally {
       setSaving(false);
     }
@@ -207,7 +300,7 @@ const AdminIndustrySurveysQuestions: React.FC = () => {
             Industry Survey Questions Builder
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Manage all survey questions, labels, and tooltip descriptions across 3 languages (English, Sinhala, Tamil).
+            Manage all survey questions, labels, tooltip descriptions, options, and explanatory pictures across 3 languages.
           </Typography>
         </Box>
         <Button
@@ -267,7 +360,7 @@ const AdminIndustrySurveysQuestions: React.FC = () => {
                     <TableCell sx={{ fontWeight: 700, width: 140 }}>Field Key</TableCell>
                     <TableCell sx={{ fontWeight: 700, width: 110 }}>Type</TableCell>
                     <TableCell sx={{ fontWeight: 700 }}>Question (English)</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Description</TableCell>
+                    <TableCell sx={{ fontWeight: 700 }}>Description & Pics</TableCell>
                     <TableCell sx={{ fontWeight: 700, width: 100 }}>Actions</TableCell>
                   </TableRow>
                 </TableHead>
@@ -303,18 +396,25 @@ const AdminIndustrySurveysQuestions: React.FC = () => {
                           )}
                         </TableCell>
                         <TableCell>
-                          {q.explanation_en ? (
-                            <Tooltip title={q.explanation_en} arrow>
-                              <Typography variant="caption" sx={{ color: 'success.main', cursor: 'help', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                <HelpOutlineIcon sx={{ fontSize: 14 }} /> {q.explanation_en.substring(0, 40)}{q.explanation_en.length > 40 ? '…' : ''}
-                              </Typography>
-                            </Tooltip>
-                          ) : (
-                            <Typography variant="caption" color="warning.main">⚠️ No description</Typography>
-                          )}
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            {q.explanation_en ? (
+                              <Tooltip title={q.explanation_en} arrow>
+                                <Typography variant="caption" sx={{ color: 'success.main', cursor: 'help', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <HelpOutlineIcon sx={{ fontSize: 14 }} /> {q.explanation_en.substring(0, 30)}{q.explanation_en.length > 30 ? '…' : ''}
+                                </Typography>
+                              </Tooltip>
+                            ) : (
+                              <Typography variant="caption" color="warning.main">⚠️ No description</Typography>
+                            )}
+                            {q.explanation_image_url && (
+                                <Tooltip title="Has explanatory picture attached">
+                                    <Chip icon={<ImageIcon sx={{ fontSize: '14px !important' }}/>} label="Pic" size="small" variant="outlined" color="primary" sx={{ height: 20 }} />
+                                </Tooltip>
+                            )}
+                          </Box>
                         </TableCell>
                         <TableCell>
-                          <Tooltip title="Edit question & description">
+                          <Tooltip title="Edit question, options, & description">
                             <IconButton size="small" onClick={() => handleOpen(q)} color="primary">
                               <EditIcon fontSize="small" />
                             </IconButton>
@@ -334,7 +434,7 @@ const AdminIndustrySurveysQuestions: React.FC = () => {
               </Table>
               {step >= 2 && (
                 <Box sx={{ p: 1.5, bgcolor: 'grey.50', borderTop: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'flex-end' }}>
-                  <Button size="small" startIcon={<AddIcon />} onClick={() => { setFormData({ ...EMPTY_FORM, step_index: step, sort_order: stepQuestions.length }); setEditingId(null); setActiveTab('question'); setOpen(true); }}>
+                  <Button size="small" startIcon={<AddIcon />} onClick={() => { setFormData({ ...EMPTY_FORM, step_index: step, sort_order: stepQuestions.length }); setEditingId(null); setOptionsList([]); setExplanationImageFile(null); setExplanationImageUrl(null); setActiveTab('question'); setOpen(true); }}>
                     Add Question to {stepInfo.badge}
                   </Button>
                 </Box>
@@ -371,7 +471,7 @@ const AdminIndustrySurveysQuestions: React.FC = () => {
                 onClick={() => setActiveTab(tab)}
                 sx={{ borderRadius: '8px 8px 0 0', mb: '-1px', textTransform: 'capitalize', fontWeight: 600 }}
               >
-                {tab === 'question' ? '📝 Question Labels' : tab === 'description' ? '💬 Descriptions (Tooltips)' : '⚙️ Options & Advanced'}
+                {tab === 'question' ? '📝 Question Labels' : tab === 'description' ? '💬 Descriptions & Pics' : '⚙️ Options & Advanced'}
               </Button>
             ))}
           </Stack>
@@ -441,9 +541,34 @@ const AdminIndustrySurveysQuestions: React.FC = () => {
                 <Alert severity="info" sx={{ mb: 1 }}>
                   Descriptions appear as a <strong>tooltip (ℹ️ help icon)</strong> next to each question label in the survey form. They guide respondents on how to answer correctly. Leave blank to show the default tooltip.
                 </Alert>
-                <TextField label="🇬🇧 Description / Tooltip (English)" name="explanation_en" value={formData.explanation_en} onChange={handleChange} multiline rows={3} fullWidth placeholder="E.g.: Enter the official registered name of your business as it appears on your business certificate." />
-                <TextField label="🇱🇰 Description / Tooltip (Sinhala)" name="explanation_si" value={formData.explanation_si} onChange={handleChange} multiline rows={3} fullWidth placeholder="සිංහල විස්තරය ඇතුළු කරන්න..." />
-                <TextField label="🇮🇳 Description / Tooltip (Tamil)" name="explanation_ta" value={formData.explanation_ta} onChange={handleChange} multiline rows={3} fullWidth placeholder="தமிழ் விளக்கம் உள்ளிடவும்..." />
+                <TextField label="🇬🇧 Description / Tooltip (English)" name="explanation_en" value={formData.explanation_en} onChange={handleChange} multiline rows={2} fullWidth placeholder="E.g.: Enter the official registered name of your business as it appears on your business certificate." />
+                <TextField label="🇱🇰 Description / Tooltip (Sinhala)" name="explanation_si" value={formData.explanation_si} onChange={handleChange} multiline rows={2} fullWidth placeholder="සිංහල විස්තරය ඇතුළු කරන්න..." />
+                <TextField label="🇮🇳 Description / Tooltip (Tamil)" name="explanation_ta" value={formData.explanation_ta} onChange={handleChange} multiline rows={2} fullWidth placeholder="தமிழ் விளக்கம் உள்ளிடவும்..." />
+                
+                <Divider sx={{ my: 1 }} />
+                
+                <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                  🖼️ Explanatory Picture (Optional)
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  You can attach a picture to explain this question visually (e.g., an example of a good document or photo to upload). This picture will be shown to users directly under the question.
+                </Typography>
+                
+                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                  <Button variant="outlined" component="label" startIcon={<ImageIcon />}>
+                    Upload Picture
+                    <input type="file" hidden accept="image/jpeg,image/png,image/webp" onChange={handleImageChange} />
+                  </Button>
+                  
+                  {explanationImageUrl && (
+                    <Box sx={{ position: 'relative', border: '1px solid', borderColor: 'divider', borderRadius: 1, p: 0.5 }}>
+                      <img src={explanationImageUrl} alt="Preview" style={{ height: 100, objectFit: 'contain', borderRadius: 4 }} />
+                      <IconButton size="small" onClick={handleRemoveImage} sx={{ position: 'absolute', top: -10, right: -10, bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', '&:hover': { bgcolor: 'error.lighter', color: 'error.main' } }}>
+                        <CloseIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  )}
+                </Box>
               </Stack>
             )}
 
@@ -451,26 +576,40 @@ const AdminIndustrySurveysQuestions: React.FC = () => {
             {activeTab === 'options' && (
               <Stack spacing={2}>
                 {(formData.type === 'select' || formData.type === 'multiselect') ? (
-                  <>
-                    <Alert severity="info">
-                      Provide options as a JSON object with <code>en</code>, <code>si</code>, and <code>ta</code> keys. Each value is a string where options are separated by spaces (e.g. <code>"1. Option A 2. Option B"</code>).
+                  <Box>
+                    <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                      Dropdown Options
+                    </Typography>
+                    <Alert severity="info" sx={{ mb: 2 }}>
+                      Add options for users to select from. You must provide at least the English text for each option.
                     </Alert>
-                    <TextField
-                      label="Options JSON (en/si/ta)"
-                      name="options_json"
-                      value={formData.options_json}
-                      onChange={handleChange}
-                      multiline
-                      rows={8}
-                      fullWidth
-                      placeholder={`{\n  "en": "1. Option A 2. Option B 3. Option C",\n  "si": "1. විකල්පය අ 2. විකල්පය ඇ 3. විකල්පය ඈ",\n  "ta": "1. விருப்பம் A 2. விருப்பம் B 3. விருப்பம் C"\n}`}
-                      InputProps={{ sx: { fontFamily: 'monospace', fontSize: '0.85rem' } }}
-                    />
-                  </>
+                    
+                    {optionsList.map((opt, i) => (
+                      <Box key={i} sx={{ display: 'flex', gap: 1, mb: 1, alignItems: 'center' }}>
+                        <Typography variant="caption" sx={{ width: 24, textAlign: 'center', color: 'text.secondary' }}>{i + 1}.</Typography>
+                        <TextField size="small" label="EN" value={opt.en} onChange={(e) => handleOptionChange(i, 'en', e.target.value)} fullWidth />
+                        <TextField size="small" label="SI" value={opt.si} onChange={(e) => handleOptionChange(i, 'si', e.target.value)} fullWidth />
+                        <TextField size="small" label="TA" value={opt.ta} onChange={(e) => handleOptionChange(i, 'ta', e.target.value)} fullWidth />
+                        <Tooltip title="Remove Option">
+                          <IconButton size="small" onClick={() => handleRemoveOption(i)} color="error">
+                            <CloseIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    ))}
+                    <Button size="small" startIcon={<AddIcon />} onClick={handleAddOption} sx={{ mt: 1 }}>
+                      Add Option
+                    </Button>
+                  </Box>
                 ) : (
                   <Alert severity="info">Options are only needed for <strong>Dropdown</strong> and <strong>Multi-select</strong> field types. Change the Input Type in the "Question Labels" tab to enable this.</Alert>
                 )}
-                <Divider />
+                
+                <Divider sx={{ my: 2 }} />
+                
+                <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                  Advanced Logic
+                </Typography>
                 <TextField
                   label="Conditional Display (Depends On)"
                   name="depends_on"

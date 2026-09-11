@@ -19,6 +19,7 @@ class BusinessSurveyQuestion extends Model
         'explanation_en',
         'explanation_si',
         'explanation_ta',
+        'explanation_image',
         'options_json',
         'depends_on',
         'is_active',
