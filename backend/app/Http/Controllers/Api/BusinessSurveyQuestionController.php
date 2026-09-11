@@ -17,16 +17,25 @@ class BusinessSurveyQuestionController extends Controller
             ->orderBy('sort_order')
             ->get();
 
+        // Append full URL for image
+        $questions->transform(function ($q) {
+            if ($q->explanation_image) {
+                $q->explanation_image_url = asset('storage/' . $q->explanation_image);
+            }
+            return $q;
+        });
+
         return response()->json([
             'success' => true,
             'data' => $questions
         ]);
     }
-    public function store(Request $request): JsonResponse
+    
+    private function processFormData(Request $request): array
     {
         $validated = $request->validate([
             'step_index' => 'required|integer',
-            'field_key' => 'required|string|unique:business_survey_questions',
+            'field_key' => 'required|string',
             'type' => 'required|string',
             'question_en' => 'nullable|string',
             'question_si' => 'nullable|string',
@@ -34,13 +43,40 @@ class BusinessSurveyQuestionController extends Controller
             'explanation_en' => 'nullable|string',
             'explanation_si' => 'nullable|string',
             'explanation_ta' => 'nullable|string',
-            'options_json' => 'nullable|array',
+            'options_json' => 'nullable', // string or array
             'depends_on' => 'nullable|string',
-            'is_active' => 'boolean',
-            'sort_order' => 'integer'
+            'is_active' => 'nullable',
+            'sort_order' => 'integer',
+            'explanation_image' => 'nullable|image|max:5120', // 5MB max
         ]);
 
+        if (isset($validated['options_json']) && is_string($validated['options_json'])) {
+            $validated['options_json'] = json_decode($validated['options_json'], true);
+        }
+
+        if (isset($validated['is_active']) && is_string($validated['is_active'])) {
+            $validated['is_active'] = filter_var($validated['is_active'], FILTER_VALIDATE_BOOLEAN);
+        }
+
+        if ($request->hasFile('explanation_image')) {
+            $validated['explanation_image'] = $request->file('explanation_image')->store('question_images', 'public');
+        }
+
+        return $validated;
+    }
+
+    public function store(Request $request): JsonResponse
+    {
+        $request->validate([
+            'field_key' => 'unique:business_survey_questions'
+        ]);
+
+        $validated = $this->processFormData($request);
         $question = BusinessSurveyQuestion::create($validated);
+
+        if ($question->explanation_image) {
+            $question->explanation_image_url = asset('storage/' . $question->explanation_image);
+        }
 
         return response()->json([
             'success' => true,
@@ -52,23 +88,16 @@ class BusinessSurveyQuestionController extends Controller
     {
         $question = BusinessSurveyQuestion::findOrFail($id);
 
-        $validated = $request->validate([
-            'step_index' => 'integer',
-            'field_key' => 'string|unique:business_survey_questions,field_key,'.$question->id,
-            'type' => 'string',
-            'question_en' => 'nullable|string',
-            'question_si' => 'nullable|string',
-            'question_ta' => 'nullable|string',
-            'explanation_en' => 'nullable|string',
-            'explanation_si' => 'nullable|string',
-            'explanation_ta' => 'nullable|string',
-            'options_json' => 'nullable|array',
-            'depends_on' => 'nullable|string',
-            'is_active' => 'boolean',
-            'sort_order' => 'integer'
+        $request->validate([
+            'field_key' => 'unique:business_survey_questions,field_key,'.$question->id
         ]);
 
+        $validated = $this->processFormData($request);
         $question->update($validated);
+
+        if ($question->explanation_image) {
+            $question->explanation_image_url = asset('storage/' . $question->explanation_image);
+        }
 
         return response()->json([
             'success' => true,
