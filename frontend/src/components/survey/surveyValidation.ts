@@ -5,17 +5,20 @@
    Step layout (14 sections, 0..13):
      0  Basic Information            (hardcoded — b_* fields, OTP verified)
      1  Business Owner Information   (hardcoded — q_owner_name … q_prev_occupation)
-     2..8  Legal / Location / Infrastructure / Capital / Workforce /
-           Production / Finance      (DB-driven — business_survey_questions)
-     9  Market & Marketing           (hardcoded)
-     10 Innovation & Technology      (hardcoded)
-     11 Business Environment & Gov.  (hardcoded)
-     12 Environmental & Social       (hardcoded)
-     13 Future Needs & Logistics     (hardcoded)
+     2..13 Legal / Location / Infrastructure / Capital / Workforce / Production /
+           Finance / Market & Marketing / Innovation & Technology / Business
+           Environment & Government / Environmental & Social / Future Needs
+                                     (DB-driven — business_survey_questions)
+
+   Steps 9-13 moved from hardcoded JSX to the database on 2026-09-10, matching
+   how 2-8 already worked — see BusinessSurvey9to13QuestionSeeder. Only 0 and 1
+   remain hardcoded: both carry logic no admin-editable question row can express
+   (OTP verification, NIC-driven DOB/age prefill, business-category autocomplete,
+   the b_*→q_* carry-over on first "Next").
 
    Option-value encoding differs between the two families of steps:
-     • hardcoded steps store the full label — "1. ඔව්"
-     • DB-driven steps store only the numeric prefix — "1"
+     • the still-hardcoded steps (0, 1) store the full label — "1. ඔව්"
+     • DB-driven steps (2-13) store only the numeric prefix — "1"
    Every comparison below goes through `is()` / `hasOpt()`, which normalise to
    the numeric prefix, so a rule is correct under either encoding.
    ────────────────────────────────────────────────────────────────────────── */
@@ -27,7 +30,7 @@ export type Translate = (en: string, si: string, ta?: string) => string;
 export const TOTAL_STEPS = 14;
 
 /** Steps rendered from `business_survey_questions` rather than hardcoded JSX. */
-export const DYNAMIC_STEPS = [2, 3, 4, 5, 6, 7, 8];
+export const DYNAMIC_STEPS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
 export const isDynamicStep = (step: number) => DYNAMIC_STEPS.includes(step);
 
 /* ── NIC parsing (also used to prefill DOB/age on the page) ───────────────── */
@@ -230,6 +233,48 @@ const FIELD_RULES: Record<string, (c: Ctx) => void> = {
   q_financial_records: (c) => c.req('q_financial_records', c.SEL),
   q_receives_salary: (c) => c.req('q_receives_salary', c.SEL),
   q_knows_financial_concepts: (c) => c.req('q_knows_financial_concepts', c.SEL),
+
+  /* — Market & Marketing (step 9) — */
+  q_customers: (c) => c.pick('q_customers'),
+  q_market_extent: (c) => c.req('q_market_extent', c.SEL),
+  q_customer_trend: (c) => c.req('q_customer_trend', c.SEL),
+  q_has_competitors: (c) => {
+    c.req('q_has_competitors', c.SEL);
+    if (is(c.fv['q_has_competitors'], '1') || is(c.fv['q_has_competitors'], '2')) {
+      c.req('q_competitor_influence', c.SEL);
+    }
+  },
+  q_marketing_methods: (c) => c.pick('q_marketing_methods'),
+  q_has_brand: (c) => c.req('q_has_brand', c.SEL),
+
+  /* — Innovation & Technology (step 10) — */
+  q_new_products: (c) => c.req('q_new_products', c.SEL),
+  q_new_tech: (c) => c.req('q_new_tech', c.SEL),
+  q_tech_devices: (c) => c.pick('q_tech_devices'),
+  q_uses_internet_for_business: (c) => c.req('q_uses_internet_for_business', c.SEL),
+  q_digital_payments: (c) => c.pick('q_digital_payments'),
+
+  /* — Business Environment & Government (step 11) — */
+  q_reg_certificates: (c) => c.pick('q_reg_certificates'),
+  q_taxes_paid: (c) => c.pick('q_taxes_paid'),
+  q_gov_support_received: (c) => c.pick('q_gov_support_received'),
+  /* 9.3 barriers: a 1-5 severity rating, each with its own field rule so a
+     missing one is reported against the right field. */
+  q_barrier_finance: (c) => c.req('q_barrier_finance', c.L('Please rate this from 1 to 5', 'කරුණාකර 1 සිට 5 දක්වා ශ්‍රේණිගත කරන්න', 'தயவுசெய்து 1 முதல் 5 வரை மதிப்பிடவும்')),
+  q_barrier_infrastructure: (c) => c.req('q_barrier_infrastructure', c.L('Please rate this from 1 to 5', 'කරුණාකර 1 සිට 5 දක්වා ශ්‍රේණිගත කරන්න', 'தயவுசெய்து 1 முதல் 5 வரை மதிப்பிடவும்')),
+  q_barrier_taxes: (c) => c.req('q_barrier_taxes', c.L('Please rate this from 1 to 5', 'කරුණාකර 1 සිට 5 දක්වා ශ්‍රේණිගත කරන්න', 'தயவுசெய்து 1 முதல் 5 வரை மதிப்பிடவும்')),
+  q_barrier_labor: (c) => c.req('q_barrier_labor', c.L('Please rate this from 1 to 5', 'කරුණාකර 1 සිට 5 දක්වා ශ්‍රේණිගත කරන්න', 'தயவுசெய்து 1 முதல் 5 வரை மதிப்பிடவும்')),
+  q_barrier_laws: (c) => c.req('q_barrier_laws', c.L('Please rate this from 1 to 5', 'කරුණාකර 1 සිට 5 දක්වා ශ්‍රේණිගත කරන්න', 'தயவுசெய்து 1 முதல் 5 வரை மதிப்பிடவும்')),
+
+  /* — Environmental & Social Impact (step 12) — */
+  q_env_impact_assessed: (c) => c.req('q_env_impact_assessed', c.SEL),
+  q_energy_saving: (c) => c.req('q_energy_saving', c.SEL),
+  q_social_responsibility: (c) => c.req('q_social_responsibility', c.SEL),
+
+  /* — Future Needs & Logistics (step 13) — */
+  q_business_expansion: (c) => c.pick('q_business_expansion'),
+  q_expected_gov_support: (c) => c.pick('q_expected_gov_support'),
+  /* q_additional_comments: intentionally no rule — free-text, optional. */
 };
 
 /* ──────────────────────────────────────────────────────────────────────────
@@ -303,52 +348,8 @@ export function getStepErrors(step: number, fv: FormValues, L: Translate, dynami
       break;
     }
 
-    /* ── 9. Market & Marketing ────────────────────────────────────────────── */
-    case 9: {
-      pick('q_customers');
-      req('q_market_extent', SEL);
-      req('q_customer_trend', SEL);
-      req('q_has_competitors', SEL);
-      if (is(fv['q_has_competitors'], '1') || is(fv['q_has_competitors'], '2')) req('q_competitor_influence', SEL);
-      pick('q_marketing_methods');
-      req('q_has_brand', SEL);
-      break;
-    }
-
-    /* ── 10. Innovation & Technology ──────────────────────────────────────── */
-    case 10: {
-      req('q_new_products', SEL);
-      req('q_new_tech', SEL);
-      pick('q_tech_devices');
-      req('q_uses_internet_for_business', SEL);
-      pick('q_digital_payments');
-      break;
-    }
-
-    /* ── 11. Business Environment & Government ────────────────────────────── */
-    case 11: {
-      pick('q_reg_certificates');
-      pick('q_taxes_paid');
-      pick('q_gov_support_received');
-      const RATE = L('Please rate this from 1 to 5', 'කරුණාකර 1 සිට 5 දක්වා ශ්‍රේණිගත කරන්න', 'தயவுசெய்து 1 முதல் 5 வரை மதிப்பிடவும்');
-      ['q_barrier_finance', 'q_barrier_infrastructure', 'q_barrier_taxes', 'q_barrier_labor', 'q_barrier_laws'].forEach((id) => req(id, RATE));
-      break;
-    }
-
-    /* ── 12. Environmental & Social Impact ────────────────────────────────── */
-    case 12: {
-      req('q_env_impact_assessed', SEL);
-      req('q_energy_saving', SEL);
-      req('q_social_responsibility', SEL);
-      break;
-    }
-
-    /* ── 13. Future Needs & Logistics ─────────────────────────────────────── */
-    case 13: {
-      pick('q_business_expansion');
-      pick('q_expected_gov_support');
-      break;
-    }
+    /* Steps 9-13 are DB-driven now (see isDynamicStep above) and are handled
+       by the branch at the top of this function via FIELD_RULES. */
 
     default:
       break;
