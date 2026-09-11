@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import GnTopHeaderBar from '../components/GnTopHeaderBar';
 import GnPageFooter from '../components/GnPageFooter';
-import { Box, Typography, Button, Container, TextField, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, Select, MenuItem, Checkbox, ListItemText, OutlinedInput, Autocomplete, Table, TableBody, TableCell, TableHead, TableRow, Chip } from '@mui/material';
+import { Box, Typography, Button, Container, TextField, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, Select, MenuItem, Autocomplete, Table, TableBody, TableCell, TableHead, TableRow, Chip } from '@mui/material';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -170,6 +170,10 @@ interface DynamicQuestionRendererProps {
   language: string;
   formValues: Record<string, string>;
   handleInputChange: (key: string, value: string) => void;
+  /** Derived by the caller from validation rules (see `requiredIds`), same as
+   *  the hardcoded steps' `QuestionLabel` — without this the required asterisk
+   *  never renders for any DB-driven field. */
+  required?: boolean;
 }
 
 /**
@@ -185,7 +189,7 @@ const isQuestionVisible = (question: any, formValues: Record<string, string>): b
   return depVals.some((v: string) => currentVal.includes(v) || currentVal === v);
 };
 
-const DynamicQuestionRenderer: React.FC<DynamicQuestionRendererProps> = ({ question, language, formValues, handleInputChange }) => {
+const DynamicQuestionRenderer: React.FC<DynamicQuestionRendererProps> = ({ question, language, formValues, handleInputChange, required }) => {
   const langKey = language === 'si' ? 'question_si' : language === 'ta' ? 'question_ta' : 'question_en';
   const label = question[langKey] || question.question_en;
   
@@ -231,6 +235,7 @@ const DynamicQuestionRenderer: React.FC<DynamicQuestionRendererProps> = ({ quest
   return (
     <QuestionField
       id={key}
+      required={required}
       label={
         <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.25 }}>
           {label}
@@ -249,6 +254,7 @@ const DynamicQuestionRenderer: React.FC<DynamicQuestionRendererProps> = ({ quest
   );
 };
 // ────────────────────────────────────────────────────────────────────────────
+
 const IndustrySurveyPage: React.FC = () => {
   const { isAuthenticated, login, isLoading, userInfo, token } = useAuth();
   const { language } = useLanguage();
@@ -304,7 +310,10 @@ const IndustrySurveyPage: React.FC = () => {
     let cancelled = false;
     fetch('/api/industry-survey/generate-reg-number', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      // Now requires a verified caller (see routes/api.php) — without this
+      // header every request 401s and the .catch below swallows it silently,
+      // so the auto-generated registration number would just never appear.
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ ccode, category_slug: selectedCategory.slug }),
     })
       .then(r => r.json())
@@ -353,6 +362,15 @@ const IndustrySurveyPage: React.FC = () => {
     6: { en: 'Workforce & Human Resources', si: '4 වන කොටස: ශ්‍රම බලකාය හා මානව සම්පත්', ta: '4 வது பகுதி: பணியாளர்கள் & மனித வளங்கள்' },
     7: { en: 'Production & Operations', si: '5 වන කොටස: නිෂ්පාදනය හා මෙහෙයුම්', ta: '5 வது பகுதி: உற்பத்தி & செயல்பாடுகள்' },
     8: { en: 'Finance & Accounting', si: '6 වන කොටස: මූල්‍ය හා ගිණුම්කරණය', ta: '6 வது பகுதி: நிதி & கணக்கியல்' },
+    /* 9-13 moved from hardcoded JSX to business_survey_questions (see
+       BusinessSurvey9to13QuestionSeeder). Titles given real en/ta translations
+       here — the old hardcoded JSX only ever had Sinhala, duplicated into the
+       en/ta slots of a no-op ternary. */
+    9: { en: 'Market & Marketing', si: '7 වන කොටස: වෙළඳපොළ හා අලෙවිකරණය', ta: '7 வது பகுதி: சந்தை & சந்தைப்படுத்தல்' },
+    10: { en: 'Innovation & Technology', si: '8 වන කොටස: නවෝත්පාදන හා තාක්ෂණය', ta: '8 வது பகுதி: புதுமை & தொழில்நுட்பம்' },
+    11: { en: 'Business Environment & Government', si: '9 වන කොටස: ව්‍යාපාරික පරිසරය හා රාජ්‍ය මැදිහත්වීම', ta: '9 வது பகுதி: வணிகச் சூழல் & அரசு தலையீடு' },
+    12: { en: 'Environmental & Social Impact', si: '10 වන කොටස: පාරිසරික හා සමාජීය බලපෑම', ta: '10 வது பகுதி: சுற்றுச்சூழல் & சமூக தாக்கம்' },
+    13: { en: 'Future Needs & Logistics', si: '11 වන කොටස: අනාගත අවශ්‍යතා සහ ලොජිස්ටික්ස්', ta: '11 வது பகுதி: எதிர்கால தேவைகள் & தளவாடங்கள்' },
   };
 
   /* ── Localisation helper ─────────────────────────────────────────────────── */
@@ -487,15 +505,26 @@ const IndustrySurveyPage: React.FC = () => {
             language={language}
             formValues={formValues}
             handleInputChange={handleInputChange}
+            required={requiredIds.has(q.field_key)}
           />
         ))}
-        <StepNav prev={stepIndex - 1} next={stepIndex + 1} />
+        {/* Steps 2..TOTAL_STEPS-2 chain to the next dynamic/hardcoded step;
+            the last step (TOTAL_STEPS-1) must submit instead of advancing to a
+            step that doesn't exist. */}
+        {stepIndex === TOTAL_STEPS - 1
+          ? <StepNav prev={stepIndex - 1} submit />
+          : <StepNav prev={stepIndex - 1} next={stepIndex + 1} />}
       </Box>
     );
   };
 
 
   const [isMobileVerified, setIsMobileVerified] = useState(false);
+  // Single-use proof issued by /api/otp/verify, bound to the specific mobile
+  // number that was verified. The backend requires and consumes this at final
+  // submission — without it, "Verified" was purely a client-side checkmark
+  // that nothing on the server ever looked at.
+  const [mobileVerificationToken, setMobileVerificationToken] = useState<string | null>(null);
   const [otpSending, setOtpSending] = useState(false);
   const [otpVerifying, setOtpVerifying] = useState(false);
   const [submitSuccessData, setSubmitSuccessData] = useState<{ startTime: string, endTime: string, regNumber: string } | null>(null);
@@ -568,6 +597,33 @@ const IndustrySurveyPage: React.FC = () => {
     }
   }, [formValues, currentStep, surveyStartTime, gpsCoordinates, draftKey]);
 
+  /**
+   * POST the given payload to /api/industry-survey. If the server reports the
+   * `id` we sent no longer exists or isn't ours (404/403 — e.g. localStorage
+   * points at a row that was deleted, or was left over from a different
+   * account on a shared computer), clear the stale local reference and retry
+   * exactly once as a fresh save rather than getting permanently stuck
+   * resubmitting against a dead ID.
+   */
+  const saveSurvey = async (payload: Record<string, any>, retrying = false): Promise<Response> => {
+    const res = await fetch('/api/industry-survey', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!retrying && (res.status === 404 || res.status === 403) && payload.id) {
+      localStorage.removeItem(`${draftKey}_db_id`);
+      const { id, ...retryPayload } = payload;
+      return saveSurvey(retryPayload, true);
+    }
+
+    return res;
+  };
+
   const handleSaveDraft = async () => {
     const draftData = {
       formValues,
@@ -596,25 +652,34 @@ const IndustrySurveyPage: React.FC = () => {
         payload.id = parseInt(existingId, 10);
       }
 
-      const res = await fetch('/api/industry-survey', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(payload),
-      });
+      const res = await saveSurvey(payload);
 
       if (res.ok) {
         const data = await res.json();
         if (data.survey?.id) {
           localStorage.setItem(`${draftKey}_db_id`, data.survey.id.toString());
         }
+      } else {
+        // The draft is already safe in localStorage regardless (that write
+        // happened above, unconditionally) — this is only the cross-device
+        // backend sync, so warn rather than silently discarding the failure
+        // as the previous code did (any non-2xx response was just ignored).
+        const body = await res.json().catch(() => null);
+        const reason = body?.error && typeof body.error === 'string' ? body.error : null;
+        console.warn('Draft saved locally but backend sync failed:', reason || res.status);
+        alert(
+          language === 'si'
+            ? `ෆෝරමය ඔබගේ උපාංගයේ සුරැකිණි, නමුත් සර්වරයට යැවීමට අසමත් විය.${reason ? ` (${reason})` : ''}`
+            : `Saved on this device, but syncing to the server failed.${reason ? ` (${reason})` : ''}`
+        );
       }
     } catch (err) {
       console.error('Failed to sync draft to server', err);
     }
 
+    // Local save (above) always succeeds, and that's what "continue later"
+    // actually depends on — so acknowledge it regardless of whether the
+    // best-effort backend sync came through.
     setSaveDraftDialogOpen(true);
   };
 
@@ -836,6 +901,8 @@ const IndustrySurveyPage: React.FC = () => {
       const data = await res.json();
       if (res.ok && data.success) {
         setOtpDialogOpen(true);
+      } else if (res.status === 429) {
+        alert(language === 'si' ? 'කරුණාකර මොහොතක් රැඳී නැවත උත්සාහ කරන්න' : 'Please wait a moment before requesting another code.');
       } else {
         alert(language === 'si' ? 'අසාර්ථකයි' : 'Failed');
       }
@@ -853,11 +920,19 @@ const IndustrySurveyPage: React.FC = () => {
       const res = await fetch('/api/otp/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({ mobile, otp: otpCode })
+        // Field name must match OtpController::verify()'s validated input —
+        // this previously sent `otp`, which the backend has never accepted
+        // (it validates/reads `code`), so every verification attempt 422'd
+        // regardless of whether the code entered was correct.
+        body: JSON.stringify({ mobile, code: otpCode })
       });
       const data = await res.json();
       if (res.ok && data.success) {
         setIsMobileVerified(true);
+        // The backend requires this exact token at final submission — it's
+        // what makes "Verified" mean something server-side rather than being
+        // a client-only checkmark.
+        setMobileVerificationToken(data.verification_token ?? null);
         setOtpDialogOpen(false);
         alert(language === 'si' ? 'සාර්ථකයි' : 'Success');
       } else {
@@ -883,33 +958,58 @@ const IndustrySurveyPage: React.FC = () => {
       latitude: gpsCoordinates?.lat,
       longitude: gpsCoordinates?.lng,
       status: 'submitted',
+      // Nested under `formValues`, matching handleSaveDraft's shape exactly —
+      // this used to spread formValues directly at the top level here while
+      // the draft path nested it, so a submitted row's answers lived at a
+      // different JSON path than a draft's. Any consumer of form_data (the
+      // registration-number query, an admin export, a future report) had to
+      // either handle both shapes forever or silently miss one of them.
       form_data: {
-        ...formValues,
-        b_reg_no: regNumber,
+        formValues: { ...formValues, b_reg_no: regNumber },
+        currentStep,
+        surveyStartTime: surveyStartTime?.toISOString(),
+        gpsCoordinates,
         survey_metadata: {
           date: new Date().toISOString(),
           surveyor: userInfo?.name,
           startTime: surveyStartTime?.toISOString(),
           endTime: endTime.toISOString(),
-        }
-      }
+        },
+      },
+      mobile_verification_token: mobileVerificationToken,
     };
     if (existingId) {
       payload.id = parseInt(existingId, 10);
     }
 
     try {
-      const response = await fetch('/api/industry-survey', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
+      const response = await saveSurvey(payload);
 
       if (!response.ok) {
-        throw new Error('Failed to submit survey');
+        const body = await response.json().catch(() => null);
+        const reason = body?.error && typeof body.error === 'string' ? body.error : null;
+        if (response.status === 422 && reason?.toLowerCase().includes('verif')) {
+          alert(language === 'si'
+            ? 'ඉදිරිපත් කිරීමට පෙර ඔබගේ දුරකථන අංකය තහවුරු කරන්න.'
+            : 'Please verify your mobile number (OTP) before submitting.');
+        } else if (response.status === 403) {
+          alert(language === 'si'
+            ? 'මෙම සමීක්ෂණය සංස්කරණය කිරීමට ඔබට අවසර නැත.'
+            : 'You do not have permission to modify this survey.');
+        } else if (response.status === 409) {
+          alert(language === 'si'
+            ? 'මෙම සමීක්ෂණය දැනටමත් අනුමත කර ඇති බැවින් වෙනස් කළ නොහැක.'
+            : 'This survey has already been approved and can no longer be modified.');
+        } else if (response.status === 401) {
+          alert(language === 'si'
+            ? 'ඔබගේ සැසිය කල් ඉකුත් වී ඇත. කරුණාකර නැවත පිවිසෙන්න.'
+            : 'Your session has expired. Please log in again.');
+        } else {
+          alert(language === 'si'
+            ? `සමීක්ෂණය ඉදිරිපත් කිරීමට අසමත් විය.${reason ? ` (${reason})` : ''}`
+            : `Failed to submit the survey.${reason ? ` (${reason})` : ''} Please try again.`);
+        }
+        return;
       }
 
       setSubmitSuccessData({
@@ -923,7 +1023,7 @@ const IndustrySurveyPage: React.FC = () => {
       localStorage.removeItem(`${draftKey}_db_id`);
     } catch (error) {
       console.error('Submission error:', error);
-      alert('Failed to submit the survey. Please try again.');
+      alert(language === 'si' ? 'දෝෂයක් ඇතිවිය. කරුණාකර නැවත උත්සාහ කරන්න.' : 'Failed to submit the survey. Please try again.');
     }
   };
 
@@ -1106,7 +1206,21 @@ const IndustrySurveyPage: React.FC = () => {
                         type="tel"
                         inputProps={{ inputMode: 'tel', autoComplete: 'tel' }}
                         value={formValues['b_mobile'] || ''}
-                        onChange={(e) => handleInputChange('b_mobile', e.target.value)}
+                        onChange={(e) => {
+                          const next = e.target.value;
+                          handleInputChange('b_mobile', next);
+                          // The verification proof is bound to the exact number
+                          // that was verified; editing it afterward must drop
+                          // the (now stale) "Verified" state client-side too,
+                          // not just fail silently at submission — the backend
+                          // would reject a mismatched proof regardless, but the
+                          // UI showing a false checkmark until then is its own
+                          // bug.
+                          if (isMobileVerified && next !== formValues['b_mobile']) {
+                            setIsMobileVerified(false);
+                            setMobileVerificationToken(null);
+                          }
+                        }}
                       />
                       {!isMobileVerified ? (
                         <Button
@@ -1350,439 +1464,7 @@ const IndustrySurveyPage: React.FC = () => {
               )}
 
 
-              {[2, 3, 4, 5, 6, 7, 8].includes(currentStep) && renderDynamicStep(currentStep)}
-                            {currentStep === 9 && (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.muted, pb: 1.25, mb: 0.5, borderBottom: `1px solid ${T.lineSoft}` }}>7 වන කොටස: වෙළඳපොළ හා අලෙවිකරණය (Market & Marketing)</Typography>
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '7.1.1 ප්‍රධාන ගැනුම්කරුවන් කවුද?' : '7.1.1 ප්‍රධාන ගැනුම්කරුවන් කවුද?'} />
-                    <FormControl fullWidth size="small">
-                      <Select
-                        multiple
-                        value={formValues['q_customers'] ? formValues['q_customers'].split(', ') : []}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          handleInputChange('q_customers', (typeof val === 'string' ? val.split(',') : val).join(', '));
-                        }}
-                        input={<OutlinedInput />}
-                        renderValue={(selected) => (selected as string[]).join(', ')}
-                      >
-                        {["1. ප්‍රදේශයේ පාරිභෝගිකයින්", "2. ප්‍රදේශයෙන් පිටත පාරිභෝගිකයින්", "3. වෙනත් ව්‍යාපාරිකයින් (B2B)", "4. අතරමැදියන්/තොග වෙළඳුන්", "5. රජයේ ආයතන", "6. අපනයනය සඳහා"].map((name) => (
-                          <MenuItem key={name} value={name}>
-                            <Checkbox checked={formValues['q_customers'] ? formValues['q_customers'].split(', ').indexOf(name) > -1 : false} />
-                            <ListItemText primary={name} />
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '7.1.2 වෙළඳපොළේ පැතිරීම' : '7.1.2 වෙළඳපොළේ පැතිරීම'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_market_extent'] || ''} onChange={(e) => handleInputChange('q_market_extent', e.target.value as string)}>
-                        <MenuItem value="1. ගමට පමණයි">1. ගමට පමණයි</MenuItem>
-                        <MenuItem value="2. ප්‍රාදේශීය ලේකම් කොට්ඨාසයට">2. ප්‍රාදේශීය ලේකම් කොට්ඨාසයට</MenuItem>
-                        <MenuItem value="3. දිස්ත්‍රික්කයට">3. දිස්ත්‍රික්කයට</MenuItem>
-                        <MenuItem value="4. පළාතට">4. පළාතට</MenuItem>
-                        <MenuItem value="5. රට පුරා">5. රට පුරා</MenuItem>
-                        <MenuItem value="6. ජාත්‍යන්තර">6. ජාත්‍යන්තර</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '7.1.3 පාරිභෝගිකයින්ගේ ප්‍රවණතාවය' : '7.1.3 පාරිභෝගිකයින්ගේ ප්‍රවණතාවය'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_customer_trend'] || ''} onChange={(e) => handleInputChange('q_customer_trend', e.target.value as string)}>
-                        <MenuItem value="1. වැඩි වෙමින් පවතී">1. වැඩි වෙමින් පවතී</MenuItem>
-                        <MenuItem value="2. අඩු වෙමින් පවතී">2. අඩු වෙමින් පවතී</MenuItem>
-                        <MenuItem value="3. වෙනසක් නැත">3. වෙනසක් නැත</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '7.2.1 තරඟකරුවන් සිටීද?' : '7.2.1 තරඟකරුවන් සිටීද?'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_has_competitors'] || ''} onChange={(e) => handleInputChange('q_has_competitors', e.target.value as string)}>
-                        <MenuItem value="1. ඔව්, බොහෝ දෙනෙක්">1. ඔව්, බොහෝ දෙනෙක්</MenuItem>
-                        <MenuItem value="2. ඔව්, කීප දෙනෙක්">2. ඔව්, කීප දෙනෙක්</MenuItem>
-                        <MenuItem value="3. නැත">3. නැත</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  {formValues['q_has_competitors'] === '1. ඔව්, බොහෝ දෙනෙක්' || formValues['q_has_competitors'] === '2. ඔව්, කීප දෙනෙක්' && (
-                    <Box>
-                      <QuestionLabel text={language === 'si' ? '7.2.2 තරඟකරුවන්ගෙන් වන බලපෑම' : '7.2.2 තරඟකරුවන්ගෙන් වන බලපෑම'} />
-                      <FormControl fullWidth size="small">
-                        <Select value={formValues['q_competitor_influence'] || ''} onChange={(e) => handleInputChange('q_competitor_influence', e.target.value as string)}>
-                          <MenuItem value="1. විශාලයි">1. විශාලයි</MenuItem>
-                          <MenuItem value="2. මධ්‍යමයි">2. මධ්‍යමයි</MenuItem>
-                          <MenuItem value="3. අඩුයි">3. අඩුයි</MenuItem>
-                          <MenuItem value="4. බලපෑමක් නැත">4. බලපෑමක් නැත</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Box>
-                  )}
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '7.3.1 අලෙවිකරණ ක්‍රම' : '7.3.1 අලෙවිකරණ ක්‍රම'} />
-                    <FormControl fullWidth size="small">
-                      <Select
-                        multiple
-                        value={formValues['q_marketing_methods'] ? formValues['q_marketing_methods'].split(', ') : []}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          handleInputChange('q_marketing_methods', (typeof val === 'string' ? val.split(',') : val).join(', '));
-                        }}
-                        input={<OutlinedInput />}
-                        renderValue={(selected) => (selected as string[]).join(', ')}
-                      >
-                        {["1. පෝස්ටර්/බැනර්", "2. සමාජ මාධ්‍ය (Facebook, WhatsApp)", "3. වෙබ් අඩවියක් මගින්", "4. මුද්‍රිත මාධ්‍ය (පුවත්පත්)", "5. රූපවාහිනී/ගුවන් විදුලි", "6. පාරිභෝගිකයින්ගේ දැනුම්දීම (Word of mouth)", "7. ප්‍රදර්ශන/පොළවල්", "8. අලෙවිකරණයක් නොකරයි"].map((name) => (
-                          <MenuItem key={name} value={name}>
-                            <Checkbox checked={formValues['q_marketing_methods'] ? formValues['q_marketing_methods'].split(', ').indexOf(name) > -1 : false} />
-                            <ListItemText primary={name} />
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '7.3.2 භාණ්ඩ සඳහා වෙළඳ නාමයක් (Brand) තිබේද?' : '7.3.2 භාණ්ඩ සඳහා වෙළඳ නාමයක් (Brand) තිබේද?'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_has_brand'] || ''} onChange={(e) => handleInputChange('q_has_brand', e.target.value as string)}>
-                        <MenuItem value="1. ඔව්">1. ඔව්</MenuItem>
-                        <MenuItem value="2. නැත">2. නැත</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <StepNav prev={8} next={10} />
-                </Box>
-              )}
-              {currentStep === 10 && (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.muted, pb: 1.25, mb: 0.5, borderBottom: `1px solid ${T.lineSoft}` }}>8 වන කොටස: නවෝත්පාදන හා තාක්ෂණය (Innovation & Technology)</Typography>
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '8.1.1 පසුගිය වසර 3 තුළ නව නිෂ්පාදන/සේවා හඳුන්වා දුන්නේද?' : '8.1.1 පසුගිය වසර 3 තුළ නව නිෂ්පාදන/සේවා හඳුන්වා දුන්නේද?'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_new_products'] || ''} onChange={(e) => handleInputChange('q_new_products', e.target.value as string)}>
-                        <MenuItem value="1. ඔව්">1. ඔව්</MenuItem>
-                        <MenuItem value="2. නැත">2. නැත</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '8.1.2 පසුගිය වසර 3 තුළ නව තාක්ෂණයක් භාවිතා කළේද?' : '8.1.2 පසුගිය වසර 3 තුළ නව තාක්ෂණයක් භාවිතා කළේද?'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_new_tech'] || ''} onChange={(e) => handleInputChange('q_new_tech', e.target.value as string)}>
-                        <MenuItem value="1. ඔව්">1. ඔව්</MenuItem>
-                        <MenuItem value="2. නැත">2. නැත</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '8.2.1 භාවිතා කරන තාක්ෂණික උපකරණ' : '8.2.1 භාවිතා කරන තාක්ෂණික උපකරණ'} />
-                    <FormControl fullWidth size="small">
-                      <Select
-                        multiple
-                        value={formValues['q_tech_devices'] ? formValues['q_tech_devices'].split(', ') : []}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          handleInputChange('q_tech_devices', (typeof val === 'string' ? val.split(',') : val).join(', '));
-                        }}
-                        input={<OutlinedInput />}
-                        renderValue={(selected) => (selected as string[]).join(', ')}
-                      >
-                        {["1. ස්මාර්ට් දුරකථනය", "2. පරිගණකය/ලැප්ටොප්", "3. අන්තර්ජාල පහසුකම්", "4. කිසිවක් නැත"].map((name) => (
-                          <MenuItem key={name} value={name}>
-                            <Checkbox checked={formValues['q_tech_devices'] ? formValues['q_tech_devices'].split(', ').indexOf(name) > -1 : false} />
-                            <ListItemText primary={name} />
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '8.2.2 අන්තර්ජාලය ව්‍යාපාරික කටයුතු සඳහා භාවිතා කරන්නේද?' : '8.2.2 අන්තර්ජාලය ව්‍යාපාරික කටයුතු සඳහා භාවිතා කරන්නේද?'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_uses_internet_for_business'] || ''} onChange={(e) => handleInputChange('q_uses_internet_for_business', e.target.value as string)}>
-                        <MenuItem value="1. ඔව්">1. ඔව්</MenuItem>
-                        <MenuItem value="2. නැත">2. නැත</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '8.2.3 ඩිජිටල් ගෙවීම් ක්‍රම භාවිතා කරන්නේද?' : '8.2.3 ඩිජිටල් ගෙවීම් ක්‍රම භාවිතා කරන්නේද?'} />
-                    <FormControl fullWidth size="small">
-                      <Select
-                        multiple
-                        value={formValues['q_digital_payments'] ? formValues['q_digital_payments'].split(', ') : []}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          handleInputChange('q_digital_payments', (typeof val === 'string' ? val.split(',') : val).join(', '));
-                        }}
-                        input={<OutlinedInput />}
-                        renderValue={(selected) => (selected as string[]).join(', ')}
-                      >
-                        {["1. ඔව් (බැංකු හරහා - Online Banking)", "2. ඔව් (LankaQR / Mobile Wallets)", "3. කාඩ්පත් මගින් (POS)", "4. නැත, මුදල් (Cash) පමණයි"].map((name) => (
-                          <MenuItem key={name} value={name}>
-                            <Checkbox checked={formValues['q_digital_payments'] ? formValues['q_digital_payments'].split(', ').indexOf(name) > -1 : false} />
-                            <ListItemText primary={name} />
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <StepNav prev={9} next={11} />
-                </Box>
-              )}
-              {currentStep === 11 && (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.muted, pb: 1.25, mb: 0.5, borderBottom: `1px solid ${T.lineSoft}` }}>9 වන කොටස: ව්‍යාපාරික පරිසරය හා රාජ්‍ය මැදිහත්වීම (Business Environment & Government)</Typography>
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '9.1.1 ව්‍යාපාරය සතු ලියාපදිංචි සහතික' : '9.1.1 ව්‍යාපාරය සතු ලියාපදිංචි සහතික'} />
-                    <FormControl fullWidth size="small">
-                      <Select
-                        multiple
-                        value={formValues['q_reg_certificates'] ? formValues['q_reg_certificates'].split(', ') : []}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          handleInputChange('q_reg_certificates', (typeof val === 'string' ? val.split(',') : val).join(', '));
-                        }}
-                        input={<OutlinedInput />}
-                        renderValue={(selected) => (selected as string[]).join(', ')}
-                      >
-                        {["1. ප්‍රාදේශීය ලේකම් ලියාපදිංචිය (BR)", "2. සමාගම් මැදුරේ ලියාපදිංචිය", "3. පළාත් සභා/ප්‍රාදේශීය සභා අනුමැතිය", "4. පරිසර ආරක්ෂණ බලපත්‍රය (EPL)", "5. සෞඛ්‍ය වෛද්‍ය නිලධාරී (MOH) සහතිකය", "6. ප්‍රමිති ආයතනයේ සහතිකය (SLSI)", "7. අපනයන සංවර්ධන මණ්ඩලයේ (EDB) ලියාපදිංචිය", "8. වෙනත්", "9. කිසිවක් නැත"].map((name) => (
-                          <MenuItem key={name} value={name}>
-                            <Checkbox checked={formValues['q_reg_certificates'] ? formValues['q_reg_certificates'].split(', ').indexOf(name) > -1 : false} />
-                            <ListItemText primary={name} />
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '9.1.2 ගෙවන බදු වර්ග' : '9.1.2 ගෙවන බදු වර්ග'} />
-                    <FormControl fullWidth size="small">
-                      <Select
-                        multiple
-                        value={formValues['q_taxes_paid'] ? formValues['q_taxes_paid'].split(', ') : []}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          handleInputChange('q_taxes_paid', (typeof val === 'string' ? val.split(',') : val).join(', '));
-                        }}
-                        input={<OutlinedInput />}
-                        renderValue={(selected) => (selected as string[]).join(', ')}
-                      >
-                        {["1. ආදායම් බදු", "2. එකතු කළ අගය මත බදු (VAT)", "3. ප්‍රාදේශීය සභා බදු", "4. කිසිවක් නැත"].map((name) => (
-                          <MenuItem key={name} value={name}>
-                            <Checkbox checked={formValues['q_taxes_paid'] ? formValues['q_taxes_paid'].split(', ').indexOf(name) > -1 : false} />
-                            <ListItemText primary={name} />
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '9.2.1 රජයෙන් ලැබී ඇති සහාය' : '9.2.1 රජයෙන් ලැබී ඇති සහාය'} />
-                    <FormControl fullWidth size="small">
-                      <Select
-                        multiple
-                        value={formValues['q_gov_support_received'] ? formValues['q_gov_support_received'].split(', ') : []}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          handleInputChange('q_gov_support_received', (typeof val === 'string' ? val.split(',') : val).join(', '));
-                        }}
-                        input={<OutlinedInput />}
-                        renderValue={(selected) => (selected as string[]).join(', ')}
-                      >
-                        {["1. මූල්‍ය ආධාර (ණය/ප්‍රතිපාදන)", "2. පුහුණු වැඩසටහන්", "3. උපදේශන සේවා", "4. අමුද්‍රව්‍ය/උපකරණ", "5. ප්‍රදර්ශන සඳහා අවස්ථා", "6. කිසිදු සහායක් ලැබී නැත"].map((name) => (
-                          <MenuItem key={name} value={name}>
-                            <Checkbox checked={formValues['q_gov_support_received'] ? formValues['q_gov_support_received'].split(', ').indexOf(name) > -1 : false} />
-                            <ListItemText primary={name} />
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <Typography variant="h6" fontWeight="bold" color="primary" sx={{ borderBottom: '2px solid', borderColor: 'primary.main', pb: 1, mb: 1, mt: 2 }}>9.3 ව්‍යාපාරික පරිසරයේ බාධක (1=බාධකයක් නොවේ, 5=ඉතා විශාල බාධකයක්)</Typography>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? 'මූල්‍ය පහසුකම් ලබා ගැනීම' : 'මූල්‍ය පහසුකම් ලබා ගැනීම'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_barrier_finance'] || ''} onChange={(e) => handleInputChange('q_barrier_finance', e.target.value as string)}>
-                        <MenuItem value="1">1</MenuItem>
-                        <MenuItem value="2">2</MenuItem>
-                        <MenuItem value="3">3</MenuItem>
-                        <MenuItem value="4">4</MenuItem>
-                        <MenuItem value="5">5</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? 'යටිතල පහසුකම් (විදුලිය/ජලය)' : 'යටිතල පහසුකම් (විදුලිය/ජලය)'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_barrier_infrastructure'] || ''} onChange={(e) => handleInputChange('q_barrier_infrastructure', e.target.value as string)}>
-                        <MenuItem value="1">1</MenuItem>
-                        <MenuItem value="2">2</MenuItem>
-                        <MenuItem value="3">3</MenuItem>
-                        <MenuItem value="4">4</MenuItem>
-                        <MenuItem value="5">5</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? 'බදු අනුපාත' : 'බදු අනුපාත'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_barrier_taxes'] || ''} onChange={(e) => handleInputChange('q_barrier_taxes', e.target.value as string)}>
-                        <MenuItem value="1">1</MenuItem>
-                        <MenuItem value="2">2</MenuItem>
-                        <MenuItem value="3">3</MenuItem>
-                        <MenuItem value="4">4</MenuItem>
-                        <MenuItem value="5">5</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? 'පුහුණු ශ්‍රමිකයින් සොයා ගැනීම' : 'පුහුණු ශ්‍රමිකයින් සොයා ගැනීම'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_barrier_labor'] || ''} onChange={(e) => handleInputChange('q_barrier_labor', e.target.value as string)}>
-                        <MenuItem value="1">1</MenuItem>
-                        <MenuItem value="2">2</MenuItem>
-                        <MenuItem value="3">3</MenuItem>
-                        <MenuItem value="4">4</MenuItem>
-                        <MenuItem value="5">5</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? 'නීති හා රෙගුලාසි ක්‍රියා පටිපාටිය' : 'නීති හා රෙගුලාසි ක්‍රියා පටිපාටිය'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_barrier_laws'] || ''} onChange={(e) => handleInputChange('q_barrier_laws', e.target.value as string)}>
-                        <MenuItem value="1">1</MenuItem>
-                        <MenuItem value="2">2</MenuItem>
-                        <MenuItem value="3">3</MenuItem>
-                        <MenuItem value="4">4</MenuItem>
-                        <MenuItem value="5">5</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <StepNav prev={10} next={12} />
-                </Box>
-              )}
-              {currentStep === 12 && (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.muted, pb: 1.25, mb: 0.5, borderBottom: `1px solid ${T.lineSoft}` }}>10 වන කොටස: පාරිසරික හා සමාජීය බලපෑම (Environmental & Social Impact)</Typography>
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '10.1.1 පරිසරයට වන බලපෑම තක්සේරු කර තිබේද?' : '10.1.1 පරිසරයට වන බලපෑම තක්සේරු කර තිබේද?'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_env_impact_assessed'] || ''} onChange={(e) => handleInputChange('q_env_impact_assessed', e.target.value as string)}>
-                        <MenuItem value="1. ඔව්">1. ඔව්</MenuItem>
-                        <MenuItem value="2. නැත">2. නැත</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '10.1.2 බලශක්තිය/ජලය ඉතිරි කිරීමට පියවර ගෙන තිබේද?' : '10.1.2 බලශක්තිය/ජලය ඉතිරි කිරීමට පියවර ගෙන තිබේද?'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_energy_saving'] || ''} onChange={(e) => handleInputChange('q_energy_saving', e.target.value as string)}>
-                        <MenuItem value="1. ඔව්">1. ඔව්</MenuItem>
-                        <MenuItem value="2. නැත">2. නැත</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '10.2.1 ප්‍රජාව වෙනුවෙන් සමාජ සත්කාර (CSR) සිදු කරන්නේද?' : '10.2.1 ප්‍රජාව වෙනුවෙන් සමාජ සත්කාර (CSR) සිදු කරන්නේද?'} />
-                    <FormControl fullWidth size="small">
-                      <Select value={formValues['q_social_responsibility'] || ''} onChange={(e) => handleInputChange('q_social_responsibility', e.target.value as string)}>
-                        <MenuItem value="1. ඔව්">1. ඔව්</MenuItem>
-                        <MenuItem value="2. නැත">2. නැත</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <StepNav prev={11} next={13} />
-                </Box>
-              )}
-
-              {currentStep === 13 && (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.muted, pb: 1.25, mb: 0.5, borderBottom: `1px solid ${T.lineSoft}` }}>11 වන කොටස: අනාගත අවශ්‍යතා සහ ලොජිස්ටික්ස් (Future Needs & Logistics)</Typography>
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '11.1.1 ව්‍යාපාරය දියුණු කිරීමට ඇති සැලසුම්' : '11.1.1 ව්‍යාපාරය දියුණු කිරීමට ඇති සැලසුම්'} />
-                    <FormControl fullWidth size="small">
-                      <Select
-                        multiple
-                        value={formValues['q_business_expansion'] ? formValues['q_business_expansion'].split(', ') : []}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          handleInputChange('q_business_expansion', (typeof val === 'string' ? val.split(',') : val).join(', '));
-                        }}
-                        input={<OutlinedInput />}
-                        renderValue={(selected) => (selected as string[]).join(', ')}
-                      >
-                        {["1. නව නිෂ්පාදන/සේවා හඳුන්වා දීම", "2. නිෂ්පාදන ධාරිතාව වැඩි කිරීම", "3. නව වෙළඳපොළවල් සෙවීම (අපනයනය ඇතුළුව)", "4. නව තාක්ෂණය/යන්ත්‍රෝපකරණ මිලදී ගැනීම", "5. ශාඛා විවෘත කිරීම", "6. සැලසුමක් නැත"].map((name) => (
-                          <MenuItem key={name} value={name}>
-                            <Checkbox checked={formValues['q_business_expansion'] ? formValues['q_business_expansion'].split(', ').indexOf(name) > -1 : false} />
-                            <ListItemText primary={name} />
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? '11.1.2 රජයෙන් හෝ වෙනත් ආයතන වලින් බලාපොරොත්තු වන සහාය' : '11.1.2 රජයෙන් හෝ වෙනත් ආයතන වලින් බලාපොරොත්තු වන සහාය'} />
-                    <FormControl fullWidth size="small">
-                      <Select
-                        multiple
-                        value={formValues['q_expected_gov_support'] ? formValues['q_expected_gov_support'].split(', ') : []}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          handleInputChange('q_expected_gov_support', (typeof val === 'string' ? val.split(',') : val).join(', '));
-                        }}
-                        input={<OutlinedInput />}
-                        renderValue={(selected) => (selected as string[]).join(', ')}
-                      >
-                        {["1. අඩු පොලී ණය", "2. නව තාක්ෂණික උපකරණ/අමුද්‍රව්‍ය", "3. ව්‍යාපාරික පුහුණුව/උපදේශනය", "4. අලෙවි පහසුකම්/වෙළඳපොළ සෙවීම", "5. ඉඩම්/යටිතල පහසුකම්", "6. නීතිමය ගැටළු විසඳීම", "7. වෙනත්"].map((name) => (
-                          <MenuItem key={name} value={name}>
-                            <Checkbox checked={formValues['q_expected_gov_support'] ? formValues['q_expected_gov_support'].split(', ').indexOf(name) > -1 : false} />
-                            <ListItemText primary={name} />
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <QuestionLabel text={language === 'si' ? 'වෙනත් අදහස්/යෝජනා' : 'වෙනත් අදහස්/යෝජනා'} />
-                    <TextField fullWidth variant="outlined" size="small" multiline rows={3} value={formValues['q_additional_comments'] || ''} onChange={(e) => handleInputChange('q_additional_comments', e.target.value)} />
-                  </Box>
-
-                  <StepNav prev={12} submit />
-                </Box>
-              )}
+              {[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].includes(currentStep) && renderDynamicStep(currentStep)}
                 </Box>
               </SurveyErrorContext.Provider>
             </Box>

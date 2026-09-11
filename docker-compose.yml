@@ -40,8 +40,13 @@ services:
       - DB_PASSWORD=celonica_pass
       - KEYCLOAK_BASE_URL=http://celonica-web-keycloak:8080
       - KEYCLOAK_PUBLIC_URL=${KC_HOSTNAME_URL:-http://localhost:8081}
-      - KEYCLOAK_REALM=ceylonica-admin
-      - KEYCLOAK_CLIENT_ID=ceylonica-frontend
+      # Must match the realm actually imported by keycloak/celonica-admin-realm.json
+      # ("celonica", no "y") — this previously said "ceylonica-admin", which does
+      # not exist locally, so every keycloak.admin-gated route 401'd/failed JWKS
+      # lookup regardless of token validity. Override per-environment if a real
+      # deployment target uses different values.
+      - KEYCLOAK_REALM=${KEYCLOAK_REALM:-celonica-admin}
+      - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID:-celonica-frontend}
       - KEYCLOAK_ADMIN_CLIENT_ID=admin-cli
       - KEYCLOAK_ADMIN_CLIENT_SECRET=my-super-secret-keycloak-client-secret
       - FRONTEND_URL=http://localhost:3001

@@ -42,11 +42,25 @@ Route::middleware('throttle:120,1')->group(function () {
     Route::get('/business-survey-questions', [App\Http\Controllers\Api\BusinessSurveyQuestionController::class, 'index']);
 });
 
-// Industry Survey submission — public but tightly throttled (20/min to prevent spam) [C-02]
-Route::middleware('throttle:20,1')->group(function () {
+// Industry Survey submission — the page itself always requires a real Keycloak
+// login before a user can reach the form (see IndustrySurveyPage.tsx's
+// login-redirect effect), so every legitimate caller already carries a valid
+// Bearer token. `keycloak.admin` (misleadingly named — it authenticates any
+// verified token, admin or not) enforces that server-side too: previously
+// these routes had no auth at all, and IndustrySurveyController read identity
+// via `$request->user()`, which this custom guard never populates — so
+// `user_id` was null on every row and the ownership check was a permanent
+// no-op regardless of who called it. [2026-09-11 auth/IDOR fix]
+Route::middleware(['throttle:20,1', 'keycloak.admin'])->group(function () {
     Route::post('/industry-survey', [IndustrySurveyController::class, 'store']);
     Route::post('/industry-survey/generate-reg-number', [IndustrySurveyController::class, 'generateRegNumber']);
-    // OTP Routes for mobile verification
+});
+
+// OTP routes stay outside the auth group: verifying phone ownership is a
+// precondition of reaching a fully-authenticated state on some flows and must
+// not itself require one. Both are still rate-limited, and OtpController adds
+// a per-mobile send cooldown on top of the per-IP throttle below.
+Route::middleware('throttle:20,1')->group(function () {
     Route::post('/otp/send', [\App\Http\Controllers\OtpController::class, 'send']);
     Route::post('/otp/verify', [\App\Http\Controllers\OtpController::class, 'verify']);
 });
