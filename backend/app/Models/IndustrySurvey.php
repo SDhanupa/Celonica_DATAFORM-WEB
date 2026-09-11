@@ -19,6 +19,7 @@ class IndustrySurvey extends Model
         'longitude',
         'status',
         'form_data',
+        'reg_number',
     ];
 
     protected $casts = [
