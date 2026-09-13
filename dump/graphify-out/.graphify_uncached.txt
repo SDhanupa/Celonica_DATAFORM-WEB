@@ -1,0 +1,14 @@
+C:\xampp\htdocs\Celonica Quecion web\backend\.github\workflows\issues.yml
+C:\xampp\htdocs\Celonica Quecion web\backend\.github\workflows\pull-requests.yml
+C:\xampp\htdocs\Celonica Quecion web\backend\.github\workflows\tests.yml
+C:\xampp\htdocs\Celonica Quecion web\backend\.github\workflows\update-changelog.yml
+C:\xampp\htdocs\Celonica Quecion web\backend\.styleci.yml
+C:\xampp\htdocs\Celonica Quecion web\backend\CHANGELOG.md
+C:\xampp\htdocs\Celonica Quecion web\backend\README.md
+C:\xampp\htdocs\Celonica Quecion web\backend\categories_visual.md
+C:\xampp\htdocs\Celonica Quecion web\backend\public\robots.txt
+C:\xampp\htdocs\Celonica Quecion web\backend\public\uploads\categories\1784866770_ft0ZlPiaSS.png
+C:\xampp\htdocs\Celonica Quecion web\backend\public\uploads\categories\1784866969_NpMlefRJkj.png
+C:\xampp\htdocs\Celonica Quecion web\backend\public\uploads\categories\1784866984_oid177Vrgc.gif
+C:\xampp\htdocs\Celonica Quecion web\backend\public\uploads\categories\1785219878_OZx56KXnjw.png
+C:\xampp\htdocs\Celonica Quecion web\backend\public\uploads\categories\1785352543_Btfk712cu7.png

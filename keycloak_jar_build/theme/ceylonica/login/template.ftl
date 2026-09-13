@@ -123,14 +123,11 @@
                                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
                                 </svg>
                             </button>
-                            <button type="button" class="social-btn social-microsoft" title="Microsoft Login">
-                                <svg class="social-svg" viewBox="0 0 24 24">
-                                    <path fill="#F25022" d="M1 1h10v10H1z"/>
-                                    <path fill="#7FBA00" d="M13 1h10v10H13z"/>
-                                    <path fill="#00A4EF" d="M1 13h10v10H1z"/>
-                                    <path fill="#FFB900" d="M13 13h10v10H13z"/>
+                            <a href="http://localhost:5173/login" class="social-btn social-user" title="User Login">
+                                <svg class="social-svg" viewBox="0 0 24 24" fill="#0f2a1e">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                                 </svg>
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </#if>

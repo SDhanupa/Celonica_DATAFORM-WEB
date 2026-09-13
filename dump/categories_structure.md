@@ -1,0 +1,3047 @@
+# Categories Structure
+
+- Lines
+  - Electricity
+    - 220kV Line
+    - 132kV Underground Cable
+    - 132kV Line
+    - To be commissioned
+  - Communication Lines
+  - Water pipe line
+  - Drainage Lines
+- Tree
+  - Forest trees
+  - Woody plants
+  - Medicinal plants
+  - Annual crop plants
+  - Perennial crops
+- Boundaries
+  - Basic administrative divisions
+    - Provincial boundaries
+      - District boundaries
+        - Divisional Secretariat Division Boundaries
+          - Grama Niladhari Divisional Boundaries
+            - Village boundaries
+  - Police boundaries
+    - SDIG Division
+      - DIG Division
+        - Police Division (Police Station)
+  - Local government limits
+    - Pradeshiya Sabha jurisdiction
+    - Municipal Council Area
+    - Municipal Council Area of ​​Jurisdiction
+  - Health Administration Restrictions
+    - Health Province
+      - Health District
+        - Medical Officer of Health Area of ​​Jurisdiction
+          - Public Health Inspectorate Area of ​​Jurisdiction
+            - Family Health Worker Area
+  - Forest administrative boundaries
+    - Forest boundary zone
+      - Forest Division
+        - Forest Range
+          - The forest beet
+            - Forest fields
+    - Classification of forests according to laws
+      - Preserved forest
+      - Reserved forest
+      - Countryside forest
+      - UNESCO Heritage Forest
+      - World Heritage Forest
+  - Wildlife management restrictions
+    - Assistant Director of Wildlife Area of ​​Jurisdiction
+      - Wildlife site
+        - Wildlife Sanctuary
+  - Natural zone boundaries Nature
+    - Flowering plant zones
+      - A: Dry zone
+      - B1: Northern Intermediate lowlands
+      - B2: Eastern Intermediate lowlands
+      - C1: Northern Wet lowlands
+      - C2: South of Ratnapura - Northern Sinharaja
+      - C3: Southern Sinharaja Hiniduma-Kanneliya
+      - D: Foothills of Adam's Peak North of Ratnapura - Ambagamuwa
+      - E: Kandy - upper Mahaweli
+      - F: Knuckles
+      - G: Central Mountains Ramboda - Nuwara Eliya
+      - H: Adam's Peak
+      - I: Horton Plains
+    - Forest zones
+      - Lowland Rain Forest
+      - Dry Monsoon Forest
+      - Moist Monsoon Forest
+      - Montane Forest
+      - Submontane Forest
+      - Open & Sparse Forest
+      - Mangrove
+      - Riverine Dry Forest
+      - Savannah
+      - Shrub
+      - Grassland
+      - Marsh
+  - Wildlife forests
+    - National parks
+    - National protected areas
+      - Nature reserve
+      - Sanctuaries
+      - Strict nature reserve
+    - Marine Reserves
+    - Elephant Pass
+  - Rocky regions
+    - Highland rock complex
+    - Vanni Rock Complex
+    - Vijayan Rock Complex
+    - Limestone rock complex
+    - Kadugannawa Rock Complex
+  - Agro-ecological zones
+    - Dry zone
+      - DL1a Agro-ecological Zone
+      - DL1b Agro-ecological Zone
+      - DL1c Agro-ecological Zone
+      - DL1d Agro-ecological Zone
+      - DL1e Agro-ecological Zone
+      - DL1f Agro-ecological Zone
+      - DL2a Agro-ecological Zone
+      - DL2b Agro-ecological Zone
+      - DL3 Agro-Ecological Zone
+      - DL4 Agro-Ecological Zone
+      - DL5 Agro-Ecological Zone
+    - Intermediate zone
+      - IL1a Agro-ecological Zone
+      - IL1b Agro-ecological Zone
+      - IL1c Agro-Ecological Zone
+      - IL2 Agro-Ecological Zone
+      - IL3 Agro-Ecological Zone
+      - IM1a Agro-ecological Zone
+      - IM1b Agro-ecological Zone
+      - IM1c Agro-ecological Zone
+      - IM2a Agro-ecological Zone
+      - IM2b Agro-ecological Zone
+      - IM3a Agro-ecological Zone
+      - IM3b Agro-ecological Zone
+      - IM3c Agro-ecological Zone
+      - IU1 Agro-Ecological Zone
+      - IU2 Agro-Ecological Zone
+      - IU3a Agro-ecological Zone
+      - IU3bAgro-ecological zone
+      - IU3c Agro-ecological Zone
+      - IU3d Agro-Ecological Zone
+      - IU3e Agro-Ecological Zone
+    - Wet zone
+      - WL1a Agro-ecological Zone
+      - WL1b Agro-ecological Zone
+      - WL2a Agro-ecological Zone
+      - WL2b Agro-ecological Zone
+      - WL3 Agro-Ecological Zone
+      - WM1a Agro-ecological Zone
+      - WM1b Agro-ecological Zone
+      - WM2a Agro-ecological Zone
+      - WM2b Agro-ecological Zone
+      - WM3a Agro-ecological Zone
+      - WM3b Agro-ecological Zone
+      - WU1 Agro-Ecological Zone
+      - WU2a Agro-ecological Zone
+      - WU2b Agro-ecological Zone
+      - WU3 Agro-Ecological Zone
+    - Agricultural Services Area
+  - Topographical zones
+    - Mountainous region
+      - Middle
+      - Bulutota-Rakwana
+      - Galoya
+    - Inland Plain
+    - Coastal Plain
+  - Climate zones
+    - Lowland wet zone
+    - Mountainous region
+    - Intermediate zone
+    - Dry zone
+    - Semi-arid zone
+    - Weather station
+    - Rain gauge
+  - Rainfall zones
+    - Wet zone
+    - Intermediate zone
+    - Dry zone
+    - Semi-arid zone
+  - Electricity distribution
+    - Distribution Region
+      - Electricity Province
+        - Electrical area
+          - Electrical grid
+          - Power plant
+  - Education
+    - Education Province
+      - Education Zone
+        - Education Division
+          - School
+          - Pirivena
+  - Disaster zones
+    - National
+      - Provinces
+        - District
+          - Divisions
+            - Community
+  - Telecommunications
+    - Telecommunications towers
+      - Provinces
+        - District
+          - Divisions and communities
+    - Telecom
+      - Telecom Regions (Provinces)
+        - Telecom Province DGM
+          - Telecom Regional Area
+            - Telecom Local Exchange Area
+  - Archaeological boundaries
+    - Archaeological District Division
+      - Archaeological Zone
+        - Archaeological site
+  - Old state boundaries
+    - Before the Anuradhapura era
+    - Anuradhapura era
+      - Ruhuna (Anuradhapura period)
+      - Located (Anuradhapura period)
+      - Maya (Anuradhapura period)
+      - Malaya (Anuradhapura period)
+    - Polonnaruwa era
+      - Uttara Desha (Polonnaru Era)
+      - Southern Land (Maya) (Polonnaru Era)
+      - Rohana (Polonnaru era)
+      - Malaya (Polonnaru period)
+    - Post-Polonnaru era
+    - The Kotte era
+      - Raigama (Kotte era)
+      - Kotte (Kotte era)
+      - Seethawaka (Kotte era)
+      - Senkadagala (Kotte era)
+      - Vanni (Kotte era)
+      - Jaffna (Kotte era)
+    - Kandy era
+    - Portuguese era
+      - Coastal (Portuguese era)
+      - Kandy (Portuguese period)
+    - Dutch era
+      - Jaffna (Dutch era)
+      - Colombo (Dutch era)
+      - Galle (Dutch era)
+      - Kingdom of Kandy
+    - English era
+      - North (English era)
+      - East (English era)
+      - Western (English era)
+      - South (English era)
+      - Middle (English era)
+  - Postal restrictions
+    - Postal province
+      - Postal District
+        - Head Post Office
+          - Sub Post Office
+  - Agricultural Administrative Boundary
+    - Agricultural District Region
+      - Agricultural Services Area
+  - Weather stations
+- Space
+  - Public spaces
+    - Sports Spaces Sport
+      - Playground
+      - Cricket ground
+      - Volleyball court
+      - Jogging track
+      - Swimming pool
+      - swimming pool
+      - Where to play on the street
+    - Entertainment and leisure places
+      - Venue
+        - Permanent venue for celebrations
+        - Temporary venue for celebrations
+          - Drinking place
+          - Where to smoke marijuana
+      - Park
+        - Public park
+        - Botanical Garden
+        - Children's Park
+        - Lakeside (Multiple)
+        - Urban jungle
+      - Rest areas
+        - Outdoor bench
+        - Yard
+        - Void Deck
+        - Ghost space
+        - Blue space
+    - Business spaces (not part of the main service provision)
+      - Free trade zones
+      - Industrial city
+      - Market
+      - Market
+      - Market (this does not mean shops)
+      - Village
+      - Sidewalk
+      - Husk
+      - Gem buying open place
+      - Tea leaf weighing station
+      - Milk market (road)
+      - Street
+    - Cultural
+      - Religious spaces
+        - Hindu Temple (Kovil)
+        - Mosque
+        - Buddhist Temple
+        - Catholic Church
+        - Temple
+        - Peace
+      - Cultural activity spaces
+        - Where to practice dancing
+        - Where to sing
+        - Cultural Center Grounds
+        - Open-air theater
+        - Archaeological site
+        - Open platform
+        - Where the dances are shown
+        - Music venue
+        - Threshing floor
+    - Tourist spaces
+      - Historical tourist sites
+        - Historical tourist sites
+        - Ruins and historical tourist sites
+      - Fun tourist spots
+      - Tourist attractions
+      - Natural tourist spots
+    - Community service provision
+      - Bathhouse
+      - Knife
+      - Public well
+      - The car park
+    - Other public spaces
+      - Cemeteries
+      - Lighthouse LIGHTHouse
+    - Common living spaces
+      - Where to live on the street
+- Land
+  - All lands not owned by the government
+    - Owned by individuals
+      - Freehold deeds
+      - Grant papers
+        - Gold mine
+        - Ratnabhumi
+        - Jayabhoomi
+        - Golden land
+    - Land owned by companies
+      - Companies' own assets
+        - Population
+          - Janawasama Company
+    - Land owned by organizations
+      - Religious organizations
+        - Temple lands
+        - Temple Land
+        - Catholic Church Land
+        - Mosque lands
+        - Kovil Land
+      - Land owned by non-governmental organizations
+    - Land owned by embassies
+  - Government lands
+    - Owned by the Divisional Secretary
+    - Railway Department
+    - Department of Forest Conservation
+    - Department of Wildlife Conservation
+    - Department of Archaeology
+    - Department of Agrarian Services
+    - Irrigation Department
+    - Coastal Conservation Department
+    - Other departments
+    - BOI
+    - Local Government Land
+      - Municipalities
+      - Municipalities
+      - Regional Councils
+    - Land owned by government corporations
+      - Land Reforms Commission
+      - Mahaweli Authority
+      - Other corporate authorities
+  - Temples and Temple Villages Act
+- Building/Land
+  - Residence
+  - Providing government services
+    - Provision of central government services
+      - Central government chief
+        - Ministries
+        - Departments
+        - Corporations
+        - Commission
+      - Central Government District Offices
+        - Department of Agriculture District Office
+        - Animal Production and Health Department District Office
+        - Department of Archaeology District Office
+        - Attorney General's Department District Office
+        - Auditor General's Department District Office
+        - Department of Ayurveda
+        - Building Department District Office
+        - Census and Statistics Department District Office
+        - Christian Religious Affairs Department District Office
+        - Civil Defense Department District Office
+        - Cooperative Development Department District Office
+        - Coastal Conservation Department District Office
+        - Department of Commerce District Office
+        - District Office of the Department of Workers' Compensation Commissioner
+        - Cultural Affairs Department District Office
+        - Customs Department
+        - Educational Publications Department District Office
+        - Examination Department District Office
+        - Sri Lanka Excise Department District Office
+        - Department of Export Agriculture District Office
+        - Department of Foreign Resources District Office
+        - Department of Fisheries and Aquatic Resources District Office
+        - Food Commissioner's Department District Office
+        - Forest Conservation Department District Office
+        - Government Analyst's Department District Office
+        - Government Factories Department District Office
+        - Government Information Department District Office
+        - Government Printing Department District Office
+        - Hindu Religious and Cultural Affairs Department District Office
+        - Department of Immigration and Emigration District Office
+        - Import and Export Control Department District Office
+        - Department of Industries District Office - Western Province
+        - Inland Revenue Department District Office
+        - Irrigation Department District Office
+        - Department of Labor District Office
+        - Commissioner General of Lands Department District Office
+        - Land Titles Settlement Department District Office
+        - Law Commission Department District Office
+        - Legal Drafting Department District Office
+        - Management Services Department District Office
+        - Manpower and Safety Department District Office
+        - Department of Measurement, Standards and Services District Office
+        - Meteorology Department District Office
+        - Motor Vehicles Department District Office
+        - Muslim Religious and Cultural Affairs Department District Office
+        - National Archives Department District Office
+        - National Botanic Gardens Department District Office
+        - National Budget Department District Office
+        - National Museums Department District Office
+        - National Physical Planning Department District Office
+        - National Planning Department District Office
+        - National Zoological Parks Department District Office
+        - Official Languages ​​Department District Office
+        - Pension Department District Office
+        - Police Department
+        - Postal Department District Office
+        - Prisons Department District Office
+        - Probation and Child Care Services Department District Office
+        - Department of Public Enterprises District Office
+        - State Finance Department District Office
+        - Public Trust Department District Office
+        - Sri Lanka Railways Department District Office
+        - Registrar General's Department District Office
+        - Companies Registrar Department District Office
+        - District Office of the Department of Registration of Persons
+        - Rubber Development Department District Office
+        - Samurdhi Development Department District Office
+        - Social Services Department District Office
+        - Sri Lanka Survey Department District Office
+        - Technical Education and Training Department District Office
+        - Textile Industries Department District Office
+        - Valuation Department District Office
+        - Wildlife Conservation Department District Office
+      - Central Government District Services Compilation
+        - Clinics
+        - Hospital
+        - Base Hospital
+        - Dispensary
+        - Pharmacy
+    - Provision of Provincial Council Services
+      - Local Government Institutions
+        - Head Offices
+        - Sub-offices
+        - Libraries
+      - Health
+      - Education
+        - Primary education
+        - School education
+        - School education
+        - Vocational education
+        - Vocational education
+        - Higher education institutions
+        - Universities
+        - Universities
+        - University campuses
+        - University institutions
+        - Research institutes
+        - Libraries
+      - Regional cultural
+        - Regional function halls
+        - Regional theaters
+      - Local law and order
+        - Police
+        - Court
+      - Agriculture and Animal Husbandry
+      - Local communication
+      - Transportation
+        - Bus stop
+        - Bus station
+        - SLTB Depot
+        - Train station
+        - Boat dock
+    - Provision of local government services
+      - Grama Niladhari Office
+    - Providing rural public services
+  - Using buildings for production and service provision
+    - A - Agriculture, forestry and fishing
+      - A1 - Crop and animal production, hunting and related service activities
+        - A11 - Non-permanent crop cultivation (seasonal crops)
+          - 111 - Cereal cultivation (except rice), leguminous crops and oilseeds
+            - 1111 - Grain land and hay farming (sorghum, maize, millet, corn on the cob/corn on the cob, etc.)
+            - 1112 - Legume crop land (mung beans, peas, soybeans, sorghum, etc.)
+            - 1113 - Oilseed land (sesame, cashew, mustard, sunflower, etc.)
+          - 112 - Paddy cultivation
+            - 1120 V
+          - 113 - Growing vegetables, roots and beans
+            - 1131 - Paddy field
+            - 1132 - Lowland vegetable land including hen farming (okra, eggplant, pumpkin, bitter gourd, cucumber, cucumber, fish chili, batana, jerkin, vetakolu, patola, gray banana etc.)
+            - 1133 - Vegetable land
+            - 1134 Potatoes
+            - 1135 red onions
+            - 1136 large onions
+            - 1137 Cassava
+            - 1138 Mushrooms
+            - 1139 Other tubers and roots (sweet potatoes, yams, turnips, etc.)
+          - 114 - Sugarcane cultivation
+            - 1140 Sugarcane
+          - 115 - Tobacco cultivation
+            - 1151 Cigarette Tobacco
+            - 1152 Beedi/Cigarette Tobacco
+            - 1153 Edible tobacco
+          - 116 - Fiber crops
+            - 1161 Flax
+            - 1169 Other fiber crops (not elsewhere specified) (such as cotton)
+          - 119 - Other non-permanent crops
+            - 1191 Flowers, cut flower production, flower buds
+            - 1192 flower seeds
+            - 1193 Grass and other fodder plant seeds
+        - A12 - Permanent crop cultivation
+          - 121 - Grape cultivation
+            - 1210 Grapes
+          - 122 - Tropical and subtropical fruit cultivation
+            - 1221 Mango
+            - 1222 Banana
+          - 123 - Citrus fruit cultivation
+            - 1223 Papaya
+          - 124 - Cultivation of fleshy fruits and fruits with hard skins
+            - 1224 Pineapple
+          - 125 - Cultivation of fruits and nuts growing on other trees and shrubs
+            - 1225 Fashion Fruit
+          - 126 - Cultivation of oil fruits
+            - 1226 Rambutan
+          - 127 - Cultivation of drinking crops
+            - 1227 Avocado
+          - 128 - Cultivation of spices, aromatics, medicines and related crops
+            - 1228 kilos of pears
+          - 129 - Growing other permanent crops
+            - 1291 rub.
+            - 1292 Betel
+            - 1293 Kithul
+            - 1294 Pillowcases
+            - 1295 - Brushing the rice
+            - 1296 Areca
+            - 1299 - Land - Other permanent crops such as jackfruit, palm oil etc.
+            - 1243 pears
+            - 1249 Fleshy fruits and fruits with hard skins (not elsewhere specified)
+            - 1251 Cashew
+            - 1252 fruit seeds
+            - 1253 Strawberry
+            - 1259 Fruits and nuts of other trees and shrubs (not elsewhere specified)
+            - 1261 Coconut/Orange
+            - 1262 - Land - Coconut
+            - 1271 Tea
+            - 1272 Coffee
+            - 1273 Cocoa
+            - 1279 - Land - Other drinking crops
+            - 1281 Cinnamon
+            - 1282 - Land - Pepper
+            - 1283 Cardamom
+            - 1283 cloves
+            - 1283 Nutmeg
+            - 1284 chili
+            - 1284 Chemical chili
+            - 1285 Ginger
+            - 1285 Yellow
+            - 1286 Medicines and drugs and related plants
+            - 1287 Herbs used to make medicine
+            - 1288 Other spices, aromatics, medicines and related crops (vanilla)
+        - A13 - Plant breeding (propagation)
+          - 130 - Plant breeding (propagation)
+            - 1301 - Potato seed production
+            - 1301 - Onion seed production
+            - 1301 - Vegetable seed production (upland/lowland)
+            - 1302 - Tea Plant Nursery Preparation
+            - 1303 - Preparation of rubber plant nurseries
+            - 1304 - Preparation of coconut nurseries
+            - 1305 - Flower seed production
+            - 1309 - Nursery arrangements for other crops (except for forestry) (areca nut, pepper, etc.)
+        - A14 - Animal Production
+          - 141 - Raising cows and buffaloes
+            - 1411 - Raising and breeding cattle
+            - 1412 - Raising and breeding a buffalo
+            - 1413 - Dairy farming
+            - 1414 - Raising and breeding of cattle and buffaloes
+          - 142 - Raising horses and other similar animals
+            - 1420 - Raising horses and other similar animals
+          - 143 - Raising camels and camelids
+            - 1430 - Raising camels and camelids
+          - 144 - Raising sheep and goats
+            - 1441 - Raising and breeding goats
+            - 1442 - Goat milk production
+            - 1443 - Raising and breeding sheep
+          - 145 - Raising pigs
+            - 1450 - Raising pigs
+          - 146 - Raising chickens, ducks, turkeys, geese
+            - 1461 - Raising and breeding chickens for eggs
+            - 1462 - Raising and breeding chickens for meat
+            - 1463 - Breeding (seed saving) of animals such as ducks, turkeys, geese
+          - 149 - Raising other animals
+            - 1469 - Raising and breeding of ducks, geese, turkeys and other animals
+            - 1491 - Raising and breeding birds
+            - 1492 - Raising and breeding rabbits and other fur-bearing animals
+            - 1493 - Beekeeping and production of honey and beeswax
+            - 1494 - Keeping and breeding pets
+            - 1499 - Raising and breeding other animals
+        - A15 - Mixed farming
+          - 150 - Mixed farming (livestock and crop cultivation)
+            - 1500 - Mixed farming (cropland and animal production)
+        - A16 - Agricultural and post-harvest support activities
+          - 161 - Support functions for crop production
+            - 1611 - Preparation of paddy fields on a rental or contract basis
+            - 1611 - Planting (for hire or on contract basis)
+            - 1611 - Cultivation care (for hire or on contract basis)
+            - 1611 - Crop spraying, windrowing (for hire or on contract basis)
+            - 1611 - Pruning of fruit trees and vines (for hire or on contract basis)
+            - 1611 - Planting rice seedlings
+            - 1611 - Harvesting (for hire or on contract basis)
+            - 1611 - Agricultural pest control (for hire or on contract basis)
+            - 1612 - Operate/operate agricultural irrigation equipment
+            - 1613 - Supply of agricultural machinery operators
+            - 1614 - Maintaining and maintaining land suitable for agriculture
+            - 1619 - Other agricultural activities (on hire or contract basis)
+          - 162 - Support services for animal production
+            - 1621 - Activities related to animal husbandry and productivity enhancement
+            - 1622 - Cattle care services, cattle services, grazing services, services related to the fattening of poultry (cleaning chicken coops, etc.)
+            - 1623 - Work related to artificial insemination (for hire or on contract basis)
+            - 1624 - Horse breeding stall service (for hire or on contract basis)
+            - 1625 - Caring for animals on animal farms
+            - 1626 - Laden tasks
+            - 1629 - Other support functions for animal production (not elsewhere specified)
+          - 163 - Post-harvest operations (processing for primary markets)
+            - 1631 - Harvest cleaning for the primary market
+            - 1632 - Harvesting for the primary market
+            - 1633 - Sorting the harvest for the primary market
+            - 1634 - Destruction of the crop for the primary market
+            - 1639 - Other post-harvest tasks
+          - 164 - Seed preparation for propagation
+            - 1641 - Removal of non-seed parts, undersized seeds, insect-damaged seeds and immature seeds
+            - 1641 - Removing moisture to a safe level during seed storage
+            - 1642 - Drying, cleaning, sorting and caring for the seeds until they reach the market
+            - 1643 - Nursing for genetically modified seeds
+            - 1649 - Other post-harvest operations for the dissemination of high-quality seeds (not elsewhere specified)
+        - A17 - Hunting, trapping and related service activities
+          - 170 - Hunting, trapping and related service activities
+            - 1701 - Hunting and trapping for trade
+            - 1702 - Taking animals (dead or alive) for food, fur/skin, research, zoo or pets
+            - 1703 - Manufacture of fur/leather from reptiles or birds caught by hunting or trapping
+            - 1704 - Catching sea mammals from land (seals)
+      - A2 - Forestry and logging
+        - A21 - Tree planting and other forestry operations
+          - 210 - Tree planting and other forestry operations
+            - 2101 - Forestry (planting, replanting, grafting, pruning, forest and woodland conservation)
+            - 2102 - Maintaining forest nurseries for forestry
+            - 2109 - Other tree planting and forestry activities
+        - A22 - Woodcutting
+          - 220 - Woodcutting
+            - 2201 - Production of roundwood for forestry-related products industries
+            - 2202 - Manufacture of unprocessed round wood (for fence posts and necessary poles)
+            - 2203 - Firewood collection and production
+            - 2204 - Charcoal production in the forest (using traditional methods)
+        - A23 - Collection of non-timber forest products
+          - 230 - Collection of non-timber forest products
+            - 2301 - Gathering mushrooms
+            - 2301 - Gathering wild fruits (diwali, palu, etc.)
+            - 2301 - Nut collection
+            - 2301 - Cork collection
+            - 2303 - Collecting medicinal plants
+            - 2304 - Collection of other forestry materials
+        - A24 - Forestry support services
+          - 240 - Forestry support services
+            - 2401 - Forestry Documentation
+            - 2401 - Forest management consultancy services
+            - 2401 - Viewing timber/values
+            - 2401 - Forest Fire Fighting and Protection
+            - 2401 - Forest Pest Control
+            - 2401 - Other forestry service functions
+            - 2402 - Transporting timber in the forest
+            - 2402 - Other wood service activities
+      - A31 - Fishing
+        - 311 - Saltwater fishing
+          - 3111 - Deep-sea fishing
+        - 312 - Freshwater fishing
+          - 3112 - Inshore fishing (including lagoons)
+          - 3113 - Catching of marine arthropods and molluscs (shrimp, crabs, lobsters, sea urchins, etc.)
+          - 3114 - Seaweed collection
+          - 3115 - Collection of natural pearls, seashells, and stone flowers
+          - 3116 - Fishing and on-board fish processing activities
+          - 3117 - Collecting ornamental marine fish
+          - 3118 - Collection of marine aquatic animals
+          - 3121 - Commercial freshwater fishing
+          - 3122 - Catching of freshwater arthropods (shrimp, crabs, oysters) and molluscs
+          - 3123 - Collecting freshwater ornamental fish
+          - 3124 - Collection of freshwater animals
+          - 3125 - Collection of freshwater plants
+      - A32 - Aquaculture
+        - 321 - Saltwater Aquaculture
+          - 3211 - Cultivation - Fish in the pond
+          - 3211 - Ornamental fish land in Karadiya
+          - 3212 Freshwater arthropods and molluscs (shrimps, crabs, other shellfish)
+          - 3212 - Shrimp, crab, mussel and other shellfish farming
+          - 3213 Aquatic animals in salt water
+          - 3214 Seaweeds and other edible seaweeds
+          - 3214 Ornamental plants in the garden
+          - 3215 - Operation of saltwater fish hatcheries
+        - 322 - Freshwater Aquaculture
+          - 3221 - Farming - Freshwater fish (including lagoons)
+          - 3221 - Cultivation - Freshwater ornamental fish
+          - 3222 - Farming - Freshwater shrimp, crabs and other shellfish
+          - 3223 - Maintaining freshwater fish/shrimp hatcheries
+          - 3224 Freshwater plants
+      - Rural Hospital
+      - Agricultural Office
+      - Development Officer's Office
+      - Samurdhi Bank
+      - A3 - Fishing and Aquaculture
+    - B - Mining and quarrying
+      - B7 - Metallurgical soil excavation
+        - B71 - Iron ore mining
+          - 710 - Iron ore mining
+            - 7100 - Iron ore mining
+          - Sarvodaya Building
+          - Sanasa Building
+          - Preschool building
+          - Community Hall
+          - Death Aid Society Building
+        - B72 - Mining of non-ferrous metals
+          - 729 - Mining of other non-ferrous metals
+            - 7291 - Rutile mining and processing
+            - 7292 - Ilmenite mining and processing
+            - 7293 - Zircon mining and processing
+            - 7294 - Gold mining
+            - 7299 - Mining of other non-ferrous ores
+      - B8 - Other mining and quarrying
+        - B81 - Quarrying, sand mining, clay mining
+          - 810 - Quarrying, sand mining, clay mining
+            - 8101 - Granite Quarrying
+            - 8101 - Ruble quarrying (Jaffna) / Sakka quarrying
+            - 8102 - Quarrying of measuring stones, sandstone, marble
+            - 8103 - Quarrying of limestone, coral reefs, and rocks
+            - 8104 - Cutting/excavating gravel and other materials
+            - 8105 - Sand dredging (freshwater)
+            - 8106 - Sea sand dredging (pumping)
+            - 8107 - Gypsum mining (calcium sulfate)
+            - 8108 - Clay excavations (ball clay, clay, bricks and tiles, porcelain) resistant to high temperatures
+            - 8109 - Other quarried stone, sand and clay (not elsewhere specified or included)
+        - B89 - Excavation and quarrying (not elsewhere classified)
+          - 891 - Mining of chemicals, minerals used for fertilizers
+            - 8911 - Mining of natural phosphates (apatite)
+            - 8912 - Mining of unburned dolomite
+            - 8919 - Mining of other chemical and fertilizer minerals
+            - 8920 - Extraction of manure from bog waste (peat extraction)
+            - 8931 - Salt extraction (excluding iodization)
+            - 8991 - Gemstone mining
+          - 892 - Extraction of fertilizer from waste materials in swamps (peat extraction)
+            - 8992 - Natural graphite mining
+          - 893 - Salt extraction
+            - 8993 - Mining of mica, feldspar, silica, rutile, calcite, zircon
+          - 899 - Other excavations and diggings (not elsewhere specified)
+            - 8994 - Quartz mining
+            - 8995 - Coal mining
+            - 8996 - Quarrying of granite; cutting of chippings, concrete blocks, etc. from the granite quarried by oneself
+            - 8999 - Earthmoving, other excavation and digging (not elsewhere classified)
+      - B9 - Excavation support services
+        - B91 - Support activities in petroleum and natural gas extraction
+          - 910 - Support activities in petroleum and natural gas extraction
+            - 9100 - Oil and gas exploration services (on a contract basis)
+        - B99 - Support services for other excavation and mining
+          - 990 - Support services for other excavation and mining
+            - 9900 - Water pumping services for excavation (for gem mining etc. - on contract basis)
+            - 9901 - Support services for gems and minerals
+            - 9902 - Support services related to black stone mining
+            - 9903 - Other mining
+    - C - Products
+      - C30 - Manufacture of other transport equipment
+        - C301 - Ship and boat manufacturing
+          - 3011 - Manufacture of ships and floating structures
+            - 30111 - Shipbuilding
+          - 3012 - Manufacture of boats for sports and recreational purposes
+            - 30112 - Manufacture of boats and passenger vessels
+            - 30113 - Manufacture of other ships and floating structures (not elsewhere specified)
+            - 30120 - Manufacture of boats for sports and recreational purposes
+        - C302 - Railway Engine and Railway Machine Box Manufacturing
+          - 3020 - Railway engine and railway engine box manufacturing
+            - 30200 - Manufacture of railway engines and railway engine boxes
+        - C303 - Manufacture of aircraft, spacecraft and related machinery
+          - 3030 - Manufacture of aircraft, spacecraft and related machinery
+            - 30300 - Manufacture of aircraft, spacecraft and related machinery
+        - C304 - Army Combat Vehicle Production
+          - 3040 - Military Assault Vehicle Production
+            - 31001 - Manufacture of wooden furniture
+        - C309 - Other transport equipment manufacturing
+          - 3091 - Motorcycle manufacturing
+            - 30910 - Motorcycle manufacturing
+          - 3092 - Manufacture of bicycles and bicycles for the disabled
+            - 30921 - Manufacture of bicycles and bicycle parts
+            - 30922 - Manufacture of tricycles, baby carriages and their spare parts
+            - 30923 - Manufacture of bicycles and parts thereof for the disabled, with or without a motor
+          - 3099 - Manufacture of other transport equipment (not elsewhere classified)
+            - 30991 - Hand-pushed cart manufacturing
+            - 30992 - Manufacture of animal-drawn carts
+      - C26 - Manufacture of computer, electronic and optical equipment
+        - C262 - Computer and insulation equipment manufacturing
+          - 2620 - Computer and insulation equipment manufacturing
+            - 26200 - Manufacturing and assembly of computers, laptops, ATM machines, computer printers, etc.
+        - C261 - Electronic components and circuits manufacturing
+          - 2610 - Manufacture of electronic components and circuits
+            - 26100 - Manufacture of electronic components and circuits
+        - C263 - Communication equipment manufacturing
+          - 2630 - Communication equipment manufacturing
+            - 26300 - Communication equipment manufacturing
+        - C264 - Consumer Electronics Manufacturing
+          - 2640 - Consumer Electronics Manufacturing
+            - 26401 - Manufacture of household audio communication equipment
+            - 26402 - Manufacture of household optical communication equipment
+            - 26403 - Manufacture of audio or visual communication equipment for use in vehicles
+            - 26404 - Public Address System Manufacturing
+            - 26405 - Other entertainment production
+            - 26409 - Manufacture of other consumer electronic products not elsewhere specified
+        - C265 - Measuring, testing, control instruments related to navigation, watches and clocks manufacturing
+          - 2651 - Manufacturing of measuring, testing, navigation and control instruments
+            - 26510 - Manufacturing of measuring, testing, navigation and control instruments
+          - 2652 - Manufacture of watches and clocks
+            - 26520 - Manufacture of all types of wrist and wall clocks
+        - C266 - Manufacture of medical electroradiation vessels and electrotherapy equipment
+          - 2660 - Manufacture of medical electroradiation vessels and electrotherapy equipment
+            - 26600 - Manufacture of medical electroradiation vessels and electrotherapy equipment
+        - C267 - Manufacture of optical and photographic equipment
+          - 2670 - Manufacture of optical and photographic equipment
+            - 26701 - Optical instrument manufacturing
+            - 26702 - Manufacture of photographic equipment
+            - 26703 - Manufacture of prisms, lenses, mirrors, etc.
+        - C268 - Magnetic and optical media production
+          - 2680 - Magnetic and optical media manufacturing
+            - 26800 - Magnetic and optical media manufacturing
+      - C21 - Basic pharmaceutical manufacturing and pharmaceutical-related processing
+        - C210 - Manufacture of pharmaceuticals, medicinal chemicals and botanicals
+          - 2100 - Manufacture of pharmaceuticals, medicinal chemicals and botanicals
+            - 21001 - Herbal (Western) Production
+            - 21002 - Production of indigenous medicines/Ayurvedic herbs, botanicals
+            - 21003 - Manufacture of impregnated cotton swabs for medical examinations
+            - 21009 - Manufacture of other pharmaceuticals, medicinal chemicals and botanicals (not elsewhere specified)
+      - C22 - Manufacture of rubber and plastic materials
+        - C222 - Plastic material production
+          - 2220 - Plastics manufacturing
+            - 22201 - Production of semi-plastic products (plastic discs, sheets, etc.)
+            - 22202 - Manufacture of fully plastic tubes, pipes, hoses, plastic fittings
+            - 22203 - Manufacture of plastic packaging materials (containers, boxes, bottles, bags, etc.)
+            - 22206 - Manufacture of artificial stone (e.g. artistically prepared marble)
+            - 22204 - Manufacturing of building plastic products (doors, windows, tanks, artificial reservoirs)
+            - 22205 - Manufacture of plastic kitchenware, toilet utensils, etc.
+            - 22207 - Manufacture of various plastic items (school bags, conveyor belts, combs, hair curlers, small gift items, etc.)
+            - 22208 - Products made of fiberglass
+            - 22209 - Manufacture of various plastic materials (nameplates) (not elsewhere classified)
+        - C221 - Rubber material production
+          - 2219 - Manufacture of other rubber products
+            - 22191 - Manufacture of rubber discs, sheets, strips, etc.
+            - 22192 - Manufacture of rubber pipes, hoses, rings, fittings, covers
+            - 22193 - Manufacture of rubber thread, fabric, rope
+            - 22194 - Manufacture of inflatable rubber mattresses, rubber sanitary products, contraceptive sheaths, etc.
+            - 22195 - Rubber bathing caps and upper body coverings, diving suits and other rubber-based clothing products
+            - 22196 - Rubber base clothing production
+            - 22197 - Manufacture of inflatable rubber balloons
+            - 22198 - Manufacture of hard rubber materials
+            - 22199 - Manufacture of other rubber products (not elsewhere classified)
+          - 2211 - Manufacture of rubber tires and tubes, tire retreading and retreaded tires
+            - 22111 - Rubber tire manufacturing
+            - 22112 - Production of inner tubes for tires
+            - 22113 - Retreading and building rubber tires
+            - 22114 - Production of interchangeable filled tires
+            - 22115 - Manufacture of solid rubber tires
+      - C10 - Foodstuffs manufacturing
+        - C101 - Meat Processing and Preservation
+          - 1010 - Meat processing and preservation
+            - 10101 - Slaughtering, processing and packaging of animals for meat (except poultry, turkeys, etc.) including by-products
+            - 10102 - Slaughtering, processing, freezing and packaging of poultry, turkeys, etc. (including by-products)
+            - 10103 - Meat canning
+            - 10104 - Meat cutting (including freezing)
+            - 10105 - Meat products (sausages, ham, bacon)
+            - 10109 - Other meat products (not elsewhere specified)
+        - C102 - Preparation and preservation of fish (shrimp, crabs and molluscs)
+          - 1020 - Preparation and preservation of fish, shrimps, crabs and molluscs
+            - 10201 - Frozen fish (except shrimps and crabs)
+            - 10202 - Freezing of shrimps, crabs, mollusks
+            - 10203 - Dried fish and jaggery production
+            - 10204 - Salting, drying and smoking of shrimps, crabs and molluscs
+            - 10205 - Cooked fish and other fish products, shrimps, crabs and molluscs products (cooked fish, fish fillets, fish roe and pickled fish roe)
+            - 10206 - Fish canning
+            - 10207 - Production of animal feed from fish
+            - 10209 - Other fish products (not elsewhere specified or included)
+        - C103 - Processing and Preservation of Vegetables and Fruits
+          - 1030 - Processing and Preservation of Vegetables and Fruits
+            - 10301 - Processing for preserving fruit
+            - 10302 - Processing of vegetables for preservation
+            - 10303 - Production of food products from vegetables, including packaging and canning
+            - 10304 - Production of food products from fruits, packaging, canning and production of jams, marmalades, table jellies
+            - 10305 - Manufacture of pickles, chutneys, mackerel and salt and pepper
+            - 10306 - Manufacture of fruit juices and concentrates thereof (cordial production)
+            - 10307 - Processing, frying and preserving of potatoes/cassava, nuts (potato/cassava chips, snacks, roasted nuts, bites, cashew nuts, peanuts, etc.)
+            - 10308 - Peanut butter and nut products
+            - 10309 - Processing and preserving of other fruit and vegetable products, production of copra and dasica coconut (not elsewhere classified)
+        - C104 - Production of vegetable and animal oils and fats
+          - 1040 - Production of vegetable and animal oils and fats
+            - 10401 - Coconut oil production
+            - 10402 - Production of fatty oils from other vegetable oils and nuts (e.g. sesame and soybean)
+            - 10403 - Extraction of oils and fats from fish and marine mammals
+            - 10404 - Manufacture of edible animal oils and fats
+            - 10405 - Margarine and haiko production
+            - 10406 ​​- Production of inedible animal oils and fats
+            - 10407 - By-products of oil production (sulfur and others)
+        - C105 - Dairy products
+          - 1050 - Dairy products
+            - 10501 - Fresh liquid milk products, pasteurized (flavored or not), bottled or packaged
+            - 10502 - Milk-based beverage products (e.g. Milo)
+            - 10503 - Manufacture of milk powder or cream-based solids
+            - 10504 - Concentrated milk products, whether or not flavoured
+            - 10505 - Manufacture of yogurt or skimmed milk
+            - 10506 - Manufacture of butter, cheese, vegetable oil
+            - 10507 - Ice cream production
+            - 10509 - Other dairy products (not elsewhere specified or included)
+        - 1061 - Flour products prepared from flour of cereals
+          - 10611 - Rice production/paddy threshing
+            - 10621 - Production of starches used to thicken food from corn, potatoes, maize, rice, and other grains
+            - 10622 - Production of glucose, glucose syrup, maltose, inulin, etc.
+            - 10623 - Manufacture of cassava flour and other substitutes therefor
+            - 10629 - Flour and flour-based products
+          - 10612 - Flour production (including cereals, rice)
+          - 10613 - Manufacture of flour from powdered coconut milk, mayo and other nuts, etc.
+          - 10614 - Breakfast cereal products (Cerilac, Triphosha, Samaposha, Aappa/Indi Aappa/Tose mixes)
+          - 10619 - Other flour products prepared from cereal flour (not elsewhere specified or included)
+        - C107 - Other food manufacturing
+          - 1071 - Bakery products
+            - 10711 - Manufacture of bread, rolls and buns, fish cakes, etc.
+            - 10712 - Pastry, spaghetti production
+            - 10713 - Preparation of biscuits, cakes and other bakery products
+            - 10714 - Preservative-free pastries
+            - 10715 - Manufacture of sweet or salty snack foods
+            - 10716 - Preparation of frozen bakery products
+            - 10717 - Cakes, wedding cakes and other cake products
+            - 10719 - Manufacture of other bakery products (not elsewhere classified)
+          - 1072 - Sugar production
+            - 10721 - Production of sugar from sugarcane (sucrose)
+            - 10722 - Sugar syrup production
+            - 10723 - Sugarcane molasses production
+            - 10724 - Honey and jaggery production
+          - 1073 - Cocoa, chocolate and confectionery manufacturing
+            - 10731 - Cocoa-based products
+            - 10732 - Chocolate and chocolate-related products
+            - 10733 - Sugar-based products such as toffee, chewing gum, lozenges
+            - 10734 - Manufacture of other sweets (e.g. Bundi, Puhuldosi, Dodol)
+            - 10735 - Preserving fruits, fruit peels, nuts (such as cashews) and other plant parts in sugar (e.g. ginger dosi, lime peel)
+            - 10739 - Manufacture of other confectionery (not elsewhere specified)
+          - 1074 - Manufacture of macaroni, noodles, couscous and similar flour-based foods
+            - 10741 - Manufacture of noodles, macaroni, pasta, naan, papadum etc. (uncooked)
+            - 10742 - Canned or frozen pasta products
+          - 1075 - Pre-cooked food production
+            - 10750 - Pre-cooked food production (not for immediate consumption)
+          - 1079 - Other food manufacturing (not elsewhere classified)
+            - 10791 - Tea production
+            - 10792 - Production of tea bags and various flavored specialty teas
+            - 10793 - Coffee production
+            - 10794 - Production of soups made from soup cubes and boiled meat and fish, etc.
+            - 10795 - Manufacture of spices, sauces, condiments and condiments
+            - 10796 - Manufacture of vinegar, yeast, baking soda and caramel, etc.
+            - 10797 - Manufacture of non-perishable foods for resale, such as sandwiches, uncooked pizzas and egg-based dishes (raisins)
+            - 10798 - Preparation of salt suitable for consumption (iodized salt)
+            - 10799 - Other food manufacturing (not elsewhere classified)
+        - 1080 - Manufacture of processed animal feed
+          - 10801 - Manufacture of processed food for pets (dogs, cats, birds and fish, etc.)
+          - 10802 - Production of feed for farm animals: including concentrated animal feed and supplementary feed
+      - C11 - Beverage production
+        - C110 - Beverage production
+          - 1101 - Spirits Filtration, Purification and Blending
+            - 11011 - Manufacture of arrack, whisky, brandy, etc.
+            - 11012 - Illegal production of alcohol
+            - 11013 - Distilled spirits mixing
+            - 11019 - Manufacture of other alcoholic beverages suitable for brewing
+            - 11021 - Wine production
+          - 1102 - Wine production
+            - 11022 - Production of mustard (except mustard grinding)
+          - 1103 - Production of grains for alcohol and production of spirits from grains
+            - 11031 - Beer production
+            - 11032 - Production of low-alcohol and non-alcoholic beer
+            - 11039 - Manufacture of other grain spirits and related malts (not elsewhere specified)
+          - 1104 - Manufacture of soft drinks, mineral water and other bottled water
+            - 11041 - Manufacture of soft drinks, soda, tonics, fruit drinks, etc.
+            - 11042 - Production of natural mineral water and bottled water
+            - 11043 - Beverage packaging production
+            - 11049 - Manufacture of other non-alcoholic beverages (except beer and wine)
+      - C12 - Tobacco products
+        - C120 - Tobacco products
+          - 1200 - Tobacco-related products
+            - 12001 - Steaming and re-drying of tobacco
+            - 12002 - Manufacture of chewing tobacco, snuff and pipe tobacco
+            - 12003 - Cigarette manufacturing
+            - 12004 - Beedi and cigar manufacturing
+            - 12009 - Other tobacco products (not elsewhere specified or included)
+      - C13 - Textile production
+        - C131 - Yarn spinning, weaving and finishing
+          - 1311 - Preparation of fibers for weaving
+            - 13111 - Manufacture of cotton blended yarn and related fibres (for weaving)
+            - 13112 - Manufacture of yarn from other fibres; manufacture of related fibres (for weaving)
+            - 13113 - Manufacturing of sewing threads
+            - 13114 - Coir fiber production, coir products, coconut husk cutting by machines
+          - 1312 - Weaving
+            - 13121 - Weaving (by hand machines)
+            - 13122 - Weaving (by power looms)
+            - 13123 - Gauze production
+          - 1313 - Textile finishing
+            - 13131 - Garments, textile fibres, yarns, bleaching and dyeing
+            - 13132 - Batik industry
+            - 13133 - Textile finishing (except bleaching and dyeing)
+            - 13134 - Waterproofing, coating or impregnation of garments
+            - 13135 - Wrinkling of fabrics and similar tasks
+            - 13136 - Silk-screen printing of fabrics and garments
+            - 13139 - Textile finishing (not elsewhere classified)
+        - C139 - Other textile manufacturing
+          - 1391 - Manufacture of knitted and crocheted fabrics
+            - 13910 - Manufacture of knitted and crocheted fabrics
+          - 1392 - Textile-related products (except clothing)
+            - 13921 - Bedding, towels, products
+            - 13922 - Manufacture of curtains, furniture or machine covers, dishcloths and similar materials, life jackets and parachutes
+            - 13923 - Hand-woven colorful fabric production
+            - 13924 - Manufacture of blankets and travel rugs, table cloths, hand towels, pillowcases, cushion covers, textile bag manufacturing
+            - 13925 - Flags and Banners Products
+            - 13926 - Mosquito net manufacturing
+            - 13929 - Lampshades, other textile products, except clothing (not elsewhere specified or included)
+          - 1393 - Carpet and rug manufacturing
+            - 13931 - Carpet manufacturing
+            - 13932 - Rug manufacturing
+            - 13933 - Mat making, coconut frond weaving (reed and others)
+            - 13939 - Weaving of fertilizer bags, other ground cover manufacturing (not elsewhere classified)
+          - 1394 - Manufacture of ropes, ropes, cords and nets
+            - 13941 - Manufacture of ropes and cables from coir fibers
+            - 13942 - Manufacture of ropes, cables and cordage of textile or other fibres
+            - 13943 - Weaving knotted nets from coconut coir rope or cords
+            - 13944 - Manufacture of other textile ropes or cables, knotted nets
+            - 13945 - Fishing net manufacturing
+          - 1399 - Other textile manufacturing (not elsewhere classified)
+            - 13991 - Weaving of fine fabrics (manufacture of ribbons, etc.)
+            - 13992 - Production of labels and badges, etc.
+            - 13993 - Decorative decoration production
+            - 13994 - Embroidery
+            - 13995 - Fabric coating or plastic laminating production
+            - 13996 - Lace production
+            - 13997 - Netting Fabric Manufacturing
+            - 13999 - Other textile manufacturing (not elsewhere classified)
+      - C14 - Garment manufacturing
+        - C141 - Manufacture of clothing, except woolen clothing
+          - 1410 - Manufacture of wearing apparel, except woolen garments
+            - 14101 - Manufacture of garments (made from any fabric other than wool)
+            - 14102 - Manufacture of garments from leather
+            - 14103 - Manufacture of shawls, caps, shoes, ties, etc.
+            - 14104 - Manufacture of gloves, belts and other clothing (of textile or leather)
+            - 14105 - Tailoring for hire
+            - 14106 - Manufacture of women's and men's underwear, nightwear
+            - 14107 - Garment finishing
+            - 14109 - Sari weaving, garment manufacturing (not elsewhere classified)
+        - C142 - Production of materials from wool
+          - 1420 - Manufacture of materials from wool
+            - 14201 - Manufacture of garments and clothing accessories from wool
+            - 14209 - Manufactures of other materials of wool (not elsewhere specified or included)
+        - C143 - Knitting and crocheting textile manufacturing
+          - 1430 - Knitting and crocheting textile manufacturing
+            - 14301 - Manufacture of jerseys, coats, sweaters, children's wear or other knitted garments
+            - 14302 - Manufacture of socks, tights, hosiery
+            - 14303 - Manufacture of other hand-knitted garments (babies' hats, socks, small garments, etc.)
+            - 14309 - Manufacture of knitted or crocheted garments or fabrics, not elsewhere specified or included
+      - C15 - Manufacture of leather and leather-related materials
+        - C151 - Tanning and tanning, luggage manufacturing, handbag making and horse clothing, wool dyeing
+          - 1511 - Leather tanning, dyeing of leather garments
+            - 15111 - Tanning, dyeing and soft leather production (metal alloys)
+            - 15112 - Leather related products
+            - 15119 - Other tanned leather (not elsewhere specified or included)
+            - 15121 - Manufacture of luggage, school bags, purses, suitcases
+            - 15122 - Manufacture of non-metallic watch straps
+            - 15123 - Manufacture of containers from reeds/palm leaves etc.
+            - 15124 - Tent Production
+            - 15129 - Manufacture of other consumer leather and leather-related products (not elsewhere classified)
+          - 1512 - Manufacture of luggage, handbags and saddlery, etc.
+        - C152 - Footwear manufacturing
+          - 1520 - Footwear manufacturing
+            - 15201 - Manufacture of leather footwear
+            - 15202 - Manufacture of footwear from basic vulcanized or rubber moulds
+            - 15203 - Manufacture of plastic and rubber footwear
+            - 15204 - Manufacture of leather footwear parts
+            - 15209 - Manufacture of other footwear (not elsewhere specified)
+      - C16 - Wood, wood products and articles of wood, straw and plaited materials, except furniture
+        - C161 - Wood chipping and sawing
+          - 1610 - Wood chipping and sawing
+            - 16101 - Wood splitting and sawing; splitting or debarking logs
+            - 16102 - Manufacture of railway wooden sleepers
+            - 16103 - Manufacture of unassembled wood flooring
+            - 16104 - Wood tanning
+            - 16109 - Wood chipping and sawing (not elsewhere classified)
+        - C162 - Wood products manufacturing, plywood and coating materials
+          - 1621 - Manufacture of veneer sheets (such as plywood) and wood-based panels
+            - 16211 - Manufacture of veneer sheets, laminated wood boards and fiber boards
+            - 16212 - Wood core board production
+            - 16213 - Thin board manufacturing
+          - 1622 - Manufacture of building materials and carpentry
+            - 16221 - Yatali, Parala, Kavi Kurupa and basic Kavi Props products
+            - 16222 - Manufacture of tiles, doors, windows and shutters
+          - 1623 - Manufacture of other wooden containers
+            - 16223 - Manufacture of wooden stairs and fences
+            - 16224 - Wood edges and mouldings manufacturing
+            - 16229 - Wood carving, other building carpentry and joinery products (not elsewhere classified)
+            - 16231 - Wooden containers, packing boxes, manufactured from wood
+            - 16232 - Manufacture of wooden drums, wooden drums, barrels, boards
+            - 16233 - Manufacture of wooden yoth drums
+            - 16239 - Manufacture of other wooden containers (not elsewhere specified)
+          - 1629 - Manufacture of other wood products, including plywood, wooden sticks and sticks
+            - 16291 - Manufacture of wooden and kitchen utensils (kulla, wang gediya)
+            - 16292 - Manufacture of wooden statues and decorative items, manufacture of handicrafts
+            - 16293 - Manufacture of cork and corkscrews
+            - 16294 - Picture framing (wooden frames)
+            - 16295 - Manufacture of wooden shoe soles, broom handles, weapon handles, etc.
+            - 16299 - Manufacture of other wooden products, wooden poles and poles (not elsewhere classified)
+      - C17 - Manufacture of paper and paper products
+        - C170 - Paper and paper products manufacturing
+          - 1701 - Manufacture of paper pulp, paper and paperboard
+            - 17011 - Paper pulp production (bleached/unbleached, waste paper)
+            - 17012 - Paperboard and paper manufacturing
+            - 17013 - Manufacture of further processed paper and paperboard
+            - 17014 - Handmade paper production
+            - 17015 - Manufacture of carbon paper, stencils, etc. in rolls or large quantities
+            - 17019 - Manufacture of other types of paper (not elsewhere specified)
+          - 1702 - Manufacture of corrugated paper and paperboard, paper containers and paperboard
+            - 17021 - Paperboard container manufacturing
+            - 17022 - Production of thick paper containers
+            - 17023 - Manufacture of corrugated paper and paperboard
+            - 17024 - Manufacture of corrugated paper containers or paperboard
+            - 17025 - Manufacture of bags and sacks from paperboard
+            - 17026 - Manufacture of office pet files and similar materials
+            - 17029 - Manufacture of other containers, paper bags and boxes of paper and paperboard, not elsewhere specified or included
+          - 1709 - Manufacture of other materials from paper and paperboard
+            - 17091 - Personal hygiene paper products manufacturing
+            - 17092 - Manufacture of household articles from paper (e.g. paper plates, cups, trays, etc.)
+            - 17093 - Manufacture of cellulose or textile fillings
+            - 17094 - Manufacture of printing and writing paper, computer paper, copy paper, stencils, carbon paper, etc.
+            - 17095 - Envelope production
+            - 17096 - Manufacture of books, lists and other stationery
+            - 17097 - Vesak Lantern Production (Paper)
+            - 17099 - Other articles made from paperboard
+      - C18 - Printing and recorded media production
+        - C181 - Printing and service related printing
+          - 1811 - Prints
+            - 18111 - Newspaper printing (except newspaper publishing)
+          - 1812 - Prints related to service work
+            - 18112 - Printing of magazines, books, etc., excluding publishing
+            - 18113 - Printing on fabrics and other materials, except silk screen printing
+            - 18114 - Table and label printing
+            - 18115 - Prints (Miscellaneous)
+            - 18116 - Greeting Card Printing
+            - 18117 - Digital Printing
+            - 18119 - Printing and similar activities (not elsewhere classified)
+            - 18121 - Inspection and mold making, etc.
+            - 18122 - Binding, laminating and other accounting functions
+            - 18123 - Computer character combination and scanning
+            - 18124 - Manufacture of design equipment required for printing (templates, frames, etc.)
+            - 18129 - Vehicle sticker production, other printing related activities
+        - C182 - Reproduction of recorded media
+          - 1820 - Reproduction of recorded media
+            - 18201 - Reproduction of original recorded sound and music
+            - 18202 - Motion pictures and other video reproductions recorded from originals
+            - 18203 - Reproduction of data discs, software data tapes from originals
+      - C19 - Charcoal production and petroleum refining
+        - C191 - Production of charcoal kiln materials
+          - 1910 - Production of charcoal kiln materials
+            - 19100 - Manufacture of charcoal kiln materials
+        - C192 - Petroleum refinery production
+          - 1920 - Petroleum refinery production
+            - 19201 - Petroleum refining and manufacturing, lubricants manufacturing
+            - 19202 - Tar production
+      - C20 - Chemical and chemical products manufacturing
+        - C201 - Production of basic chemicals, fertilizers and nitrogen compounds, plastics, synthetic rubber
+          - 2011 - Basic chemical production
+            - 20111 - Production of liquefied or compressed air and gas
+          - 2012 - Production of fertilizer and nitrogen compounds
+            - 20112 - Manufacture of inorganic acids (excluding nitric acid)
+          - 2013 - Production of plastics and synthetic rubber from basic state
+            - 20113 - Dyes and pigments production
+            - 20114 - Manufacture of other inorganic compounds
+            - 20115 - Basic organic chemical production
+            - 20116 - Production of distilled water (battery water)
+            - 20117 - Production of synthetic glycerin
+            - 20118 - Coconut shell charcoal production
+            - 20119 - Other basic chemical products (not elsewhere specified)
+        - C202 - Other chemical production
+          - 2021 - Production of pesticides and other agrochemicals
+            - 20121 - Fertilizer production (urea, potassium, phosphate, etc.)
+          - 2022 - Paints, varnishes and similar coatings, printing inks and mastics (wood gums)
+            - 20122 - Production of nitrogen and related substances
+            - 20131 - Basic quality plastic production (vinyl chloride, vinyl acetate)
+            - 20132 - Basic polythene production
+            - 20133 - Production of basic polypropylene, production of polythene bags
+            - 20134 - Polyethylene production
+            - 20135 - Other plastic products from primary state
+            - 20136 - Basic synthetic rubber production
+            - 20137 - Production of natural rubber and synthetic rubber mixtures
+            - 20139 - Other primary plastic and synthetic rubber products (not elsewhere specified)
+            - 20211 - Manufacture of pesticides, insecticides, fungicides, herbicides, etc.
+            - 20212 - Production of non-sprouting materials, production of formal seedling growing materials
+            - 20219 - Manufacture of other agrochemicals (not elsewhere specified)
+            - 20221 - Manufacture of lacquers, dyes, varnishes, enamels
+            - 20222 - Manufacture of varnishes, varnish oils and polishes
+        - C203 - Manufacture of man-made fibrous materials
+          - 2030 - Production of man-made fibrous materials
+            - 20301 - Manufacture of artificial or non-natural fibers
+            - 20309 - Miscellaneous man-made fibrous materials (not elsewhere specified)
+          - 2023 - Manufacture of soaps and detergents, cleaning and polishing preparations, fragrances and toilet cleaning preparations
+            - 20223 - Manufacture of thinners, turpentine, not in shops for removing prepared paint or varnish
+            - 20224 - Printing ink production
+            - 20225 - Manufacture of fillers, surface preparation compounds, etc.
+            - 20226 - Mastic (wood gum) production
+          - 2029 - Other chemical products (not elsewhere classified)
+            - 20235 - Manufacture of perfumes and fragrances, air fresheners, etc., for rooms and toilets
+            - 20236 - Toothpaste, tooth powder and other similar products
+            - 20237 - Manufacture of polishes or waxes for polishing leather or wood
+            - 20239 - Other similar products not elsewhere specified or included
+            - 20291 - Manufacture of fireworks, explosives
+            - 20292 - Incense stick production
+            - 20293 - Manufacture of mosquito coils, chalk (writing), camphor, camphor balls, etc.
+            - 20294 - Matchbox production
+            - 20295 - Candle manufacturing
+            - 20296 - Activated carbon production
+            - 20297 - Manufacture of glues and processed gums
+            - 20298 - Production of fragrances obtained from natural plant extracts, such as citrus oil, cinnamon oil, etc.
+            - 20299 - Other chemical products (photographic films, plates, sensitive paper; metal cleaning agents (brass); textile finishing agents; gelatins and other proteins)
+            - 20229 - Manufacture of paints, varnishes and other materials (not elsewhere classified)
+            - 20231 - Production of organic surfactants
+            - 20232 - Manufacture of soap (used for washing hands), shampoo, shaving creams/ointments
+            - 20233 - Manufacture of laundry soap and laundry detergents, washing agents, toilet cleaners
+            - 20234 - Cosmetics (hair, nail styling products and cosmetics; suntan and sun protection products)
+      - C23 - Manufacture of other non-metallic mineral products
+        - C231 - Glass and glass material production
+          - 2310 - Manufacture of glass and glass products
+            - 23101 - Production of flat glass (wired, colored, multi-colored flat glass)
+            - 23102 - Manufacture of glass mirrors
+            - 23103 - Manufacture of glass molded stones for walls and floors
+            - 23104 - Manufacture of bottles and other glass containers
+            - 23105 - Manufacture of drinking glassware
+            - 23106 - Manufacture of glassware for domestic use
+            - 23107 - Manufacture of special glass used in spectacles, laboratory equipment, etc.
+            - 23109 - Manufacture of fish tanks, manufacture of other glassware (not elsewhere classified)
+        - C239 - Manufacture of non-metallic mineral products (not elsewhere specified)
+          - 2395 - Concrete, cement and mortar related products
+            - 23951 - Cement bricks, tiles, cement sheets, doors, windows, cement pillars, manufacturing
+            - 23952 - Lime plaster related products
+            - 23953 - Manufacture of asbestos sheets (corrugated and other cement sheets)
+            - 23954 - Production of powdered lime mortar
+            - 23955 - Manufacture of sculptures, statues, furniture, flower vases, flower pots from cement
+            - 23956 - Manufacture of ready-mixed mortar for concrete
+            - 23959 - Other cement-related products
+          - 2396 - Stone processing, cutting and polishing
+            - 23961 - Stone cutting, shaping, paving and finishing for construction and highways
+            - 23962 - Cutting, shaping and finishing of memorial stones
+            - 23963 - Manufacture of furniture made of stone
+          - 2399 - Manufacture of non-metallic minerals not elsewhere specified or included
+            - 23991 - Manufacture of grinding stones, natural or artificial abrasive powders and non-metallic mineral products not elsewhere specified or included
+            - 23992 - Stone grinding/cutting
+          - 2391 - Thermal and Materials Production
+            - 23911 - Manufacture of high-temperature resistant mortar, concrete, etc.
+            - 23912 - Manufacture of high-temperature resistant bricks, tubes, pipes, containers
+            - 23919 - Manufacture of other high-temperature resistant materials (not elsewhere specified)
+          - 2392 - Clay building materials production
+            - 23921 - Roof tile manufacturing
+            - 23922 - Brick manufacturing
+            - 23923 - Ceramic brick (floor and wall) production
+            - 23924 - Manufacture of ceramic sanitary ware (bathroom sets, etc.)
+            - 23929 - Manufacture of other clay and building materials (not elsewhere classified)
+          - 2393 - Manufacture of other porcelain and ceramic products
+            - 23931 - Manufacture of clay pots, flower pots and other clay products
+            - 23932 - Manufacture of dishes, ceramic figurines and other ceramic ornaments
+            - 23933 - Manufacture of porcelain cups, porcelain figurines and other ornamental articles
+            - 23934 - Manufacturing of electrical insulation and insulating devices
+            - 23935 - Manufacture of ceramic laboratories, chemicals and industrial materials
+            - 23939 - Manufacture of other porcelain and earthenware (not elsewhere classified)
+          - 2394 - Cement and mortar production
+            - 23942 - Chalk/white chalk production
+            - 23943 - Manufacture of plaster of Paris (made from gypsum or calcium sulphate) which has been calcined and converted into lime
+            - 23941 - Cement production
+      - C24 - Production of basic metals
+        - C241 - Basic iron and steel production
+          - 2410 - Basic iron and steel production
+            - 24100 - Basic iron and steel production
+        - C242 - Production of basic precious metals and other metals (non-ferrous)
+          - 2420 - Manufacture of basic precious metals and other non-ferrous metals
+            - 24200 - Production of basic precious and other metals (non-ferrous)
+        - C243 - Metal Casting
+          - 2431 - Iron and steel casting
+            - 24310 - Iron and steel casting
+          - 2432 - Non-ferrous metal casting
+            - 24320 - Non-ferrous metal casting
+      - C25 - Manufacture of fabricated metal products (except machinery and equipment)
+        - C252 - Manufacture of weapons and military equipment
+          - 2520 - Manufacture of arms and military equipment
+            - 25200 - Manufacture of arms and military equipment
+        - C259 - Other wrought iron products, metalworking service activities
+          - 2591 - Metal cutting, metal pressing, sealing and roll forming
+            - 25911 - Manufacture of metal products such as metal sheets by pressing, pressing, etc.
+            - 25912 - Manufacture of metal products by boiling metal powder
+          - 2592 - Metal plating
+            - 25921 - Metal coating and general engineering work
+            - 25922 - Welding work
+            - 25923 - Lathework
+          - 2593 - General Industrial Engineering
+            - 25931 - Manufacture of household appliances (of metal)
+            - 25932 - Manufacture of brass building hardware such as key plates, key cutting, hinges, latches, etc.
+            - 25933 - Manufacture of building hardware, such as key plates, hinges, bolts, etc., of other metals
+            - 25934 - Products manufactured in blacksmith shops
+            - 25939 - Hand tool manufacturing
+          - 2599 - Other fabricated metal products (not elsewhere classified)
+            - 25991 - Manufacture of nails, rivets (nails, rivets), pins, etc.
+            - 25992 - Manufacture of billy hooks, manufacture of metal electrical wires and similar materials
+            - 25993 - Packaging and container manufacturing (buckets, boxes, tins, etc.)
+            - 25994 - Manufacture of metal utensils and household utensils used for cooking
+            - 25995 - Sanitary ware manufacturing
+            - 25996 - Wire, barbed wire, green mesh used for fencing, springs, etc.
+            - 25997 - Manufacture of brass lamps, flower vases and other brass articles
+            - 25999 - Other fabricated metal products not elsewhere specified or included
+        - C251 - Manufacturing of structural metal products (warehouses, tanks, steam generators, etc.)
+          - 2513 - Manufacture of steam generators (except central-top boilers)
+            - 25113 - Manufacture of iron doors, windows, gates
+            - 25114 - Iron frame manufacturing
+            - 25119 - Manufacture of other structural metal products (not elsewhere classified)
+            - 25120 - Metal warehouses, tank manufacturing
+            - 25130 - Manufacture of steam generators (except central-top boilers)
+          - 2511 - Manufacture of structural metal products
+            - 25111 - Metal products for construction purposes
+          - 2512 - Manufacture of metal packaging tanks
+            - 25112 - Manufacture of various industrial metal frames
+      - C27 - Electrical equipment manufacturing
+        - C279 - Other electrical equipment manufacturing
+          - 2790 - Other electrical equipment manufacturing
+            - 27901 - Electric bells, electric magnets, door opening and closing devices
+            - 27909 - Manufacture of antennas, manufacture of other electrical equipment n.e.c.
+        - C271 - Manufacture of electric motors, generators and transformers and electricity distribution and control equipment
+          - 2710 - Manufacture of electric motors, generators and transformers and electricity distribution and control equipment
+            - 27104 - Manufacture of electrical circuit breakers
+            - 27101 - Electric motor manufacturing
+            - 27102 - Manufacture of generators
+            - 27103 - Manufacture of electrical transformers
+            - 27109 - Manufacture of other motors, generators, transformers and electrical distribution and control equipment
+        - C272 - Production of dry cells and accumulator cells
+          - 2720 ​​- Manufacture of dry cells and accumulator cells
+            - 27201 - Production of primary cells
+            - 27202 - Dry cell production
+            - 27203 - Battery cell manufacturing
+            - 27204 - Manufacture of electric cells and spare parts
+            - 27209 - Manufacture of solar cells, manufacture of electric cells not elsewhere specified
+            - 27310 - Optical fiber manufacturing
+            - 27321 - Manufacture of other electronic wires and electrical cables
+            - 27322 - Manufacture of other electronic wires and electrical cables
+            - 27329 - Manufacture of cables used in electrical, electronic and network systems
+        - C273 - Wiring and related equipment manufacturing
+          - 2731 - Optical fiber manufacturing
+            - 27331 - Switch manufacturing (used for wiring)
+          - 2732 - Manufacture of electrical conductors and wires and cables
+            - 27332 - Manufacture of electrical conduits, conduits, switch boxes, and related tools
+          - 2733 - Manufacturing of equipment used for wiring
+            - 27333 - Manufacture of lightning protection devices (lightning conductors) and coils
+            - 27339 - Manufacture of other products and tools for making electrical circuits
+        - C274 - Manufacture of electrical lighting equipment
+          - 2740 - Manufacture of electrical lighting equipment
+            - 27401 - Manufacture of filament bulbs
+            - 27402 - Manufacture of CFL and fluorescent lamps
+            - 27403 - Manufacture of other bulbs
+            - 27404 - Manufacture of table lamps, high-intensity discharge lamps, spotlights, etc.
+            - 27405 - Manufacture of lamps such as kerosene lamps
+            - 27409 - Manufacture of electrical lighting equipment
+        - C275 - Household Appliances Manufacturing
+          - 2750 - Household appliance manufacturing
+            - 27509 - Manufacture of other household appliances
+            - 27501 - Manufacture of refrigerators and freezers, washing machines, floor polishers, vacuum cleaners, grinders, juicers, etc.
+            - 27502 - Manufacture of electric heaters, electric irons, hair dryers, toasters, etc.
+            - 27503 - Gas stove manufacturing
+            - 27504 - Manufacture of can openers, knife sharpeners, razors, etc.
+      - C28 - Manufacture of machinery and equipment (not elsewhere classified)
+        - C281 - Manufacture of general purpose machinery
+          - 2811 - Manufacture of engines and turbines (except aircraft, vehicle and bicycle engines)
+            - 28110 - Engine and turbine manufacturing
+          - 2812 - Manufacture of equipment for generating electricity using liquids
+            - 28120 - Manufacture of equipment for the production of electricity using liquids
+          - 2813 - Manufacture of pumps, compressors, taps and valves
+            - 28130 - Manufacture of pumps, compressors, taps and valves
+          - 2814 - Manufacture of bearings, gears and driving equipment
+            - 28140 - Manufacture of bearings, gears and driving equipment
+          - 2815 - Manufacture of electric ovens and furnaces
+            - 28150 - Manufacture of electric ovens, stoves and heaters and manufacture of solar hot water sets
+          - 2816 - Manufacture of lifting and handling equipment
+            - 28160 - Hand-operated power-operated loading and unloading equipment, lifting equipment
+          - 2817 - Manufacture of office machinery (except computers and testing equipment)
+            - 28171 - Office equipment manufacturing
+            - 28172 - Manufacture of office equipment such as photocopiers, typewriters, etc.
+          - 2818 - Manufacture of power-driven hand tools
+            - 28180 - Manufacture of power-driven hand tools
+          - 2819 - Manufacture of other general purpose machinery
+            - 28191 - Manufacture of industrial refrigerators or industrial freezers, non-domestic electric fans, air conditioners, heavy duty heaters, etc.
+            - 28192 - Manufacture of special equipment for weighing, packing and wrapping goods
+            - 28193 - Manufacture of gas generators, automatic vending machines
+            - 28199 - Manufacture of other daily use appliances
+        - C282 - Special Purpose Machine Manufacturing
+          - 2821 - Manufacture of machinery used in agriculture and forestry
+            - 28210 - Manufacture of machinery used in agriculture and forestry
+          - 2822 - Manufacture of metal forming machines and machine tools
+            - 28220 - Manufacture of machines for metal forming
+          - 2823 - Manufacture of machinery for the metal industry
+            - 28230 - Manufacture of machinery for the metal industry
+          - 2824 - Manufacture of machinery for mining, quarrying and construction
+            - 28240 - Manufacture of machinery used in mining, quarrying and construction
+          - 2825 - Manufacture of machinery for food processing, beverage processing and tobacco processing
+            - 28250 - Manufacture of machinery for food processing, beverage processing and tobacco processing
+          - 2826 - Manufacture of machinery for the textile industry, clothing manufacturing and leather goods manufacturing
+            - 28260 - Manufacture of machinery used in the textile industry, garment manufacturing and leather goods manufacturing
+          - 2829 - Manufacture of special purpose machinery
+            - 28290 - Manufacture of equipment used in industries such as glass, paper, printing, etc.
+      - C29 - Motor vehicle and trailer manufacturing
+        - C293 - Manufacture of motor vehicle spare parts
+          - 2930 - Manufacture of motor vehicle spare parts
+            - 29301 - Manufacture of motor vehicle spare parts
+            - 29302 - Car sheet manufacturing
+        - C291 - Motor vehicle manufacturing
+          - 2910 - Manufacture of motor vehicles
+            - 29100 - Manufacture and assembly of motor vehicles
+        - C292 - Vehicle bodywork and trailer manufacturing
+          - 2920 - Vehicle bodywork and trailer manufacturing
+            - 29200 - Vehicle bodywork
+      - C31 - Furniture manufacturing
+        - C310 - Furniture manufacturing
+          - 3100 - Manufacture of furniture
+            - 31002 - Plastic furniture manufacturing
+            - 31003 - Manufacture of all metal furniture
+            - 31004 - Manufacture of furniture from bamboo, rattan and similar materials
+            - 31005 - Sewing machine, production of covers for televisions
+            - 31006 - Furniture finishing (spraying, painting, polishing, upholstering chairs, cushion covers for pillows and mattresses, etc.)
+            - 31007 - Manufacture of mattresses (coir or rubber), manufacture of pillows
+            - 31008 - Restaurant cart manufacturing
+            - 31009 - Manufacture of other furniture (not elsewhere classified)
+      - C32 - Other products
+        - C322 - Musical instrument manufacturing
+          - 3220 - Manufacture of musical instruments
+            - 32201 - Manufacture of mechanical musical instruments
+            - 32202 - Manufacture of electric musical instruments
+            - 32203 - Manufacture of mouth-blown sound signaling devices
+            - 32204 - Manufacture of finger-plucked musical instruments
+            - 32205 - Manufacture of equipment parts and related components
+            - 32209 - Manufacture of other musical instruments (not elsewhere classified)
+        - C323 - Sports equipment manufacturing
+          - 3230 - Sports equipment manufacturing
+            - 32301 - Batting products such as cricket bats
+            - 32302 - Manufacture of leather, rubber, tennis, etc. balls
+            - 32303 - Manufacture of protective gear used in sports such as sports gloves, helmets, etc.
+        - C324 - Manufacture of sports goods and toys
+          - 3240 - Manufacture of sports goods and toys
+            - 32401 - Manufacture of dolls, dolls' clothing and related articles
+            - 32402 - Toy animal manufacturing
+            - 32403 - Manufacture of wheeled toys and similar articles
+            - 32404 - Manufacture of puzzles and similar articles
+            - 32405 - Manufacture of game boards and similar articles
+            - 32406 - Manufacture of billiard and casino tables
+            - 32409 - Manufacture of other toys and games
+        - C321 - Manufacture of jewelry, small ornaments and related materials
+          - 3211 - Manufacture of jewellery and related articles
+            - 32111 - Gem cutting and polishing
+            - 32112 - Cutting and polishing of diamonds and other stones
+            - 32113 - Gold jewellery manufacturing and repair
+            - 32114 - Manufacture of silver jewellery and related materials
+            - 32115 - Manufacture of carved articles using precious or other metals
+            - 32116 - Manufacture of coins and medals (of precious metals or other metals)
+            - 32117 - Manufacture of utensils made of precious metals or alloys of precious metals (religious idols, spoons, forks, etc.)
+            - 32118 - Manufacture of industrial or laboratory equipment of precious metals
+            - 32119 - Jewelry polishing, other jewelry and other material manufacturing (not elsewhere classified)
+          - 3212 - Manufacture of imitation jewellery and related materials
+            - 32121 - Manufacture of imitation jewellery and related materials
+            - 32122 - Manufacture of metal watch straps
+        - C325 - Supply and manufacture of medical and dental equipment
+          - 3250 - Supply and manufacture of medical and dental equipment
+            - 32501 - Manufacture of orthopaedic devices and parts for the treatment of bone and muscle deformities
+            - 32502 - Manufacture of artificial teeth and attachments, etc.
+            - 32503 - Manufacture of cement used for bone reconstruction
+            - 32504 - Manufacture of special goods such as beds and chairs used for medical, veterinary, dental, etc.
+            - 32505 - Manufacture of eyeglasses, sunglasses, contact lenses, swimming goggles, etc.
+            - 32509 - Manufacture of other medical and dental equipment and supplies (not elsewhere classified)
+        - C329 - Other production (not elsewhere specified)
+          - 3290 - Other manufacturing (not elsewhere specified)
+            - 32901 - Manufacturing of safety and security equipment
+            - 32902 - Manufacture of vehicle number plates, date stamps, protruding and counting devices
+            - 32903 - Manufacture of brooms, brooms and brushes and handicrafts made from coir fibers
+            - 32904 - Manufacture of pens and pencils
+            - 32905 - Umbrella manufacturing
+            - 32906 - Artificial flowers, artificial garlands, bouquets, wreaths, flower baskets
+            - 32907 - Manufacture of wooden masks and coconut shell products, laksha industry, manufacture of ornamental items from shells, etc.
+            - 32908 - Button manufacturing, toothbrush manufacturing
+            - 32909 - Manufacture of coffins and other products of this class (not elsewhere specified)
+      - C33 - Repair and installation of machinery and other equipment
+        - C331 - Repair of fabricated metal products
+          - 3311 - Repair of fabricated metal products
+            - 33110 - Repair of fabricated metal products
+          - 3312 - Machine tool repair
+            - 33121 - Industrial Machinery Repair
+            - 33122 - Agricultural machinery and equipment repair
+          - 3313 - Electrical and optical equipment repair
+            - 33131 - Repair and maintenance of measuring, testing, control and operating equipment
+            - 33132 - Repair and maintenance of irradiation, electrotherapy, electromedical equipment
+            - 33133 - Repair and maintenance of optical instruments
+          - 3314 - Electrical Appliance Repair
+            - 33140 - Repair of electrical equipment (large motors, generators, transformers, large switchboards, primary batteries) excluding household appliances
+          - 3315 - Repair of transport equipment (except motor vehicles)
+            - 33150 - Daily repair and maintenance of ships, boats, carts, vehicles, aircraft, etc.
+          - 3319 - Other Equipment Repair
+            - 33191 - Fishing net repair
+            - 33192 - Manufacture of coin-operated gaming devices and musical instruments
+            - 33193 - Other equipment repair
+          - 3320 - Installation of industrial machinery and other equipment
+            - 33200 - Industrial machinery installation
+    - Q - Public Health and Social Services
+      - Q86 - Public health services
+        - 861 - Hospital services
+          - 8610 - Hospital services
+            - 86101 - Government National Hospitals, Teaching Hospitals, District Hospitals
+            - 86102 - Government-owned special hospitals (maternity hospital, mental hospital, dental, eye, children's, chest, cancer hospitals)
+            - 86103 - Government Rural Hospital, Estate Hospital
+            - 86104 - Government Ayurvedic Hospital
+            - 86105 - Private hospital services
+            - 86109 - Other hospital activities not elsewhere classified (Military and police hospitals, Jayawardenapura Hospital)
+        - 862 - Medical and dental services
+          - 8620 - Medical and dental services
+            - 86201 - Government Dispensary (West) and Government Dispensary (Ayurveda) Activities
+            - 86202 - Western Medical Private Dispensary/Medical Consultancy Services
+            - 86203 - Dental clinic services
+            - 86204 - Specialist medical services
+            - 86205 - Family Planning Center Activities
+            - 86209 - Medical and dental activities not elsewhere classified
+        - 869 - Other personal health services
+          - 8690 - Other personal health services
+            - 86901 - Acupuncture and Homeopathy Clinics
+            - 86902 - Ayurveda and local private and government dispensary/medical consultation services
+            - 86903 - Massage clinics, ophthalmology, physiotherapy, hydrotherapy, diagnostic clinics and home care services
+            - 86904 - Medical Laboratory Services
+            - 86905 - School Dentistry and Family Health Service
+            - 86906 - Public Health Inspectorate Office
+            - 86907 - Blood Bank and Eye Donation Association Activities
+            - 86908 - Ambulance Services and Mobile Nursing Services
+            - 86909 - Provision of toilet facilities and human health activities not elsewhere classified
+      - Q87 - Residential Security Services
+        - 871 - Residential Nursing Services
+          - 8710 - Residential Nursing Services
+            - 87101 - Nursing homes
+            - 87102 - Homes for people recovering from illnesses
+            - 87103 - Nursing homes
+            - 87104 - Nursing home activities
+        - 872 - Care for people with chronic mental disorders and substance abuse (residential)
+          - 8720 - Care work for people with long-term mental disorders and substance abuse (residential)
+            - 87201 - Treatment facilities for alcohol and drug addicts
+            - 87202 - Homes for recovering mental patients
+            - 87203 - Group homes for the mentally ill
+            - 87204 - People with long-term mental disorders
+            - 87205 - Semi-residential activities for mental health
+        - 873 - Care work for the elderly and disabled (residential)
+          - 8730 - Care of the elderly and disabled (residential)
+            - 87301 - Housing facilities for people in need of assistance
+            - 87302 - Nursing homes
+            - 87303 - Homes for the disabled (excluding nursing care)
+            - 87304 - Rest homes without nursing services (rest houses)
+        - 879 - Other residential care activities
+          - 8790 - Other residential care activities
+            - 87901 - Children's homes and orphanages
+            - 87902 - Homes where convicts released from prison or people released from hospitals are kept for socialization
+            - 87903 - Refugee camps, welfare centers
+            - 87909 - Animal shelters and other residential care activities
+      - Q88 - Social work (homeless)
+        - 881 - Social services for the elderly and disabled (without shelter)
+          - 8810 - Social work activities for the elderly and disabled (non-residential)
+            - 88101 - Social service activities carried out by meeting with the elderly and disabled
+            - 88102 - Day care for adults
+            - 88103 - Employment training activities for disabled people and activities to provide vocational qualifications for disabled people
+        - 889 - Other social work activities (without accommodation)
+          - 8890 - Other social work activities (without accommodation)
+            - 88901 - Child Day Care Centers
+            - 88902 - Day care centers for the elderly
+            - 88903 - Day care for the disabled
+            - 88904 - Church-related welfare organizations
+            - 88905 - Diving and natural disaster relief activities
+            - 88906 - Child and Youth Welfare Guidance Activities
+            - 88907 - Disaster Relief and Refugee Relief
+            - 88908 - Social Counseling Services
+            - 88909 - Social work activities without a place of residence not elsewhere classified
+    - D - Electricity, gas, steam and air conditioning supply
+      - D35 - Electricity, gas, steam and air conditioning supply
+        - D351 - Generation, Transmission and Distribution of Electric Power
+          - 3510 - Electric power generation, transmission and distribution
+            - 35102 - Coal-fired thermal power plants
+            - 35101 - Hydroelectric generation
+            - 35103 - Thermal power plants operating on fuels such as gas and diesel
+            - 35104 - Small Rural Hydropower Plants
+            - 35105 - Solar power plants
+            - 35106 - Wind power plants
+            - 35107 - Electrical products using other energy sources
+            - 35108 - Electricity distribution only
+        - D352 - Gas production, distribution of liquefied gas (gas) through mains
+          - 3520 - Gas production, distribution of liquefied gas (gas) through mains
+            - 35200 - Gas production, distribution of liquefied gas (gas) through mains
+        - D353 - Steam and air conditioning supply.
+          - 3530 - Steam and air conditioning supply.
+            - 35301 - Supply of steam or hot water for heating, power and other purposes
+            - 35302 - Supply of cold air or cold water. For cooling needs
+            - 35303 - Ice production for food and non-food purposes
+    - E - Water collection, waste disposal, treatment and supply
+      - E36 - Water collection, treatment and supply
+        - E360 - Water collection, treatment and supply
+          - 3600 - Water collection, treatment and supply
+            - 36001 - Water collection, treatment and distribution by bowser and pipeline (National Water Supply and Water Transport Board)
+            - 36002 - Water collection, purification and distribution by community organizations
+            - 36003 - Water purification and distribution by other organizations
+            - 36004 - Rainwater collection, purification and distribution
+            - 36005 - Production of water by distillation of sea water or groundwater
+            - 36006 - Irrigation Canal Activities/Operations
+            - 36009 - Well drilling, water collection, treatment and supply not elsewhere specified
+      - E37 - Sewerage systems
+        - E370 - Sewerage systems
+          - 3700 - Sewerage systems
+            - 37001 - Operation of sewage systems, treatment facilities/treatment facilities therefor
+            - 37002 - Remediation of human and industrial wastewater
+            - 37009 - Other water transport activities (not elsewhere classified)
+      - E38 - Waste collection, treatment and disposal activities, separation of materials from waste
+        - E381 - Waste collection
+          - 3812 - Hazardous waste collection
+            - 38120 - Hazardous waste collection
+          - 3811 - Non-hazardous waste collection
+            - 38110 - Non-hazardous waste collection
+        - E382 - Waste treatment and disposal
+          - 3821 - Non-hazardous waste treatment and disposal
+            - 38211 - Non-hazardous waste treatment and disposal
+            - 38212 - Production of compost fertilizer from organic waste
+            - 38213 - Land reclamation from non-hazardous waste
+            - 38214 - Biogas production
+          - 3822 - Hazardous waste treatment and disposal
+            - 38220 - Hazardous waste treatment and disposal
+        - E383 - Separation of materials from waste
+          - 3830 - Separation of materials from waste
+            - 38301 - Recycling of metal waste, scrap or other materials
+            - 38302 - Recycling of non-metallic waste (non-metallic scrap), scrap (debris) or other material
+      - E39 - Treatment activities and other waste management services
+        - E390 - Treatment activities and other waste management services
+          - 3900 - Treatment activities and other waste management services
+            - 39000 - Treatment activities and other waste management services
+    - F - Construction
+      - F41 - Building construction
+        - F410 - Building construction
+          - 4100 - Building construction
+            - 41001 - Building construction (residential)
+            - 41002 - Building construction (non-residential)
+            - 41003 - Building construction (residential and non-residential)
+            - 41004 - Alterations and repairs to existing housing models
+      - F42 - Civil Engineering
+        - F421 - Construction (Highways and Railways)
+          - 4210 - Construction (Highways and Railways)
+            - 42101 - Road construction
+            - 42102 - Railway construction
+            - 42103 - Bridge and tunnel construction
+            - 42104 - Construction (Running Tracks)
+            - 42109 - Other construction (related to highways and railways)
+        - F422 - Construction (Utility Projects)
+          - 4220 - Construction (Utility Projects)
+            - 42201 - Pipeline, power line and communication line construction
+            - 42202 - Irrigation systems (canals) and reservoir construction
+            - 42203 - Sewerage system construction (including repair) and sewage treatment plant construction
+            - 42204 - Gas station construction
+            - 42205 - Power Generation Construction
+            - 42206 - Construction communication towers
+            - 42207 - Drilling/Construction Wells
+        - F429 - Construction Other Civil Engineering Projects
+          - 4290 - Construction Other Civil Engineering Projects
+            - 42901 - Construction of industrial facilities, refinery buildings and chemical plants
+            - 42902 - Construction of waterways, harbours and riverside boat landings; and dam and embankment construction
+            - 42903 - Waterway excavation
+            - 42904 - Construction work (outdoor sports facilities)
+            - 42905 - Land development with land subdivisions (road additions, infrastructure)
+            - 42909 - Construction Other Civil Engineering
+      - F43 - Specialized construction activities
+        - F431 - Demolition and land/land subdivision
+          - 4311 - Demolition
+            - 43110 - Demolition and destruction of other structures and buildings
+        - F432 - Electrical power supplies and other construction installation processes
+          - 4312 - Ground preparation
+            - 43121 - Land preparation for buildings
+            - 43122 - Land preparation (for other construction, excavation, transportation, etc.)
+          - 4321 - Electrical Fixtures
+            - 43211 - Electrical wiring and equipment installation
+            - 43212 - Telephone wiring installation
+            - 43213 - Installation of computer network systems and television cable wiring, including the use of optical fibers
+            - 43219 - Other electrical installations (not elsewhere specified)
+          - 4322 - Plumbing, heating and air conditioning installation
+            - 43221 - Plumbing and sanitary ware installation
+            - 43222 - Installation (heating, ventilation, refrigeration or air conditioning, ducts, solar energy collectors)
+            - 43223 - Installation of heating systems (electric, gas and oil)
+            - 43224 - Firefighting equipment for installations
+          - 4329 - Other construction fixtures
+            - 43229 - Other installation related (plumbing, heating and air conditioning (not elsewhere specified))
+            - 43291 - Fixtures, elevators and escalators
+            - 43292 - Installation of automatic swing doors
+            - 43293 - Mounting lightning conductor
+            - 43299 - Other construction installation (not elsewhere classified)
+        - F433 - Building Completions and Finishes
+          - 4330 - Building Completions and Finishes
+            - 43301 - Wooden doors, windows and door and window frames, pantry cupboards, ceiling fittings, wooden partitioning of buildings
+            - 43302 - Installation of aluminum and iron doors, windows and door and window frames, ceiling installations using aluminum and other metals, partitioning of buildings
+            - 43303 - Amano Rainwater Drainage Installations
+            - 43304 - Laying ceramic tiles, terrazzo, marble, granite, etc.
+            - 43305 - Installation of wooden coverings to walls and floors of buildings (carpet and linoleum floor coverings)
+            - 43306 - Building Coatings and Civil Engineering Models
+            - 43307 - Steel or stainless steel railings for use on stairs and balconies in buildings
+            - 43308 - Gate fittings and window grille fittings
+            - 43309 - Other building completion work (not elsewhere specified)
+        - F439 - Other specialized construction activities
+          - 4390 - Other specialized construction activities
+            - 43901 - Foundation construction (including file excavation)
+            - 43902 - Moisture-proofing and water-proofing works
+            - 43903 - Bricklaying and stone installation
+            - 43904 - Underground work
+            - 43905 - Concrete Floor Construction
+            - 43906 - Construction (outdoor swimming pools)
+            - 43907 - Processes such as cleaning and sand removal on the exterior of buildings
+            - 43908 - Crane for rent (with operator)
+            - 43909 - Asphalt melting, rental of backhoes (with driver), other specialized construction activities (not elsewhere classified)
+    - G - Wholesale and retail trade; repair of motor vehicles and motorcycles
+      - G45 - Wholesale and retail trade and repair of motor vehicles and motorcycles.
+        - G451 - Motor Vehicle Sales
+          - 4510 - Motor vehicle sales
+            - 45101 - Wholesale and retail trade of new vehicles (except three-wheelers and motorcycles)
+            - 45102 - Wholesale and retail trade of used vehicles
+            - 45103 - Authorized dealer wholesale and retail trade
+            - 45104 - Motor Vehicle Auction
+            - 45105 - Three-wheeler wholesale and retail trade
+            - 45106 - Brokerage activities related to vehicles
+        - G452 - Motor vehicle repair and maintenance
+          - 4520 - Motor vehicle repair and maintenance
+            - 45203 - Vehicle Spraying / Painting
+            - 45201 - Three-wheeler repair
+            - 45202 - Repair of motor vehicles other than three-wheelers and motorcycles
+            - 45204 - Tire and tube repair and re-fitting
+            - 45205 - Battery charging
+            - 45209 - Other repair cushion work etc. and not elsewhere specified
+        - G453 - Trade in motor vehicle spare parts and accessories
+          - 4530 - Trade in motor vehicle parts and accessories
+            - 45301 - Wholesale and retail trade of rubber tires and tubes
+            - 45302 - Wholesale and retail trade in batteries, lighting equipment and electrical accessories
+            - 45303 - Wholesale and retail of three-wheel spare parts
+            - 45309 - Wholesale and retail trade of other motor vehicle parts and accessories (except three-wheelers and motorcycles)
+        - G454 - Trade in repair and maintenance of motorcycles and related spare parts and accessories
+          - 4540 - Trade Repair and maintenance of motorcycles and related spare parts and accessories
+            - 45401 - Wholesale and retail trade of motorcycles
+            - 45402 - Wholesale and retail trade of motorcycle spare parts and accessories
+            - 45403 - Motorcycle repair and maintenance
+      - G46 - Wholesale trade (except motor vehicles and motorcycles)
+        - G461 - Wholesale trade on a hire or contract basis
+          - 4610 - Wholesale trade on a hire or contract basis
+            - 46101 - Authorized sales representative functions (on commission)
+            - 46102 - Wholesale Trade Auction Houses
+            - 46103 - Brokerage activities related to trade (except real estate, vehicles) e.g. tea leaf collection
+        - G462 - Wholesale trade in agricultural raw materials and live animals
+          - 4620 - Wholesale trade in agricultural raw materials and live animals
+            - 46201 - Wholesale trade in grains (including rice and paddy)
+            - 46202 - Wholesale of seeds
+            - 46203 - Wholesale trade in flowers and various types of plants
+            - 46204 - Wholesale trade in non-manufactured tobacco
+            - 46205 - Animal/Animal Wholesale Trade
+            - 46206 - Wholesale trade of coconuts and oranges
+            - 46207 - Wholesale trade in leather and coverings
+            - 46208 - Wholesale trade in agricultural waste and residues, by-products related to animal nutrition, straw and poles
+            - 46209 - Copra, wholesale trade in other agricultural raw materials
+        - G463 - Wholesale trade in food, beverages and tobacco
+          - 4630 - Wholesale trade of food, beverages and tobacco
+            - 46301 - Wholesale of beverages (non-alcoholic)
+            - 46302 - Wholesale of alcoholic beverages
+            - 46303 - Wholesale trade in fruits and vegetables
+            - 46304 - Wholesale trade in dairy products
+            - 46305 - Wholesale trade in fish, eggs and meat
+            - 46306 - Tea wholesale trade
+            - 46307 - Wholesale trade in minor export crops
+            - 46308 - Wholesale trade (edible oils e.g. coconut oil, vegetable oil)
+            - 46309 - Wholesale trade of other food (e.g. biscuits, salt) and tobacco
+        - G464 - Wholesale trade in household goods
+          - 4641 - Wholesale trade in clothing and footwear
+            - 46411 - Wholesale trade in spun yarn for weaving
+            - 46412 - Wholesale trade in fabrics and cloth
+            - 46413 - Wholesale trade in textile accessories (sewing threads, needles, labels, etc.)
+            - 46414 - Wholesale of clothing/apparel
+            - 46415 - Wholesale footwear
+            - 46416 - Wholesale trade of umbrellas, mosquito nets, pillowcases, etc.
+            - 46417 - Wholesale trade in ropes and cables
+            - 46419 - Wholesale of other clothing and footwear
+          - 4649 - Wholesale trade in other household goods
+            - 46491 - Wholesale trade of crockery, glassware, cutlery, aluminum products
+            - 46492 - Wholesale of electrical goods/items, lighting equipment, watches
+            - 46493 - Wholesale trade in home furnishings and wood products
+            - 46494 - Wholesale trade in radios, televisions and other electronic equipment
+            - 46495 - Wholesale trade in pharmaceuticals and medical and surgical equipment
+            - 46496 - Wholesale trade in perfumes, soaps, cosmetics
+            - 46497 - Wholesale trade in paper and paperboard, books, newspapers, stationery
+            - 46498 - Wholesale of jewelry
+            - 46499 - Wholesale trade of other sporting goods, toys, bicycles, sunglasses, binoculars, etc. (not elsewhere specified)
+        - G465 - Wholesale of machinery and supplies
+          - 4651 - Wholesale trade in computers, computer peripherals, and software
+            - 46511 - Wholesale of computers and computer peripherals
+            - 46512 - Software wholesale trade
+          - 4652 - Wholesale trade, electrical and telecommunications equipment and spare parts
+            - 46522 - Wholesale trade in telecommunications equipment and spare parts
+            - 46521 - Wholesale trade in electrical equipment and spare parts
+            - 46523 - Wholesale trade (CD, DVD, Diskettes, Magnetic and Optical disks)
+          - 4653 - Wholesale trade in agricultural machinery and equipment and supply.
+            - 46531 - Wholesale trade in tractors used for agricultural and forestry purposes (4 wheels)
+            - 46532 - Wholesale trade in tractors used for agricultural and forestry purposes (2 wheels)
+            - 46533 - Wholesale of agricultural machinery and equipment (seeders, fertilizer spreaders, seeders, milking machines, lawn mowers, etc.)
+            - 46534 - Fishing gear trade
+          - 4659 - Wholesale trade of other machinery and equipment
+            - 46591 - Wholesale trade in office furniture/wooden furniture
+            - 46592 - Wholesale trade of transport equipment (except motorcycles, motor vehicles, bicycles and three-wheelers)
+            - 46593 - Wholesale trade of machinery for industry
+            - 46594 - Wholesale trade in civil engineering machinery
+            - 46595 - Wholesale of wires and switches/wires and keyboards
+            - 46596 - Wholesale of electric motors and transformers
+            - 46597 - Wholesale trade in all types of mechanical equipment
+            - 46598 - Wholesale trade in measuring tools and equipment
+            - 46599 - Wholesale trade of other mechanical equipment (not elsewhere classified)
+        - G466 - Other specialized wholesale trade
+          - 4661 - Wholesale trade in solid, liquid (liquid) and gas and related products
+            - 46611 - Wholesale trade in diesel, petrol and kerosene
+            - 46612 - Wholesale of LP Gas and other Gases
+            - 46613 - Wholesale trade in lubricating oils, greases, and all other petroleum products
+            - 46614 - Wholesale of firewood
+            - 46615 - Wholesale trade of coal, coconut shell charcoal
+            - 46616 - Incense stick trade
+            - 46617 - Explosives Trade
+            - 46619 - Wholesale of other solid, liquid and gaseous products and related products
+          - 4662 - Wholesale trade in metals and ores/iron ore
+            - 46621 - Wholesale trade of iron and non-ferrous ores
+            - 46622 - Wholesale of basic ferrous and non-ferrous metals
+            - 46623 - Wholesale trade of semi-finished iron and non-ferrous metal products (brass goods),
+            - 46624 - Wholesale trade in gold and other precious metals
+            - 46629 - Wholesale of other metals and iron ore
+          - 4663 - Wholesale trade in construction materials (hardware, plumbing supplies, heating equipment and supplies)
+            - 46631 - Wholesale of timber
+            - 46632 - Wholesale of paints and varnishes
+            - 46633 - Wholesale trade in cement, bricks, sand, lime, granite, floor and wall coverings, and small equipment such as locks, hinges and saw blades
+            - 46634 - Roofing Tile Wholesale
+            - 46635 - Wholesale trade in ceramic tiles and sanitary porcelain ware for walls and floors
+            - 46636 - Wholesale of flat glass
+            - 46637 - Wholesale trade in sanitary ware (pipes, fittings, tees, bends, elbows, connectors, rubber pipes, etc.)
+            - 46639 - Wholesale trade of other construction materials
+          - 4669 - Waste and scrap and other products
+            - 46696 - Collection and sale of reusable automotive parts
+            - 46691 - Wholesale trade in printing inks, industrial gases, fragrances and flavors, acids and sulfur
+            - 46692 - Wholesale trade in fertilizers, agrochemical products
+            - 46693 - Wholesale trade of basic rubber, plastic, polythene and rigid foam boxes
+            - 46694 - Wholesale of gemstones
+            - 46695 - Paper wholesale trade
+            - 46697 - Collection of used metal or non-metal materials (bottles, paper, computer parts for resale)
+            - 46698 - Wholesale of textiles
+            - 46699 - Collecting reusable equipment or other materials removed from institutions, separating their usable parts and selling them or selling them for recycling
+        - G469 - Non-specialized wholesale trade
+          - 4690 - Non-specialized wholesale trade
+            - 46901 - Non-specialized wholesale trade in miscellaneous goods
+            - 46902 - Mobile wholesale trade of various goods
+      - G47 - Retail trade (except of motor vehicles and motorcycles)
+        - G471 - Non-specialized retail trade (located in a permanent building)
+          - 4711 - Retail trade (unspecified) with food, beverages or tobacco predominating
+            - 47111 - Cooperative shops/stores
+            - 47112 - Supermarkets (Cargills, Keels, Lak Sathosa, Centers, Coop City etc.)
+            - 47113 - Grocery store
+          - 4719 - Other retail trade, non-specialized stores
+            - 47190 - Retail trade (miscellaneous goods and food products, beverages or tobacco not predominating) - (e.g. Lady Jay, Arpico Supermarkets)
+        - G472 - Retail sale of food, beverages and tobacco (located in a permanent building)
+          - 4721 - Food retail trade (located in a permanent building)
+            - 47211 - Retail trade of fresh or preserved fruits and vegetables
+            - 47212 - Retail trade in dairy products and eggs
+            - 47213 - Retail trade in meat and meat products (formal trade establishment)
+            - 47214 - Retail trade in fish, other seafood and products (formal trade establishment)
+            - 47215 - Retail trade of bakery products
+            - 47216 - Retail trade in dried fish
+            - 47217 - Retail trade of spices
+            - 47218 - Rice retail trade
+            - 47219 - Retail sale of other specialized food products (e.g. coconut oil, tea leaves, coconuts, oranges) (located in a permanent building)
+          - 4722 - Retail sale of specialty beverages in stores (located in a permanent building)
+            - 47221 - Retail trade, specialized in alcoholic beverages (drinking not permitted on the premises)
+            - 47222 - Retail trade, specialized in non-alcoholic beverages
+          - 4723 - Retail sale of specialized tobacco products (in a permanent building)
+            - 47231 - Retail trade, specialized in tobacco
+            - 47232 - Retail trade, specialized in tobacco products
+            - 47233 - Retail sale of narcotics
+        - G473 - Retail sale of motor fuel (located in a permanent building)
+          - 4730 - Specialized retail sale of automotive fuel (located in a permanent building)
+            - 47301 - Retail trade specializing in refueling of motor vehicles (gas stations)
+            - 47302 - Retail sale of motor vehicle lubricants, cooling products
+            - 47303 - Retail sale of fuel oil
+            - 47304 - Retail sale of petrol, diesel
+        - G474 - Retail sale of information and communication equipment (located in a permanent building)
+          - 4741 - Specialized retail sale of computers, other peripherals, software and telecommunications equipment
+            - 47411 - Specialized retail trade of computers and other computer peripheral equipment
+            - 47412 - Retail trade specializing in video game consoles, non-modifiable software and video games
+            - 47413 - Mobile Phone, SIM Card Sales Shop
+            - 47419 - Retail trade of other telephone accessories (not elsewhere classified)
+          - 4742 - Retail trade, specialized in audio and visual equipment (located in a permanent building)
+            - 47420 - Retail trade, specialized in radio and television CD, DVD players and stereo equipment
+        - G475 - Specialized retail trade of other household appliances (located in a permanent building)
+          - 4751 - Retail trade, specialized in textiles
+            - 47511 - Retail trade, specialized in textiles
+            - 47512 - Retail trade of yarns, etc. (non-woven)
+            - 47513 - Retail trade specializing in weaving, or embroidery of basic materials used in making rugs
+            - 47514 - Retail sale of sewing needles, sewing threads, etc.
+            - 47519 - Other textile retail stores/trade
+          - 4752 - Retail stores specializing in hardware, paint and glass (located in a permanent building)
+            - 47525 - Specialized retail trade in floor tiles and sanitary ware
+            - 47521 - Retail trade in building materials and equipment (sand, bricks, roofing tiles, cement and iron)
+            - 47522 - Retail trade of paints, varnishes
+            - 47523 - Retail trade in lumber (sawn)
+            - 47524 - Retail trade in flat glass
+            - 47529 - Retail trade, specialized in hardware materials (miscellaneous)
+          - 4753 - Carpets, rugs, wall and floor coverings specialty retail stores (located in a permanent building)
+            - 47531 - Retail trade, specialized in carpets, rugs
+            - 47532 - Retail trade specializing in curtains, blinds and net curtains
+            - 47533 - Retail trade, specialized in wall coverings and floor coverings
+            - 47539 - Rexin Trading
+          - 4759 - Specialized retail sale of household appliances, furniture, lighting equipment and other materials (in a permanent building)
+            - 47591 - Retail trade, specialized in furniture (wood)
+            - 47592 - Specialized retail trade of lighting equipment
+            - 47593 - Retail sale of mattresses, pillows, cushions, etc.
+            - 47594 - Retail sale of security systems, such as safes, specialized safes and fire extinguishers
+            - 47595 - Retail trade of glassware and decorative items
+            - 47596 - Walang Specialized Retail
+            - 47597 - Specialized retail trade in musical instruments and entertainment
+            - 47598 - Retail sale of electrical household appliances and sewing machine spare parts
+            - 47599 - Specialized retail trade of plastic goods, other household appliances (miscellaneous)
+        - G476 - Specialized retail trade of cultural and recreational goods (located in a permanent building)
+          - 4761 - Specialized retail trade/stores of books, newspapers, and stationery
+            - 47611 - Retail sale of books of all kinds
+            - 47612 - Retail sale of stationery
+            - 47613 - Retail sale of newspapers
+            - 47614 - Retail trade of invitation cards
+            - 47619 - Retail sale of books, stationery, and newspapers (miscellaneous)
+          - 4762 - Specialized retail sale of music and video recordings (in a permanent building)
+            - 47621 - Specialized retail sale of music records/tapes, audio tapes, compact discs, cassette tapes, compact discs
+            - 47622 - Specialized retail sale of video tapes and DVDs
+            - 47623 - Retail trade (Blank CDs and DVDs)
+            - 47629 - Specialized retail sale of music and video recordings
+          - 4763 - Specialized retail sale of sports equipment (located in a permanent building)
+            - 47631 - Retail trade of sporting goods
+            - 47632 - Bicycle specialized retail trade
+            - 47633 - Specialized retail trade of exercise equipment
+            - 47634 - Retail sale of boats, fishing equipment and camping equipment used for sports
+          - 4764 - Specialized retail sale of games and toys (in a permanent building)
+            - 47640 - Specialized retail sale of games and toys made of all materials (chess boards, carrom boards)
+        - G477 - Specialized retail sale of other goods (in a permanent building)
+          - 4771 - Specialized retail trade of textiles, footwear and leather goods
+            - 47711 - Ready-made clothing trade (women's, children's and men's clothing, decorative items made of fabric, ties, hats, etc.)
+            - 47712 - Specialized retail sale of footwear
+            - 47713 - Specialized retail trade in luggage, handbags and all kinds of leather goods
+            - 47714 - Specialized retail trade in Atapirikara Pooja items
+            - 47715 - Retail trade of baby products
+            - 47716 - Retail trade of incense sticks, aromatic powders
+            - 47717 - Retail trade of fishing gear
+          - 4772 - Specialized retail sale of pharmaceuticals and medical goods, cosmetics and toiletries (located in a permanent building)
+            - 47721 - Western Pharmaceutical Trade (Pharmacy)
+            - 47722 - Ayurvedic medicines specialty retail trade
+            - 47723 - Specialized retail trade of medical goods
+            - 47724 - Specialized retail trade of orthopedic goods
+            - 47725 - Specialized retail sale of perfumes and cosmetics, toiletries
+          - 4773 - Other retail sale of modern goods in specialized stores (in a permanent building)
+            - 47731 - Specialized retail trade of photographic equipment
+            - 47732 - Opticians' activities, retail sale of audio and visual equipment
+            - 47733 - Retail trade of souvenirs/collections, statues, handicrafts, artificial flowers
+            - 47734 - Jewelry Trading
+            - 47735 - Retail sale of plants, flowers, flower pots, seeds
+            - 47736 - LP Gas Trading (for cooking)
+            - 47737 - Specialized retail sale of pets and animal food (fish, birds)
+            - 47738 - Retail trade in fertilizers, agrochemicals and coir
+            - 47739 - Retail trade of kerosene, other new goods
+          - 4774 - Retail sale of second-hand goods
+            - 47742 - Retail sale of antiques
+            - 47743 - Auctioning of goods
+            - 47741 - Retail sale of used books
+            - 47744 - Retail sale of second-hand clothing (Bale) and footwear
+            - 47745 - Retail sale of used household electrical appliances
+            - 47749 - Retail sale of other used goods
+        - G478 - Retail trade carried out through stalls and markets (easily removable stalls)
+          - 4781 - Retail sale of food, beverages and tobacco products through stalls and markets
+            - 47811 - Retail sale of vegetables and fruits through shops and markets
+            - 47812 - Retail trade of dried fish through shops and markets
+            - 47813 - Retail sale of meat through shops and markets
+            - 47814 - Retail sale of food and beverages through shops and markets
+            - 47815 - Retail sale of tobacco (primary stage) through shops and markets
+            - 47816 - Betel, retail sale of betel nuts
+            - 47817 - Fish trading at fish stalls or stalls
+            - 47818 - Retail trade of bites, roasted cashew nuts, etc.
+            - 47819 - Retail sale of food, beverages and tobacco in shops and markets (not elsewhere classified)
+          - 4782 - Retail sale of textiles, clothing and footwear through stalls and markets
+            - 47821 - Retail sale of clothing (via stalls or markets)
+            - 47822 - Retail sale of textiles (via stalls or markets)
+            - 47823 - Retail sale of footwear (via stalls or markets)
+            - 47829 - Retail sale of other textiles, clothing or footwear (via stalls or markets)
+          - 4789 - Other retail sale of goods via stalls and markets
+            - 47891 - Retail trade of carpets and rugs
+            - 47892 - Book retailing
+            - 47893 - Retail trade of games and toys
+            - 47894 - Retail sale of household appliances in stalls and markets
+            - 47895 - Retail sale of consumer electronics through shops and markets
+            - 47896 - Retail sale of music and video recordings in shops and markets
+            - 47897 - Retail sale of natural flowers at stalls
+            - 47898 - Retail trade of money goods
+            - 47899 - Retail sale of other goods via stalls and markets (not elsewhere classified)
+        - G479 - Retail trade carried out without shops, stalls or markets
+          - 4791 - Retail trade by mail order or via the Internet
+            - 47911 - Retail sale of any kind of goods by mail order
+            - 47912 - All types of products - Retail trade via the Internet
+            - 47913 - Retail trade by means of coin-operated vending machines
+          - 4799 - Other retail sale (not in stores, shops or markets)
+            - 47990 - Mobile Timber Trade
+            - 47991 - Retail sale of all types of products through vending machines
+            - 47992 - Direct deliveries to customer premises
+            - 47993 - Auction processes without warehouses
+            - 47994 - Retail trade by authorized representatives
+            - 47995 - Woodshed
+            - 47996 - Door-to-door retail sale of fish, fruits and vegetables
+            - 47997 - Door-to-door retail sale of bakery products
+            - 47998 - Mobile furniture trade
+            - 47999 - Door-to-door retail sale of other goods n.e.c.
+    - H - Transportation and storage
+      - H49 - Land transport and pipeline transport
+        - H491 - Transport via railways
+          - 4912 - Freight train services
+            - 49120 - Freight transport by rail
+          - 4911 - Passenger transport by intercity railways
+            - 49110 - Passenger transport by rail
+        - H492 - Other land transport
+          - 4921 - Urban and suburban land passenger transport
+            - 49211 - Community Transport Service (CTB)
+            - 49212 - Private Passenger (Bus) Services
+            - 49219 - Other urban and suburban passenger transport
+          - 4922 - Other land passenger transport
+            - 49221 - Taxi/Cab Services
+            - 49222 - Three-wheeler services
+            - 49223 - School Transport Services
+            - 49224 - Private car/van rental with driver
+            - 49225 - Tourist transportation
+            - 49229 - Other land passenger transport (not elsewhere classified)
+          - 4923 - From freight routes
+            - 49231 - Refrigerated cargo transport
+            - 49232 - Freight transport/hire transport by heavy vehicles
+            - 49233 - Freight transport/hire transport by other vehicles
+            - 49234 - Furniture removal
+            - 49235 - Transport of goods by vehicles drawn by people or animals
+            - 49236 - Truck/lorry rental with driver
+            - 49239 - Other goods transport by road
+      - H50 - Water transport
+        - H501 - Transport in marine and coastal waters
+          - 5011 - Sea and coastal water passenger transport
+            - 50111 - Passenger transport on sea and coastal waters (including pleasure boats, high-speed ships, sightseeing boats)
+            - 50112 - Transportation process by ferry
+            - 50119 - Other inland and coastal water passenger transport
+          - 5012 - Sea and coastal water transport
+            - 50120 - Sea and inland waterway transport of goods
+        - H502 - Transport in fresh water
+          - 5021 - Passenger transport on inland waters
+            - 50211 - River passenger transport
+            - 50212 - Passenger transport via canals
+            - 50213 - Passenger transport via lakes
+            - 50214 - Passenger transport via inland waters
+            - 50215 - Pleasure boat rental with crew
+            - 50219 - Other passenger transport by land
+          - 5022 - Inland waterway transport
+            - 50221 - River freight transport
+            - 50222 - Transport of goods via canals
+            - 50223 - Transportation of goods via tanks
+            - 50224 - Other cargo transportation from Miri
+      - H51 - Air transport
+        - H512 - Air freight
+          - 5120 - Air freight
+            - 51200 - Air freight
+        - H511 - Air passenger transport
+          - 5110 - Air passenger transport
+            - 51100 - Passenger transport by air
+      - H52 - Support process for storage and transportation of goods
+        - H521 - Storage and warehousing
+          - 5210 - Warehousing and storage
+            - 52101 - General merchandise stores
+            - 52102 - Cold storage
+            - 52109 - Other storage and warehousing
+        - H522 - Support processes for transportation
+          - 5221 - Additional service tasks in land transport
+            - 52211 - Bicycle parking lot/station/garage
+            - 52212 - Car/Car Park/Garage
+            - 52213 - Operations at railway stations
+            - 52214 - Bus stop operations
+            - 52215 - Highway Operations
+            - 52216 - Container yard
+            - 52219 - Other auxiliary service functions in land transport
+            - 52221 - Terminal Facilities Operations Ports and Jetties, etc.
+          - 5222 - Additional service tasks in water transport
+            - 52222 - Lighthouse Tasks
+            - 52229 - Other additional tasks in water transport
+          - 5223 - Additional service tasks in air transport
+            - 52231 - Airport and Air Traffic Control Functions
+            - 52232 - Airport Ground Service Functions Airport
+            - 52233 - Airline Terminal Facilities Operations Terminals etc.
+          - 5224 - Cargo Handling
+            - 52240 - Cargo handling support functions
+          - 5229 - Other transportation support functions
+            - 52291 - Preparing and organizing transportation operations by rail, road, sea or air
+            - 52292 - Customs Agent Functions
+            - 52293 - Sea Passenger Cargo Forwarding and Air Shipping Agent
+            - 52294 - Brokerage service for ship and aircraft space
+            - 52295 - Providing advice on exports
+            - 52299 - Other transportation support activities not elsewhere classified
+      - H53 - Postal and courier functions
+        - H531 - Postal tasks
+          - 5310 - Postal functions
+            - 53101 - Government Post Offices
+            - 53102 - Representative Post Offices
+            - 53109 - Other postal services
+        - H532 - Messaging/Courier Functions
+          - 5320 - Message/Courier Functions
+            - 53200 - Courier/Messenger Functions
+    - I - Accommodation and catering
+      - I55 - Accommodation
+        - I551 - Short-term accommodation provision
+          - 5510 - Provision of short-term accommodation
+            - 55104 - Lodge
+            - 55102 - Inn/Guesthouse
+            - 55103 - Holiday Resort/Tourist Bungalow
+            - 55101 - Hotels (with accommodation facilities)
+            - 55105 - Rest rooms, retirement homes
+            - 55106 - Rental of wedding halls etc.
+            - 55107 - Motel
+            - 55109 - Other short-term accommodation services
+        - I552 - Campgrounds, amusement parks and theme parks
+          - 5520 - Campgrounds, recreational vehicle parks and amusement parks
+            - 55200 - Recreational camps for short-term visitors
+        - I559 - Other Accommodations
+          - 5590 - Other accommodation facilities
+            - 55901 - Student Hostels
+            - 55902 - School hostels
+            - 55903 - Employee dormitories
+            - 55904 - Room facilities and accommodation facilities
+            - 55909 - Provision of other accommodation not elsewhere specified
+      - I56 - Food and beverage service
+        - I561 - Canteens and mobile food service
+          - 5610 - Canteens and mobile food service
+            - 56108 - Ice Cream Stalls
+            - 56101 - With dining service facilities (restaurants)
+            - 56102 - Restaurants and tea shops
+            - 56103 - Food restaurants
+            - 56104 - Take Out
+            - 56105 - Ice cream trade by vehicle/bicycle
+            - 56106 - Mobile food cart
+            - 56107 - Food delivery services (e.g. pizza)
+            - 56109 - Other catering and mobile food service activities
+        - I562 - Food, beverage and catering services for events
+          - 5621 - Catering for festive occasions
+            - 56210 - Catering for events
+          - 5629 - Provision of food and services for other occasions
+            - 56291 - Catering contract work (e.g. for institutions)
+            - 56292 - Catering for sports events etc. under sponsorship
+            - 56293 - Restaurants/Canteens - Available in any location such as schools, hospitals, factories (upon sponsorship)
+            - 56299 - Hopper, hopper, rice packet making and other food service operations (not elsewhere classified)
+        - I563 - Serving beverages
+          - 5630 - Beverage service
+            - 56301 - Liquor store (drinking is allowed on site)
+            - 56302 - Coffee/tea shops (for immediate consumption)
+            - 56303 - Places selling fruit drinks
+            - 56304 - Mobile sales of beverages
+            - 56305 - Places selling raw milk for drinking
+            - 56306 - Milk shop (ready to drink)
+            - 56307 - Porridge shop (green porridge, sau porridge, soup etc.)
+            - 56308 - Illegal alcohol, place of sale for immediate consumption
+            - 56309 - Other beverage supply activities
+    - J - Information and communication publishing functions
+      - J58 - Publisher Activities
+        - 582 - Software publishing
+          - 5820 - Software publishing
+            - 58201 - Operating System Publishing
+            - 58202 - Business/Professional (Software) Publishing
+            - 58203 - Computer games for all operating systems (software publications)
+        - 581 - Publishing of books, periodicals and other publishing activities
+          - 5811 - Book publishing
+            - 58111 - Book publishing, including dictionary publications, pamphlets and similar publications
+          - 5812 - Directory and Address List Statement
+            - 58112 - Audiobook Publishing
+            - 58119 - Other book publications
+            - 58120 - Telephone book directory listings, court decisions, drug summary reports, mailing lists
+          - 5813 - Publishing of newspapers, magazines, periodicals
+            - 58131 - Newspaper publishing, including advertising newsletters
+            - 58132 - Publication of periodicals and other journals (magazines, newspapers)
+            - 58139 - Publishing of other newspapers or journals and periodicals
+          - 5819 - Other publishing functions
+            - 58191 - Catalogues, photographs, postcards, greeting cards, forms and posters. Advertising material and other printed matter
+            - 58192 - Passenger declaration of numerical or other details (directly controlled by computer)
+      - J59 - Film, video and television program production, sound recording,
+        - 591 - Film, video and television program activities
+          - 5911 - Film, video and television program production activities
+            - 59110 - Film, video and television commercial production
+          - 5912 - Film, video and television program post-production work
+            - 59121 - Laboratory activities related to motion pictures, animation films, animation film development and processing activities in specialized laboratories
+            - 59122 - Video and film post-production activities such as editing, captioning, subtitling, computer-generated imagery, animation and special effects (phenomena), etc.
+            - 59123 -
+          - 5913 - Film, video and television program distribution work
+            - 59130 - Distribution of motion pictures, video tapes, DVDs and similar products to cinemas and television channel programs and exhibitors
+          - 5914 - Film projection tasks
+            - 59141 - Cinemas
+            - 59149 - Projection facilities for showing motion pictures or cinemas, video tapes
+        - 592 - Sound recording and music publishing activities
+          - 5920 - Sound recording and music publishing jobs
+            - 59201 - Original (sound) recording products such as tapes, compact discs, etc.
+            - 59202 - Sound recording products in a studio or elsewhere
+            - 59203 - Music publishing/publication
+            - 59209 - Other music recording and music publishing activities
+      - J60 - Program preparation and broadcasting tasks
+        - 601 - Radio broadcasting tasks
+          - 6010 - Radio broadcasting functions
+            - 60100 - Radio broadcasting functions
+        - 602 - Television programs and broadcasting functions
+          - 6020 - Television programming and broadcasting tasks
+            - 60200 - Television programming and broadcasting functions
+      - J61 - Telecommunications
+        - 611 - Wired telecommunications functions
+          - 6110 - Wired telecommunications tasks
+            - 61100 - Wired telecommunications tasks
+        - 612 - Wireless telecommunications functions
+          - 6120 - Wireless telecommunications functions
+            - 61200 - Wireless telecommunications functions
+        - 613 - Satellite telecommunications functions
+          - 6130 - Satellite Telecommunications Functions
+            - 61300 - Satellite telecommunications functions
+        - 619 - Other telecommunications functions
+          - 6190 - Other telecommunications functions
+            - 61901 - Telephone facilities and communication centres
+            - 61902 - Other telecommunications functions
+      - J62 - Computer programming consultancy related tasks
+        - 620 - Computer programming consultancy activities
+          - 6201 - Computer programmer tasks
+            - 62010 - Software design, development; and computer database and web page design
+          - 6202 - Computer consulting and computer facilities management activities
+            - 62020 - Design and construction of computer systems that combine computer hardware, software and communication technology
+          - 6209 - Other information technology and computer service activities
+            - 62090 - Computer disaster recovery, personal computer installation and software installation
+      - J63 - Information service activities
+        - 631 - Data processing, maintaining websites on the Internet and related activities, network access
+          - 6311 - Data processing, maintaining websites on the Internet and related activities
+            - 63111 - Data processing activities
+            - 63112 - Data Entry Service Provisions
+            - 63113 - Maintaining websites on the Internet, maintaining services and applications for the proper maintenance of those activities
+            - 63119 - Data processing and internet operations and related activities not elsewhere classified
+          - 6312 - Network access
+            - 63120 - Operating websites with search engines to generate and maintain comprehensive data systems with Internet addresses with an easy search format.
+        - 639 - Other information service functions
+          - 6391 - News Agent Functions
+            - 63910 - News conference and news bureau activities, news provision, pictures and media publicity
+            - 63991 - Internet access services
+          - 6399 - Other information service functions (not elsewhere classified)
+            - 63992 - Telephone information services (surveys using telephone)
+    - K - Financial and insurance functions
+      - K64 - Financial service activities (except insurance and pension funding)
+        - 641 - Financial intervention
+          - 6411 - Central Banking Affairs
+            - 64110 - Central Banking Affairs
+          - 6419 - Other financial intermediation (with or without a mobile account)
+            - 64191 - Licensed Commercial Banks
+            - 64192 - Licensed Specialized Banks (NSB)
+            - 64193 - Cooperative Rural Development Banks
+            - 64194 - Credit Unions
+            - 64199 - Other banks, (samurdhi bank)
+        - 642 - Corporate functions related to holding shares in other companies that control
+          - 6420 - Corporate functions related to holding shares in other companies that control
+            - 64200 - Administrative companies (parent companies) functions
+        - 643 - Trustee Funds and Similar Financial Activities
+          - 6430 - Trust Funds and Similar Financial Activities
+            - 64301 - Board of Trustees
+            - 64302 - Funds
+            - 64309 - Other financial activities similar to board of trustees and fund activities
+        - 649 - Other financial service activities (except insurance and pension fund activities)
+          - 6491 - Financial Taxation
+            - 64910 - Financial tax companies
+          - 6492 - Other loan assistance
+            - 64921 - Pawn shops and pawnbrokers
+            - 64922 - Lending money at interest (outside the banking system)
+            - 64929 - Other credit support activities
+          - 6499 - Other financial service activities (except insurance and pension funding activities) not elsewhere classified
+            - 64990 - Other financial service activities (except insurance and pension funding activities) not elsewhere classified
+      - K65 - Insurance, reinsurance and pension funding (excluding compulsory social security activities)
+        - 651 - Insurance
+          - 6511 - Life Insurance
+            - 65110 - Life Insurance
+          - 6512 - Other insurance activities (except life insurance)
+            - 65120 - Other insurance activities (except life insurance)
+        - 652 - Reinsurance
+          - 6520 - Reinsurance
+            - 65200 - Reinsurance
+        - 653 - Pension Funds
+          - 6530 - Pension Funds
+            - 65300 - Social Insurance Retirement Funds
+      - K66 - Support activities for financial services and insurance activities
+        - 661 - Activities supporting financial services and insurance activities (except insurance and pension activities)
+          - 6611 - Financial Market Administration
+            - 66110 - Stock market and other financial market administration
+          - 6612 - Security and Commodity Contract Auction Companies (Security Transactions on Behalf of Others)
+            - 66121 - Foreign currency transfer
+            - 66122 - Stock market brokers and related functions
+          - 6619 - Other support functions for financial services
+            - 66191 - Credit card transaction
+            - 66192 - Investment Advisory Services
+            - 66193 - Mortgage Advisor and Brokerage Functions
+            - 66194 - Fund management, custody and custodial services free of charge or on a contract basis
+            - 66199 - Other functions supporting financial services functions
+        - 662 - Support functions for insurance and pension funds
+          - 6621 - Risk and Loss Damage Assessment
+            - 66210 - Risk and Loss Assessment (Insurance)
+          - 6622 - Functions of an insurance agent and broker
+            - 66220 - Functions of an insurance agent and broker
+          - 6629 - Other support functions for insurance and pension funds
+            - 66290 - Activities closely related to insurance and pension funds
+    - L - Real estate tasks
+      - L68 - Real estate tasks
+        - 663 - Fund Management Functions
+          - 6630 - Fund Management Functions
+            - 66300 - Fund Management Functions
+        - 681 - Real estate related activities, whether on their own or on lease
+          - 6810 - Real estate related activities, whether own or leased
+            - 68101 - Buying, selling, renting, self-management, renting rooms in own or leased buildings
+            - 68102 - Selling or buying and selling houses or other buildings owned by oneself
+            - 68103 - Sale or subdivision of land and purchase and sale of land
+            - 68104 - All real estate transactions, including renting, leasing, etc. of houses or other buildings owned by one (including renting/leasing part of the house)
+            - 68105 - Development of building projects for rental
+            - 68106 - Mobile Home Project Operation for Residence
+            - 68107 - Rental or leasing of exhibition halls, auditoriums, grounds, etc.
+            - 68108 - Rental or leasing of market and market grounds
+          - 6820 - Real estate activities on a rental or contract basis
+            - 68201 - Real estate agent and broker activities
+            - 68202 - Property Management on a rental or contract basis
+            - 68209 - Other functions and property services on a rental or contract basis
+    - M - Professional, Scientific and Technical Affairs
+      - M69 - Legal and accounting work
+        - 691 - Legal Affairs
+          - 6910 - Legal Affairs
+            - 69101 - Legal advice and representation
+            - 69102 - Providing legal advice and representation in labor disputes
+            - 69103 - Preparation of business documents and provision of legal advice related thereto
+            - 69104 - Legal matters related to patents, certificates of title
+            - 69105 - Preparation and advice on other legal documents
+            - 69106 - Public Notary Services
+            - 69108 - Other legal matters
+            - 69109 - Justice of the Peace
+        - 692 - Accounting, Bookkeeping, Auditing and Tax Consultant
+          - 6920 - Accounting, bookkeeping, auditing and tax consultancy
+            - 69201 - All accounting and bookkeeping activities
+            - 69202 - Bookkeeping
+            - 69203 - Auditing and consulting services
+            - 69204 - Tax Consulting
+      - M70 - Head office and management consultancy activities
+        - 701 - Head Office Activities
+          - 7010 - Head Office Work
+            - 70101 - Head office activities of companies and business establishments
+            - 70102 - District and regional office work of companies and business establishments
+        - 702 - Management Consulting Services
+          - 7020 - Management Consulting
+            - 70200 - Management consulting services
+      - M71 - Architectural and Engineering Work, Technical Inspection and Analysis
+        - 711 - Architectural and engineering services and related consultancy services
+          - 7110 - Architectural and engineering consultancy services
+            - 71101 - Provision of architectural services and consultancy
+            - 71102 - Provision of engineering services and consultancy
+            - 71103 - Provision of drafting services
+            - 71104 - Building inspection services and consultancy
+            - 71105 - Surveying and surveying services
+            - 71106 - Map Drawing and Preparation (Using Latitude and Longitude)
+        - 712 - Technical Inspection and Analysis
+          - 7120 - Technical Testing and Analysis
+            - 71201 - Physical condition and quality inspection (checking the condition of weighing and measuring equipment)
+            - 71202 - Environmental Indicator Testing and Measurement (Water and Air Pollution)
+            - 71203 - Quality Assurance of Consumer Goods (Works of the Sri Lanka Standards Institution)
+            - 71204 - Vehicle Smoke Inspection
+            - 71205 - Operations of Police Laboratories
+            - 71206 - Quality testing of raw materials used in various products (measuring the strength of yarns used for weaving or sewing, measuring the strength of iron, cement, etc.)
+            - 71207 - Vehicle Quality Inspection
+            - 71209 - Certification of quality control of other products
+      - M72 - Scientific Research and Development
+        - 721 - Research and experimental development for natural sciences and engineering
+          - 7210 - Research and experiments for natural sciences and engineering
+            - 72101 - Research and development in natural sciences
+            - 72102 - Research and development activities in agricultural sciences
+            - 72103 - Technical and engineering research and development work
+            - 72104 - Medical Science Research and Development Activities
+            - 72105 - Research and development activities in biotechnology
+            - 72106 - Research work on several subjects (natural sciences based)
+        - 722 - Research and development related to social sciences, anthropology
+          - 7220 - Research and development related to social sciences, anthropology
+            - 72201 - Research and development related to social sciences
+            - 72202 - Research and development related to anthropology
+      - M73 - Advertising and Advertising Research
+        - 731 - Advertising
+          - 7310 - Advertising
+            - 73101 - Design and execution of advertising campaigns
+            - 73102 - Organizational engagement in trade promotion activities and other promotional services
+        - 732 - Market Research and Public Opinion Services
+          - 7320 - Market Research and Public Opinion Services
+            - 73201 - Trade Research
+            - 73202 - Public Opinion Services
+      - M74 - Other professional, scientific, and industrial activities
+        - 742 - Photography
+          - 7420 - Photography
+            - 74201 - Photographic studios and photographic activities
+            - 74202 - Film processing (developing, printing)
+            - 74203 - Newspaper photography
+            - 74204 - Very fine photography
+            - 74205 - Videography of weddings, meetings and other events
+            - 74206 - Film development, processing, etc.
+        - 741 - Specialized design work
+          - 7410 - Specialized design work
+            - 74109 - Interior decoration work
+            - 74101 - Textile Design
+            - 74102 - Apparel Design
+            - 74103 - Footwear Design
+            - 74104 - Jewelry Design
+            - 74105 - Furniture design and other interior decoration
+            - 74106 - Construction Design
+            - 74107 - Industrial design work
+            - 74108 - Media photographer
+        - 749 - Other professional, scientific and industrial activities (not elsewhere classified)
+          - 7490 - Other professional, scientific and industrial activities (not elsewhere classified)
+            - 74901 - Translation and Interpretation
+            - 74902 - Quantity Surveying
+            - 74903 - Immigration Consulting
+            - 74904 - Weather forecasting
+            - 74905 - Property/Asset Valuation
+            - 74909 - Vehicle valuation and other technical consultancy activities (not elsewhere classified)
+      - M75 - Veterinary services
+        - 750 - Veterinary work
+          - 7500 - Veterinary work
+            - 75000 - Farm animal and pet veterinary services
+    - N - Administrative and support services
+      - N77 - Renting and Leasing
+        - 771 - Rental and leasing of motor vehicles
+          - 7710 - Renting and leasing of motor vehicles
+            - 77101 - Car rental and leasing (without drivers)
+            - 77102 - Rental and leasing of trucks, trailers and accessories (without drivers), excluding motorcycles
+            - 77109 - Rental and leasing of other vehicles (without drivers)
+        - 772 - Renting and leasing of goods and household appliances for personal use
+          - 7721 - Rental and leasing of recreational and sports equipment
+            - 77211 - Rental and leasing of boats, sailboats used for recreational purposes
+            - 77212 - Rental and leasing of bicycles used for recreational purposes
+            - 77213 - Rental and leasing of chairs and umbrellas used for recreational activities on the beach
+            - 77219 - Rental and leasing of other sports equipment (not elsewhere classified)
+          - 7722 - Video and disc rental
+            - 77220 - Rental of videos, CDs, DVDs, etc.
+          - 7729 - Renting and leasing of other personal goods and household equipment
+            - 77291 - Rental of wedding dresses including fabrics, accessories and footwear
+            - 77292 - Rental of festive items
+            - 77293 - Rental and leasing of musical instruments, loudspeakers
+            - 77294 - Rental and leasing of books, newspapers, magazines, etc.
+            - 77295 - Rental and leasing of goods and equipment used for entertainment or hobbies
+            - 77296 - Rental or leasing of electrical appliances for domestic use
+            - 77299 - Renting and leasing of other personal and household goods not elsewhere classified
+        - 773 - Renting and leasing of other machinery, equipment and goods
+          - 7730 - Renting and leasing of other machinery, equipment and goods
+            - 77301 - Rental and leasing of machinery and other equipment used in industry (without operator) - Engines and turbines, equipment related to motion picture production
+            - 77302 - Rental and leasing of land vehicles without drivers
+            - 77303 - Rental and leasing of unmanned watercraft
+            - 77304 - Rental and leasing of machinery and equipment for forestry and agriculture without an operator
+            - 77305 - Construction and civil engineering equipment and vehicles for hire without drivers
+            - 77306 - Rental and leasing of office machinery without operator
+            - 77307 - Office buildings, equipment rental
+            - 77308 - Animal rental (cattle, horses)
+            - 77309 - Renting and leasing of other machinery and equipment (not elsewhere classified)
+        - 774 - Leasing of intellectual property and similar products, excluding extraction activities
+          - 7740 - Leasing of intellectual property and similar products (this does not include publishing of books, newspapers, etc.)
+            - 77400 - Excise duty on intellectual property (this does not include publishing books, newspapers, etc.)
+      - N78 - Employment-related matters
+        - 781 - Employment agency related matters
+          - 7810 - Employment agency related activities
+            - 78100 - Employment agency related activities
+        - 782 - Temporary employment agency work
+          - 7820 - Temporary employment agency work
+            - 78200 - Activities related to the provision of employees to sponsors
+        - 783 - Other human resource provision
+          - 7830 - Other human resource provision
+            - 78300 - Permanent or long-term human resource provision
+      - N79 - Travel agency travel service, seat reservations and related activities
+        - 791 - Transport services and tourism services
+          - 7911 - Travel agency services
+            - 79110 - Travel agency services and sale of tourist tickets
+          - 7912 - Tourism services activities
+            - 79120 - Tourism services
+        - 799 - Other seat reservations etc. and related matters
+          - 7990 - Other seat reservations etc. and related activities
+            - 79901 - Provision of services related to transportation, such as seat reservations (transport, hotels, restaurants, taxis)
+            - 79902 - Issuance of tickets for watching plays, etc.
+            - 79903 - Activities related to tourist guides
+            - 79904 - Tourism Promotion Related Activities
+      - N80 - Security and Investigation Activities
+        - 801 - Private Security Operations
+          - 8010 - Private Security Operations
+            - 80101 - Private security services
+            - 80102 - Bodyguard and other personal security services
+        - 802 - Security System Services (Security Systems)
+          - 8020 - Security System Service Activities (Security Systems)
+            - 80201 - Operation and maintenance of electronic security alarm systems
+            - 80202 - Mechanical repairs, installations, refitting, etc.
+        - 803 - Investigations related to security
+          - 8030 - Investigations related to security
+            - 80300 - Investigation and Secret Investigation
+      - N81 - Provision of services related to building construction and landscaping
+        - 811 - Provision of support services for buildings and landscaping
+          - 8110 - Providing support services for buildings and landscaping
+            - 81100 - Providing a combination of services such as building cleaning, personal security services, laundry, and guest reception at the client's location
+        - 812 - Cleaning work
+          - 8121 - General building cleaning
+            - 81210 - General cleaning inside any type of building (offices, factories, shops, houses, etc.)
+          - 8129 - Other building cleaning and industrial cleaning
+            - 81291 - Exterior cleaning of any type of building
+            - 81292 - Industrial machinery cleaning
+            - 81293 - Road sweeping, cleaning
+            - 81294 - Cleaning of aircraft, buses, trains, etc.
+            - 81295 - Swimming pool maintenance and cleaning
+            - 81299 - Other building and industrial cleaning activities (not elsewhere classified) Street sweeping
+        - 813 - Provision of garden landscaping and maintenance services
+          - 8130 - Provision of garden landscaping and maintenance services
+            - 81301 - Landscaping, landscaping and maintenance
+            - 81302 - Lawn care and maintenance
+            - 81309 - Growing plants to prevent environmental pollution
+      - N82 - Office administration, office and other business support services
+        - 821 - Office administration and related support services
+          - 8211 - Office Administration and Service Coordination
+            - 82111 - Providing financial planning, making payments and keeping accounting records for others on a contract or fee basis
+            - 82112 - Personal deliveries (on a contract or fee basis)
+            - 82113 - Office letter delivery services
+            - 82114 - Supply and operational service activities (on a contract or fee basis)
+          - 8219 - Other specialized office support services including photocopying, document preparation
+            - 82119 - Other office administrative service activities (not elsewhere classified)
+            - 82191 - Office secretarial and office document preparation work
+            - 82192 - Photocopying, copying, copying of house plans
+            - 82199 - Other specialized office support services (not elsewhere classified)
+        - 822 - Call contact centers in telephone networks
+          - 8220 - Call contact centers in telephone networks
+            - 82200 - Call center operators in telephone networks (such as Telecom Mobitel Dialog)
+        - 823 - Trade fair and meeting organization
+          - 8230 - Trade fair and meeting organization
+            - 82301 - Trade fairs and business organizations
+            - 82302 - Meeting and discussion organizations
+        - 829 - Business support service activities (not elsewhere classified)
+          - 8291 - Collection centers and credit issuing institutions
+            - 82911 - Bill payment centers (electricity, water, etc.)
+            - 82912 - Other collection centers and credit issuing institutions
+          - 8292 - Packaging work
+            - 82921 - Liquid bottling, food and beverage packaging (on a contract or fee basis)
+            - 82922 - Packaging of solids (on contract or fee basis)
+            - 82923 - Safe packaging of pharmaceutical compounds (on a contract or fee basis)
+            - 82924 - Labeling, stamping and moulding (on a contract or fee basis)
+            - 82925 - Parceling and gift wrapping (on a contract or fee basis)
+            - 82926 - Dry cleaning (on a contract or fee basis)
+          - 8299 - Other office support services (not elsewhere classified)
+            - 82991 - Public Records Services
+            - 82992 - Fundraising for other organizations
+            - 82993 - Functions of Independent Auctioneers
+            - 82994 - Paper sorting
+            - 82995 - Fish cutting (cutting into pieces)
+            - 82999 - Other business support service activities (not elsewhere classified)
+    - O - Public Administration and Security Essential Social Security
+      - O84 - Public administration and security; essential social security
+        - 841 - State Economic and Community Social Policy Administration
+          - 8411 - Public administration functions
+            - 84110 - Central government executive and legislative activities, tax policy activities, policy planning for research and development activities, executive and legal administration of local government institutions, customs administration, economic and...
+          - 8412 - Regulations relating to the provision of health care, education, cultural services and other social service activities, except social security
+            - 84120 - Administration and operations related to health, education, culture, sports, recreation, environmental, housing and social services
+          - 8413 - Regulations and contributions to more efficient business operations
+            - 84130 - Agriculture, land use, energy and mineral resources, infrastructure, transport, communication, hotels and tourism, wholesale and retail trade, preparation of public administration and legal regulations for various economic activities (includi...
+        - 842 - Services for the entire community
+          - 8421 - Foreign Relations
+            - 84210 - Ministry of Foreign Affairs, Sri Lankan embassies established in foreign countries, management of international financial and technical affairs, services providing military or other assistance to foreign countries, cultural activities carried...
+          - 8422 - Security Activities
+            - 84220 - Administration, judiciary and operations for military and defense affairs (naval and air), defense-related research and development policies and related funds administration
+          - 8423 - Regulations and safety activities for the general public
+            - 84230 - Police Department, Prison Administration, Rehabilitation Camps, Fire Fighting and Fire Prevention, Tribunals, Mediation Boards, Courts-Martial, Ministry of Justice, Court Affairs, Military Judiciary and Legal System Activities, Administration...
+        - 843 - Compulsory social security activities
+          - 8430 - Compulsory social security activities
+            - 84301 - Department of Pensions
+            - 84302 - Pensions
+            - 84302 - Other compulsory social security activities
+    - P - Education
+      - P85 - Education
+        - 855 - Educational support functions
+          - 8550 - Educational support functions
+            - 85501 - Agency Services - Enrolling Students in Foreign Universities
+            - 85502 - Educational consultancy and educational guidance - Counselling services
+            - 85503 - Educational Testing Broadcasts and Educational Testing Services
+            - 85509 - Other educational support functions
+        - 851 - Pre-primary and primary education
+          - 85101 - Early Childhood Education (Preschool)
+          - 85102 - Government Primary School Education
+          - 85103 - Private primary school education
+          - 85104 - International Primary School Education
+          - 85105 - Special Primary School Education
+          - 85106 - Literacy education for adults
+          - 85107 - Other religious primary education
+        - 852 - Secondary Education
+          - 8521 - General/Common Secondary Education
+            - 85211 - Government Secondary School Education
+            - 85212 - Private secondary school education
+            - 85213 - International Secondary School Education
+            - 85214 - Pirivena Education
+            - 85215 - Priestly Education/Seminarian/Divine School
+            - 85216 - Arabic school education
+            - 85217 - Schools providing secondary education for the disabled
+          - 8522 - Technical/Industrial and Vocational Secondary Education
+            - 85221 - Training in technical colleges, vocational training institutes and national apprenticeship boards
+            - 85222 - Carpentry schools, masonry training
+            - 85223 - Juki machine sewing training and other sewing classes, fashion design and textile industry training
+            - 85224 - Catering training and mentoring of head chefs in hotels and restaurants
+            - 85225 - Media Training and Computer Repair (Hardware and Software)
+            - 85226 - Special technical education training for crafts
+            - 85227 - Beauty Course
+            - 85228 - Professional Driver Training, Trucks, Bus Trainers
+            - 85229 - Other technical and vocational secondary education (not elsewhere classified)
+        - 853 - Higher Education
+          - 8530 - Higher Education
+            - 85301 - Public University and Open University Education
+            - 85302 - Private university education
+            - 85303 - Postgraduate Educational Institutions
+            - 85304 - Law School Education
+            - 85305 - College of Education Studies
+            - 85306 - Teacher Training Colleges
+            - 85307 - Higher education centers for education
+            - 85308 - Nursing School Training
+            - 85309 - Other higher education (not elsewhere classified)
+        - 854 - Other education
+          - 8541 - Sports and Recreation Education
+            - 85410 - Sports and recreational education (karate, gymnastics, swimming, yoga, cricket, football, etc.)
+          - 8542 - Cultural Education
+            - 85420 - Cultural education (dance, music, drama, art, piano, photography, etc.)
+          - 8549 - Other education (not elsewhere classified)
+            - 85492 - Tuition classes
+            - 85493 - Driving Training Schools (Learners Non-Professional)
+            - 85494 - Religious instruction (religious schools)
+            - 85499 - Other education (not elsewhere specified) - aircraft pilot training, lifeguard training, etc.)
+            - 85491 - Computer Training Classes
+    - R - Arts and public entertainment
+      - R93 - Sports and recreational games
+        - 931 - Sports activities
+          - 9311 - Provision of sports facilities
+            - 93111 - Swimming pool operators
+            - 93112 - Operations of bodybuilding centers
+            - 93113 - Operations of sports centers
+            - 93114 - Operation of stadiums, golf courses and other sports facilities
+            - 93115 - Organization and management of outdoor and indoor sports opportunities/events
+          - 9312 - Sports Club Activities
+            - 93120 - Sports club activities
+          - 9319 - Other sports activities
+            - 93191 - Activities of athletes, track and field athletes, judges, timekeepers, etc.
+            - 93192 - Sports Statutory Boards
+            - 93199 - Other sports activities not elsewhere specified
+        - 932 - Other recreational games
+          - 9321 - Happy Garden/ Amusement Park
+            - 93210 - Happy Garden/ Amusement Park
+          - 9329 - Other recreational and sporting activities
+            - 93291 - Planetarium
+            - 93292 - Operation of games using coins such as jackpots
+            - 93293 - Recreational transportation operations
+            - 93299 - Other fun games
+      - R90 - Arts and entertainment
+        - 900 - Arts and Entertainment
+          - 9000 - Arts and entertainment
+            - 90001 - Presentation of live theatrical productions, opera and drama productions, circus, musicals, plays, scriptwriters, directors, musicians, preachers or speakers
+            - 90002 - Decoration of stages, function halls, etc.
+            - 90003 - Sculpture, painting, cartoon and engraving crafts
+            - 90004 - Private Book Authors (for all subjects)
+            - 90005 - Independent Writers
+            - 90006 - Restoration of works of art (such as paintings)
+            - 90007 - Live art show production work
+            - 90009 - Other creative, artistic and recreational activities not elsewhere classified
+      - R91 - Libraries, archives, museums and other cultural activities
+        - 910 - Libraries, archives, museums and other cultural activities
+          - 9101 - Library and archive work
+            - 91011 - All types of library work
+            - 91012 - Document preservation activities
+          - 9102 - Historic sites, buildings and museums
+            - 91021 - Museum work
+            - 91022 - Historical Ruins Work
+          - 9103 - Botanical gardens, zoos and natural resources activities
+            - 91031 - Horticultural work
+            - 91032 - Zoo activities
+            - 91033 - Sanctuary operations including wildlife conservation etc.
+      - R92 - Gambling and betting activities
+        - 920 - Gambling and betting activities
+          - 9200 - Gambling and betting activities
+            - 92001 - Race Betting
+            - 92002 - Casino Games
+            - 92003 - Lottery Sales
+            - 92009 - Other gambling and betting activities not elsewhere classified
+    - S - Other service activities
+      - S94 - Functions of member organizations
+        - 941 - Functions of business, employers and professional membership organizations
+          - 9411 - Functions of business and employer membership organizations
+            - 94110 - Functions of business, employer membership organizations (Chamber of Commerce, Chamber of Industry, etc.)
+          - 9412 - Activities related to professional membership organizations
+            - 94120 - Functions of professional membership organizations (professional organizations of chartered accountants, professional organizations of doctors, professional organizations of engineers)
+        - 942 - Trade Union Functions
+          - 9420 - Trade Union Functions
+            - 94200 - Trade Union Functions
+        - 949 - Functions of other member organizations
+          - 9492 - Functions of political organizations
+            - 94920 - Functions of political organizations (party offices)
+          - 9499 - Functions of membership organizations
+            - 94991 - Activities of other membership organizations (international organizations, national liberation organizations, organizations established for the rights of individual peoples, etc.)
+            - 94992 - Customer service activities in companies
+            - 94993 - Functions of Automobile Associations (Three-Wheeler Owners Association, Private Bus Owners Association)
+            - 94994 - Organizations established to improve interpersonal relationships
+            - 94995 - Activities of student companies, youth companies, etc.
+            - 94996 - Activities of companies for cultural activities or for the entertainment or benefit of individuals
+            - 94997 - Functions of members of organizations that provide money for prizes or allowances
+            - 94998 - Activities of funeral societies
+            - 94999 - Other functions of other members not specified elsewhere
+          - 9491 - Functions of religious organizations
+            - 94914 - Hindu Temple
+            - 94915 - Other religious organizations
+            - 94919 - Activities of religious organizations not elsewhere classified
+            - 94911 - Temple
+            - 94912 - Church
+            - 94913 - Mosque
+      - S95 - Repair of personal and household appliances, including computers
+        - 951 - Computer and Communication Equipment Repair
+          - 9511 - Computer and computer equipment repair
+            - 95111 - Repair of computers and other related equipment
+            - 95112 - Repair and maintenance work on automatic money counting machines, etc.
+          - 9512 - Communication Equipment Repair
+            - 95121 - Telephone and mobile phone repair
+            - 95122 - Repair of other communication equipment
+            - 95123 - Commercial TV and video camera repair and maintenance work
+            - 95129 - Repair and maintenance work on communication equipment not elsewhere specified
+        - 952 - Repair of personal and household appliances
+          - 9521 - Consumer Electronics Repair
+            - 95211 - Repair and maintenance of televisions, radios, video recorders
+            - 95212 - Repair and maintenance of home video cameras
+            - 95219 - Other electrical equipment repair and maintenance work
+          - 9522 - Repair of household appliances used in homes and gardens
+            - 95221 - Repair of household appliances (refrigerators, washing machines, air conditioners)
+            - 95222 - Repair and servicing of garden equipment (lawn mowers)
+          - 9523 - Shoe and leather goods repair
+            - 95223 - Office Equipment Repair
+            - 95229 - Repair and servicing of other household and garden equipment
+            - 95230 - Shoe, leather goods and umbrella repair work
+          - 9524 - Repair of furniture and other household goods
+            - 95240 - Repair work of furniture and other household goods
+          - 9529 - Repair of other personal and household appliances
+            - 95291 - Bicycle repair work (Winkala)
+            - 95292 - Repair work of wristwatches and wall clocks
+            - 95299 - Repair of musical instruments, sports equipment and other sports equipment
+      - S96 - Other personal service activities
+        - 960 - Other personal service activities
+          - 9601 - Washing and dry-cleaning of textiles and wool products
+            - 96010 - All types of laundry, dry cleaning and ironing related tasks
+          - 9602 - Hairdressing and other beauty treatments
+            - 96021 - Hairdressing and other beauty treatments
+            - 96022 - Hairdressing and shaving related tasks
+            - 96029 - Beauty and related activities
+          - 9603 - Funeral related work
+            - 96031 - Funeral related work
+            - 96032 - Rental of halls for funerals
+          - 9609 - Other personal service activities not elsewhere classified
+            - 96091 - Functions of massage establishments
+            - 96092 - Activities related to astrology, spirituality, magic and witchcraft
+            - 96093 - Places that provide wedding proposal services,
+            - 96094 - Pet Services
+            - 96095 - Shoe polishers, porters (airports, railway stations and markets, etc.), people who serve a person, people who stand in parking lots
+            - 96096 - Marriage Registry
+            - 96099 - Coconut crushing and other personal service activities not elsewhere specified
+    - T - Activities of households as employers; activities of indivisible goods and services provided for the use of residents
+      - T97 - Activities of households as employers
+        - 970 - Activities of households as employers
+          - 9700 - Activities of households as employers
+            - 97001 - Childcare activities (paid)
+            - 97002 - Security guard duties (paid)
+            - 97003 - Gardeners' work (paid)
+            - 97004 - Food preparation tasks (paid)
+            - 97005 - Miscellaneous work (paid)
+            - 97006 - Domestic work
+            - 97009 - Other activities (paid)
+      - T98 - Production of goods and services that cannot be separated for consumption by households
+        - 981 - Production of goods and services that cannot be allocated for own consumption
+          - 9810 - Non-separable goods and services produced for own consumption
+            - 98101 - Hunting for own use
+            - 98102 - Paddy cultivation for own use
+            - 98103 - Other farms for own use
+            - 98104 - Construction work for own use
+            - 98105 - Making clothes for own use
+            - 98109 - Other materials produced for own use (not elsewhere specified)
+        - 982 - Non-separable services produced for own use
+          - 9820 - Non-separable services produced for own use
+            - 98201 - Cooking for oneself
+            - 98202 - Teaching activities for family members
+            - 98203 - Family care work
+            - 98209 - Other services for own use
+    - U - International Organizational Affairs
+      - U99 - International Organizational Affairs
+        - 990 - International Organizational Affairs
+          - 9900 - International Organizational Affairs
+            - 99001 - Activities of the United Nations Organization System
+            - 99002 - International Monetary Fund
+            - 99003 - World Bank Affairs
+            - 99004 - SAARC Organization
+            - 99005 - Red Cross
+            - 99006 - World Health Organization, World Customs Organization
+            - 99007 - Asian Development Bank
+            - 99008 - Diplomatic and Consular Services
+    - 99009 - Other international organization activities (not elsewhere classified)
+- Geographical location
+  - Mountain
+  - Cup
+  - Rock
+  - Plateau
+  - Stone wall
+  - Cave
+  - Plain
+  - Sandbank
+  - Limestone
+    - Limestone cave
+    - Get up.
+    - Tower
+    - Veclusian springs
+- Natural location
+  - Swamp
+  - Mangrove
+  - Primary forest
+  - Secondary forest
+  - Thorny bush
+  - Pathan Bima
+  - Talawa
+- Water base spaces
+  - Sea
+    - Point
+    - Island
+    - The reef
+    - Lagoon
+    - Sea cliff
+    - Sea cave
+    - Spouting horn
+    - Arch
+    - Sea stack
+    - Bay
+    - Sand
+      - Normal beach
+      - Bay of Plenty
+      - Storm sand
+      - Deposit sand
+    - Sand dunes
+    - Wave platforms
+    - Bay of Plenty
+    - Coastal reef
+    - Tombolo
+    - Mud
+  - Natural water bodies other than rivers
+    - Stream
+    - Pond
+    - In the water
+    - Lake
+    - Source
+      - Fountain
+      - Bubble
+  - Water-based
+    - Well
+      - Drinking well
+      - Bath well
+      - Cultivation well
+      - Tube well
+      - The weeping well
+    - Reservoir
+      - Water plane
+      - Bank
+      - Dam
+      - The sluice
+      - Tunnel
+    - Lake
+      - Abandoned tank
+      - The above
+      - The bag and the turban
+      - The gate is closed.
+      - Lake bottom and lake (water) surface
+      - Horowuwa
+      - Canal
+      - Mount Ve (lake embankment)
+      - External discharge
+      - Queen's Fort / Sorovwa
+    - Irrigation canal
+      - Parts of the alley
+        - Water control gate
+        - Anicut
+        - Canal bank
+        - Canal Reserve
+        - Nawat
+        - Delusion
+        - Agatha
+        - The river
+        - Anvil
+        - Canal bank
+        - Garbage canal
+  - Natural water bodies
+    - River
+      - River basin
+      - The first river
+      - The Apara River (Oya)
+      - West River
+    - River topography
+      - Waterfall
+      - V Valley
+      - U Valley
+      - Canyon (door)
+      - Stone forest
+      - Nettie Neru
+      - Overflowing plains
+      - River coil
+      - Dunuwila
+      - Delta
+      - Swamp
+      - Estuary
+- Roads
+  - About the road
+    - Road signs
+      - RNS-04: Expressways (Light blue)
+      - Route number signs
+      - MS-05: Chevron Markers
+      - RNS-04: Expressways (Dark blue)
+      - IS(EX)-06: Exit Ramp, Direction Sign
+      - OSD-16: Expressway start
+      - RNS-02: B Class Highways
+      - APR-13: 5.00 am – 9.00 pm
+      - HWP-03: Flammable liquid
+      - HWP-08: Corrosive
+      - Provincial Roads
+      - HWP-01: Explosive
+      - HWP-07: Radioactive substance
+      - LSP-01: Light Signals for Pedestrians
+      - RM-16: No Parking Line
+      - RM-17: No Parking Double Line
+      - RM-11: Longitudinal Double Continuous Center Line
+      - HWP-02: Flammable gas
+      - PDV-05: Prohibited distance at bus stops
+      - RM-06: Longitudinal Continuous Center Line
+      - HWP-04: Flammable solid
+      - Other signs useful for drivers
+      - HWP-06: Infectious substance
+      - RSS-05: Speed ​​Limit for vehicles within built-up areas except for 3 wheelers and land vehicles
+      - DWS-03: Double Bend to Left Ahead
+      - DWS-01: Left Bend Ahead
+      - DWS-04: Double Bend to Right Ahead
+      - DWS-05: Hair Pin Bend to Right Ahead
+      - DWS-02: Right Bend Ahead
+      - DWS-06: Hair Pin Bend to Left Ahead
+      - DWS-07: Dual Carriage-way Ends
+      - DWS-08: Dual Carriage-way Starts Ahead
+      - DWS-09: Road Narrows Ahead
+      - DWS-10: Road Narrows on the Left Side Ahead
+      - DWS-11: Road Narrows on the Right Side Ahead
+      - DWS-12: Intersection Ahead
+      - DWS-13: Staggered Junction Ahead with First Side Road to Left
+      - DWS-14: Staggered Junction Ahead with First Side Road to Right
+      - DWS-15: 'T' Junction Ahead
+      - DWS-41: Cattle Crossing Ahead
+      - DWS-16: 'Y' Junction Ahead
+      - DWS-17: Traffic From Left Merges Ahead
+      - DWS-18: Side Road From Left Intersects at Right Angle Ahead
+      - DWS-19: Traffic From Right Merges Ahead
+      - DWS-20: Side Road From Right Intersects at Right Angle Ahead
+      - DWS-21: Narrow Bridge or Culvert Ahead
+      - DWS-22: Two-way Traffic Ahead
+      - DWS-25: Roundabout Ahead
+      - DWS-26: Light Signals Ahead
+      - DWS-27: Dangerous Descent Ahead
+      - DWS-28: Dangerous Ascent Ahead
+      - DWS-29: Slippery Road Ahead
+      - DWS-31: Falling Rocks Ahead
+      - DWS-32: Pedestrian Crossing Ahead
+      - DWS-33: Children present/crossing Ahead
+      - DWS-35: Road Work Ahead
+      - DWS-36: Level Crossing with Gates Ahead
+      - DWS-37: Unprotected Level Crossing Ahead
+      - DWS-40: Cyclist crossing Ahead
+      - DWS-45: Uneven Road Ahead
+      - DWS-49: Low flying Air Crafts Ahead
+      - DWS-44: Road Hump Ahead
+      - DWS-46: Dip or Causeway Ahead
+      - DWS-50: Railway Level Crossing Ahead
+      - DWS-51: Railway Level Crossing Comprising Two or More Tracks ahead
+      - RSS-07: Speed ​​Limit for heavy vehicles in non-built-up areas
+      - RSS-09: Speed ​​Limit for all vehicles within school areas and hospitals
+      - PHS-01: No Entry
+      - PHS-10: Road Closed
+      - PHS-19: Road Closed for Motorcycles
+      - HWP-05: Oxidizer
+      - RSS-06: Speed ​​Limit for light vehicles outside built-up areas
+      - IS(PR)-04: Direction Sign, Provincial Roads
+      - MNS-02: Turn Right
+      - APR-08: School
+      - PRS-02: Give Way
+      - PRS-06: Priority over incoming traffic
+      - PRS-01: Stop
+      - PRS-03: Priority road
+      - IS(NH)-09: Confirming Distances
+      - National Highways
+      - PRS-04: End of priority road
+      - PRS-05: Priority for the oncoming traffic
+      - MNS-01: Turn Left
+      - RNS-01: A Class Highways
+      - RNS-03: C Class highways
+      - IS(NH)-10: Beginning of an administrative area
+    - Road content
+      - Culvert
+      - Bridge
+      - Midday sun
+      - Stripes on both sides
+      - Sidewall
+      - Sidewalk
+      - Bus stop
+      - Canal
+      - Roundabout
+      - Signal light
+      - Kilometer post
+      - Junction
+  - Types of roads
+    - Railways
+      - Main Line
+      - Coastal line
+      - Puttalam line
+      - Kelani Valley line
+      - Matale line
+      - Northern line
+      - Mannar line
+      - Batticaloa line
+      - Trincomalee line
+      - Mihintale line
+    - Public roads
+      - Expressway
+      - A way
+      - Route B
+      - C way
+      - Jeep route
+      - AC route
+      - AB path
+    - Private roads
+      - Roads within agricultural land
+      - Paths inside the production floor
+      - The road to home

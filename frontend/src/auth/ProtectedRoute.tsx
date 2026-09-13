@@ -1,6 +1,7 @@
 import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from './AuthProvider';
+import keycloak from './keycloak';
 import { Box, CircularProgress, Typography } from '@mui/material';
 
 interface ProtectedRouteProps {
@@ -40,7 +41,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    // Redirect directly to Keycloak — no custom login page
+    keycloak.login({ redirectUri: window.location.origin + location.pathname, prompt: 'login' });
+    return null;
   }
 
   if (allowedRoles && allowedRoles.length > 0) {

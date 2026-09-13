@@ -135,6 +135,7 @@ services:
     volumes:
       - ./keycloak:/opt/keycloak/data/import
       - ./keycloak/themes/ceylonica:/opt/keycloak/themes/ceylonica
+      - ./keycloak/providers:/opt/keycloak/providers
     depends_on:
       keycloak-db:
         condition: service_healthy

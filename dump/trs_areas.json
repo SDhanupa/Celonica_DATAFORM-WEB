@@ -1,0 +1,4160 @@
+[
+  {
+    "code": "TEL-RTOM-1",
+    "location": "අම්බලන්ගොඩ - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-1 - අම්බලන්ගොඩ - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "අම්බලන්ගොඩ - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Ambalangoda- Regional Management Office Area",
+    "name_ta": "அம்பலாங்கொட - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-2",
+    "location": "අම්පාර - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-2 - අම්පාර - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "අම්පාර - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Ampara- Regional Management Office Area",
+    "name_ta": "அம்பாறை - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-3",
+    "location": "අනුරාධපුර - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-3 - අනුරාධපුර - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "අනුරාධපුර - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Anuradhapura- Regional Management Office Area",
+    "name_ta": "அனுராதபுரம் - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-4",
+    "location": "අවිස්සාවේල්ල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-4 - අවිස්සාවේල්ල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "අවිස්සාවේල්ල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Avissawella- Regional Management Office Area",
+    "name_ta": "அவிசாவளை - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-5",
+    "location": "බදුල්ල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-5 - බදුල්ල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "බදුල්ල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Badulla- Regional Management Office Area",
+    "name_ta": "பதுளை - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-6",
+    "location": "බණ්ඩාරවෙල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-6 - බණ්ඩාරවෙල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "බණ්ඩාරවෙල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Bandarawela- Regional Management Office Area",
+    "name_ta": "பண்டாரவளை - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-7",
+    "location": "මඩකලපුව - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-7 - මඩකලපුව - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "මඩකලපුව - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "BatticaloaRegional Management Office Area",
+    "name_ta": "மட்டக்களப்பு - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-8",
+    "location": "භලාවත - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-8 - භලාවත - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "භලාවත - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Chilaw- Regional Management Office Area",
+    "name_ta": "சிலாபம் - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-9",
+    "location": "දඹුල්ල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-9 - දඹුල්ල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "දඹුල්ල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Dambulla- Regional Management Office Area",
+    "name_ta": "தம்புள்ளை - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-10",
+    "location": "ඇඹිලිපිටිය - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-10 - ඇඹිලිපිටිය - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "ඇඹිලිපිටිය - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Embilipitiya- Regional Management Office Area",
+    "name_ta": "எம்பிலிபிட்டிய - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-11",
+    "location": "ගාල්ල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-11 - ගාල්ල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "ගාල්ල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Galle- Regional Management Office Area",
+    "name_ta": "காலி - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-12",
+    "location": "ගම්පහ - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-12 - ගම්පහ - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "ගම්පහ - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Gampaha- Regional Management Office Area",
+    "name_ta": "கம்பஹா - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-13",
+    "location": "ගම්පොල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-13 - ගම්පොල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "ගම්පොල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Gampola- Regional Management Office Area",
+    "name_ta": "கம்பளை - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-14",
+    "location": "හම්බන්තොට - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-14 - හම්බන්තොට - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "හම්බන්තොට - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Hambantota- Regional Management Office Area",
+    "name_ta": "அம்பாந்தோட்டை - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-15",
+    "location": "හැටන් - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-15 - හැටන් - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "හැටන් - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Hatton- Regional Management Office Area",
+    "name_ta": "ஹட்டன் - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-16",
+    "location": "හැව්ලොක් ටවුන් - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-16 - හැව්ලොක් ටවුන් - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "හැව්ලොක් ටවුන් - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Havelock Town- Regional Management Office Area",
+    "name_ta": "ஹேவ்லாக் டவுன் - டெலிகாம் பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-17",
+    "location": "හෝමාගම - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-17 - හෝමාගම - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "හෝමාගම - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Homagama- Regional Management Office Area",
+    "name_ta": "ஹோமாகம - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-18",
+    "location": "හොරණ - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-18 - හොරණ - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "හොරණ - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Horana- Regional Management Office Area",
+    "name_ta": "ஹொரண - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-19",
+    "location": "යාපනය - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-19 - යාපනය - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "යාපනය - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Jaffna- Regional Management Office Area",
+    "name_ta": "யாழ்ப்பாணம் - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-20",
+    "location": "කල්මුනේ - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-20 - කල්මුනේ - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "කල්මුනේ - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Kalmunei- Regional Management Office Area",
+    "name_ta": "கல்முனை - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-21",
+    "location": "කළුතර - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-21 - කළුතර - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "කළුතර - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Kalutara- Regional Management Office Area",
+    "name_ta": "களுத்துறை - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-22",
+    "location": "මහනුවර - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-22 - මහනුවර - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "මහනුවර - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Kandy- Regional Management Office Area",
+    "name_ta": "கண்டி - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-23",
+    "location": "කෑගල්ල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-23 - කෑගල්ල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "කෑගල්ල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Kegalle- Regional Management Office Area",
+    "name_ta": "கேகாலை - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-24",
+    "location": "කැලණිය - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-24 - කැලණිය - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "කැලණිය - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Kelaniya- Regional Management Office Area",
+    "name_ta": "களனி - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-25",
+    "location": "කිලිනොච්චි - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-25 - කිලිනොච්චි - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "කිලිනොච්චි - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Kilinochchi- Regional Management Office Area",
+    "name_ta": "கிளிநொச்சி - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-26",
+    "location": "කොලොන්නාව - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-26 - කොලොන්නාව - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "කොලොන්නාව - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Kolonnawa- Regional Management Office Area",
+    "name_ta": "கொலன்னாவ - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-27",
+    "location": "කෝට්ටේ - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-27 - කෝට්ටේ - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "කෝට්ටේ - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Kotte- Regional Management Office Area",
+    "name_ta": "கோட்டே - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-28",
+    "location": "කුලියාපිටිය - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-28 - කුලියාපිටිය - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "කුලියාපිටිය - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Kuliyapitiya- Regional Management Office Area",
+    "name_ta": "குளியாபிட்டிய - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-29",
+    "location": "කුරුණෑගල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-29 - කුරුණෑගල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "කුරුණෑගල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Kurunegala- Regional Management Office Area",
+    "name_ta": "குருநாகல் - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-30",
+    "location": "මන්නාරම - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-30 - මන්නාරම - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "මන්නාරම - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Mannar- Regional Management Office Area",
+    "name_ta": "மன்னார் - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-31",
+    "location": "මරදාන - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-31 - මරදාන - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "මරදාන - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Maradana- Regional Management Office Area",
+    "name_ta": "மருதானை - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-32",
+    "location": "මාතලේ - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-32 - මාතලේ - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "මාතලේ - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Matale- Regional Management Office Area",
+    "name_ta": "மாத்தளை - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-33",
+    "location": "මාතර - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-33 - මාතර - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "මාතර - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Matara- Regional Management Office Area",
+    "name_ta": "மாத்தறை - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-34",
+    "location": "මොනරාගල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-34 - මොනරාගල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "මොනරාගල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Monaragala- Regional Management Office Area",
+    "name_ta": "மொனராகலை - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-35",
+    "location": "මුලතිව් - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-35 - මුලතිව් - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "මුලතිව් - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Mullaitivu- Regional Management Office Area",
+    "name_ta": "முல்லைத்தீவு - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-36",
+    "location": "මීගමුව - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-36 - මීගමුව - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "මීගමුව - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Negombo- Regional Management Office Area",
+    "name_ta": "நீர்கொழும்பு - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-37",
+    "location": "නිට්ටඹුව - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-37 - නිට්ටඹුව - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "නිට්ටඹුව - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Nittambuwa- Regional Management Office Area",
+    "name_ta": "நிட்டம்புவ - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-38",
+    "location": "නුගේගොඩ - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-38 - නුගේගොඩ - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "නුගේගොඩ - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Nugegoda- Regional Management Office Area",
+    "name_ta": "நுகேகொட - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-39",
+    "location": "නුවරඑලිය - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-39 - නුවරඑලිය - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "නුවරඑලිය - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Nuwara Eliya- Regional Management Office Area",
+    "name_ta": "நுவரெலியா - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-40",
+    "location": "පානදුර - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-40 - පානදුර - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "පානදුර - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Panadura- Regional Management Office Area",
+    "name_ta": "பாணந்துறை - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-41",
+    "location": "පොළොන්නරුව - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-41 - පොළොන්නරුව - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "පොළොන්නරුව - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Polonnaruwa- Regional Management Office Area",
+    "name_ta": "பொலன்னறுவை - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-42",
+    "location": "පුත්තලම - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-42 - පුත්තලම - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "පුත්තලම - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Puttalam- Regional Management Office Area",
+    "name_ta": "புத்தளம் - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-43",
+    "location": "රත්මලාන - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-43 - රත්මලාන - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "රත්මලාන - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Rathmalana- Regional Management Office Area",
+    "name_ta": "இரத்மலானை - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-44",
+    "location": "රත්නපුරය - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-44 - රත්නපුරය - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "රත්නපුරය - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Ratnapura- Regional Management Office Area",
+    "name_ta": "இரத்தினபுரி - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-45",
+    "location": "ත්රිකුණාමලය - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-45 - ත්රිකුණාමලය - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "ත්රිකුණාමලය - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Trincomalee- Regional Management Office Area",
+    "name_ta": "திருகோணமலை - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-46",
+    "location": "වවුනියාව - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-46 - වවුනියාව - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "වවුනියාව - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Vavuniya- Regional Management Office Area",
+    "name_ta": "வவுனியா - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-RTOM-47",
+    "location": "වත්තල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "full_location_name": "TEL-RTOM-47 - වත්තල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "location_type": "ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_si": "වත්තල - ටෙලිකොම් ප්‍රාදේශීය කාර්යාලය",
+    "name_en": "Wattala- Regional Management Office Area",
+    "name_ta": "வத்தளை - தொலைத்தொடர்பு பிராந்திய அலுவலகம்"
+  },
+  {
+    "code": "TEL-LEA-1",
+    "location": "අච්චුවේලි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-1 - අච්චුවේලි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "අච්චුවේලි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Achchuveli - Local Exchange Area",
+    "name_ta": "அச்சுவேலி - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-2",
+    "location": "අඩම්පන් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-2 - අඩම්පන් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "අඩම්පන් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Adampan - Local Exchange Area",
+    "name_ta": "அடம்பன் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-3",
+    "location": "ආගරපතන - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-3 - ආගරපතන - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ආගරපතන - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Agarapatana - Local Exchange Area",
+    "name_ta": "அகரபதன - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-4",
+    "location": "අක්කරපත්තුව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-4 - අක්කරපත්තුව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "අක්කරපත්තුව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Akkaraipattu - Local Exchange Area",
+    "name_ta": "அக்கரைப்பற்று - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-5",
+    "location": "අකුරණ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-5 - අකුරණ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "අකුරණ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Akurana - Local Exchange Area",
+    "name_ta": "அக்குறணை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-6",
+    "location": "අකුරැස්ස - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-6 - අකුරැස්ස - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "අකුරැස්ස - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Akuressa - Local Exchange Area",
+    "name_ta": "அக்குரஸ்ஸ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-7",
+    "location": "අලව්ව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-7 - අලව්ව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "අලව්ව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Alawwa - Local Exchange Area",
+    "name_ta": "அலவ்வா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-8",
+    "location": "අම්බලන්ගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-8 - අම්බලන්ගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "අම්බලන්ගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Ambalangoda - Local Exchange Area",
+    "name_ta": "அம்பலாங்கொட - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-9",
+    "location": "අම්බලන්තොට - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-9 - අම්බලන්තොට - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "අම්බලන්තොට - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Ambalantota - Local Exchange Area",
+    "name_ta": "அம்பலாந்தோட்டை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-10",
+    "location": "අඹන්පොල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-10 - අඹන්පොල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "අඹන්පොල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Ambanpola - Local Exchange Area",
+    "name_ta": "அம்பன்பொல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-11",
+    "location": "අම්පාර - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-11 - අම්පාර - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "අම්පාර - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Ampara - Local Exchange Area",
+    "name_ta": "அம்பாறை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-12",
+    "location": "අම්පිටියකන්ද - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-12 - අම්පිටියකන්ද - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "අම්පිටියකන්ද - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Ampitikanda - Local Exchange Area",
+    "name_ta": "அம்பிட்டியகந்த - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-13",
+    "location": "ආණමඩුව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-13 - ආණමඩුව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ආණමඩුව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Anamaduwa - Local Exchange Area",
+    "name_ta": "ஆனமடுவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-14",
+    "location": "අංගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-14 - අංගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "අංගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Angoda - Local Exchange Area",
+    "name_ta": "அங்கொட - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-15",
+    "location": "අගුණකොලපැලැස්ස - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-15 - අගුණකොලපැලැස්ස - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "අගුණකොලපැලැස්ස - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Angunakolapelessa - Local Exchange Area",
+    "name_ta": "அங்குனகொலபெலஸ்ஸ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-16",
+    "location": "අංකුඹුර - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-16 - අංකුඹුර - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "අංකුඹුර - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Ankumbura - Local Exchange Area",
+    "name_ta": "அங்கும்புரா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-17",
+    "location": "අනුරාධපුර - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-17 - අනුරාධපුර - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "අනුරාධපුර - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Anuradhapura - Local Exchange Area",
+    "name_ta": "அனுராதபுரம் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-18",
+    "location": "අනුරාධපුර (පැරණි) - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-18 - අනුරාධපුර (පැරණි) - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "අනුරාධපුර (පැරණි) - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Anuradhapura (OLD) - Local Exchange Area",
+    "name_ta": "அனுராதபுரம் (பழைய) - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-19",
+    "location": "අරලගංවිල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-19 - අරලගංවිල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "අරලගංවිල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Aralaganwila - Local Exchange Area",
+    "name_ta": "அரலகங்வில - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-20",
+    "location": "අරණායක - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-20 - අරණායක - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "අරණායක - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Aranayaka - Local Exchange Area",
+    "name_ta": "அரநாயக்க - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-21",
+    "location": "අත්තනකඩවල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-21 - අත්තනකඩවල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "අත්තනකඩවල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Attanakadawala - Local Exchange Area",
+    "name_ta": "அத்தனகடவல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-22",
+    "location": "අවිස්සාවේල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-22 - අවිස්සාවේල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "අවිස්සාවේල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Avissawella - Local Exchange Area",
+    "name_ta": "அவிசாவளை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-23",
+    "location": "අයගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-23 - අයගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "අයගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Ayagama - Local Exchange Area",
+    "name_ta": "அயகம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-24",
+    "location": "බඩල්ගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-24 - බඩල්ගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "බඩල්ගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Badalgama - Local Exchange Area",
+    "name_ta": "படல்கம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-25",
+    "location": "බඩල්කුඹුර - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-25 - බඩල්කුඹුර - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "බඩල්කුඹුර - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Badalkumbura - Local Exchange Area",
+    "name_ta": "படல்கும்புரா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-26",
+    "location": "බද්දේගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-26 - බද්දේගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "බද්දේගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Baddegama - Local Exchange Area",
+    "name_ta": "பத்தேகம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-27",
+    "location": "බදුල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-27 - බදුල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "බදුල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Badulla - Local Exchange Area",
+    "name_ta": "பதுளை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-28",
+    "location": "බදුරලිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-28 - බදුරලිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "බදුරලිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Baduraliya - Local Exchange Area",
+    "name_ta": "பதுரலிய - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-29",
+    "location": "බකමූණ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-29 - බකමූණ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "බකමූණ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Bakamuna - Local Exchange Area",
+    "name_ta": "ஆந்தை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-30",
+    "location": "බලන්ගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-30 - බලන්ගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "බලන්ගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Balangoda - Local Exchange Area",
+    "name_ta": "பலாங்கொடை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-31",
+    "location": "බඹරබොටුව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-31 - බඹරබොටුව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "බඹරබොටුව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Bambarabotuwa - Local Exchange Area",
+    "name_ta": "பம்பரபொடுவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-32",
+    "location": "බණ්ඩාරගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-32 - බණ්ඩාරගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "බණ්ඩාරගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Bandaragama - Local Exchange Area",
+    "name_ta": "பண்டாரகம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-33",
+    "location": "බණ්ඩාරවෙල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-33 - බණ්ඩාරවෙල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "බණ්ඩාරවෙල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Bandarawela - Local Exchange Area",
+    "name_ta": "பண்டாரவளை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-34",
+    "location": "මඩකලපුව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-34 - මඩකලපුව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මඩකලපුව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Batticaloa - Local Exchange Area",
+    "name_ta": "மட்டக்களப்பு - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-35",
+    "location": "මඩකලපුව 5ESS - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-35 - මඩකලපුව 5ESS - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මඩකලපුව 5ESS - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Batticaloa 5ESS - Local Exchange Area",
+    "name_ta": "மட்டக்களப்பு 5ESS - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-36",
+    "location": "බත්තුළුඔය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-36 - බත්තුළුඔය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "බත්තුළුඔය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Battuluoya - Local Exchange Area",
+    "name_ta": "பட்டுலுஓயா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-37",
+    "location": "බටු මුලියා - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-37 - බටු මුලියා - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "බටු මුලියා - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Batu Mulia - Local Exchange Area",
+    "name_ta": "பத்து முலியா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-38",
+    "location": "බෙලියල්ටා - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-38 - බෙලියල්ටා - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "බෙලියල්ටා - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Belialta - Local Exchange Area",
+    "name_ta": "Belialta - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-39",
+    "location": "බෙංගමුව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-39 - බෙංගමුව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "බෙංගමුව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Bengamuwa - Local Exchange Area",
+    "name_ta": "பெங்கமுவா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-40",
+    "location": "බෙන්තොට - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-40 - බෙන්තොට - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "බෙන්තොට - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Bentota - Local Exchange Area",
+    "name_ta": "பென்டோட்டா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-41",
+    "location": "බෙරලපනාතර - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-41 - බෙරලපනාතර - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "බෙරලපනාතර - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Beralapanathara - Local Exchange Area",
+    "name_ta": "பேரலபநாதரா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-42",
+    "location": "බේරුවල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-42 - බේරුවල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "බේරුවල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Beruwala - Local Exchange Area",
+    "name_ta": "பேருவளை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-43",
+    "location": "බයිබලය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-43 - බයිබලය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "බයිබලය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Bible - Local Exchange Area",
+    "name_ta": "பைபிள் - உள்ளூர் பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-44",
+    "location": "බිංගිරිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-44 - බිංගිරිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "බිංගිරිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Bingiriya - Local Exchange Area",
+    "name_ta": "பிங்கிரியா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-45",
+    "location": "බගවන්තලාව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-45 - බගවන්තලාව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "බගවන්තලාව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Bogawantalawa - Local Exchange Area",
+    "name_ta": "பொகவந்தலாவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-46",
+    "location": "බොරලන්ද - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-46 - බොරලන්ද - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "බොරලන්ද - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Boralanda - Local Exchange Area",
+    "name_ta": "பொரலந்தா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-47",
+    "location": "බොරලැස්ගමුව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-47 - බොරලැස්ගමුව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "බොරලැස්ගමුව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Boralesgamuwa - Local Exchange Area",
+    "name_ta": "பொரலஸ்கமுவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-48",
+    "location": "බුලත්කොහුපිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-48 - බුලත්කොහුපිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "බුලත්කොහුපිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Bulathkohupitiya - Local Exchange Area",
+    "name_ta": "புலத்கொஹுபிட்டிய - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-49",
+    "location": "බුලත්සිංහල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-49 - බුලත්සිංහල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "බුලත්සිංහල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Bulathsinhala - Local Exchange Area",
+    "name_ta": "புலத்சிங்கள - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-50",
+    "location": "බුත්තල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-50 - බුත්තල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "බුත්තල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Buttala - Local Exchange Area",
+    "name_ta": "புத்தள - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-51",
+    "location": "මධ්යම 5ESS - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-51 - මධ්යම 5ESS - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මධ්යම 5ESS - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Central 5ESS - Local Exchange Area",
+    "name_ta": "மத்திய 5ESS - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-52",
+    "location": "මධ්යම කඳවුර - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-52 - මධ්යම කඳවුර - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මධ්යම කඳවුර - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Central Camp - Local Exchange Area",
+    "name_ta": "மத்திய முகாம் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-53",
+    "location": "සෙන්ට්‍රල් සිටි ඊ-108 - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-53 - සෙන්ට්‍රල් සිටි ඊ-108 - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "සෙන්ට්‍රල් සිටි ඊ-108 - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Central City E-108 - Local Exchange Area",
+    "name_ta": "மத்திய நகரம் E-108 - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-54",
+    "location": "මධ්‍යම උතුරු ඊ-10 - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-54 - මධ්‍යම උතුරු ඊ-10 - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මධ්‍යම උතුරු ඊ-10 - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Central North E-10 - Local Exchange Area",
+    "name_ta": "மத்திய வடக்கு E-10 - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-55",
+    "location": "චාවකච්චේරි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-55 - චාවකච්චේරි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "චාවකච්චේරි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Chavakachcheri - Local Exchange Area",
+    "name_ta": "சாவகச்சேரி - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-56",
+    "location": "චෙඩ්ඩිකුලම් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-56 - චෙඩ්ඩිකුලම් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "චෙඩ්ඩිකුලම් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Cheddikulam - Local Exchange Area",
+    "name_ta": "செட்டிகுளம் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-57",
+    "location": "චෙඩ්ඩිපාලයම් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-57 - චෙඩ්ඩිපාලයම් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "චෙඩ්ඩිපාලයම් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Cheddipalayam - Local Exchange Area",
+    "name_ta": "செட்டிபாளையம் - மண்டல பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-58",
+    "location": "භලාවත - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-58 - භලාවත - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "භලාවත - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Chilaw - Local Exchange Area",
+    "name_ta": "சிலாபம் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-59",
+    "location": "හලාවතුර - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-59 - හලාවතුර - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "හලාවතුර - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Chilawathura - Local Exchange Area",
+    "name_ta": "சிலாபம் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-60",
+    "location": "චීන වරාය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-60 - චීන වරාය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "චීන වරාය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "China Bay - Local Exchange Area",
+    "name_ta": "சீன துறைமுகம் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-61",
+    "location": "චුන්නාකම් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-61 - චුන්නාකම් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "චුන්නාකම් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Chunnakam - Local Exchange Area",
+    "name_ta": "சுன்னாகம் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-62",
+    "location": "කොළඹ අයි.එස්.සී - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-62 - කොළඹ අයි.එස්.සී - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කොළඹ අයි.එස්.සී - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Colombo ISC - Local Exchange Area",
+    "name_ta": "கொழும்பு ISC - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-63",
+    "location": "කොළඹ ISC ARE 13 - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-63 - කොළඹ ISC ARE 13 - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කොළඹ ISC ARE 13 - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Colombo ISC ARE 13 - Local Exchange Area",
+    "name_ta": "கொழும்பு ISC ARE 13 - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-64",
+    "location": "කොළඹ ISC NEAX61 - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-64 - කොළඹ ISC NEAX61 - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කොළඹ ISC NEAX61 - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Colombo ISC NEAX61 - Local Exchange Area",
+    "name_ta": "கொழும்பு ISC NEAX61 - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-65",
+    "location": "ක්‍රේග් හෙඩ් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-65 - ක්‍රේග් හෙඩ් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ක්‍රේග් හෙඩ් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Craig Head - Local Exchange Area",
+    "name_ta": "கிரேக் தலைவர் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-66",
+    "location": "දඹුල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-66 - දඹුල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "දඹුල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Dambulla - Local Exchange Area",
+    "name_ta": "தம்புள்ளை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-67",
+    "location": "දන්කොටුව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-67 - දන්කොටුව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "දන්කොටුව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Dankotuwa - Local Exchange Area",
+    "name_ta": "தங்கொடுவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-68",
+    "location": "දෙහිඅත්ත - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-68 - දෙහිඅත්ත - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "දෙහිඅත්ත - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Dehiatta - Local Exchange Area",
+    "name_ta": "தெஹியத்த - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-69",
+    "location": "ඩෙල්ෆ්ට් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-69 - ඩෙල්ෆ්ට් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ඩෙල්ෆ්ට් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Delft - Local Exchange Area",
+    "name_ta": "டெல்ஃப்ட் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-70",
+    "location": "දෙනියාය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-70 - දෙනියාය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "දෙනියාය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Deniyaya - Local Exchange Area",
+    "name_ta": "தெனியாய - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-71",
+    "location": "දැරණියගල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-71 - දැරණියගල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "දැරණියගල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Deraniyagala - Local Exchange Area",
+    "name_ta": "தெரணியகல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-72",
+    "location": "දිද්දෙනිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-72 - දිද්දෙනිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "දිද්දෙනිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Diddeniya - Local Exchange Area",
+    "name_ta": "தித்தெனிய - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-73",
+    "location": "දිගන - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-73 - දිගන - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "දිගන - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Digana - Local Exchange Area",
+    "name_ta": "திகன - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-74",
+    "location": "දික්වැල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-74 - දික්වැල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "දික්වැල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Dikwella - Local Exchange Area",
+    "name_ta": "டிக்வெல்ல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-75",
+    "location": "දියබෙදුම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-75 - දියබෙදුම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "දියබෙදුම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Diyabeduma - Local Exchange Area",
+    "name_ta": "திசைதிருப்பல் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-76",
+    "location": "දොඩන්දූව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-76 - දොඩන්දූව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "දොඩන්දූව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Dodanduwa - Local Exchange Area",
+    "name_ta": "தொடந்துவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-77",
+    "location": "දොඩන්ගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-77 - දොඩන්ගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "දොඩන්ගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Dodangoda - Local Exchange Area",
+    "name_ta": "தொடங்கொட - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-78",
+    "location": "දොළොස්බාගේ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-78 - දොළොස්බාගේ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "දොළොස්බාගේ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Dolosbage - Local Exchange Area",
+    "name_ta": "பன்னிரண்டாவது - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-79",
+    "location": "දූනගහ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-79 - දූනගහ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "දූනගහ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Dunagaha - Local Exchange Area",
+    "name_ta": "துனகஹா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-80",
+    "location": "ඇහැලියගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-80 - ඇහැලියගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ඇහැලියගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Eheliyagoda - Local Exchange Area",
+    "name_ta": "எஹலியகொட - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-81",
+    "location": "ඇල්පිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-81 - ඇල්පිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ඇල්පිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Elpitiya - Local Exchange Area",
+    "name_ta": "எல்பிட்டிய - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-82",
+    "location": "ඇඹිලිපිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-82 - ඇඹිලිපිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ඇඹිලිපිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Embilipitiya - Local Exchange Area",
+    "name_ta": "எம்பிலிபிட்டிய - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-83",
+    "location": "එප්පාවල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-83 - එප්පාවල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "එප්පාවල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Eppawala - Local Exchange Area",
+    "name_ta": "எப்பாவல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-84",
+    "location": "එරාවුර් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-84 - එරාවුර් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "එරාවුර් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Eravur - Local Exchange Area",
+    "name_ta": "ஏறாவூர் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-85",
+    "location": "එරුක්කලම්පිඩ්ඩි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-85 - එරුක්කලම්පිඩ්ඩි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "එරුක්කලම්පිඩ්ඩි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Erukkalampiddy - Local Exchange Area",
+    "name_ta": "எருக்கலம்பிட்டி - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-86",
+    "location": "ජී.ඉහළ කෝරලේ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-86 - ජී.ඉහළ කෝරලේ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ජී.ඉහළ කෝරලේ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "G.Ihala Korale - Local Exchange Area",
+    "name_ta": "G. இஹல கோரலே - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-87",
+    "location": "ගේල් එස්එස්සී - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-87 - ගේල් එස්එස්සී - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ගේල් එස්එස්සී - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Gaile SSC - Local Exchange Area",
+    "name_ta": "GAIL SSC - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-88",
+    "location": "ගලගෙදර - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-88 - ගලගෙදර - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ගලගෙදර - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Galagedara - Local Exchange Area",
+    "name_ta": "கலகெதர - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-89",
+    "location": "ගලහ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-89 - ගලහ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ගලහ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Galaha - Local Exchange Area",
+    "name_ta": "கலஹா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-90",
+    "location": "ගලමුන්නයි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-90 - ගලමුන්නයි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ගලමුන්නයි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Galamunnai - Local Exchange Area",
+    "name_ta": "கலமுன்னை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-91",
+    "location": "ගලෙන්බිඳුණුවැව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-91 - ගලෙන්බිඳුණුවැව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ගලෙන්බිඳුණුවැව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Galenbindunuwewa - Local Exchange Area",
+    "name_ta": "கலென்பிந்துனுவெவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-92",
+    "location": "ගලේවෙල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-92 - ගලේවෙල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ගලේවෙල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Galewela - Local Exchange Area",
+    "name_ta": "கலேவெல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-93",
+    "location": "ගල්ගමුව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-93 - ගල්ගමුව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ගල්ගමුව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Galgamuwa - Local Exchange Area",
+    "name_ta": "கல்கமுவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-94",
+    "location": "ගල්හින්න - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-94 - ගල්හින්න - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ගල්හින්න - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Galhinna - Local Exchange Area",
+    "name_ta": "கல்ஹின்னா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-95",
+    "location": "ගලිගමුව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-95 - ගලිගමුව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ගලිගමුව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Galigamuwa - Local Exchange Area",
+    "name_ta": "கலிகமுவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-96",
+    "location": "ගල්කිරියාගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-96 - ගල්කිරියාගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ගල්කිරියාගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Galkiriyagama - Local Exchange Area",
+    "name_ta": "கல்கிரியாகம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-97",
+    "location": "ගාල්ල CONT. - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-97 - ගාල්ල CONT. - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ගාල්ල CONT. - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Galle CONT. - Local Exchange Area",
+    "name_ta": "காலி CONT. - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-98",
+    "location": "ගාල්ල ටී.එස්.සී - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-98 - ගාල්ල ටී.එස්.සී - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ගාල්ල ටී.එස්.සී - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Galle TSC - Local Exchange Area",
+    "name_ta": "Galle உள்ளூர் பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-99",
+    "location": "ගල්නෑව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-99 - ගල්නෑව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ගල්නෑව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Galnewa - Local Exchange Area",
+    "name_ta": "கல்னேவா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-100",
+    "location": "ගම්පහ 1 - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-100 - ගම්පහ 1 - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ගම්පහ 1 - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Gampaha 1 - Local Exchange Area",
+    "name_ta": "கம்பஹா 1 - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-101",
+    "location": "ගම්පහ 2 - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-101 - ගම්පහ 2 - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ගම්පහ 2 - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Gampaha 2 - Local Exchange Area",
+    "name_ta": "கம்பஹா 2 - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-102",
+    "location": "ගම්පොල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-102 - ගම්පොල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ගම්පොල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Gampola - Local Exchange Area",
+    "name_ta": "கம்பளை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-103",
+    "location": "ගනේමුල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-103 - ගනේමුල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ගනේමුල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Ganemulla - Local Exchange Area",
+    "name_ta": "கணேமுல்ல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-104",
+    "location": "ගාර්න්පහ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-104 - ගාර්න්පහ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ගාර්න්පහ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Garnpaha - Local Exchange Area",
+    "name_ta": "கர்ன்பஹா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-105",
+    "location": "ගෙලිඔය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-105 - ගෙලිඔය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ගෙලිඔය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Gelioya - Local Exchange Area",
+    "name_ta": "கெலிஓயா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-106",
+    "location": "ගිනිගත්හේන - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-106 - ගිනිගත්හේන - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ගිනිගත්හේන - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Ginigathena - Local Exchange Area",
+    "name_ta": "கினிகத்தேன - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-107",
+    "location": "ගිරාඳුරුකෝට්ටේ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-107 - ගිරාඳුරුකෝට්ටේ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ගිරාඳුරුකෝට්ටේ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Girandurukotte - Local Exchange Area",
+    "name_ta": "Girandurukotte - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-108",
+    "location": "ගිරිබාව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-108 - ගිරිබාව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ගිරිබාව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Giribawa - Local Exchange Area",
+    "name_ta": "கிரிபாவா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-109",
+    "location": "ගිරිඋල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-109 - ගිරිඋල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ගිරිඋල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Giriulla - Local Exchange Area",
+    "name_ta": "கிரியுல்லா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-110",
+    "location": "ගෝමරන්කඩවල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-110 - ගෝමරන්කඩවල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ගෝමරන්කඩවල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Gomarankadawala - Local Exchange Area",
+    "name_ta": "கோமரன்கடவல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-111",
+    "location": "හබරාදුව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-111 - හබරාදුව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "හබරාදුව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Habaraduwa - Local Exchange Area",
+    "name_ta": "ஹபராதுவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-112",
+    "location": "හබරණ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-112 - හබරණ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "හබරණ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Habarana - Local Exchange Area",
+    "name_ta": "ஹபரன - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-113",
+    "location": "හක්මන - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-113 - හක්මන - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "හක්මන - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Hakmana - Local Exchange Area",
+    "name_ta": "ஹக்மனா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-114",
+    "location": "හල්දුම්මුල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-114 - හල්දුම්මුල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "හල්දුම්මුල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Haldummulla - Local Exchange Area",
+    "name_ta": "ஹல்துமுல்ல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-115",
+    "location": "හල්ග්‍රාන් ඔය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-115 - හල්ග්‍රාන් ඔය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "හල්ග්‍රාන් ඔය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Halgran oya - Local Exchange Area",
+    "name_ta": "ஹல்கிரான் ஓயா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-116",
+    "location": "හාලිඇල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-116 - හාලිඇල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "හාලිඇල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Haliela - Local Exchange Area",
+    "name_ta": "ஹலீலா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-117",
+    "location": "හම්බන්තොට - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-117 - හම්බන්තොට - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "හම්බන්තොට - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Hambantota - Local Exchange Area",
+    "name_ta": "ஹம்பாந்தோட்டை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-118",
+    "location": "හන්දෙස්සා - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-118 - හන්දෙස්සා - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "හන්දෙස්සා - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Handessa - Local Exchange Area",
+    "name_ta": "Handessa - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-119",
+    "location": "හැටන් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-119 - හැටන් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "හැටන් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Hatton - Local Exchange Area",
+    "name_ta": "ஹட்டன் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-120",
+    "location": "හැව්ලොක් TDM - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-120 - හැව්ලොක් TDM - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "හැව්ලොක් TDM - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Havelock TDM - Local Exchange Area",
+    "name_ta": "ஹேவ்லாக் டிடிஎம் - உள்ளூர் பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-121",
+    "location": "හැව්ලොක් ටවුන් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-121 - හැව්ලොක් ටවුන් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "හැව්ලොක් ටවුන් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Havelock TOWN - Local Exchange Area",
+    "name_ta": "ஹேவ்லாக் டவுன் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-122",
+    "location": "හෙට්ටිපොල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-122 - හෙට්ටිපොල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "හෙට්ටිපොල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Hettipola - Local Exchange Area",
+    "name_ta": "ஹெட்டிபொல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-123",
+    "location": "හික්කඩුව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-123 - හික්කඩුව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "හික්කඩුව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Hikkaduwa - Local Exchange Area",
+    "name_ta": "ஹிக்கடுவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-124",
+    "location": "හිඟුරක්ගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-124 - හිඟුරක්ගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "හිඟුරක්ගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Hingurakgoda - Local Exchange Area",
+    "name_ta": "ஹிங்குராக்கொட - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-125",
+    "location": "හිඟුරාන - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-125 - හිඟුරාන - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "හිඟුරාන - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Hingurana - Local Exchange Area",
+    "name_ta": "ஹிங்குரானா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-126",
+    "location": "හිරිපිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-126 - හිරිපිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "හිරිපිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Hiripitiya - Local Exchange Area",
+    "name_ta": "ஹிரிபிட்டிய - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-127",
+    "location": "හෝකන්දර - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-127 - හෝකන්දර - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "හෝකන්දර - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Hokandara - Local Exchange Area",
+    "name_ta": "ஹோகந்தரா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-128",
+    "location": "හෝමාගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-128 - හෝමාගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "හෝමාගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Homagama - Local Exchange Area",
+    "name_ta": "ஹோமாகம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-129",
+    "location": "හොරොව්පතාන - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-129 - හොරොව්පතාන - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "හොරොව්පතාන - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Horowpathana - Local Exchange Area",
+    "name_ta": "ஹொரோவ்பத்தானை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-130",
+    "location": "හුංගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-130 - හුංගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "හුංගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Hungama - Local Exchange Area",
+    "name_ta": "ஹங்கமா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-131",
+    "location": "ඉමදූව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-131 - ඉමදූව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ඉමදූව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Imaduwa - Local Exchange Area",
+    "name_ta": "இமதுவா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-132",
+    "location": "ඉඟිනියාගල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-132 - ඉඟිනියාගල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ඉඟිනියාගල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Inginiyagala - Local Exchange Area",
+    "name_ta": "இங்கினியாகல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-133",
+    "location": "ඉංගිරිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-133 - ඉංගිරිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ඉංගිරිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Ingiriya - Local Exchange Area",
+    "name_ta": "இங்கிரிய - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-134",
+    "location": "ජාඇල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-134 - ජාඇල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ජාඇල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Jaela - Local Exchange Area",
+    "name_ta": "ஜா-எல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-135",
+    "location": "ජලීනා - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-135 - ජලීනා - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ජලීනා - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Jalina - Local Exchange Area",
+    "name_ta": "ஜலீனா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-136",
+    "location": "කඩවල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-136 - කඩවල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කඩවල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kadawala - Local Exchange Area",
+    "name_ta": "கடவாலா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-137",
+    "location": "කඩුගන්නාව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-137 - කඩුගන්නාව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කඩුගන්නාව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kadugannawa - Local Exchange Area",
+    "name_ta": "கடுகன்னாவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-138",
+    "location": "කඩුවෙල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-138 - කඩුවෙල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කඩුවෙල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kaduwela - Local Exchange Area",
+    "name_ta": "கடுவெல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-139",
+    "location": "කහටගස්දිගිලිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-139 - කහටගස්දිගිලිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කහටගස්දිගිලිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kahatagasdigiliya - Local Exchange Area",
+    "name_ta": "கஹடகஸ்திகிலிய - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-140",
+    "location": "කලරගානියා - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-140 - කලරගානියා - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කලරගානියා - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kalaragania - Local Exchange Area",
+    "name_ta": "கலராகனியா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-141",
+    "location": "කලවාන - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-141 - කලවාන - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කලවාන - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kalawana - Local Exchange Area",
+    "name_ta": "கலவான - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-142",
+    "location": "කල්එලිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-142 - කල්එලිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කල්එලිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kaleliya - Local Exchange Area",
+    "name_ta": "கலேலியா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-143",
+    "location": "කල්මුණේ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-143 - කල්මුණේ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කල්මුණේ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kalmune - Local Exchange Area",
+    "name_ta": "கல்முனை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-144",
+    "location": "කල්පිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-144 - කල්පිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කල්පිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kalpitiya - Local Exchange Area",
+    "name_ta": "கல்பிட்டி - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-145",
+    "location": "කළුතර - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-145 - කළුතර - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කළුතර - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kalutara - Local Exchange Area",
+    "name_ta": "களுத்துறை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-146",
+    "location": "කඹුරුපිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-146 - කඹුරුපිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කඹුරුපිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kamburupitiya - Local Exchange Area",
+    "name_ta": "கம்புருபிட்டிய - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-147",
+    "location": "කන්දකැටිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-147 - කන්දකැටිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කන්දකැටිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kandaketiya - Local Exchange Area",
+    "name_ta": "கந்தகெட்டிய - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-148",
+    "location": "කන්දිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-148 - කන්දිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කන්දිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kandiya - Local Exchange Area",
+    "name_ta": "சந்திப்பு - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-149",
+    "location": "මහනුවර (8) - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-149 - මහනුවර (8) - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මහනුවර (8) - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kandy (8) - Local Exchange Area",
+    "name_ta": "கண்டி (8) - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-150",
+    "location": "මහනුවර (ඒ) - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-150 - මහනුවර (ඒ) - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මහනුවර (ඒ) - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kandy (A) - Local Exchange Area",
+    "name_ta": "கண்டி (A) - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-151",
+    "location": "මහනුවර (සී) - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-151 - මහනුවර (සී) - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මහනුවර (සී) - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kandy (C) - Local Exchange Area",
+    "name_ta": "கண்டி (சி) - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-152",
+    "location": "මහනුවර ටී.එස්.සී - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-152 - මහනුවර ටී.එස්.සී - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මහනුවර ටී.එස්.සී - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kandy TSC - Local Exchange Area",
+    "name_ta": "கண்டி TSC - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-153",
+    "location": "කන්කසන්තුරේ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-153 - කන්කසන්තුරේ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කන්කසන්තුරේ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kankasanture - Local Exchange Area",
+    "name_ta": "காங்கேசன்துறை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-154",
+    "location": "කන්තලේ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-154 - කන්තලේ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කන්තලේ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kantale - Local Exchange Area",
+    "name_ta": "கந்தளே - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-155",
+    "location": "කරදියනාරු - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-155 - කරදියනාරු - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කරදියනාරු - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Karadiyanaru - Local Exchange Area",
+    "name_ta": "கடலோர - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-156",
+    "location": "කරෙයිනගර් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-156 - කරෙයිනගර් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කරෙයිනගර් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Karainagar - Local Exchange Area",
+    "name_ta": "காரைநகர் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-157",
+    "location": "කරවෙඩ්ඩි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-157 - කරවෙඩ්ඩි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කරවෙඩ්ඩි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Karaveddy - Local Exchange Area",
+    "name_ta": "கரவெட்டி - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-158",
+    "location": "කරවිටාගාර - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-158 - කරවිටාගාර - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කරවිටාගාර - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Karawitagara - Local Exchange Area",
+    "name_ta": "கரவிடகர - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-159",
+    "location": "කරුවලගස්වැව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-159 - කරුවලගස්වැව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කරුවලගස්වැව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Karuwalagaswewa - Local Exchange Area",
+    "name_ta": "கருவலகஸ்வெவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-160",
+    "location": "කටාන - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-160 - කටාන - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කටාන - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Katana - Local Exchange Area",
+    "name_ta": "கட்டானா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-161",
+    "location": "කාත්තන්කුඩි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-161 - කාත්තන්කුඩි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කාත්තන්කුඩි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kattankudy - Local Exchange Area",
+    "name_ta": "காத்தான்குடி - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-162",
+    "location": "කටුගස්තොට - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-162 - කටුගස්තොට - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කටුගස්තොට - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Katugastota - Local Exchange Area",
+    "name_ta": "கடுகஸ்தோட்டை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-163",
+    "location": "කටුනායක - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-163 - කටුනායක - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කටුනායක - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Katunayake - Local Exchange Area",
+    "name_ta": "கட்டுநாயக்க - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-164",
+    "location": "කටුපොත - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-164 - කටුපොත - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කටුපොත - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Katupotha - Local Exchange Area",
+    "name_ta": "கடுபொத - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-165",
+    "location": "කයිට්ස් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-165 - කයිට්ස් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කයිට්ස් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kayts - Local Exchange Area",
+    "name_ta": "ஊர்காவற்துறை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-166",
+    "location": "කැබිතිගොල්ලෑව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-166 - කැබිතිගොල්ලෑව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කැබිතිගොල්ලෑව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kebithigollewa - Local Exchange Area",
+    "name_ta": "கெபிதிகொல்லேவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-167",
+    "location": "කෑගල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-167 - කෑගල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කෑගල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kegalle - Local Exchange Area",
+    "name_ta": "கேகாலை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-168",
+    "location": "කෙහෙල්වාලියා - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-168 - කෙහෙල්වාලියා - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කෙහෙල්වාලියා - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kehelwalia - Local Exchange Area",
+    "name_ta": "கெஹெல்வாலியா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-169",
+    "location": "කැකිරාව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-169 - කැකිරාව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කැකිරාව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kekirawa - Local Exchange Area",
+    "name_ta": "கெகிராவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-170",
+    "location": "කැලණිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-170 - කැලණිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කැලණිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kelaniya - Local Exchange Area",
+    "name_ta": "களனி - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-171",
+    "location": "කිලිනොච්චි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-171 - කිලිනොච්චි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කිලිනොච්චි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kilinochchi - Local Exchange Area",
+    "name_ta": "கிளிநொச்சி - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-172",
+    "location": "කිලිවෙඩ්ඩි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-172 - කිලිවෙඩ්ඩි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කිලිවෙඩ්ඩි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kiliveddi - Local Exchange Area",
+    "name_ta": "கிளிவெட்டி - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-173",
+    "location": "කින්නියා - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-173 - කින්නියා - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කින්නියා - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kinniya - Local Exchange Area",
+    "name_ta": "கிண்ணியா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-174",
+    "location": "කිරිඇල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-174 - කිරිඇල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කිරිඇල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kiriella - Local Exchange Area",
+    "name_ta": "கிரியெல்ல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-175",
+    "location": "කිරිමැටියාන - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-175 - කිරිමැටියාන - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කිරිමැටියාන - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kirimetiyana - Local Exchange Area",
+    "name_ta": "கிரிமெட்டியனா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-176",
+    "location": "කිරිඳිවැල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-176 - කිරිඳිවැල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කිරිඳිවැල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kirindiwela - Local Exchange Area",
+    "name_ta": "கிரிந்திவெல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-177",
+    "location": "කිතුල්ගල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-177 - කිතුල්ගල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කිතුල්ගල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kitulgala - Local Exchange Area",
+    "name_ta": "கிதுல்கல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-178",
+    "location": "කොච්චිකඩේ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-178 - කොච්චිකඩේ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කොච්චිකඩේ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kochchikade - Local Exchange Area",
+    "name_ta": "கொச்சிக்கடை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-179",
+    "location": "කොච්චිකඩේ (ආර්එස්) - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-179 - කොච්චිකඩේ (ආර්එස්) - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කොච්චිකඩේ (ආර්එස්) - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kochchikade (RS) - Local Exchange Area",
+    "name_ta": "கொச்சிக்கடை (RS) - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-180",
+    "location": "කොඩිකාමම් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-180 - කොඩිකාමම් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කොඩිකාමම් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kodikamam - Local Exchange Area",
+    "name_ta": "கொடிகாமம் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-181",
+    "location": "කොල්ලුපිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-181 - කොල්ලුපිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කොල්ලුපිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kollupitiya - Local Exchange Area",
+    "name_ta": "கொள்ளுப்பிட்டி - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-182",
+    "location": "කොලොන්න - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-182 - කොලොන්න - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කොලොන්න - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kolonna - Local Exchange Area",
+    "name_ta": "கொலொன்னா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-183",
+    "location": "කොරන - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-183 - කොරන - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කොරන - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Korana - Local Exchange Area",
+    "name_ta": "கொரானா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-184",
+    "location": "කොස්ගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-184 - කොස්ගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කොස්ගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kosgama - Local Exchange Area",
+    "name_ta": "கொஸ்கம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-185",
+    "location": "කොස්ගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-185 - කොස්ගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කොස්ගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kosgoda - Local Exchange Area",
+    "name_ta": "கொஸ்கொட - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-186",
+    "location": "කොස්ලන්ද - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-186 - කොස්ලන්ද - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කොස්ලන්ද - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Koslanda - Local Exchange Area",
+    "name_ta": "கொஸ்லந்தா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-187",
+    "location": "කොටදෙණියාව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-187 - කොටදෙණියාව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කොටදෙණියාව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kotadeniyawa - Local Exchange Area",
+    "name_ta": "கொட்டதெனியாவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-188",
+    "location": "කොටපොල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-188 - කොටපොල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කොටපොල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kotapola - Local Exchange Area",
+    "name_ta": "கொட்டபொல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-189",
+    "location": "කොටියාකුඹුර - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-189 - කොටියාකුඹුර - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කොටියාකුඹුර - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kotiyakumbura - Local Exchange Area",
+    "name_ta": "கோடியாகும்புர - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-190",
+    "location": "කොත්මලේ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-190 - කොත්මලේ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කොත්මලේ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kotmale - Local Exchange Area",
+    "name_ta": "கொத்மலை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-191",
+    "location": "කෝට්ටේගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-191 - කෝට්ටේගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කෝට්ටේගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kottegoda - Local Exchange Area",
+    "name_ta": "கொட்டேகொட - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-192",
+    "location": "කුච්චවේලි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-192 - කුච්චවේලි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කුච්චවේලි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kuchchaveli - Local Exchange Area",
+    "name_ta": "குச்சவெளி - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-193",
+    "location": "කුලියාපිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-193 - කුලියාපිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කුලියාපිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kuliyapitiya - Local Exchange Area",
+    "name_ta": "குளியாபிட்டிய - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-194",
+    "location": "කුරුණෑගල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-194 - කුරුණෑගල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කුරුණෑගල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kurunegala - Local Exchange Area",
+    "name_ta": "குருநாகல் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-195",
+    "location": "කුරුවිට - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-195 - කුරුවිට - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කුරුවිට - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Kuruwita - Local Exchange Area",
+    "name_ta": "குருவிட்ட - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-196",
+    "location": "ලග්ගල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-196 - ලග්ගල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ලග්ගල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Laggala - Local Exchange Area",
+    "name_ta": "லக்கலா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-197",
+    "location": "ලකාචි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-197 - ලකාචි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ලකාචි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "lakachi - Local Exchange Area",
+    "name_ta": "லகாச்சி - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-198",
+    "location": "ලුණුගන්වෙහෙර - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-198 - ලුණුගන්වෙහෙර - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ලුණුගන්වෙහෙර - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Lunuganwehera - Local Exchange Area",
+    "name_ta": "லுனுகன்வெஹெர - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-199",
+    "location": "ලුණුවිල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-199 - ලුණුවිල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ලුණුවිල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Lunuwila - Local Exchange Area",
+    "name_ta": "லுனுவில - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-200",
+    "location": "මාදම්පේ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-200 - මාදම්පේ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මාදම්පේ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Madampe - Local Exchange Area",
+    "name_ta": "மாதம்பே - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-201",
+    "location": "මඩොල්කැලේ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-201 - මඩොල්කැලේ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මඩොල්කැලේ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Madolkele - Local Exchange Area",
+    "name_ta": "மடோல்கெலே - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-202",
+    "location": "මඩු පල්ලිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-202 - මඩු පල්ලිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මඩු පල්ලිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Madu Church - Local Exchange Area",
+    "name_ta": "மடு தேவாலயம் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-203",
+    "location": "මඩු පාර - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-203 - මඩු පාර - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මඩු පාර - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Madu Road - Local Exchange Area",
+    "name_ta": "மது சாலை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-204",
+    "location": "මඩුල්සිම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-204 - මඩුල්සිම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මඩුල්සිම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Madulsima - Local Exchange Area",
+    "name_ta": "மதுல்சிமா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-205",
+    "location": "මදුරන්කුලිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-205 - මදුරන්කුලිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මදුරන්කුලිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Madurankuliya - Local Exchange Area",
+    "name_ta": "மதுரங்குளிய - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-206",
+    "location": "මගන්දෙන - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-206 - මගන්දෙන - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මගන්දෙන - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Magandena - Local Exchange Area",
+    "name_ta": "மகந்தேனா - உள்ளூர் பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-207",
+    "location": "මහඔය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-207 - මහඔය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මහඔය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Maha Oya - Local Exchange Area",
+    "name_ta": "மஹாஓயா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-208",
+    "location": "මහකුඹුක්කඩවල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-208 - මහකුඹුක්කඩවල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මහකුඹුක්කඩවල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Mahakumbukkadawala - Local Exchange Area",
+    "name_ta": "மஹகும்புக்கடவல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-209",
+    "location": "මහරගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-209 - මහරගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මහරගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Maharagama - Local Exchange Area",
+    "name_ta": "மஹரகம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-210",
+    "location": "මහියංගනය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-210 - මහියංගනය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මහියංගනය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Mahiyanganaya - Local Exchange Area",
+    "name_ta": "மஹியங்கனை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-211",
+    "location": "මහෝ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-211 - මහෝ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මහෝ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Maho - Local Exchange Area",
+    "name_ta": "மஹோ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-212",
+    "location": "මාකඳුර - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-212 - මාකඳුර - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මාකඳුර - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Makandura - Local Exchange Area",
+    "name_ta": "மகந்துரா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-213",
+    "location": "මලලේ. - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-213 - මලලේ. - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මලලේ. - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Malale. - Local Exchange Area",
+    "name_ta": "தடகள. - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-214",
+    "location": "මල්වාන - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-214 - මල්වාන - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මල්වාන - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Malwana - Local Exchange Area",
+    "name_ta": "மல்வான - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-215",
+    "location": "මාමඩුව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-215 - මාමඩුව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මාමඩුව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Mamaduwa - Local Exchange Area",
+    "name_ta": "மாமதுவா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-216",
+    "location": "මනම්පිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-216 - මනම්පිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මනම්පිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Manampitiya - Local Exchange Area",
+    "name_ta": "மனம்பிட்டிய - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-217",
+    "location": "මනිපායි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-217 - මනිපායි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මනිපායි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Manipay - Local Exchange Area",
+    "name_ta": "மானிப்பாய் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-218",
+    "location": "මාන්කුලම් (ජලිනා SSC) - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-218 - මාන්කුලම් (ජලිනා SSC) - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මාන්කුලම් (ජලිනා SSC) - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Mankulam (Jalina SSC) - Local Exchange Area",
+    "name_ta": "மாங்குளம் (ஜாலினா SSC) - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-219",
+    "location": "මාන්කුලම් (වව්නියාව SSC) - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-219 - මාන්කුලම් (වව්නියාව SSC) - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මාන්කුලම් (වව්නියාව SSC) - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Mankulam (Vavuniya SSC) - Local Exchange Area",
+    "name_ta": "மாங்குளம் (வவுனியா SSC) - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-220",
+    "location": "මන්මුනේ නිරිතදිග - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-220 - මන්මුනේ නිරිතදිග - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මන්මුනේ නිරිතදිග - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Manmunai South West - Local Exchange Area",
+    "name_ta": "மண்முனைக்கு தென்மேற்கு - பிராந்திய பரிவர்த்தனை"
+  },
+  {
+    "code": "TEL-LEA-221",
+    "location": "මන්නාරම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-221 - මන්නාරම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මන්නාරම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Mannar - Local Exchange Area",
+    "name_ta": "மன்னார் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-222",
+    "location": "මරදාන - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-222 - මරදාන - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මරදාන - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Maradana - Local Exchange Area",
+    "name_ta": "மருதானை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-223",
+    "location": "මරදන්කඩවල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-223 - මරදන්කඩවල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මරදන්කඩවල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Maradankadawala - Local Exchange Area",
+    "name_ta": "மரதன்கடவல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-224",
+    "location": "මාරවියා - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-224 - මාරවියා - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මාරවියා - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Marawia - Local Exchange Area",
+    "name_ta": "மராவியா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-225",
+    "location": "මස්කෙළිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-225 - මස්කෙළිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මස්කෙළිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Maskeliya - Local Exchange Area",
+    "name_ta": "மஸ்கெலியா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-226",
+    "location": "මාස්පොල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-226 - මාස්පොල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මාස්පොල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Maspola - Local Exchange Area",
+    "name_ta": "மஸ்போலா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-227",
+    "location": "මාතර - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-227 - මාතර - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මාතර - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Matara - Local Exchange Area",
+    "name_ta": "மாத்தறை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-228",
+    "location": "මට්ටක්කුලිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-228 - මට්ටක්කුලිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මට්ටක්කුලිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Mattakkuliya - Local Exchange Area",
+    "name_ta": "மட்டக்குளி - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-229",
+    "location": "මත්තේගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-229 - මත්තේගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මත්තේගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Mattegoda - Local Exchange Area",
+    "name_ta": "மத்தேகொட - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-230",
+    "location": "මතුගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-230 - මතුගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මතුගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Matugama - Local Exchange Area",
+    "name_ta": "மத்துகம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-231",
+    "location": "මතුරල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-231 - මතුරල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මතුරල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Maturala - Local Exchange Area",
+    "name_ta": "மதுராலா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-232",
+    "location": "මාවනැල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-232 - මාවනැල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මාවනැල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Mawanella - Local Exchange Area",
+    "name_ta": "மாவனல்லை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-233",
+    "location": "මාවරල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-233 - මාවරල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මාවරල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Mawarala - Local Exchange Area",
+    "name_ta": "மவரல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-234",
+    "location": "මාවතගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-234 - මාවතගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මාවතගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Mawathagama - Local Exchange Area",
+    "name_ta": "மாவத்தகம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-235",
+    "location": "මැදගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-235 - මැදගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මැදගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Medagama - Local Exchange Area",
+    "name_ta": "மெதகம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-236",
+    "location": "මැදමහනුවර - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-236 - මැදමහනුවර - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මැදමහනුවර - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Medamahanuwara - Local Exchange Area",
+    "name_ta": "மெதமஹனுவர - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-237",
+    "location": "මැදවච්චිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-237 - මැදවච්චිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මැදවච්චිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Medawachchiya - Local Exchange Area",
+    "name_ta": "மேடவாச்சி - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-238",
+    "location": "මැදිරිගිරිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-238 - මැදිරිගිරිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මැදිරිගිරිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Medirygiriya - Local Exchange Area",
+    "name_ta": "மெதிரிகிரிய - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-239",
+    "location": "මෙගහලැන්න - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-239 - මෙගහලැන්න - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මෙගහලැන්න - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Megahalenna - Local Exchange Area",
+    "name_ta": "மெகஹலென்ன - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-240",
+    "location": "මැල්සිරිපුර - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-240 - මැල්සිරිපුර - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මැල්සිරිපුර - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Melsiripura - Local Exchange Area",
+    "name_ta": "மெல்சிரிபுர - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-241",
+    "location": "මිද්දෙනිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-241 - මිද්දෙනිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මිද්දෙනිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Middeniya - Local Exchange Area",
+    "name_ta": "மித்தெனிய - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-242",
+    "location": "මිහින්තලේ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-242 - මිහින්තලේ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මිහින්තලේ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Mihintale - Local Exchange Area",
+    "name_ta": "மிஹிந்தலை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-243",
+    "location": "මිනුවන්ගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-243 - මිනුවන්ගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මිනුවන්ගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Minuwangoda - Local Exchange Area",
+    "name_ta": "மினுவாங்கொடை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-244",
+    "location": "මීරිගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-244 - මීරිගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මීරිගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Mirigama - Local Exchange Area",
+    "name_ta": "மீரிகம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-245",
+    "location": "මොනරාගල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-245 - මොනරාගල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මොනරාගල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Monaragala - Local Exchange Area",
+    "name_ta": "மொனராகலை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-246",
+    "location": "මොරටුව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-246 - මොරටුව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මොරටුව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Moratuwa - Local Exchange Area",
+    "name_ta": "மொரட்டுவை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-247",
+    "location": "මොරවක - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-247 - මොරවක - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මොරවක - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Morawaka - Local Exchange Area",
+    "name_ta": "மொரவக்கா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-248",
+    "location": "මොරවැව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-248 - මොරවැව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මොරවැව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Morawewa - Local Exchange Area",
+    "name_ta": "மொரவெவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-249",
+    "location": "ගල්කිස්ස C$E - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-249 - ගල්කිස්ස C$E - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ගල්කිස්ස C$E - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Mt. Lavinia C$E - Local Exchange Area",
+    "name_ta": "கல்கிசை சி $ இ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-250",
+    "location": "මුලතිව් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-250 - මුලතිව් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මුලතිව් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Mulativu - Local Exchange Area",
+    "name_ta": "முல்லைத்தீவு - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-251",
+    "location": "මුල්ලියාවලයි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-251 - මුල්ලියාවලයි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මුල්ලියාවලයි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Mulliyawalai - Local Exchange Area",
+    "name_ta": "முள்ளியவளை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-252",
+    "location": "මුන්ඩෙල් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-252 - මුන්ඩෙල් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මුන්ඩෙල් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Mundel - Local Exchange Area",
+    "name_ta": "முண்டல் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-253",
+    "location": "මුරුන්කන් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-253 - මුරුන්කන් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මුරුන්කන් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Murunkan - Local Exchange Area",
+    "name_ta": "முருங்கன் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-254",
+    "location": "මුරුතලාව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-254 - මුරුතලාව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මුරුතලාව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Muruthalawa - Local Exchange Area",
+    "name_ta": "முருதலாவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-255",
+    "location": "මුතියන් වෙල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-255 - මුතියන් වෙල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මුතියන් වෙල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Muthiyan Wela - Local Exchange Area",
+    "name_ta": "முதியன்வெல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-256",
+    "location": "මූතූර් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-256 - මූතූර් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මූතූර් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Muttur - Local Exchange Area",
+    "name_ta": "மூதூர் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-257",
+    "location": "නාගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-257 - නාගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "නාගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Nagoda - Local Exchange Area",
+    "name_ta": "நாகொட - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-258",
+    "location": "නයිනතිව් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-258 - නයිනතිව් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "නයිනතිව් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Nainativu - Local Exchange Area",
+    "name_ta": "நைனாதீவு- பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-259",
+    "location": "නමුණුකුල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-259 - නමුණුකුල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "නමුණුකුල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Namunukula - Local Exchange Area",
+    "name_ta": "நமுனுகுல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-260",
+    "location": "නානාටන් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-260 - නානාටන් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "නානාටන් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Nanatan - Local Exchange Area",
+    "name_ta": "நானாடன் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-261",
+    "location": "නාරම්මල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-261 - නාරම්මල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "නාරම්මල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Narammala - Local Exchange Area",
+    "name_ta": "நாரம்மல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-262",
+    "location": "නාඋල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-262 - නාඋල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "නාඋල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Naula - Local Exchange Area",
+    "name_ta": "நாவுலா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-263",
+    "location": "නාවලපිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-263 - නාවලපිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "නාවලපිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Nawalapitiya - Local Exchange Area",
+    "name_ta": "நாவலப்பிட்டி - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-264",
+    "location": "නෙබොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-264 - නෙබොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "නෙබොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Neboda - Local Exchange Area",
+    "name_ta": "நெபோடா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-265",
+    "location": "නැදුන්කේනි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-265 - නැදුන්කේනි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "නැදුන්කේනි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Nedunkeni - Local Exchange Area",
+    "name_ta": "நெடுங்கேணி - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-266",
+    "location": "නැගම්පන - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-266 - නැගම්පන - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "නැගම්පන - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Negampana - Local Exchange Area",
+    "name_ta": "நாகம்பனை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-267",
+    "location": "මීගමුව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-267 - මීගමුව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මීගමුව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Negombo - Local Exchange Area",
+    "name_ta": "நீர்கொழும்பு - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-268",
+    "location": "මීගමුව (CONT.) - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-268 - මීගමුව (CONT.) - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මීගමුව (CONT.) - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Negombo (CONT.) - Local Exchange Area",
+    "name_ta": "நீர்கொழும்பு (CONT.) - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-269",
+    "location": "මීගමුව (NX 61) - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-269 - මීගමුව (NX 61) - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "මීගමුව (NX 61) - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Negombo (NX 61) - Local Exchange Area",
+    "name_ta": "நீர்கொழும்பு (NX 61) - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-270",
+    "location": "නෙලුලුලන් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-270 - නෙලුලුලන් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "නෙලුලුලන් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Nelululan - Local Exchange Area",
+    "name_ta": "நெலுலுலன் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-271",
+    "location": "නෙළුව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-271 - නෙළුව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "නෙළුව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Neluwa - Local Exchange Area",
+    "name_ta": "நெலுவா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-272",
+    "location": "නෙරියකුලම් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-272 - නෙරියකුලම් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "නෙරියකුලම් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Neriyakulam - Local Exchange Area",
+    "name_ta": "நேரியகுளம் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-273",
+    "location": "නිකදළුපොත - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-273 - නිකදළුපොත - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "නිකදළුපොත - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Nikadalupotha - Local Exchange Area",
+    "name_ta": "நிகடலுபொத - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-274",
+    "location": "නිකවැරටිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-274 - නිකවැරටිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "නිකවැරටිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Nikaweratiya - Local Exchange Area",
+    "name_ta": "நிகவெரட்டிய - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-275",
+    "location": "නිලාවේලි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-275 - නිලාවේලි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "නිලාවේලි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Nilaveli - Local Exchange Area",
+    "name_ta": "நிலாவெளி - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-276",
+    "location": "නින්දවූර් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-276 - නින්දවූර් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "නින්දවූර් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Nintavur - Local Exchange Area",
+    "name_ta": "நிந்தவூர் - பிராந்திய பரிவர்த்தனை"
+  },
+  {
+    "code": "TEL-LEA-277",
+    "location": "නිවිතිගල අයි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-277 - නිවිතිගල අයි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "නිවිතිගල අයි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Nivitigala I - Local Exchange Area",
+    "name_ta": "நிவிதிகல I - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-278",
+    "location": "නොච්චියාගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-278 - නොච්චියාගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "නොච්චියාගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Nochchiyagama - Local Exchange Area",
+    "name_ta": "நொச்சியாகம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-279",
+    "location": "නෝටන් පාලම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-279 - නෝටන් පාලම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "නෝටන් පාලම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Norton Bridge - Local Exchange Area",
+    "name_ta": "நார்டன் பிரிட்ஜ் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-280",
+    "location": "නුගේගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-280 - නුගේගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "නුගේගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Nugegoda - Local Exchange Area",
+    "name_ta": "நுகேகொட - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-281",
+    "location": "නුවරඑලිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-281 - නුවරඑලිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "නුවරඑලිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Nuwara eliya - Local Exchange Area",
+    "name_ta": "நுவரெலியா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-282",
+    "location": "ඔඩ්ඩුසුඩාන් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-282 - ඔඩ්ඩුසුඩාන් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ඔඩ්ඩුසුඩාන් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Oddusuddan - Local Exchange Area",
+    "name_ta": "ஒட்டுசுடான் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-283",
+    "location": "ඔලුවිල් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-283 - ඔලුවිල් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ඔලුවිල් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Oluvil - Local Exchange Area",
+    "name_ta": "ஒலுவில் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-284",
+    "location": "ඕමන්තේ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-284 - ඕමන්තේ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ඕමන්තේ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Omantai - Local Exchange Area",
+    "name_ta": "ஓமந்தை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-285",
+    "location": "පදවිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-285 - පදවිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පදවිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Padaviya - Local Exchange Area",
+    "name_ta": "நிலை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-286",
+    "location": "පදවි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-286 - පදවි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පදවි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Padawi - Local Exchange Area",
+    "name_ta": "பதவிகள் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-287",
+    "location": "පදියතලාව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-287 - පදියතලාව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පදියතලාව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Padiyathalawa - Local Exchange Area",
+    "name_ta": "பதியத்தலாவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-288",
+    "location": "පාදුක්ක - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-288 - පාදුක්ක - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පාදුක්ක - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Padukka - Local Exchange Area",
+    "name_ta": "பாதுக்க - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-289",
+    "location": "පාලවි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-289 - පාලවි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පාලවි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Palavi - Local Exchange Area",
+    "name_ta": "பாலாவி - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-290",
+    "location": "පලෙයි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-290 - පලෙයි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පලෙයි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Pallai - Local Exchange Area",
+    "name_ta": "பாளை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-291",
+    "location": "පල්ලේගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-291 - පල්ලේගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පල්ලේගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Pallegama - Local Exchange Area",
+    "name_ta": "பல்லேகம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-292",
+    "location": "පල්ලෙකැලේ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-292 - පල්ලෙකැලේ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පල්ලෙකැලේ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Pallekele - Local Exchange Area",
+    "name_ta": "பல்லேகல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-293",
+    "location": "පල්ලෙපොල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-293 - පල්ලෙපොල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පල්ලෙපොල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Pallepola - Local Exchange Area",
+    "name_ta": "பல்லேபொல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-294",
+    "location": "පල්ලෙවෙල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-294 - පල්ලෙවෙල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පල්ලෙවෙල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Pallewela - Local Exchange Area",
+    "name_ta": "பல்லேவல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-295",
+    "location": "පානදුර - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-295 - පානදුර - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පානදුර - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Panadura - Local Exchange Area",
+    "name_ta": "பாணந்துறை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-296",
+    "location": "පණ්ඩතරිප්පු - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-296 - පණ්ඩතරිප්පු - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පණ්ඩතරිප්පු - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Pandatharippu - Local Exchange Area",
+    "name_ta": "பண்டதரிப்பு - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-297",
+    "location": "පන්නල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-297 - පන්නල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පන්නල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Pannala - Local Exchange Area",
+    "name_ta": "பன்னாலா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-298",
+    "location": "පස්සර - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-298 - පස්සර - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පස්සර - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Passara - Local Exchange Area",
+    "name_ta": "பசரா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-299",
+    "location": "පස්යාල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-299 - පස්යාල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පස්යාල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Pasyala - Local Exchange Area",
+    "name_ta": "பஸ்யாலா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-300",
+    "location": "පාවත්කුලම් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-300 - පාවත්කුලම් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පාවත්කුලම් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Pawatkulam - Local Exchange Area",
+    "name_ta": "பாவத்துக்குளம் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-301",
+    "location": "පැල්මඩුල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-301 - පැල්මඩුල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පැල්මඩුල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Pelmadulla - Local Exchange Area",
+    "name_ta": "பெல்மதுல்லா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-302",
+    "location": "පේරාදෙණිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-302 - පේරාදෙණිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පේරාදෙණිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Peradeniya - Local Exchange Area",
+    "name_ta": "பேராதனை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-303",
+    "location": "පේසාලේ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-303 - පේසාලේ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පේසාලේ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Pesale - Local Exchange Area",
+    "name_ta": "பேசாலை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-304",
+    "location": "පිළිමතලාව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-304 - පිළිමතලාව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පිළිමතලාව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Pilimathalawa - Local Exchange Area",
+    "name_ta": "பிலிமத்தலாவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-305",
+    "location": "පිළියන්දල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-305 - පිළියන්දල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පිළියන්දල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Piliyandala - Local Exchange Area",
+    "name_ta": "பிலியந்தலை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-306",
+    "location": "පිනපාන - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-306 - පිනපාන - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පිනපාන - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Pinapana - Local Exchange Area",
+    "name_ta": "பினாபனா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-307",
+    "location": "පිටබැද්දර - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-307 - පිටබැද්දර - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පිටබැද්දර - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Pitabeddara - Local Exchange Area",
+    "name_ta": "பிடபெத்தரா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-308",
+    "location": "පේදුරුතුඩුව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-308 - පේදුරුතුඩුව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පේදුරුතුඩුව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Point Pedro - Local Exchange Area",
+    "name_ta": "பருத்தித்துறை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-309",
+    "location": "පොල්ගහවෙල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-309 - පොල්ගහවෙල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පොල්ගහවෙල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Polgahawela - Local Exchange Area",
+    "name_ta": "பொல்கஹவெல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-310",
+    "location": "පොළොන්නරුව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-310 - පොළොන්නරුව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පොළොන්නරුව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Polonnaruwa - Local Exchange Area",
+    "name_ta": "பொலன்னறுவை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-311",
+    "location": "පොල්පිතිගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-311 - පොල්පිතිගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පොල්පිතිගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Polpithigama - Local Exchange Area",
+    "name_ta": "பொல்பிதிகம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-312",
+    "location": "පොල්විල් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-312 - පොල්විල් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පොල්විල් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Poluvil - Local Exchange Area",
+    "name_ta": "Polville - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-313",
+    "location": "පුනරීන් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-313 - පුනරීන් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පුනරීන් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Pooneryn - Local Exchange Area",
+    "name_ta": "பூனரின் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-314",
+    "location": "පොරතිව් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-314 - පොරතිව් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පොරතිව් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Porativu - Local Exchange Area",
+    "name_ta": "போரதீவு - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-315",
+    "location": "පොතුහැර - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-315 - පොතුහැර - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පොතුහැර - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Potuhera - Local Exchange Area",
+    "name_ta": "பொத்துஹெரா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-316",
+    "location": "පුලස්තිගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-316 - පුලස්තිගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පුලස්තිගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Pulasthigama - Local Exchange Area",
+    "name_ta": "புலஸ்திகம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-317",
+    "location": "පුලියන්කුලම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-317 - පුලියන්කුලම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පුලියන්කුලම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Puliyankulama - Local Exchange Area",
+    "name_ta": "புளியங்குளம் - பிராந்திய பரிவர்த்தனை"
+  },
+  {
+    "code": "TEL-LEA-318",
+    "location": "පුල්මෝඩෙයි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-318 - පුල්මෝඩෙයි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පුල්මෝඩෙයි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Pulmodai - Local Exchange Area",
+    "name_ta": "புல்மோடை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-319",
+    "location": "පුනකාරි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-319 - පුනකාරි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පුනකාරි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Punakari - Local Exchange Area",
+    "name_ta": "புனகரி - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-320",
+    "location": "පුණ්ඩළුඔය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-320 - පුණ්ඩළුඔය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පුණ්ඩළුඔය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Pundaluoya - Local Exchange Area",
+    "name_ta": "பூண்டலுஓயா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-321",
+    "location": "පුංගුඩුතිව් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-321 - පුංගුඩුතිව් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පුංගුඩුතිව් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Pungudutivu - Local Exchange Area",
+    "name_ta": "புங்குடுதீவு - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-322",
+    "location": "පුස්සැල්ලාව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-322 - පුස්සැල්ලාව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පුස්සැල්ලාව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Pussellawa - Local Exchange Area",
+    "name_ta": "புஸ்ஸல்லாவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-323",
+    "location": "පුදුකුඩිඉරිප්පු - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-323 - පුදුකුඩිඉරිප්පු - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පුදුකුඩිඉරිප්පු - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Puthukkudiyiruppu - Local Exchange Area",
+    "name_ta": "புதுக்குடியிருப்பு - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-324",
+    "location": "පුත්තලම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-324 - පුත්තලම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "පුත්තලම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Puttalam - Local Exchange Area",
+    "name_ta": "புத்தளம் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-325",
+    "location": "රද්දොළුගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-325 - රද්දොළුගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "රද්දොළුගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Raddolugama - Local Exchange Area",
+    "name_ta": "ரடோலுகம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-326",
+    "location": "රාගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-326 - රාගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "රාගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Ragama - Local Exchange Area",
+    "name_ta": "ராகம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-327",
+    "location": "රජකදළුව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-327 - රජකදළුව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "රජකදළුව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Rajakadaluwa - Local Exchange Area",
+    "name_ta": "ராஜகடலுவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-328",
+    "location": "රක්වාන - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-328 - රක්වාන - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "රක්වාන - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Rakwana - Local Exchange Area",
+    "name_ta": "ரக்வானா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-329",
+    "location": "රඹෑව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-329 - රඹෑව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "රඹෑව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Rambewa - Local Exchange Area",
+    "name_ta": "ரம்பேவா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-330",
+    "location": "රම්බොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-330 - රම්බොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "රම්බොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Ramboda - Local Exchange Area",
+    "name_ta": "ரம்போடா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-331",
+    "location": "රඹුක්කන - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-331 - රඹුක්කන - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "රඹුක්කන - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Rambukkana - Local Exchange Area",
+    "name_ta": "ரம்புக்கன - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-332",
+    "location": "රංගල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-332 - රංගල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "රංගල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Rangala - Local Exchange Area",
+    "name_ta": "ரங்கலா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-333",
+    "location": "රන්පොකුණගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-333 - රන්පොකුණගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "රන්පොකුණගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Ranpokunagama - Local Exchange Area",
+    "name_ta": "ரன்பொகுணகம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-334",
+    "location": "රපුතලේ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-334 - රපුතලේ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "රපුතලේ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Raputale - Local Exchange Area",
+    "name_ta": "Raputale - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-335",
+    "location": "රත්මලාන - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-335 - රත්මලාන - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "රත්මලාන - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Ratmalana - Local Exchange Area",
+    "name_ta": "இரத்மலானை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-336",
+    "location": "රත්නපුරය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-336 - රත්නපුරය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "රත්නපුරය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Ratnapura - Local Exchange Area",
+    "name_ta": "இரத்தினபுரி - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-337",
+    "location": "රත්තොට - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-337 - රත්තොට - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "රත්තොට - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Rattota - Local Exchange Area",
+    "name_ta": "ரத்தோட்ட - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-338",
+    "location": "රිදිගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-338 - රිදිගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "රිදිගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Ridigama - Local Exchange Area",
+    "name_ta": "ரிதிகம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-339",
+    "location": "රිදිනලියද්ද - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-339 - රිදිනලියද්ද - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "රිදිනලියද්ද - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Ridinaliyadda - Local Exchange Area",
+    "name_ta": "ரிதினாலியத்த - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-340",
+    "location": "රිකිල්ලගස්කඩ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-340 - රිකිල්ලගස්කඩ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "රිකිල්ලගස්කඩ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Rikillagaskada - Local Exchange Area",
+    "name_ta": "ரிகில்லகஸ்கட - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-341",
+    "location": "රුක්මල්ගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-341 - රුක්මල්ගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "රුක්මල්ගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Rukmalgama - Local Exchange Area",
+    "name_ta": "ருக்மல்கம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-342",
+    "location": "රුවන්වැල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-342 - රුවන්වැල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "රුවන්වැල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Ruwanwella - Local Exchange Area",
+    "name_ta": "ருவன்வெல்ல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-343",
+    "location": "සම්මන්තුරේ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-343 - සම්මන්තුරේ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "සම්මන්තුරේ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Sammanthurai - Local Exchange Area",
+    "name_ta": "சம்மாந்துறை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-344",
+    "location": "සඳලංකාව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-344 - සඳලංකාව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "සඳලංකාව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Sandalankawa - Local Exchange Area",
+    "name_ta": "சண்டலங்கா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-345",
+    "location": "සේරුවාවිල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-345 - සේරුවාවිල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "සේරුවාවිල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Seruwawila - Local Exchange Area",
+    "name_ta": "சேருவாவில - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-346",
+    "location": "සෙවනගල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-346 - සෙවනගල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "සෙවනගල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Sevanagala - Local Exchange Area",
+    "name_ta": "செவனகல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-347",
+    "location": "සීගිරිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-347 - සීගිරිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "සීගිරිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Sigiriya - Local Exchange Area",
+    "name_ta": "சிகிரியா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-348",
+    "location": "සිතන්කර්මි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-348 - සිතන්කර්මි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "සිතන්කර්මි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Sithankermi - Local Exchange Area",
+    "name_ta": "சித்தன்கர்மி - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-349",
+    "location": "සියඹලාණ්ඩුව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-349 - සියඹලාණ්ඩුව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "සියඹලාණ්ඩුව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Siyambalanduwa - Local Exchange Area",
+    "name_ta": "சியம்பலாண்டுவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-350",
+    "location": "සියඹලාණ්ඩුව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-350 - සියඹලාණ්ඩුව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "සියඹලාණ්ඩුව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Siyambalanduwa - Local Exchange Area",
+    "name_ta": "சியம்பலாண்டுவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-351",
+    "location": "සූරියවැව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-351 - සූරියවැව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "සූරියවැව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Sooriyawewa - Local Exchange Area",
+    "name_ta": "சூரியவெவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-352",
+    "location": "ශ්රීපුර - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-352 - ශ්රීපුර - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ශ්රීපුර - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Sripura - Local Exchange Area",
+    "name_ta": "ஸ்ரீபுரா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-353",
+    "location": "තබුත්තේගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-353 - තබුත්තේගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "තබුත්තේගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Tabuttegama - Local Exchange Area",
+    "name_ta": "தபுத்தேகம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-354",
+    "location": "තලෙයිමන්නාරම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-354 - තලෙයිමන්නාරම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "තලෙයිමන්නාරම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Talaimannar - Local Exchange Area",
+    "name_ta": "தலைமன்னார் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-355",
+    "location": "තලාතුඔය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-355 - තලාතුඔය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "තලාතුඔය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Talatuoya - Local Exchange Area",
+    "name_ta": "தலத்துஓயா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-356",
+    "location": "තලාව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-356 - තලාව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "තලාව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Talawa - Local Exchange Area",
+    "name_ta": "தலைவா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-357",
+    "location": "තලවකැලේ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-357 - තලවකැලේ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "තලවකැලේ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Talawakele - Local Exchange Area",
+    "name_ta": "தலவாக்கலே - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-358",
+    "location": "තංගල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-358 - තංගල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "තංගල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Tangalle - Local Exchange Area",
+    "name_ta": "தங்காலை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-359",
+    "location": "තෙලිජ්ජවිල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-359 - තෙලිජ්ජවිල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "තෙලිජ්ජවිල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Telijjawila - Local Exchange Area",
+    "name_ta": "தெலிஜ்ஜாவில - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-360",
+    "location": "තල්පොට - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-360 - තල්පොට - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "තල්පොට - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Thalpota - Local Exchange Area",
+    "name_ta": "தல்பொட - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-361",
+    "location": "තම්පලකාමම් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-361 - තම්පලකාමම් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "තම්පලකාමම් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Thampalakamam - Local Exchange Area",
+    "name_ta": "தம்பலகாமம் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-362",
+    "location": "තණමල්විල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-362 - තණමල්විල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "තණමල්විල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Thanamalwila - Local Exchange Area",
+    "name_ta": "தனமல்வில - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-363",
+    "location": "තවලම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-363 - තවලම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "තවලම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Thawalama - Local Exchange Area",
+    "name_ta": "தவலம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-364",
+    "location": "තිඹොල්කැටිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-364 - තිඹොල්කැටිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "තිඹොල්කැටිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Thimbolketiya - Local Exchange Area",
+    "name_ta": "திம்போல்கெட்டிய - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-365",
+    "location": "තිරුක්කෝවිල් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-365 - තිරුක්කෝවිල් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "තිරුක්කෝවිල් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Thirukkovil - Local Exchange Area",
+    "name_ta": "திருக்கோவில் - வட்டார பரிவர்த்தனை"
+  },
+  {
+    "code": "TEL-LEA-366",
+    "location": "තිස්සමහාරාමය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-366 - තිස්සමහාරාමය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "තිස්සමහාරාමය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Thissamaharamaya - Local Exchange Area",
+    "name_ta": "திஸ்ஸமஹாராம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-367",
+    "location": "තුනුක්කායි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-367 - තුනුක්කායි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "තුනුක්කායි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Thunukkai - Local Exchange Area",
+    "name_ta": "துணுக்காய் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-368",
+    "location": "ටිලිකොල්ට්‍රි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-368 - ටිලිකොල්ට්‍රි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ටිලිකොල්ට්‍රි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Tillicoultry - Local Exchange Area",
+    "name_ta": "தொலைத்தொடர்பு - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-369",
+    "location": "තිරප්පනේ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-369 - තිරප්පනේ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "තිරප්පනේ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Tirappane - Local Exchange Area",
+    "name_ta": "திரப்பனே - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-370",
+    "location": "ටොප්පූර් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-370 - ටොප්පූර් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ටොප්පූර් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Toppur - Local Exchange Area",
+    "name_ta": "தோப்பூர் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-371",
+    "location": "ට්‍රැටා පෙරියකුලම් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-371 - ට්‍රැටා පෙරියකුලම් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ට්‍රැටා පෙරියකුලම් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Trata Periyakulam - Local Exchange Area",
+    "name_ta": "ட்ரோடா பெரியகுளம் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-372",
+    "location": "ත්රිකුණාමලය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-372 - ත්රිකුණාමලය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ත්රිකුණාමලය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Trincomalee - Local Exchange Area",
+    "name_ta": "திருகோணமலை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-373",
+    "location": "උඩප්පුව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-373 - උඩප්පුව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "උඩප්පුව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Udappuwa - Local Exchange Area",
+    "name_ta": "உடப்புவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-374",
+    "location": "උඩතුත්තිරිපිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-374 - උඩතුත්තිරිපිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "උඩතුත්තිරිපිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Udatuttiripitiya - Local Exchange Area",
+    "name_ta": "உடதுத்திரிபிட்டிய - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-375",
+    "location": "උඩුබද්දාව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-375 - උඩුබද්දාව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "උඩුබද්දාව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Udubaddawa - Local Exchange Area",
+    "name_ta": "உடுபத்தாவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-376",
+    "location": "උඩුගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-376 - උඩුගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "උඩුගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Udugama - Local Exchange Area",
+    "name_ta": "உடுகம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-377",
+    "location": "උඩුපුස්සැල්ලාව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-377 - උඩුපුස්සැල්ලාව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "උඩුපුස්සැල්ලාව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Udupussellawa - Local Exchange Area",
+    "name_ta": "உடுபுஸ்ஸல்லாவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-378",
+    "location": "උහන - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-378 - උහන - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "උහන - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Uhana - Local Exchange Area",
+    "name_ta": "உஹானா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-379",
+    "location": "උකුවෙල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-379 - උකුවෙල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "උකුවෙල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Ukuwela - Local Exchange Area",
+    "name_ta": "உகுவெல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-380",
+    "location": "උළුක්කුලම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-380 - උළුක්කුලම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "උළුක්කුලම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Ulukkulama - Local Exchange Area",
+    "name_ta": "உளுக்குளம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-381",
+    "location": "උඳුගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-381 - උඳුගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "උඳුගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Undugoda - Local Exchange Area",
+    "name_ta": "உண்டுகொட - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-382",
+    "location": "Upcot - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-382 - Upcot - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "Upcot - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Upcot - Local Exchange Area",
+    "name_ta": "அப்காட் - உள்ளூர் பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-383",
+    "location": "ඌරාපොල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-383 - ඌරාපොල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ඌරාපොල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Urapola - Local Exchange Area",
+    "name_ta": "ஊரபொல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-384",
+    "location": "ඌරුබොක්ක - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-384 - ඌරුබොක්ක - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ඌරුබොක්ක - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Urubokka - Local Exchange Area",
+    "name_ta": "ஊர்பொக்க - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-385",
+    "location": "ඌව පරණගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-385 - ඌව පරණගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "ඌව පරණගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Uva Paranagama - Local Exchange Area",
+    "name_ta": "ஊவா பரணகம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-386",
+    "location": "වඩ්ඩුකොඩ්ඩෙයි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-386 - වඩ්ඩුකොඩ්ඩෙයි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "වඩ්ඩුකොඩ්ඩෙයි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Vaddukoddai - Local Exchange Area",
+    "name_ta": "வட்டுக்கோட்டை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-387",
+    "location": "වාකරේ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-387 - වාකරේ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "වාකරේ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Vakarai - Local Exchange Area",
+    "name_ta": "வாகரை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-388",
+    "location": "වාලච්චේනයි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-388 - වාලච්චේනයි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "වාලච්චේනයි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Valachchenai - Local Exchange Area",
+    "name_ta": "வாழைச்சேனை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-389",
+    "location": "වවුනියාව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-389 - වවුනියාව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "වවුනියාව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Vavuniya - Local Exchange Area",
+    "name_ta": "வவுனியா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-390",
+    "location": "වේලනයි - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-390 - වේලනයි - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "වේලනයි - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Velanai - Local Exchange Area",
+    "name_ta": "வேலணை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-391",
+    "location": "වැලිවේරිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-391 - වැලිවේරිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "වැලිවේරිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Veliveriya - Local Exchange Area",
+    "name_ta": "வெலிவேரிய - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-392",
+    "location": "වෙල්වටිචර් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-392 - වෙල්වටිචර් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "වෙල්වටිචර් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Velvetiture - Local Exchange Area",
+    "name_ta": "வெல்வெடிச்சர் - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-393",
+    "location": "වේයන්ගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-393 - වේයන්ගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "වේයන්ගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Veyangoda - Local Exchange Area",
+    "name_ta": "வெயங்கொட - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-394",
+    "location": "විදල්ලල්තිව් - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-394 - විදල්ලල්තිව් - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "විදල්ලල්තිව් - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Vidallaltivu - Local Exchange Area",
+    "name_ta": "விடலால்தீவு - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-395",
+    "location": "වලස්මුල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-395 - වලස්මුල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "වලස්මුල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Walasmulla - Local Exchange Area",
+    "name_ta": "வலஸ்முல்ல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-396",
+    "location": "වනාතවිල්ලුව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-396 - වනාතවිල්ලුව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "වනාතවිල්ලුව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Wanathawilluwa - Local Exchange Area",
+    "name_ta": "வனாத்தவில்லுவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-397",
+    "location": "වරකාපොල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-397 - වරකාපොල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "වරකාපොල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Warakapola - Local Exchange Area",
+    "name_ta": "வரக்காபொல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-398",
+    "location": "වාරියපොළ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-398 - වාරියපොළ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "වාරියපොළ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Wariyapola - Local Exchange Area",
+    "name_ta": "வாரியபொல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-399",
+    "location": "වටගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-399 - වටගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "වටගොඩ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Watagoda - Local Exchange Area",
+    "name_ta": "வடகொட - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-400",
+    "location": "වටවල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-400 - වටවල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "වටවල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Watawala - Local Exchange Area",
+    "name_ta": "வட்டவல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-401",
+    "location": "වත්තල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-401 - වත්තල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "වත්තල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Wattala - Local Exchange Area",
+    "name_ta": "வத்தளை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-402",
+    "location": "වත්තේගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-402 - වත්තේගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "වත්තේගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Wattegama - Local Exchange Area",
+    "name_ta": "வத்தேகம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-403",
+    "location": "වැද්දුව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-403 - වැද්දුව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "වැද්දුව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Wedduwa - Local Exchange Area",
+    "name_ta": "வெத்துவா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-404",
+    "location": "වීරකැටිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-404 - වීරකැටිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "වීරකැටිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Weeraketiya - Local Exchange Area",
+    "name_ta": "வீரகெட்டிய - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-405",
+    "location": "වැලිගම - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-405 - වැලිගම - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "වැලිගම - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Weligama - Local Exchange Area",
+    "name_ta": "வெலிகம - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-406",
+    "location": "වැලිගෙපොල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-406 - වැලිගෙපොල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "වැලිගෙපොල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Weligepola - Local Exchange Area",
+    "name_ta": "வெலிகேபொல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-407",
+    "location": "වැලිකන්ද - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-407 - වැලිකන්ද - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "වැලිකන්ද - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Welikanda - Local Exchange Area",
+    "name_ta": "வெலிகந்த - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-408",
+    "location": "වැලිමඞ - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-408 - වැලිමඞ - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "වැලිමඞ - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Welimada - Local Exchange Area",
+    "name_ta": "வெலிமடை - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-409",
+    "location": "වැල්ලම්පිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-409 - වැල්ලම්පිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "වැල්ලම්පිටිය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Wellampitiya - Local Exchange Area",
+    "name_ta": "வெல்லம்பிட்டிய - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-410",
+    "location": "වැල්ලවාය - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-410 - වැල්ලවාය - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "වැල්ලවාය - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Wellawaya - Local Exchange Area",
+    "name_ta": "வெல்லவாய - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-411",
+    "location": "විල්ගමුව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-411 - විල්ගමුව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "විල්ගමුව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Wilgamuwa - Local Exchange Area",
+    "name_ta": "வில்கமுவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-412",
+    "location": "යක්කලමුල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-412 - යක්කලමුල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "යක්කලමුල්ල - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Yakkalamulla - Local Exchange Area",
+    "name_ta": "யக்கலமுல்ல - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-413",
+    "location": "යාලකලන්පල්ටුව - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-413 - යාලකලන්පල්ටුව - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "යාලකලන්පල්ටුව - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Yalakalanpaltuwa - Local Exchange Area",
+    "name_ta": "யலகலன்பல்டுவ - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-414",
+    "location": "යටියන - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-414 - යටියන - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "යටියන - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Yatiyana - Local Exchange Area",
+    "name_ta": "யதியானா - பிராந்திய பரிமாற்றம்"
+  },
+  {
+    "code": "TEL-LEA-415",
+    "location": "කෝරා - ප්‍රාදේශීය හුවමාරුව",
+    "full_location_name": "TEL-LEA-415 - කෝරා - ප්‍රාදේශීය හුවමාරුව",
+    "location_type": "ප්‍රාදේශීය හුවමාරුව",
+    "name_si": "කෝරා - ප්‍රාදේශීය හුවමාරුව",
+    "name_en": "Корау - Local Exchange Area",
+    "name_ta": "கோரா - பிராந்திய பரிமாற்றம்"
+  }
+]

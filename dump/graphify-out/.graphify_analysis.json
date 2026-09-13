@@ -1,0 +1,1683 @@
+{
+  "communities": {
+    "0": [
+      "frontend_package_dependencies_react",
+      "frontend_src_api_apolloclient",
+      "frontend_src_api_apolloclient_apolloclient",
+      "frontend_src_api_apolloclient_authlink",
+      "frontend_src_api_apolloclient_httplink",
+      "frontend_src_app",
+      "frontend_src_app_app",
+      "frontend_src_auth_authprovider",
+      "frontend_src_auth_authprovider_authcontext",
+      "frontend_src_auth_authprovider_authcontexttype",
+      "frontend_src_auth_authprovider_authprovider",
+      "frontend_src_auth_authprovider_authproviderprops",
+      "frontend_src_auth_authprovider_useauth",
+      "frontend_src_auth_keycloak",
+      "frontend_src_auth_keycloak_keycloak",
+      "frontend_src_auth_protectedroute",
+      "frontend_src_auth_protectedroute_protectedroute",
+      "frontend_src_auth_protectedroute_protectedrouteprops",
+      "frontend_src_components_adminlayout",
+      "frontend_src_components_adminlayout_adminlayout",
+      "frontend_src_components_adminlayout_adminlayoutprops",
+      "frontend_src_components_onboardingmodal",
+      "frontend_src_components_onboardingmodal_complete_onboarding",
+      "frontend_src_components_onboardingmodal_onboardingmodal",
+      "frontend_src_components_onboardingmodal_onboardingmodalprops",
+      "frontend_src_components_sidebar",
+      "frontend_src_components_sidebar_navitems",
+      "frontend_src_components_sidebar_rolecolors",
+      "frontend_src_components_sidebar_sidebar",
+      "frontend_src_components_topbar",
+      "frontend_src_components_topbar_topbar",
+      "frontend_src_components_topnavbar",
+      "frontend_src_components_topnavbar_topnavbar",
+      "frontend_src_graphql_mutations_register_user",
+      "frontend_src_graphql_mutations_update_user_profile",
+      "frontend_src_graphql_queries_get_me",
+      "frontend_src_main",
+      "frontend_src_pages_dashboardpage",
+      "frontend_src_pages_dashboardpage_dashboardpage",
+      "frontend_src_pages_dashboardpage_mockstats",
+      "frontend_src_pages_dashboardpage_recentactivity",
+      "frontend_src_pages_dashboardpage_statcard",
+      "frontend_src_pages_dashboardpage_statcardprops",
+      "frontend_src_pages_loginpage",
+      "frontend_src_pages_loginpage_features",
+      "frontend_src_pages_loginpage_loginpage",
+      "frontend_src_pages_placeholderpages",
+      "frontend_src_pages_placeholderpages_placeholderpage",
+      "frontend_src_pages_placeholderpages_placeholderpageprops",
+      "frontend_src_pages_placeholderpages_reportspage",
+      "frontend_src_pages_placeholderpages_userspage",
+      "frontend_src_pages_profilepage",
+      "frontend_src_pages_profilepage_profilemodalprops",
+      "frontend_src_pages_profilepage_profilepage",
+      "frontend_src_pages_registrationpage",
+      "frontend_src_pages_registrationpage_registrationpage",
+      "frontend_src_theme_theme",
+      "frontend_src_theme_theme_colors",
+      "frontend_src_theme_theme_theme",
+      "react"
+    ],
+    "1": [
+      "backend_app_graphql_mutations_onboardingmutations",
+      "backend_app_graphql_mutations_onboardingmutations_onboardingmutations",
+      "backend_app_graphql_mutations_onboardingmutations_onboardingmutations_completeuseronboarding",
+      "backend_app_graphql_mutations_usermutations",
+      "backend_app_graphql_mutations_usermutations_usermutations",
+      "backend_app_graphql_mutations_usermutations_usermutations_construct",
+      "backend_app_graphql_mutations_usermutations_usermutations_registeruser",
+      "backend_app_graphql_mutations_usermutations_usermutations_updateuserprofile",
+      "backend_app_graphql_queries_userqueries",
+      "backend_app_graphql_queries_userqueries_userqueries",
+      "backend_app_graphql_queries_userqueries_userqueries_meuser",
+      "backend_app_graphql_queries_userqueries_userqueries_needsonboarding",
+      "backend_app_http_controllers_controller",
+      "backend_app_http_controllers_controller_controller",
+      "backend_app_http_controllers_imageuploadcontroller",
+      "backend_app_http_controllers_imageuploadcontroller_imageuploadcontroller",
+      "backend_app_http_controllers_imageuploadcontroller_imageuploadcontroller_upload",
+      "backend_app_http_middleware_keycloakauthguard",
+      "backend_app_http_middleware_keycloakauthguard_keycloakauthguard",
+      "backend_app_http_middleware_keycloakauthguard_keycloakauthguard_decodetoken",
+      "backend_app_http_middleware_keycloakauthguard_keycloakauthguard_extracttoken",
+      "backend_app_http_middleware_keycloakauthguard_keycloakauthguard_getjwks",
+      "backend_app_http_middleware_keycloakauthguard_keycloakauthguard_handle",
+      "backend_app_models_user",
+      "backend_app_models_user_user",
+      "backend_app_models_user_user_casts",
+      "backend_app_services_keycloakadminservice",
+      "backend_app_services_keycloakadminservice_keycloakadminservice",
+      "backend_app_services_keycloakadminservice_keycloakadminservice_construct",
+      "backend_app_services_keycloakadminservice_keycloakadminservice_createuser",
+      "backend_app_services_keycloakadminservice_keycloakadminservice_getaccesstoken",
+      "backend_app_services_keycloakadminservice_keycloakadminservice_getuserbyemail",
+      "backend_config_auth",
+      "backend_config_cache",
+      "backend_create_accounts",
+      "backend_database_factories_userfactory",
+      "backend_database_factories_userfactory_userfactory",
+      "backend_database_factories_userfactory_userfactory_definition",
+      "backend_database_factories_userfactory_userfactory_unverified",
+      "backend_routes_api",
+      "closure",
+      "illuminate_database_eloquent_factories_factory",
+      "illuminate_foundation_auth_user",
+      "illuminate_http_request",
+      "illuminate_notifications_notifiable",
+      "static"
+    ],
+    "2": [
+      "backend_composer",
+      "backend_composer_allow_plugins_pestphp_pest_plugin",
+      "backend_composer_allow_plugins_php_http_discovery",
+      "backend_composer_autoload",
+      "backend_composer_autoload_dev",
+      "backend_composer_autoload_dev_psr_4",
+      "backend_composer_autoload_psr_4",
+      "backend_composer_config",
+      "backend_composer_config_allow_plugins",
+      "backend_composer_config_optimize_autoloader",
+      "backend_composer_config_preferred_install",
+      "backend_composer_config_sort_packages",
+      "backend_composer_description",
+      "backend_composer_extra",
+      "backend_composer_extra_laravel",
+      "backend_composer_keywords",
+      "backend_composer_laravel_dont_discover",
+      "backend_composer_license",
+      "backend_composer_minimum_stability",
+      "backend_composer_name",
+      "backend_composer_prefer_stable",
+      "backend_composer_psr_4_app",
+      "backend_composer_psr_4_database_factories",
+      "backend_composer_psr_4_database_seeders",
+      "backend_composer_psr_4_tests",
+      "backend_composer_require",
+      "backend_composer_require_dev",
+      "backend_composer_require_dev_fakerphp_faker",
+      "backend_composer_require_dev_laravel_pail",
+      "backend_composer_require_dev_laravel_pint",
+      "backend_composer_require_dev_laravel_sail",
+      "backend_composer_require_dev_mockery_mockery",
+      "backend_composer_require_dev_nunomaduro_collision",
+      "backend_composer_require_dev_phpunit_phpunit",
+      "backend_composer_require_firebase_php_jwt",
+      "backend_composer_require_laravel_framework",
+      "backend_composer_require_laravel_tinker",
+      "backend_composer_require_nuwave_lighthouse",
+      "backend_composer_require_php",
+      "backend_composer_schema",
+      "backend_composer_type",
+      "ref_framework",
+      "ref_laravel"
+    ],
+    "3": [
+      "backend_app_models_admin",
+      "backend_app_models_police",
+      "backend_app_models_police_police",
+      "backend_app_models_police_police_gramaniladhari",
+      "backend_app_models_psrilanka",
+      "backend_app_models_psrilanka_psrilanka",
+      "backend_database_seeders_adminseeder",
+      "backend_database_seeders_adminseeder_adminseeder",
+      "backend_database_seeders_adminseeder_adminseeder_run",
+      "backend_database_seeders_categoryseeder",
+      "backend_database_seeders_categoryseeder_categoryseeder",
+      "backend_database_seeders_categoryseeder_categoryseeder_run",
+      "backend_database_seeders_databaseseeder",
+      "backend_database_seeders_databaseseeder_databaseseeder",
+      "backend_database_seeders_databaseseeder_databaseseeder_run",
+      "backend_database_seeders_gndivisionhousingseeder",
+      "backend_database_seeders_gndivisionhousingseeder_gndivisionhousingseeder",
+      "backend_database_seeders_gndivisionhousingseeder_gndivisionhousingseeder_run",
+      "backend_database_seeders_gneconomyseeder",
+      "backend_database_seeders_gneconomyseeder_gneconomyseeder",
+      "backend_database_seeders_gneconomyseeder_gneconomyseeder_run",
+      "backend_database_seeders_gramaniladhariseeder",
+      "backend_database_seeders_gramaniladhariseeder_gramaniladhariseeder",
+      "backend_database_seeders_gramaniladhariseeder_gramaniladhariseeder_run",
+      "backend_database_seeders_locationcategoriesseeder",
+      "backend_database_seeders_locationcategoriesseeder_locationcategoriesseeder",
+      "backend_database_seeders_locationcategoriesseeder_locationcategoriesseeder_run",
+      "backend_database_seeders_policedataseeder",
+      "backend_database_seeders_policedataseeder_policedataseeder",
+      "backend_database_seeders_policedataseeder_policedataseeder_run",
+      "backend_database_seeders_policeseeder",
+      "backend_database_seeders_policeseeder_policeseeder",
+      "backend_database_seeders_policeseeder_policeseeder_run",
+      "backend_database_seeders_psrilankaseeder",
+      "backend_database_seeders_psrilankaseeder_psrilankaseeder",
+      "backend_database_seeders_psrilankaseeder_psrilankaseeder_run",
+      "backend_database_seeders_questionseeder",
+      "backend_database_seeders_questionseeder_questionseeder",
+      "backend_database_seeders_questionseeder_questionseeder_run",
+      "backend_map_police",
+      "illuminate_database_seeder"
+    ],
+    "4": [
+      "backend_app_console_commands_seedleafquestions",
+      "backend_app_console_commands_seedleafquestions_seedleafquestions",
+      "backend_app_console_commands_seedleafquestions_seedleafquestions_handle",
+      "backend_app_graphql_mutations_categorymutations",
+      "backend_app_graphql_mutations_categorymutations_categorymutations",
+      "backend_app_graphql_mutations_categorymutations_categorymutations_createcategory",
+      "backend_app_graphql_mutations_categorymutations_categorymutations_deletecategory",
+      "backend_app_graphql_mutations_categorymutations_categorymutations_updatecategory",
+      "backend_app_graphql_mutations_policemutations",
+      "backend_app_graphql_mutations_policemutations_policemutations",
+      "backend_app_graphql_mutations_policemutations_policemutations_updatepolicemapping",
+      "backend_app_graphql_mutations_postofficemutations",
+      "backend_app_graphql_mutations_postofficemutations_postofficemutations",
+      "backend_app_graphql_mutations_postofficemutations_postofficemutations_updategndpostofficemapping",
+      "backend_app_graphql_queries_categoryqueries",
+      "backend_app_graphql_queries_categoryqueries_categoryqueries",
+      "backend_app_graphql_queries_categoryqueries_categoryqueries_categories",
+      "backend_app_graphql_queries_categoryqueries_categoryqueries_categorybyslug",
+      "backend_app_graphql_queries_categoryqueries_categoryqueries_getallcategoryids",
+      "backend_app_graphql_queries_categoryqueries_categoryqueries_progress",
+      "backend_app_graphql_queries_districtqueries",
+      "backend_app_graphql_queries_districtqueries_districtqueries",
+      "backend_app_graphql_queries_districtqueries_districtqueries_getdistricts",
+      "backend_app_graphql_queries_questionqueries",
+      "backend_app_graphql_queries_questionqueries_questionqueries",
+      "backend_app_graphql_queries_questionqueries_questionqueries_categoryanswers",
+      "backend_app_graphql_queries_questionqueries_questionqueries_myanswers",
+      "backend_app_models_category",
+      "backend_app_models_category_category",
+      "backend_app_models_category_category_children",
+      "backend_app_models_category_category_getancestorsattribute",
+      "backend_app_models_category_category_parent",
+      "backend_app_models_category_category_questions",
+      "graphql_type_definition_resolveinfo",
+      "nuwave_lighthouse_support_contracts_graphqlcontext"
+    ],
+    "5": [
+      "apollo_client",
+      "emotion_react",
+      "emotion_styled",
+      "frontend_package_dependencies",
+      "frontend_package_dependencies_apollo_client",
+      "frontend_package_dependencies_emotion_react",
+      "frontend_package_dependencies_emotion_styled",
+      "frontend_package_dependencies_graphql",
+      "frontend_package_dependencies_keycloak_js",
+      "frontend_package_dependencies_mui_icons_material",
+      "frontend_package_dependencies_mui_lab",
+      "frontend_package_dependencies_mui_material",
+      "frontend_package_dependencies_mui_system",
+      "frontend_package_dependencies_mui_x_charts",
+      "frontend_package_dependencies_mui_x_data_grid",
+      "frontend_package_dependencies_notistack",
+      "frontend_package_dependencies_react_dom",
+      "frontend_package_dependencies_react_router_dom",
+      "frontend_package_dependencies_react_swipeable",
+      "graphql",
+      "keycloak_js",
+      "mui_icons_material",
+      "mui_lab",
+      "mui_material",
+      "mui_system",
+      "mui_x_charts",
+      "mui_x_data_grid",
+      "notistack",
+      "react_dom",
+      "react_router_dom",
+      "react_swipeable"
+    ],
+    "6": [
+      "backend_app_graphql_queries_housingdataquery",
+      "backend_app_graphql_queries_housingdataquery_housingdataquery",
+      "backend_app_graphql_queries_housingdataquery_housingdataquery_invoke",
+      "backend_app_models_gndivisionhousing",
+      "backend_app_models_gndivisionhousing_gndivisionhousing",
+      "backend_app_models_gndivisionhousing_gndivisionhousing_gramaniladhari",
+      "backend_app_models_pdistrict",
+      "backend_app_models_pdistrict_pdistrict",
+      "backend_app_models_pdistrict_pdistrict_getpopulationbothattribute",
+      "backend_app_models_pdistrict_pdistrict_getpopulationfemaleattribute",
+      "backend_app_models_pdistrict_pdistrict_getpopulationmaleattribute",
+      "backend_app_models_pdistrict_pdistrict_gramaniladharis",
+      "backend_app_models_pdistrict_pdistrict_pprovince",
+      "backend_app_models_pgn_pgn",
+      "backend_app_models_pgn_pgn_gramaniladhari",
+      "backend_app_models_pprovince",
+      "backend_app_models_pprovince_pprovince",
+      "backend_app_models_pprovince_pprovince_getpopulationbothattribute",
+      "backend_app_models_pprovince_pprovince_getpopulationfemaleattribute",
+      "backend_app_models_pprovince_pprovince_getpopulationmaleattribute",
+      "backend_app_models_pprovince_pprovince_gramaniladharis",
+      "backend_app_models_pprovince_pprovince_pdistricts",
+      "backend_database_seeders_pdistrictseeder",
+      "backend_database_seeders_pdistrictseeder_pdistrictseeder",
+      "backend_database_seeders_pdistrictseeder_pdistrictseeder_run",
+      "backend_database_seeders_pprovinceseeder",
+      "backend_database_seeders_pprovinceseeder_pprovinceseeder",
+      "backend_database_seeders_pprovinceseeder_pprovinceseeder_run"
+    ],
+    "7": [
+      "backend_composer_scripts",
+      "backend_composer_scripts_dev",
+      "backend_composer_scripts_post_autoload_dump",
+      "backend_composer_scripts_post_create_project_cmd",
+      "backend_composer_scripts_post_root_package_install",
+      "backend_composer_scripts_post_update_cmd",
+      "backend_composer_scripts_pre_package_uninstall",
+      "backend_composer_scripts_setup",
+      "backend_composer_scripts_test",
+      "ref_composer_config_disableprocesstimeout",
+      "ref_composer_install",
+      "ref_illuminate_foundation_composerscripts_postautoloaddump",
+      "ref_illuminate_foundation_composerscripts_prepackageuninstall",
+      "ref_npm_install",
+      "ref_npm_run_build",
+      "ref_npx_concurrently_c_93c5fd_c4b5fd_fb7185_fdba74_php_artisan_serve_php_artisan_queue_listen_tries_1_timeout_0_php_artisan_pail_timeout_0_npm_run_dev_names_server_queue_logs_vite_kill_others",
+      "ref_php_artisan_config_clear_ansi",
+      "ref_php_artisan_key_generate",
+      "ref_php_artisan_key_generate_ansi",
+      "ref_php_artisan_migrate_force",
+      "ref_php_artisan_migrate_graceful_ansi",
+      "ref_php_artisan_package_discover_ansi",
+      "ref_php_artisan_test",
+      "ref_php_artisan_vendor_publish_tag_laravel_assets_ansi_force",
+      "ref_php_r_file_exists_database_database_sqlite_touch_database_database_sqlite",
+      "ref_php_r_file_exists_env_copy_env_example_env"
+    ],
+    "8": [
+      "frontend_src_graphql_mutations_update_police_mapping",
+      "frontend_src_graphql_queries",
+      "frontend_src_graphql_queries_get_admin",
+      "frontend_src_graphql_queries_get_dashboard_stats",
+      "frontend_src_graphql_queries_get_districts",
+      "frontend_src_graphql_queries_get_grama_niladharis",
+      "frontend_src_graphql_queries_get_p_district_with_gns",
+      "frontend_src_graphql_queries_get_p_districts",
+      "frontend_src_graphql_queries_get_phi_areas_by_district",
+      "frontend_src_graphql_queries_get_polices",
+      "frontend_src_graphql_queries_get_post_offices_by_district",
+      "frontend_src_graphql_queries_get_trs_areas_by_district",
+      "frontend_src_pages_districtprovinceconnectionspage",
+      "frontend_src_pages_districtprovinceconnectionspage_districtdetailsmodal",
+      "frontend_src_pages_districtprovinceconnectionspage_districtprovinceconnectionspage",
+      "frontend_src_pages_gramaniladharispage",
+      "frontend_src_pages_gramaniladharispage_gramaniladharispage",
+      "frontend_src_pages_phiconnectionspage",
+      "frontend_src_pages_phiconnectionspage_phiconnectionspage",
+      "frontend_src_pages_policeconnectionspage",
+      "frontend_src_pages_policeconnectionspage_policeconnectionspage",
+      "frontend_src_pages_postofficeconnectionspage",
+      "frontend_src_pages_postofficeconnectionspage_postofficeconnectionspage",
+      "frontend_src_pages_trsconnectionspage",
+      "frontend_src_pages_trsconnectionspage_trsconnectionspage"
+    ],
+    "9": [
+      "frontend_tsconfig_app",
+      "frontend_tsconfig_app_compileroptions",
+      "frontend_tsconfig_app_compileroptions_allowimportingtsextensions",
+      "frontend_tsconfig_app_compileroptions_isolatedmodules",
+      "frontend_tsconfig_app_compileroptions_jsx",
+      "frontend_tsconfig_app_compileroptions_lib",
+      "frontend_tsconfig_app_compileroptions_module",
+      "frontend_tsconfig_app_compileroptions_moduleresolution",
+      "frontend_tsconfig_app_compileroptions_noemit",
+      "frontend_tsconfig_app_compileroptions_nofallthroughcasesinswitch",
+      "frontend_tsconfig_app_compileroptions_nounusedlocals",
+      "frontend_tsconfig_app_compileroptions_nounusedparameters",
+      "frontend_tsconfig_app_compileroptions_resolvejsonmodule",
+      "frontend_tsconfig_app_compileroptions_skiplibcheck",
+      "frontend_tsconfig_app_compileroptions_strict",
+      "frontend_tsconfig_app_compileroptions_target",
+      "frontend_tsconfig_app_include",
+      "ref_dom",
+      "ref_dom_iterable",
+      "ref_es2020",
+      "ref_src"
+    ],
+    "10": [
+      "frontend_tsconfig_node",
+      "frontend_tsconfig_node_compileroptions",
+      "frontend_tsconfig_node_compileroptions_allowimportingtsextensions",
+      "frontend_tsconfig_node_compileroptions_erasablesyntaxonly",
+      "frontend_tsconfig_node_compileroptions_lib",
+      "frontend_tsconfig_node_compileroptions_module",
+      "frontend_tsconfig_node_compileroptions_moduledetection",
+      "frontend_tsconfig_node_compileroptions_moduleresolution",
+      "frontend_tsconfig_node_compileroptions_noemit",
+      "frontend_tsconfig_node_compileroptions_nofallthroughcasesinswitch",
+      "frontend_tsconfig_node_compileroptions_nounusedlocals",
+      "frontend_tsconfig_node_compileroptions_nounusedparameters",
+      "frontend_tsconfig_node_compileroptions_skiplibcheck",
+      "frontend_tsconfig_node_compileroptions_target",
+      "frontend_tsconfig_node_compileroptions_tsbuildinfofile",
+      "frontend_tsconfig_node_compileroptions_types",
+      "frontend_tsconfig_node_compileroptions_verbatimmodulesyntax",
+      "frontend_tsconfig_node_include",
+      "ref_es2023",
+      "ref_node",
+      "ref_vite_config_ts"
+    ],
+    "11": [
+      "axios",
+      "backend_package",
+      "backend_package_devdependencies",
+      "backend_package_devdependencies_axios",
+      "backend_package_devdependencies_concurrently",
+      "backend_package_devdependencies_laravel_vite_plugin",
+      "backend_package_devdependencies_tailwindcss",
+      "backend_package_devdependencies_tailwindcss_vite",
+      "backend_package_devdependencies_vite",
+      "backend_package_json_vite",
+      "backend_package_private",
+      "backend_package_schema",
+      "backend_package_scripts",
+      "backend_package_scripts_build",
+      "backend_package_scripts_dev",
+      "backend_package_type",
+      "concurrently",
+      "laravel_vite_plugin",
+      "tailwindcss",
+      "tailwindcss_vite"
+    ],
+    "12": [
+      "frontend_package",
+      "frontend_package_devdependencies",
+      "frontend_package_devdependencies_types_react",
+      "frontend_package_devdependencies_types_react_dom",
+      "frontend_package_devdependencies_typescript",
+      "frontend_package_devdependencies_vite",
+      "frontend_package_devdependencies_vitejs_plugin_react",
+      "frontend_package_json_vite",
+      "frontend_package_name",
+      "frontend_package_private",
+      "frontend_package_scripts",
+      "frontend_package_scripts_build",
+      "frontend_package_scripts_dev",
+      "frontend_package_scripts_preview",
+      "frontend_package_type",
+      "frontend_package_version",
+      "types_react",
+      "types_react_dom",
+      "typescript",
+      "vitejs_plugin_react"
+    ],
+    "13": [
+      "frontend_src_components_categorydialog",
+      "frontend_src_components_categorydialog_categorydialog",
+      "frontend_src_components_categorydialog_categorydialogprops",
+      "frontend_src_graphql_mutations",
+      "frontend_src_graphql_mutations_activate_admin",
+      "frontend_src_graphql_mutations_create_category",
+      "frontend_src_graphql_mutations_deactivate_admin",
+      "frontend_src_graphql_mutations_delete_category",
+      "frontend_src_graphql_mutations_register_admin",
+      "frontend_src_graphql_mutations_update_admin_role",
+      "frontend_src_graphql_mutations_update_category",
+      "frontend_src_graphql_mutations_update_gnd_post_office_mapping",
+      "frontend_src_graphql_queries_get_admins",
+      "frontend_src_graphql_queries_get_categories",
+      "frontend_src_pages_adminspage",
+      "frontend_src_pages_adminspage_adminspage",
+      "frontend_src_pages_adminspage_mock_admins",
+      "frontend_src_pages_adminspage_roleconfig",
+      "frontend_src_pages_categoriespage",
+      "frontend_src_pages_categoriespage_categoriespage"
+    ],
+    "14": [
+      "backend_app_models_gramaniladhari_gramaniladhari",
+      "backend_app_models_gramaniladhari_gramaniladhari_drinkingwatersource",
+      "backend_app_models_gramaniladhari_gramaniladhari_gneconomy",
+      "backend_app_models_gramaniladhari_gramaniladhari_householdheadrelationship",
+      "backend_app_models_gramaniladhari_gramaniladhari_housingownershipstatus",
+      "backend_app_models_gramaniladhari_gramaniladhari_housingrooftype",
+      "backend_app_models_gramaniladhari_gramaniladhari_housingunittype",
+      "backend_app_models_gramaniladhari_gramaniladhari_housingwalltype",
+      "backend_app_models_gramaniladhari_gramaniladhari_pdistrict",
+      "backend_app_models_gramaniladhari_gramaniladhari_pgn",
+      "backend_app_models_gramaniladhari_gramaniladhari_police",
+      "backend_app_models_gramaniladhari_gramaniladhari_postoffice",
+      "backend_app_models_gramaniladhari_gramaniladhari_pprovince",
+      "backend_app_models_gramaniladhari_gramaniladhari_religiousaffiliation",
+      "backend_app_models_gramaniladhari_gramaniladhari_roomsinhousingunit",
+      "backend_app_models_gramaniladhari_gramaniladhari_scopesearch",
+      "backend_app_models_gramaniladhari_gramaniladhari_solidwastedisposal",
+      "backend_app_models_gramaniladhari_gramaniladhari_toiletfacility"
+    ],
+    "15": [
+      "backend_app_graphql_mutations_adminmutations",
+      "backend_app_graphql_mutations_adminmutations_adminmutations",
+      "backend_app_graphql_mutations_adminmutations_adminmutations_activateadmin",
+      "backend_app_graphql_mutations_adminmutations_adminmutations_deactivateadmin",
+      "backend_app_graphql_mutations_adminmutations_adminmutations_registeradmin",
+      "backend_app_graphql_mutations_adminmutations_adminmutations_updateadminrole",
+      "backend_app_graphql_queries_adminqueries",
+      "backend_app_graphql_queries_adminqueries_adminqueries",
+      "backend_app_graphql_queries_adminqueries_adminqueries_admin",
+      "backend_app_graphql_queries_adminqueries_adminqueries_admins",
+      "backend_app_graphql_queries_adminqueries_adminqueries_dashboardstats",
+      "backend_app_graphql_queries_adminqueries_adminqueries_me",
+      "backend_app_models_admin_admin",
+      "backend_app_models_admin_admin_findbykeycloaksub",
+      "backend_app_models_admin_admin_scopeactive",
+      "self"
+    ],
+    "16": [
+      "backend_app_graphql_mutations_questionmutations",
+      "backend_app_graphql_mutations_questionmutations_questionmutations",
+      "backend_app_graphql_mutations_questionmutations_questionmutations_answerquestion",
+      "backend_app_graphql_mutations_questionmutations_questionmutations_createquestion",
+      "backend_app_graphql_mutations_questionmutations_questionmutations_deletequestion",
+      "backend_app_graphql_mutations_questionmutations_questionmutations_ensureadmin",
+      "backend_app_graphql_mutations_questionmutations_questionmutations_updatequestion",
+      "backend_app_graphql_queries_questionqueries_questionqueries_questions",
+      "backend_app_models_question",
+      "backend_app_models_question_question",
+      "backend_app_models_question_question_category",
+      "backend_app_models_useranswer",
+      "backend_app_models_useranswer_useranswer",
+      "backend_app_models_useranswer_useranswer_question",
+      "backend_app_models_useranswer_useranswer_user"
+    ],
+    "17": [
+      "frontend_src_components_agedemographicschart",
+      "frontend_src_components_agedemographicschart_age3dbarchart",
+      "frontend_src_components_agedemographicschart_age3dbarchartprops",
+      "frontend_src_components_agedemographicschart_categorylabels",
+      "frontend_src_components_agedemographicschart_palette",
+      "frontend_src_components_housingownershipchart",
+      "frontend_src_components_housingownershipchart_categorylabels",
+      "frontend_src_components_housingownershipchart_housingownershipchart",
+      "frontend_src_components_housingownershipchart_housingownershipchartprops",
+      "frontend_src_components_housingownershipchart_palette",
+      "frontend_src_graphql_queries_get_gn_by_coordinates",
+      "frontend_src_pages_userdashboard",
+      "frontend_src_pages_userdashboard_getthemecolors",
+      "frontend_src_pages_userdashboard_userdashboard",
+      "frontend_src_pages_userdashboard_userdashboardprops"
+    ],
+    "18": [
+      "frontend_src_components_dynamiccategorywrapper",
+      "frontend_src_components_dynamiccategorywrapper_dynamiccategorywrapper",
+      "frontend_src_components_questiondialog",
+      "frontend_src_components_questiondialog_questiondialog",
+      "frontend_src_components_questiondialog_questiondialogprops",
+      "frontend_src_components_subcategorypage",
+      "frontend_src_components_subcategorypage_subcategorypage",
+      "frontend_src_components_subcategorypage_subcategorypageprops",
+      "frontend_src_graphql_mutations_create_question",
+      "frontend_src_graphql_mutations_delete_question",
+      "frontend_src_graphql_mutations_update_question",
+      "frontend_src_graphql_queries_get_category_answers",
+      "frontend_src_graphql_queries_get_category_by_slug",
+      "frontend_src_pages_questionspage",
+      "frontend_src_pages_questionspage_questionspage"
+    ],
+    "19": [
+      "backend_app_graphql_queries_phiareaqueries",
+      "backend_app_graphql_queries_phiareaqueries_phiareaqueries",
+      "backend_app_graphql_queries_phiareaqueries_phiareaqueries_phiareasbydistrict",
+      "backend_app_models_drinkingwatersource",
+      "backend_app_models_drinkingwatersource_drinkingwatersource",
+      "backend_app_models_drinkingwatersource_drinkingwatersource_gramaniladhari",
+      "backend_app_models_phiarea",
+      "backend_app_models_phiarea_phiarea",
+      "backend_app_models_solidwastedisposal",
+      "backend_app_models_solidwastedisposal_solidwastedisposal",
+      "backend_app_models_solidwastedisposal_solidwastedisposal_gramaniladhari",
+      "backend_import_drinking_water",
+      "backend_import_solid_waste",
+      "illuminate_database_eloquent_factories_hasfactory"
+    ],
+    "20": [
+      "backend_app_console_commands_importgramaniladharis",
+      "backend_app_console_commands_importgramaniladharis_importgramaniladharis",
+      "backend_app_console_commands_importgramaniladharis_importgramaniladharis_handle",
+      "backend_app_console_commands_importphiareas",
+      "backend_app_console_commands_importphiareas_importphiareas",
+      "backend_app_console_commands_importphiareas_importphiareas_handle",
+      "backend_app_console_commands_importpostoffices",
+      "backend_app_console_commands_importpostoffices_importpostoffices",
+      "backend_app_console_commands_importpostoffices_importpostoffices_handle",
+      "backend_app_console_commands_mappgnstogramaniladharis_mappgnstogramaniladharis",
+      "backend_app_console_commands_mappgnstogramaniladharis_mappgnstogramaniladharis_handle",
+      "backend_app_console_commands_updategramaniladharis",
+      "backend_app_console_commands_updategramaniladharis_updategramaniladharis",
+      "backend_app_console_commands_updategramaniladharis_updategramaniladharis_handle",
+      "illuminate_console_command"
+    ],
+    "21": [
+      "backend_app_console_commands_fixpgnmapping",
+      "backend_app_console_commands_mappgnstogramaniladharis",
+      "backend_app_models_gramaniladhari",
+      "backend_app_models_pgn",
+      "backend_database_seeders_pgnseeder",
+      "backend_database_seeders_pgnseeder_pgnseeder",
+      "backend_database_seeders_pgnseeder_pgnseeder_run",
+      "backend_fix_links",
+      "backend_import_roof",
+      "backend_import_roof_normalizename",
+      "backend_update_p_gns",
+      "backend_update_p_gns2"
+    ],
+    "22": [
+      "backend_app_models_gneconomy",
+      "backend_app_models_gneconomy_gneconomy",
+      "backend_app_models_housingrooftype",
+      "backend_app_models_housingrooftype_housingrooftype",
+      "backend_app_models_housingrooftype_housingrooftype_gramaniladhari",
+      "backend_app_models_housingunittype",
+      "backend_app_models_housingunittype_housingunittype",
+      "backend_app_models_housingunittype_housingunittype_gramaniladhari",
+      "backend_import_unit_types",
+      "illuminate_database_eloquent_model"
+    ],
+    "23": [
+      "backend_app_console_commands_importtrsareas",
+      "backend_app_console_commands_importtrsareas_importtrsareas",
+      "backend_app_console_commands_importtrsareas_importtrsareas_handle",
+      "backend_app_graphql_queries_trsareaqueries",
+      "backend_app_graphql_queries_trsareaqueries_trsareaqueries",
+      "backend_app_graphql_queries_trsareaqueries_trsareaqueries_trsareasbydistrict",
+      "backend_app_models_trsarea",
+      "backend_app_models_trsarea_trsarea"
+    ],
+    "24": [
+      "frontend_src_components_custom3dbarchart",
+      "frontend_src_components_custom3dbarchart_custom3dbarchart",
+      "frontend_src_components_custom3dbarchart_custom3dbarchartprops",
+      "frontend_src_components_custom3dbarchart_desktopcategorylabels",
+      "frontend_src_components_custom3dbarchart_mobilecategorylabels",
+      "frontend_src_components_custom3dbarchart_palette",
+      "frontend_src_graphql_queries_get_housing_data"
+    ],
+    "25": [
+      "backend_app_graphql_queries_postofficequeries",
+      "backend_app_graphql_queries_postofficequeries_postofficequeries",
+      "backend_app_graphql_queries_postofficequeries_postofficequeries_postofficesbydistrict",
+      "backend_app_models_postoffice",
+      "backend_app_models_postoffice_postoffice",
+      "backend_app_models_postoffice_postoffice_gramaniladharis"
+    ],
+    "26": [
+      "backend_app_providers_appserviceprovider",
+      "backend_app_providers_appserviceprovider_appserviceprovider",
+      "backend_app_providers_appserviceprovider_appserviceprovider_boot",
+      "backend_app_providers_appserviceprovider_appserviceprovider_register",
+      "backend_bootstrap_providers",
+      "illuminate_support_serviceprovider"
+    ],
+    "27": [
+      "backend_tests_feature_exampletest",
+      "backend_tests_feature_exampletest_exampletest",
+      "backend_tests_feature_exampletest_exampletest_test_the_application_returns_a_successful_response",
+      "backend_tests_testcase",
+      "backend_tests_testcase_testcase",
+      "illuminate_foundation_testing_testcase"
+    ],
+    "28": [
+      "backend_app_models_householdheadrelationship",
+      "backend_app_models_householdheadrelationship_householdheadrelationship",
+      "backend_app_models_householdheadrelationship_householdheadrelationship_gramaniladhari",
+      "backend_import_household_head",
+      "backend_import_household_head_normalizename"
+    ],
+    "29": [
+      "backend_app_models_housingownershipstatus",
+      "backend_app_models_housingownershipstatus_housingownershipstatus",
+      "backend_app_models_housingownershipstatus_housingownershipstatus_gramaniladhari",
+      "backend_import_housing_ownership",
+      "backend_map_gn_ids"
+    ],
+    "30": [
+      "backend_app_models_religiousaffiliation",
+      "backend_app_models_religiousaffiliation_religiousaffiliation",
+      "backend_app_models_religiousaffiliation_religiousaffiliation_gramaniladhari",
+      "backend_import_religion",
+      "backend_import_religion_normalizename"
+    ],
+    "31": [
+      "frontend_src_components_populationinfographic",
+      "frontend_src_components_populationinfographic_data",
+      "frontend_src_components_populationinfographic_populationinfographic",
+      "frontend_src_components_populationinfographic_populationinfographicprops",
+      "frontend_src_components_populationinfographic_translations"
+    ],
+    "32": [
+      "frontend_src_graphql_mutations_answer_question",
+      "frontend_src_graphql_queries_get_my_answers",
+      "frontend_src_graphql_queries_get_questions",
+      "frontend_src_pages_surveypage",
+      "frontend_src_pages_surveypage_surveypage"
+    ],
+    "33": [
+      "backend_app_graphql_queries_gnbycoordinates",
+      "backend_app_graphql_queries_gnbycoordinates_gnbycoordinates",
+      "backend_app_graphql_queries_gnbycoordinates_gnbycoordinates_invoke",
+      "backend_app_graphql_queries_gnbycoordinates_gnbycoordinates_pointinpolygon"
+    ],
+    "34": [
+      "backend_app_models_housingwalltype",
+      "backend_app_models_housingwalltype_housingwalltype",
+      "backend_app_models_housingwalltype_housingwalltype_gramaniladhari",
+      "backend_import_wall_types"
+    ],
+    "35": [
+      "backend_app_models_roomsinhousingunit",
+      "backend_app_models_roomsinhousingunit_roomsinhousingunit",
+      "backend_app_models_roomsinhousingunit_roomsinhousingunit_gramaniladhari",
+      "backend_import_rooms"
+    ],
+    "36": [
+      "backend_app_models_toiletfacility",
+      "backend_app_models_toiletfacility_toiletfacility",
+      "backend_app_models_toiletfacility_toiletfacility_gramaniladhari",
+      "backend_import_toilet_facilities"
+    ],
+    "37": [
+      "backend_tests_unit_exampletest",
+      "backend_tests_unit_exampletest_exampletest",
+      "backend_tests_unit_exampletest_exampletest_test_that_true_is_true",
+      "phpunit_framework_testcase"
+    ],
+    "38": [
+      "extract",
+      "extract_content",
+      "extract_fs",
+      "extract_lines"
+    ],
+    "39": [
+      "test_query",
+      "test_query_content",
+      "test_query_fs",
+      "test_query_lines"
+    ],
+    "40": [
+      "test_query_local",
+      "test_query_local_content",
+      "test_query_local_fs",
+      "test_query_local_lines"
+    ],
+    "41": [
+      "backend_database_migrations_0001_01_01_000000_create_users_table",
+      "backend_database_migrations_0001_01_01_000000_create_users_table_down",
+      "backend_database_migrations_0001_01_01_000000_create_users_table_up"
+    ],
+    "42": [
+      "backend_database_migrations_0001_01_01_000001_create_cache_table",
+      "backend_database_migrations_0001_01_01_000001_create_cache_table_down",
+      "backend_database_migrations_0001_01_01_000001_create_cache_table_up"
+    ],
+    "43": [
+      "backend_database_migrations_0001_01_01_000002_create_jobs_table",
+      "backend_database_migrations_0001_01_01_000002_create_jobs_table_down",
+      "backend_database_migrations_0001_01_01_000002_create_jobs_table_up"
+    ],
+    "44": [
+      "backend_database_migrations_2024_01_01_000001_create_admins_table",
+      "backend_database_migrations_2024_01_01_000001_create_admins_table_down",
+      "backend_database_migrations_2024_01_01_000001_create_admins_table_up"
+    ],
+    "45": [
+      "backend_database_migrations_2026_06_27_102121_add_details_to_users_table",
+      "backend_database_migrations_2026_06_27_102121_add_details_to_users_table_down",
+      "backend_database_migrations_2026_06_27_102121_add_details_to_users_table_up"
+    ],
+    "46": [
+      "backend_database_migrations_2026_06_27_112145_add_onboarding_fields_to_users_table",
+      "backend_database_migrations_2026_06_27_112145_add_onboarding_fields_to_users_table_down",
+      "backend_database_migrations_2026_06_27_112145_add_onboarding_fields_to_users_table_up"
+    ],
+    "47": [
+      "backend_database_migrations_2026_06_27_223403_add_profile_fields_to_admins_table",
+      "backend_database_migrations_2026_06_27_223403_add_profile_fields_to_admins_table_down",
+      "backend_database_migrations_2026_06_27_223403_add_profile_fields_to_admins_table_up"
+    ],
+    "48": [
+      "backend_database_migrations_2026_06_27_225539_create_questions_table",
+      "backend_database_migrations_2026_06_27_225539_create_questions_table_down",
+      "backend_database_migrations_2026_06_27_225539_create_questions_table_up"
+    ],
+    "49": [
+      "backend_database_migrations_2026_06_27_225539_create_user_answers_table",
+      "backend_database_migrations_2026_06_27_225539_create_user_answers_table_down",
+      "backend_database_migrations_2026_06_27_225539_create_user_answers_table_up"
+    ],
+    "50": [
+      "backend_database_migrations_2026_07_01_180947_create_categories_table",
+      "backend_database_migrations_2026_07_01_180947_create_categories_table_down",
+      "backend_database_migrations_2026_07_01_180947_create_categories_table_up"
+    ],
+    "51": [
+      "backend_database_migrations_2026_07_05_125658_update_questions_table_for_categories",
+      "backend_database_migrations_2026_07_05_125658_update_questions_table_for_categories_down",
+      "backend_database_migrations_2026_07_05_125658_update_questions_table_for_categories_up"
+    ],
+    "52": [
+      "backend_database_migrations_2026_07_05_135448_add_repeater_to_questions_and_answers",
+      "backend_database_migrations_2026_07_05_135448_add_repeater_to_questions_and_answers_down",
+      "backend_database_migrations_2026_07_05_135448_add_repeater_to_questions_and_answers_up"
+    ],
+    "53": [
+      "backend_database_migrations_2026_07_06_133947_create_grama_niladharis_table",
+      "backend_database_migrations_2026_07_06_133947_create_grama_niladharis_table_down",
+      "backend_database_migrations_2026_07_06_133947_create_grama_niladharis_table_up"
+    ],
+    "54": [
+      "backend_database_migrations_2026_07_06_150751_create_police_divisions_table",
+      "backend_database_migrations_2026_07_06_150751_create_police_divisions_table_down",
+      "backend_database_migrations_2026_07_06_150751_create_police_divisions_table_up"
+    ],
+    "55": [
+      "backend_database_migrations_2026_07_06_150752_create_police_station_contacts_table",
+      "backend_database_migrations_2026_07_06_150752_create_police_station_contacts_table_down",
+      "backend_database_migrations_2026_07_06_150752_create_police_station_contacts_table_up"
+    ],
+    "56": [
+      "backend_database_migrations_2026_07_06_150753_create_sinhala_police_stations_table",
+      "backend_database_migrations_2026_07_06_150753_create_sinhala_police_stations_table_down",
+      "backend_database_migrations_2026_07_06_150753_create_sinhala_police_stations_table_up"
+    ],
+    "57": [
+      "backend_database_migrations_2026_07_06_150754_create_gnd_police_mappings_table",
+      "backend_database_migrations_2026_07_06_150754_create_gnd_police_mappings_table_down",
+      "backend_database_migrations_2026_07_06_150754_create_gnd_police_mappings_table_up"
+    ],
+    "58": [
+      "backend_database_migrations_2026_07_08_142840_create_police_table",
+      "backend_database_migrations_2026_07_08_142840_create_police_table_down",
+      "backend_database_migrations_2026_07_08_142840_create_police_table_up"
+    ],
+    "59": [
+      "backend_database_migrations_2026_07_09_122214_create_post_offices_table",
+      "backend_database_migrations_2026_07_09_122214_create_post_offices_table_down",
+      "backend_database_migrations_2026_07_09_122214_create_post_offices_table_up"
+    ],
+    "60": [
+      "backend_database_migrations_2026_07_09_125154_add_name_columns_to_grama_niladharis_table",
+      "backend_database_migrations_2026_07_09_125154_add_name_columns_to_grama_niladharis_table_down",
+      "backend_database_migrations_2026_07_09_125154_add_name_columns_to_grama_niladharis_table_up"
+    ],
+    "61": [
+      "backend_database_migrations_2026_07_09_153223_add_post_office_id_to_grama_niladharis_table",
+      "backend_database_migrations_2026_07_09_153223_add_post_office_id_to_grama_niladharis_table_down",
+      "backend_database_migrations_2026_07_09_153223_add_post_office_id_to_grama_niladharis_table_up"
+    ],
+    "62": [
+      "backend_database_migrations_2026_07_10_024945_create_phi_areas_table",
+      "backend_database_migrations_2026_07_10_024945_create_phi_areas_table_down",
+      "backend_database_migrations_2026_07_10_024945_create_phi_areas_table_up"
+    ],
+    "63": [
+      "backend_database_migrations_2026_07_10_034439_create_trs_areas_table",
+      "backend_database_migrations_2026_07_10_034439_create_trs_areas_table_down",
+      "backend_database_migrations_2026_07_10_034439_create_trs_areas_table_up"
+    ],
+    "64": [
+      "backend_database_migrations_2026_07_10_155048_create_p_srilankas_table",
+      "backend_database_migrations_2026_07_10_155048_create_p_srilankas_table_down",
+      "backend_database_migrations_2026_07_10_155048_create_p_srilankas_table_up"
+    ],
+    "65": [
+      "backend_database_migrations_2026_07_10_155947_create_p_provinces_table",
+      "backend_database_migrations_2026_07_10_155947_create_p_provinces_table_down",
+      "backend_database_migrations_2026_07_10_155947_create_p_provinces_table_up"
+    ],
+    "66": [
+      "backend_database_migrations_2026_07_10_160316_create_p_districts_table",
+      "backend_database_migrations_2026_07_10_160316_create_p_districts_table_down",
+      "backend_database_migrations_2026_07_10_160316_create_p_districts_table_up"
+    ],
+    "67": [
+      "backend_database_migrations_2026_07_10_161506_add_province_foreign_key_to_grama_niladharis_table",
+      "backend_database_migrations_2026_07_10_161506_add_province_foreign_key_to_grama_niladharis_table_down",
+      "backend_database_migrations_2026_07_10_161506_add_province_foreign_key_to_grama_niladharis_table_up"
+    ],
+    "68": [
+      "backend_database_migrations_2026_07_10_162246_add_district_foreign_key_to_grama_niladharis_table",
+      "backend_database_migrations_2026_07_10_162246_add_district_foreign_key_to_grama_niladharis_table_down",
+      "backend_database_migrations_2026_07_10_162246_add_district_foreign_key_to_grama_niladharis_table_up"
+    ],
+    "69": [
+      "backend_database_migrations_2026_07_10_162759_add_province_foreign_key_to_p_district_table",
+      "backend_database_migrations_2026_07_10_162759_add_province_foreign_key_to_p_district_table_down",
+      "backend_database_migrations_2026_07_10_162759_add_province_foreign_key_to_p_district_table_up"
+    ],
+    "70": [
+      "backend_database_migrations_2026_07_10_165647_create_p_gns_table",
+      "backend_database_migrations_2026_07_10_165647_create_p_gns_table_down",
+      "backend_database_migrations_2026_07_10_165647_create_p_gns_table_up"
+    ],
+    "71": [
+      "backend_database_migrations_2026_07_14_115359_add_language_fields_to_grama_niladharis_table",
+      "backend_database_migrations_2026_07_14_115359_add_language_fields_to_grama_niladharis_table_down",
+      "backend_database_migrations_2026_07_14_115359_add_language_fields_to_grama_niladharis_table_up"
+    ],
+    "72": [
+      "backend_database_migrations_2026_07_15_202941_add_ccode_to_p_gns_table",
+      "backend_database_migrations_2026_07_15_202941_add_ccode_to_p_gns_table_down",
+      "backend_database_migrations_2026_07_15_202941_add_ccode_to_p_gns_table_up"
+    ],
+    "73": [
+      "backend_database_migrations_2026_07_15_230540_create_gn_division_housings_table",
+      "backend_database_migrations_2026_07_15_230540_create_gn_division_housings_table_down",
+      "backend_database_migrations_2026_07_15_230540_create_gn_division_housings_table_up"
+    ],
+    "74": [
+      "backend_database_migrations_2026_07_15_231941_add_grama_niladhari_id_and_ccode_to_gn_division_housings_table",
+      "backend_database_migrations_2026_07_15_231941_add_grama_niladhari_id_and_ccode_to_gn_division_housings_table_down",
+      "backend_database_migrations_2026_07_15_231941_add_grama_niladhari_id_and_ccode_to_gn_division_housings_table_up"
+    ],
+    "75": [
+      "backend_database_migrations_2026_07_16_080000_create_gn_economies_table",
+      "backend_database_migrations_2026_07_16_080000_create_gn_economies_table_down",
+      "backend_database_migrations_2026_07_16_080000_create_gn_economies_table_up"
+    ],
+    "76": [
+      "backend_database_migrations_2026_07_19_210146_add_age_groups_to_p_gns_table",
+      "backend_database_migrations_2026_07_19_210146_add_age_groups_to_p_gns_table_down",
+      "backend_database_migrations_2026_07_19_210146_add_age_groups_to_p_gns_table_up"
+    ],
+    "77": [
+      "backend_database_migrations_2026_07_19_215239_create_housing_ownership_statuses_table",
+      "backend_database_migrations_2026_07_19_215239_create_housing_ownership_statuses_table_down",
+      "backend_database_migrations_2026_07_19_215239_create_housing_ownership_statuses_table_up"
+    ],
+    "78": [
+      "backend_database_migrations_2026_07_20_184500_add_gn_id_to_housing_ownership_statuses_table",
+      "backend_database_migrations_2026_07_20_184500_add_gn_id_to_housing_ownership_statuses_table_down",
+      "backend_database_migrations_2026_07_20_184500_add_gn_id_to_housing_ownership_statuses_table_up"
+    ],
+    "79": [
+      "backend_database_migrations_2026_07_20_191200_create_housing_wall_types_table",
+      "backend_database_migrations_2026_07_20_191200_create_housing_wall_types_table_down",
+      "backend_database_migrations_2026_07_20_191200_create_housing_wall_types_table_up"
+    ],
+    "80": [
+      "backend_database_migrations_2026_07_21_024800_create_housing_unit_types_table",
+      "backend_database_migrations_2026_07_21_024800_create_housing_unit_types_table_down",
+      "backend_database_migrations_2026_07_21_024800_create_housing_unit_types_table_up"
+    ],
+    "81": [
+      "backend_database_migrations_2026_07_21_030400_create_toilet_facilities_table",
+      "backend_database_migrations_2026_07_21_030400_create_toilet_facilities_table_down",
+      "backend_database_migrations_2026_07_21_030400_create_toilet_facilities_table_up"
+    ],
+    "82": [
+      "backend_database_migrations_2026_07_21_031600_create_drinking_water_sources_table",
+      "backend_database_migrations_2026_07_21_031600_create_drinking_water_sources_table_down",
+      "backend_database_migrations_2026_07_21_031600_create_drinking_water_sources_table_up"
+    ],
+    "83": [
+      "backend_database_migrations_2026_07_21_033800_create_solid_waste_disposals_table",
+      "backend_database_migrations_2026_07_21_033800_create_solid_waste_disposals_table_down",
+      "backend_database_migrations_2026_07_21_033800_create_solid_waste_disposals_table_up"
+    ],
+    "84": [
+      "backend_database_migrations_2026_07_21_051011_create_rooms_in_housing_units_table",
+      "backend_database_migrations_2026_07_21_051011_create_rooms_in_housing_units_table_down",
+      "backend_database_migrations_2026_07_21_051011_create_rooms_in_housing_units_table_up"
+    ],
+    "85": [
+      "backend_database_migrations_2026_07_21_052443_create_housing_roof_types_table",
+      "backend_database_migrations_2026_07_21_052443_create_housing_roof_types_table_down",
+      "backend_database_migrations_2026_07_21_052443_create_housing_roof_types_table_up"
+    ],
+    "86": [
+      "backend_database_migrations_2026_07_21_061840_create_religious_affiliations_table",
+      "backend_database_migrations_2026_07_21_061840_create_religious_affiliations_table_down",
+      "backend_database_migrations_2026_07_21_061840_create_religious_affiliations_table_up"
+    ],
+    "87": [
+      "backend_database_migrations_2026_07_21_064755_create_household_head_relationships_table",
+      "backend_database_migrations_2026_07_21_064755_create_household_head_relationships_table_down",
+      "backend_database_migrations_2026_07_21_064755_create_household_head_relationships_table_up"
+    ],
+    "88": [
+      "backend_database_migrations_2026_07_24_052252_add_description_to_categories_table",
+      "backend_database_migrations_2026_07_24_052252_add_description_to_categories_table_down",
+      "backend_database_migrations_2026_07_24_052252_add_description_to_categories_table_up"
+    ],
+    "89": [
+      "frontend_tsconfig",
+      "frontend_tsconfig_files",
+      "frontend_tsconfig_references"
+    ],
+    "90": [
+      "setup_keycloak",
+      "setup_keycloak_path",
+      "setup_keycloak_sh__entry"
+    ],
+    "91": [
+      "test_kc",
+      "test_kc_getadmintoken",
+      "test_kc_http"
+    ],
+    "92": [
+      "backend_app_console_commands_fixpgnmapping_fixpgnmapping",
+      "backend_app_console_commands_fixpgnmapping_fixpgnmapping_handle"
+    ],
+    "94": [
+      "backend_artisan",
+      "backend_routes_console"
+    ],
+    "95": [
+      "backend_extract_drinking_water",
+      "backend_extract_drinking_water_get_val"
+    ],
+    "96": [
+      "backend_extract_solid_waste",
+      "backend_extract_solid_waste_get_val"
+    ],
+    "97": [
+      "backend_extract_toilet_facilities",
+      "backend_extract_toilet_facilities_get_val"
+    ],
+    "98": [
+      "backend_extract_unit_types",
+      "backend_extract_unit_types_get_val"
+    ],
+    "99": [
+      "backend_extract_wall_types",
+      "backend_extract_wall_types_get_val"
+    ],
+    "100": [
+      "backend_parse_gn",
+      "backend_parse_gn_clean_int"
+    ],
+    "101": [
+      "backend_resources_js_app",
+      "backend_resources_js_bootstrap"
+    ],
+    "102": [
+      "backend_test_auto_loc",
+      "backend_test_auto_loc_pointinpolygon"
+    ],
+    "103": [
+      "backend_test_exact_gn_all",
+      "backend_test_exact_gn_all_testall"
+    ],
+    "104": [
+      "backend_test_pip",
+      "backend_test_pip_pointinpolygon"
+    ],
+    "105": [
+      "restore_db",
+      "restore_db_sh__entry"
+    ],
+    "106": [
+      "backend_analyze_household_head"
+    ],
+    "107": [
+      "backend_analyze_religion"
+    ],
+    "108": [
+      "backend_analyze_roof"
+    ],
+    "109": [
+      "backend_analyze_rooms"
+    ],
+    "110": [
+      "backend_bootstrap_app"
+    ],
+    "111": [
+      "backend_check_ages"
+    ],
+    "112": [
+      "backend_check_db"
+    ],
+    "113": [
+      "backend_check_district"
+    ],
+    "114": [
+      "backend_check_duplicates"
+    ],
+    "115": [
+      "backend_check_pahalagama"
+    ],
+    "116": [
+      "backend_check_pgn"
+    ],
+    "117": [
+      "backend_check_schema"
+    ],
+    "118": [
+      "backend_check_unlinked"
+    ],
+    "119": [
+      "backend_config_app"
+    ],
+    "120": [
+      "backend_config_cors"
+    ],
+    "121": [
+      "backend_config_database"
+    ],
+    "122": [
+      "backend_config_filesystems"
+    ],
+    "123": [
+      "backend_config_keycloak"
+    ],
+    "124": [
+      "backend_config_lighthouse"
+    ],
+    "125": [
+      "backend_config_logging"
+    ],
+    "126": [
+      "backend_config_mail"
+    ],
+    "127": [
+      "backend_config_queue"
+    ],
+    "128": [
+      "backend_config_services"
+    ],
+    "129": [
+      "backend_config_session"
+    ],
+    "130": [
+      "backend_create_db"
+    ],
+    "131": [
+      "backend_export_household_head_to_json"
+    ],
+    "132": [
+      "backend_export_religion_to_json"
+    ],
+    "133": [
+      "backend_export_roof_to_json"
+    ],
+    "134": [
+      "backend_export_rooms_to_json"
+    ],
+    "135": [
+      "backend_extract_gn_data"
+    ],
+    "136": [
+      "backend_extract_gn_population"
+    ],
+    "137": [
+      "backend_extract_gn_population2"
+    ],
+    "138": [
+      "backend_extract_housing_ownership"
+    ],
+    "139": [
+      "backend_extract_pahalagama"
+    ],
+    "140": [
+      "backend_fast_fix"
+    ],
+    "141": [
+      "backend_generate_md"
+    ],
+    "142": [
+      "backend_merge_dbs"
+    ],
+    "143": [
+      "backend_merge_user_answers"
+    ],
+    "144": [
+      "backend_public_index"
+    ],
+    "145": [
+      "backend_query_gn"
+    ],
+    "146": [
+      "backend_resources_views_welcome_blade"
+    ],
+    "147": [
+      "backend_routes_web"
+    ],
+    "148": [
+      "backend_run_extracted"
+    ],
+    "149": [
+      "backend_test"
+    ],
+    "150": [
+      "backend_test_all_data"
+    ],
+    "151": [
+      "backend_test_all_districts"
+    ],
+    "152": [
+      "backend_test_bb"
+    ],
+    "153": [
+      "backend_test_coords"
+    ],
+    "154": [
+      "backend_test_cors"
+    ],
+    "155": [
+      "backend_test_counts"
+    ],
+    "156": [
+      "backend_test_dccode"
+    ],
+    "157": [
+      "backend_test_dccode2"
+    ],
+    "158": [
+      "backend_test_dccode_all"
+    ],
+    "159": [
+      "backend_test_districts_count"
+    ],
+    "160": [
+      "backend_test_districts_output"
+    ],
+    "161": [
+      "backend_test_exact_gn"
+    ],
+    "162": [
+      "backend_test_gampaha"
+    ],
+    "163": [
+      "backend_test_get_me"
+    ],
+    "164": [
+      "backend_test_gn"
+    ],
+    "165": [
+      "backend_test_gn_district"
+    ],
+    "166": [
+      "backend_test_gql"
+    ],
+    "167": [
+      "backend_test_gql2"
+    ],
+    "168": [
+      "backend_test_gql3"
+    ],
+    "169": [
+      "backend_test_gql_pip"
+    ],
+    "170": [
+      "backend_test_graphql2"
+    ],
+    "171": [
+      "backend_test_graphql3"
+    ],
+    "172": [
+      "backend_test_graphql_api"
+    ],
+    "173": [
+      "backend_test_graphql_api2"
+    ],
+    "174": [
+      "backend_test_greedy_dccode"
+    ],
+    "175": [
+      "backend_test_introspection"
+    ],
+    "176": [
+      "backend_test_memory"
+    ],
+    "177": [
+      "backend_test_schema"
+    ],
+    "178": [
+      "backend_test_wgdk"
+    ],
+    "179": [
+      "backend_update_ccodes"
+    ],
+    "180": [
+      "backend_vite_config"
+    ],
+    "181": [
+      "convert_phi"
+    ],
+    "182": [
+      "convert_trs"
+    ],
+    "183": [
+      "fix_ccodes"
+    ],
+    "184": [
+      "frontend_crop_image"
+    ],
+    "185": [
+      "frontend_eslint_config"
+    ],
+    "186": [
+      "frontend_test_playwright"
+    ],
+    "187": [
+      "frontend_vite_config"
+    ],
+    "188": [
+      "generate_report"
+    ],
+    "189": [
+      "inspect_police"
+    ],
+    "190": [
+      "process_police"
+    ],
+    "191": [
+      "split_db"
+    ],
+    "192": [
+      "start"
+    ],
+    "193": [
+      "test"
+    ],
+    "194": [
+      "test2"
+    ],
+    "195": [
+      "test_gnd"
+    ],
+    "196": [
+      "test_map"
+    ],
+    "197": [
+      "test_mapping"
+    ],
+    "198": [
+      "test_matches"
+    ],
+    "199": [
+      "test_unmapped_php_test_unmapped"
+    ],
+    "200": [
+      "test_unmapped_py_test_unmapped"
+    ]
+  },
+  "cohesion": {
+    "0": 0.05819209039548023,
+    "1": 0.06086956521739131,
+    "2": 0.046511627906976744,
+    "3": 0.06463414634146342,
+    "4": 0.10588235294117647,
+    "5": 0.06451612903225806,
+    "6": 0.09259259259259259,
+    "7": 0.08,
+    "8": 0.11666666666666667,
+    "9": 0.09523809523809523,
+    "10": 0.09523809523809523,
+    "11": 0.1,
+    "12": 0.1,
+    "13": 0.14736842105263157,
+    "14": 0.1111111111111111,
+    "15": 0.19166666666666668,
+    "16": 0.2,
+    "17": 0.14285714285714285,
+    "18": 0.17142857142857143,
+    "19": 0.18681318681318682,
+    "20": 0.17142857142857143,
+    "21": 0.22727272727272727,
+    "22": 0.26666666666666666,
+    "23": 0.32142857142857145,
+    "24": 0.2857142857142857,
+    "25": 0.4,
+    "26": 0.4,
+    "27": 0.4,
+    "28": 0.4,
+    "29": 0.4,
+    "30": 0.4,
+    "31": 0.4,
+    "32": 0.4,
+    "33": 0.6666666666666666,
+    "34": 0.5,
+    "35": 0.5,
+    "36": 0.5,
+    "37": 0.6666666666666666,
+    "38": 0.5,
+    "39": 0.5,
+    "40": 0.5,
+    "41": 0.6666666666666666,
+    "42": 0.6666666666666666,
+    "43": 0.6666666666666666,
+    "44": 0.6666666666666666,
+    "45": 0.6666666666666666,
+    "46": 0.6666666666666666,
+    "47": 0.6666666666666666,
+    "48": 0.6666666666666666,
+    "49": 0.6666666666666666,
+    "50": 0.6666666666666666,
+    "51": 0.6666666666666666,
+    "52": 0.6666666666666666,
+    "53": 0.6666666666666666,
+    "54": 0.6666666666666666,
+    "55": 0.6666666666666666,
+    "56": 0.6666666666666666,
+    "57": 0.6666666666666666,
+    "58": 0.6666666666666666,
+    "59": 0.6666666666666666,
+    "60": 0.6666666666666666,
+    "61": 0.6666666666666666,
+    "62": 0.6666666666666666,
+    "63": 0.6666666666666666,
+    "64": 0.6666666666666666,
+    "65": 0.6666666666666666,
+    "66": 0.6666666666666666,
+    "67": 0.6666666666666666,
+    "68": 0.6666666666666666,
+    "69": 0.6666666666666666,
+    "70": 0.6666666666666666,
+    "71": 0.6666666666666666,
+    "72": 0.6666666666666666,
+    "73": 0.6666666666666666,
+    "74": 0.6666666666666666,
+    "75": 0.6666666666666666,
+    "76": 0.6666666666666666,
+    "77": 0.6666666666666666,
+    "78": 0.6666666666666666,
+    "79": 0.6666666666666666,
+    "80": 0.6666666666666666,
+    "81": 0.6666666666666666,
+    "82": 0.6666666666666666,
+    "83": 0.6666666666666666,
+    "84": 0.6666666666666666,
+    "85": 0.6666666666666666,
+    "86": 0.6666666666666666,
+    "87": 0.6666666666666666,
+    "88": 0.6666666666666666,
+    "89": 0.6666666666666666,
+    "90": 0.6666666666666666,
+    "91": 0.6666666666666666,
+    "92": 1.0,
+    "94": 1.0,
+    "95": 1.0,
+    "96": 1.0,
+    "97": 1.0,
+    "98": 1.0,
+    "99": 1.0,
+    "100": 1.0,
+    "101": 1.0,
+    "102": 1.0,
+    "103": 1.0,
+    "104": 1.0,
+    "105": 1.0,
+    "106": 1.0,
+    "107": 1.0,
+    "108": 1.0,
+    "109": 1.0,
+    "110": 1.0,
+    "111": 1.0,
+    "112": 1.0,
+    "113": 1.0,
+    "114": 1.0,
+    "115": 1.0,
+    "116": 1.0,
+    "117": 1.0,
+    "118": 1.0,
+    "119": 1.0,
+    "120": 1.0,
+    "121": 1.0,
+    "122": 1.0,
+    "123": 1.0,
+    "124": 1.0,
+    "125": 1.0,
+    "126": 1.0,
+    "127": 1.0,
+    "128": 1.0,
+    "129": 1.0,
+    "130": 1.0,
+    "131": 1.0,
+    "132": 1.0,
+    "133": 1.0,
+    "134": 1.0,
+    "135": 1.0,
+    "136": 1.0,
+    "137": 1.0,
+    "138": 1.0,
+    "139": 1.0,
+    "140": 1.0,
+    "141": 1.0,
+    "142": 1.0,
+    "143": 1.0,
+    "144": 1.0,
+    "145": 1.0,
+    "146": 1.0,
+    "147": 1.0,
+    "148": 1.0,
+    "149": 1.0,
+    "150": 1.0,
+    "151": 1.0,
+    "152": 1.0,
+    "153": 1.0,
+    "154": 1.0,
+    "155": 1.0,
+    "156": 1.0,
+    "157": 1.0,
+    "158": 1.0,
+    "159": 1.0,
+    "160": 1.0,
+    "161": 1.0,
+    "162": 1.0,
+    "163": 1.0,
+    "164": 1.0,
+    "165": 1.0,
+    "166": 1.0,
+    "167": 1.0,
+    "168": 1.0,
+    "169": 1.0,
+    "170": 1.0,
+    "171": 1.0,
+    "172": 1.0,
+    "173": 1.0,
+    "174": 1.0,
+    "175": 1.0,
+    "176": 1.0,
+    "177": 1.0,
+    "178": 1.0,
+    "179": 1.0,
+    "180": 1.0,
+    "181": 1.0,
+    "182": 1.0,
+    "183": 1.0,
+    "184": 1.0,
+    "185": 1.0,
+    "186": 1.0,
+    "187": 1.0,
+    "188": 1.0,
+    "189": 1.0,
+    "190": 1.0,
+    "191": 1.0,
+    "192": 1.0,
+    "193": 1.0,
+    "194": 1.0,
+    "195": 1.0,
+    "196": 1.0,
+    "197": 1.0,
+    "198": 1.0,
+    "199": 1.0,
+    "200": 1.0
+  },
+  "gods": [
+    {
+      "id": "frontend_src_auth_authprovider_useauth",
+      "label": "useAuth()",
+      "degree": 27
+    },
+    {
+      "id": "backend_app_models_gramaniladhari_gramaniladhari",
+      "label": "GramaNiladhari",
+      "degree": 26
+    },
+    {
+      "id": "backend_app_models_category_category",
+      "label": "Category",
+      "degree": 22
+    },
+    {
+      "id": "backend_app_models_admin_admin",
+      "label": "Admin",
+      "degree": 16
+    },
+    {
+      "id": "frontend_tsconfig_node_compileroptions",
+      "label": "compilerOptions",
+      "degree": 16
+    },
+    {
+      "id": "frontend_tsconfig_app_compileroptions",
+      "label": "compilerOptions",
+      "degree": 15
+    },
+    {
+      "id": "backend_app_models_user_user",
+      "label": "User",
+      "degree": 14
+    },
+    {
+      "id": "backend_app_models_pgn_pgn",
+      "label": "PGn",
+      "degree": 12
+    },
+    {
+      "id": "backend_app_models_question_question",
+      "label": "Question",
+      "degree": 10
+    },
+    {
+      "id": "backend_app_models_pdistrict_pdistrict",
+      "label": "PDistrict",
+      "degree": 9
+    }
+  ],
+  "surprises": [
+    {
+      "source": "GramaNiladharisPage()",
+      "target": "react",
+      "source_files": [
+        "frontend/src/pages/GramaNiladharisPage.tsx",
+        "frontend/package.json"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "bridges separate communities; peripheral node `GramaNiladharisPage()` unexpectedly reaches hub `react`"
+    },
+    {
+      "source": "SubCategoryPage()",
+      "target": "useAuth()",
+      "source_files": [
+        "frontend/src/components/SubCategoryPage.tsx",
+        "frontend/src/auth/AuthProvider.tsx"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities; peripheral node `SubCategoryPage()` unexpectedly reaches hub `useAuth()`"
+    },
+    {
+      "source": "CategoriesPage()",
+      "target": "useAuth()",
+      "source_files": [
+        "frontend/src/pages/CategoriesPage.tsx",
+        "frontend/src/auth/AuthProvider.tsx"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities; peripheral node `CategoriesPage()` unexpectedly reaches hub `useAuth()`"
+    },
+    {
+      "source": "UserDashboard()",
+      "target": "react",
+      "source_files": [
+        "frontend/src/pages/UserDashboard.tsx",
+        "frontend/package.json"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "ProtectedRoute()",
+      "target": "useAuth()",
+      "source_files": [
+        "frontend/src/auth/ProtectedRoute.tsx",
+        "frontend/src/auth/AuthProvider.tsx"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "peripheral node `ProtectedRoute()` unexpectedly reaches hub `useAuth()`"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `dependencies` connect `dependencies` to `App.tsx`, `frontend/package.json`?",
+      "why": "High betweenness centrality (0.020) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `react` connect `App.tsx` to `queries.ts`, `UserDashboard.tsx`, `dependencies`?",
+      "why": "High betweenness centrality (0.018) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `User` connect `User` to `Illuminate\\Database\\Eloquent\\Factories\\HasFactory`?",
+      "why": "High betweenness centrality (0.018) - this node is a cross-community bridge."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 7 inferred relationships involving `GramaNiladhari` (e.g. with `.handle()` and `.handle()`) actually correct?",
+      "why": "`GramaNiladhari` has 7 INFERRED edges - model-reasoned connections that need verification."
+    },
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `$schema`, `name`, `type` to the rest of the system?",
+      "why": "174 weakly-connected nodes found - possible documentation gaps or missing edges."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `App.tsx` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.05819209039548023 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `User` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.06086956521739131 - nodes in this community are weakly interconnected."
+    }
+  ]
+}

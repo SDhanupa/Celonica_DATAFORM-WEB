@@ -41,6 +41,7 @@ const SYNC_USER_MUTATION = gql`
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [token, setToken] = useState<string | undefined>(undefined);
   const [userInfo, setUserInfo] = useState<AuthContextType['userInfo']>(null);
   const isRun = React.useRef(false);
   const apolloClient = useApolloClient();
@@ -57,8 +58,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         checkLoginIframe: false,
       })
       .then((authenticated) => {
-        setIsAuthenticated(authenticated);
-        if (authenticated && keycloak.tokenParsed) {
+        if (authenticated && keycloak.tokenParsed && keycloak.token) {
+          setIsAuthenticated(true);
+          setToken(keycloak.token);
           setUserInfo({
             name: keycloak.tokenParsed['name'],
             email: keycloak.tokenParsed['email'],
@@ -67,7 +69,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             realm_roles: keycloak.tokenParsed['realm_access']?.roles || [],
           });
 
-          // Automatically sync user to local database
           apolloClient.mutate({
             mutation: SYNC_USER_MUTATION,
           }).catch((err) => console.error('Failed to sync user with DB:', err));
@@ -78,13 +79,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setIsLoading(false);
       });
 
-    // Auto-refresh token 30 seconds before expiry
     keycloak.onTokenExpired = () => {
       keycloak.updateToken(30).catch(() => {
         keycloak.logout();
       });
     };
-  }, []);
+  }, [apolloClient]);
 
   const logout = () => {
     keycloak.logout({ redirectUri: window.location.origin + '/' });
@@ -103,7 +103,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       value={{
         isAuthenticated,
         isLoading,
-        token: keycloak.token,
+        token,
         userInfo,
         logout,
         login,

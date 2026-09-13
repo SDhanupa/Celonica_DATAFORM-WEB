@@ -1,0 +1,19 @@
+{
+  "nodes": [
+    {
+      "id": "backend_public_uploads_categories_1784866984_oid177vrgc_image",
+      "label": "1784866984_oid177Vrgc Category Image",
+      "file_type": "image",
+      "source_file": "C:\\xampp\\htdocs\\Celonica Quecion web\\backend\\public\\uploads\\categories\\1784866984_oid177Vrgc.gif",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [],
+  "hyperedges": [],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

@@ -42,16 +42,21 @@ export async function getGuestToken(): Promise<string | null> {
 }
 
 const authLink = setContext(async (_, { headers }) => {
-  // Refresh token if expiring soon
-  if (keycloak.authenticated && keycloak.isTokenExpired(30)) {
-    try {
-      await keycloak.updateToken(30);
-    } catch (err) {
-      console.error('Failed to refresh token', err);
+  // First, check if there's a custom local token for standard users
+  let token = localStorage.getItem('ceylonica_user_token');
+
+  if (!token) {
+    // If no local token, check Keycloak
+    if (keycloak.authenticated && keycloak.isTokenExpired(30)) {
+      try {
+        await keycloak.updateToken(30);
+      } catch (err) {
+        console.error('Failed to refresh token', err);
+      }
     }
+    token = keycloak.token || null;
   }
 
-  let token = keycloak.token;
   if (!token) {
     token = (await getGuestToken()) || undefined;
   }
