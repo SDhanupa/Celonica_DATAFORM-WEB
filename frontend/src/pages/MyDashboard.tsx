@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Typography, Container, Grid, Button, Avatar, IconButton, useTheme, Card, CardContent } from '@mui/material';
 import { useAuth } from '../auth/AuthProvider';
 import { useNavigate } from 'react-router-dom';
@@ -8,12 +8,37 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 
 const MyDashboard: React.FC = () => {
-  const { userInfo } = useAuth();
+  const { token, userInfo } = useAuth();
   const theme = useTheme();
   const navigate = useNavigate();
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+  const [surveys, setSurveys] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchSurveys = async () => {
+      if (!token) return;
+      try {
+        const res = await fetch('/api/my-industry-surveys', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setSurveys(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch user surveys:', err);
+      }
+    };
+    fetchSurveys();
+  }, [token]);
+
+  const submittedCount = surveys.filter(s => s.status === 'submitted' || s.status === 'approved').length;
+  const draftCount = surveys.filter(s => s.status === 'draft').length;
 
   const userName = userInfo?.preferred_username || userInfo?.name || 'User';
   
@@ -28,12 +53,12 @@ const MyDashboard: React.FC = () => {
       btnText: 'Start Exploring'
     },
     {
-      title: 'Analytics Reports',
-      desc: 'View comprehensive insights and housing infrastructure statistics.',
-      icon: <AssessmentIcon sx={{ fontSize: 40 }} />,
+      title: 'Industry Surveys',
+      desc: `You have ${submittedCount} completed submissions and ${draftCount} drafts in progress. Manage your survey data here.`,
+      icon: <AssignmentIcon sx={{ fontSize: 40 }} />,
       color: 'linear-gradient(135deg, #F5AF19 0%, #F12711 100%)',
-      action: () => {},
-      btnText: 'View Reports'
+      action: () => navigate('/fill-data'),
+      btnText: 'View Submissions'
     },
     {
       title: 'Profile Settings',
