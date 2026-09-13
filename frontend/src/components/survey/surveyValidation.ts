@@ -27,10 +27,10 @@ export type FormValues = Record<string, string>;
 export type Errors = Record<string, string>;
 export type Translate = (en: string, si: string, ta?: string) => string;
 
-export const TOTAL_STEPS = 14;
+export const TOTAL_STEPS = 16;
 
 /** Steps rendered from `business_survey_questions` rather than hardcoded JSX. */
-export const DYNAMIC_STEPS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+export const DYNAMIC_STEPS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 export const isDynamicStep = (step: number) => DYNAMIC_STEPS.includes(step);
 
 /* ── NIC parsing (also used to prefill DOB/age on the page) ───────────────── */
