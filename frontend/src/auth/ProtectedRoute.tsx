@@ -60,7 +60,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
 
     if (!hasRole) {
       // Redirect unauthorized users to their dashboard
-      return <Navigate to="/mydashboard" replace />;
+      return <Navigate to="/gnpage" replace />;
     }
   }
 
