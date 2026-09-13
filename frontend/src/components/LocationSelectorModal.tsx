@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { Box, Typography, Button, FormControl, CircularProgress, Alert, Dialog, DialogContent, DialogActions, Autocomplete, TextField, Divider, useTheme } from '@mui/material';
 import { useQuery } from '@apollo/client';
-import { GET_ALL_LOCATIONS, GET_GN_BY_COORDINATES } from '../graphql/queries';
+import { GET_P_DISTRICTS, GET_GNS_BY_DISTRICT_LIGHT, GET_GN_BY_COORDINATES } from '../graphql/queries';
 
 interface LocationSelectorModalProps {
   open: boolean;
@@ -29,11 +29,18 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
   const [selectedCity, setSelectedCity] = useState<string>('');
   const [selectedGN, setSelectedGN] = useState<string>('');
 
-  // Fetch ALL locations at once so everything is 0ms instantaneous when navigating dropdowns.
-  const { data: allLocationsData, loading: allLocationsLoading, error: allLocationsError } = useQuery(GET_ALL_LOCATIONS, {
+  // Fetch only districts initially for instantaneous load
+  const { data: districtsData, loading: districtsLoading, error: districtsError } = useQuery(GET_P_DISTRICTS, {
     fetchPolicy: 'cache-first',
   });
-  if (allLocationsError) console.error('Locations query error:', allLocationsError);
+  if (districtsError) console.error('Districts query error:', districtsError);
+
+  // Fetch GN divisions when a district is selected
+  const { data: gnsData, loading: gnsLoading } = useQuery(GET_GNS_BY_DISTRICT_LIGHT, {
+    variables: { id: selectedDistrict },
+    skip: !selectedDistrict,
+    fetchPolicy: 'cache-first',
+  });
 
   const { data: autoGnData, loading: autoGnLoading } = useQuery(GET_GN_BY_COORDINATES, {
     variables: { lat: location?.lat, lng: location?.lng },
@@ -45,10 +52,9 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
   
   // Extract the GN data for the selected district instantly from memory
   const districtGNs = React.useMemo(() => {
-    if (!selectedDistrict || !allLocationsData?.pDistricts) return [];
-    const district = allLocationsData.pDistricts.find((d: any) => d.id === selectedDistrict);
-    return district?.gramaNiladharis || [];
-  }, [allLocationsData, selectedDistrict]);
+    if (!selectedDistrict || !gnsData?.pDistrict?.gramaNiladharis) return [];
+    return gnsData.pDistrict.gramaNiladharis;
+  }, [gnsData, selectedDistrict]);
 
   const uniqueCities = React.useMemo(() => {
     if (!districtGNs.length) return [];
@@ -99,10 +105,10 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
     let loadedGn: any = null;
     if (!showManualForm && activeGn) {
       loadedGn = activeGn;
-    } else if (showManualForm && selectedGN && allLocationsData?.pDistricts) {
-      const currentDistrict = allLocationsData.pDistricts.find((d: any) => d.id === selectedDistrict);
-      if (currentDistrict && currentDistrict.gramaNiladharis) {
-        const found = currentDistrict.gramaNiladharis.find((x: any) => x.id === selectedGN);
+    } else if (showManualForm && selectedGN && districtsData?.pDistricts) {
+      const currentDistrict = districtsData.pDistricts.find((d: any) => d.id === selectedDistrict);
+      if (currentDistrict) {
+        const found = districtGNs.find((x: any) => x.id === selectedGN);
         if (found) {
           loadedGn = {
             ...found,
@@ -248,19 +254,19 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
             <FormControl fullWidth>
               <Autocomplete
-                options={allLocationsData?.pDistricts || []}
+                options={districtsData?.pDistricts || []}
                 getOptionLabel={(option: any) => {
                   if (!option) return '';
                   const name = language === 'en' ? option.admin2NameEn : language === 'si' ? option.admin2NameSi : option.admin2NameTa;
                   return name || option.admin2NameEn || option.id || '';
                 }}
-                value={allLocationsData?.pDistricts?.find((d: any) => d.id === selectedDistrict) || null}
+                value={districtsData?.pDistricts?.find((d: any) => d.id === selectedDistrict) || null}
                 onChange={(event, newValue) => {
                   setSelectedDistrict(newValue ? newValue.id : '');
                   setSelectedCity('');
                   setSelectedGN('');
                 }}
-                loading={allLocationsLoading}
+                loading={districtsLoading}
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -268,8 +274,8 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
                     InputProps={{
                       ...params.InputProps,
                       endAdornment: (
-                        <React.Fragment>
-                          {allLocationsLoading ? <CircularProgress color="inherit" size={20} /> : null}
+                      <React.Fragment>
+                          {districtsLoading ? <CircularProgress color="inherit" size={20} /> : null}
                           {params.InputProps.endAdornment}
                         </React.Fragment>
                       ),
@@ -292,7 +298,7 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
                   setSelectedCity(newValue ? newValue.divisionalSecretariatCode : '');
                   setSelectedGN('');
                 }}
-                loading={false}
+                loading={gnsLoading}
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -322,7 +328,7 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
                 onChange={(event, newValue) => {
                   setSelectedGN(newValue ? newValue.id : '');
                 }}
-                loading={false}
+                loading={gnsLoading}
                 renderInput={(params) => (
                   <TextField
                     {...params}
