@@ -22,6 +22,7 @@ import SurveyProgress, { SurveySection } from '../components/survey/SurveyProgre
 import {
   extractNICDetails, getStepErrors, getFirstInvalidStep, isDynamicStep, TOTAL_STEPS,
 } from '../components/survey/surveyValidation';
+import { DYNAMIC_STEP_TITLES } from '../components/survey/surveySteps';
 
 /* Section icons — one per step, shown in the sticky progress header */
 import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
@@ -402,24 +403,9 @@ const IndustrySurveyPage: React.FC = () => {
     return language === 'si' ? q.explanation_si : language === 'ta' ? q.explanation_ta : q.explanation_en;
   };
 
-  const stepTitles: Record<number, any> = {
-    2: { en: 'Legal Status of the Business', si: 'ව්‍යාපාරයේ නීතිමය තත්ත්වය', ta: 'வணிகத்தின் சட்ட நிலை' },
-    3: { en: 'Location & Infrastructure', si: 'ස්ථානය හා යටිතල පහසුකම්', ta: 'இடம் மற்றும் உள்கட்டமைப்பு' },
-    4: { en: 'Infrastructure and Services', si: 'යටිතල පහසුකම් හා සේවා', ta: 'உள்கட்டமைப்பு மற்றும் சேவைகள்' },
-    5: { en: 'Capital Sources', si: '3 වන කොටස: ප්‍රාග්ධන මූලාශ්‍ර', ta: '3 வது பகுதி: மூலதன ஆதாரங்கள்' },
-    6: { en: 'Workforce & Human Resources', si: '4 වන කොටස: ශ්‍රම බලකාය හා මානව සම්පත්', ta: '4 வது பகுதி: பணியாளர்கள் & மனித வளங்கள்' },
-    7: { en: 'Production & Operations', si: '5 වන කොටස: නිෂ්පාදනය හා මෙහෙයුම්', ta: '5 வது பகுதி: உற்பத்தி & செயல்பாடுகள்' },
-    8: { en: 'Finance & Accounting', si: '6 වන කොටස: මූල්‍ය හා ගිණුම්කරණය', ta: '6 வது பகுதி: நிதி & கணக்கியல்' },
-    /* 9-13 moved from hardcoded JSX to business_survey_questions (see
-       BusinessSurvey9to13QuestionSeeder). Titles given real en/ta translations
-       here — the old hardcoded JSX only ever had Sinhala, duplicated into the
-       en/ta slots of a no-op ternary. */
-    9: { en: 'Market & Marketing', si: '7 වන කොටස: වෙළඳපොළ හා අලෙවිකරණය', ta: '7 வது பகுதி: சந்தை & சந்தைப்படுத்தல்' },
-    10: { en: 'Innovation & Technology', si: '8 වන කොටස: නවෝත්පාදන හා තාක්ෂණය', ta: '8 வது பகுதி: புதுமை & தொழில்நுட்பம்' },
-    11: { en: 'Business Environment & Government', si: '9 වන කොටස: ව්‍යාපාරික පරිසරය හා රාජ්‍ය මැදිහත්වීම', ta: '9 வது பகுதி: வணிகச் சூழல் & அரசு தலையீடு' },
-    12: { en: 'Environmental & Social Impact', si: '10 වන කොටස: පාරිසරික හා සමාජීය බලපෑම', ta: '10 வது பகுதி: சுற்றுச்சூழல் & சமூக தாக்கம்' },
-    13: { en: 'Future Needs & Logistics', si: '11 වන කොටස: අනාගත අවශ්‍යතා සහ ලොජිස්ටික්ස්', ta: '11 வது பகுதி: எதிர்கால தேவைகள் & தளவாடங்கள்' },
-  };
+  /* Titles for the DB-driven steps live in surveySteps.ts so the admin builder
+     and this page can never disagree about what a step is called. */
+  const stepTitles: Record<number, any> = DYNAMIC_STEP_TITLES;
 
   /* ── Localisation helper ─────────────────────────────────────────────────── */
   const L = React.useCallback(

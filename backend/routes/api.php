@@ -94,6 +94,9 @@ Route::middleware(['keycloak.admin', 'super_admin'])->group(function () {
     Route::post('/category-data/{slug}/{id}/generate-reg-number', [\App\Http\Controllers\CategoryDataUploadController::class, 'generateRegNumber']);
 
     // [C-01 FIX] Business Survey Questions write operations — super_admin only
+    // `all` differs from the public GET by including inactive rows, which the
+    // builder needs in order to show and re-enable a deactivated question.
+    Route::get('/business-survey-questions/all', [App\Http\Controllers\Api\BusinessSurveyQuestionController::class, 'adminIndex']);
     Route::post('/business-survey-questions', [App\Http\Controllers\Api\BusinessSurveyQuestionController::class, 'store']);
     Route::put('/business-survey-questions/{id}', [App\Http\Controllers\Api\BusinessSurveyQuestionController::class, 'update']);
     Route::delete('/business-survey-questions/{id}', [App\Http\Controllers\Api\BusinessSurveyQuestionController::class, 'destroy']);
