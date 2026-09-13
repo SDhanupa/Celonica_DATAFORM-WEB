@@ -12,6 +12,7 @@ import ExploreIcon from '@mui/icons-material/Explore';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import EditLocationAltIcon from '@mui/icons-material/EditLocationAlt';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
 import MapRoundedIcon from '@mui/icons-material/MapRounded';
 import KeyboardArrowRightRoundedIcon from '@mui/icons-material/KeyboardArrowRightRounded';
@@ -228,14 +229,8 @@ const UserPage: React.FC = () => {
               <Button 
                 variant="contained" 
                 size="large"
-                startIcon={<DashboardRoundedIcon />}
-                onClick={() => {
-                  if (selectedLocation) {
-                    navigate(`/gnpage/${encodeURIComponent(selectedLocation.nameEn.replace(/ /g, '-'))}/${encodeURIComponent(selectedLocation.CCODE)}`);
-                  } else {
-                    setShowLocationModal(true);
-                  }
-                }}
+                startIcon={<AssignmentIcon />}
+                onClick={() => navigate('/fill-data')}
                 sx={{ 
                   background: 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)',
                   color: 'white',
@@ -254,9 +249,42 @@ const UserPage: React.FC = () => {
                   } 
                 }}
               >
-                {selectedLocation ? 'Access Regional Platform' : 'Set Your Location'}
+                Industry Survey
               </Button>
               
+              <Button 
+                variant="outlined" 
+                size="large"
+                startIcon={<DashboardRoundedIcon />}
+                onClick={() => {
+                  if (selectedLocation) {
+                    navigate(`/gnpage/${encodeURIComponent(selectedLocation.nameEn.replace(/ /g, '-'))}/${encodeURIComponent(selectedLocation.CCODE)}`);
+                  } else {
+                    setShowLocationModal(true);
+                  }
+                }}
+                sx={{ 
+                  color: '#475569', 
+                  borderColor: '#cbd5e1',
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  fontSize: '1rem',
+                  borderRadius: '16px',
+                  px: 4,
+                  py: 1.5,
+                  bgcolor: 'rgba(255,255,255,0.8)',
+                  backdropFilter: 'blur(10px)',
+                  transition: 'all 0.2s',
+                  '&:hover': { 
+                    bgcolor: '#f8fafc', 
+                    borderColor: '#94a3b8',
+                    transform: 'translateY(-2px)'
+                  }
+                }}
+              >
+                Dashboard
+              </Button>
+
               {selectedLocation && (
                 <Button 
                   variant="outlined" 

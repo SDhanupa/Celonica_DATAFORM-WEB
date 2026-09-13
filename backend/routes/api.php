@@ -54,6 +54,7 @@ Route::middleware('throttle:120,1')->group(function () {
 Route::middleware(['throttle:20,1', 'keycloak.admin'])->group(function () {
     Route::post('/industry-survey', [IndustrySurveyController::class, 'store']);
     Route::post('/industry-survey/generate-reg-number', [IndustrySurveyController::class, 'generateRegNumber']);
+    Route::get('/my-industry-surveys', [IndustrySurveyController::class, 'mySurveys']);
 });
 
 // OTP routes stay outside the auth group: verifying phone ownership is a

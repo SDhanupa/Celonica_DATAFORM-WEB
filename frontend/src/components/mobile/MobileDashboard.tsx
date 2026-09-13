@@ -183,11 +183,12 @@ const MobileDashboard: React.FC<MobileDashboardProps> = (props) => {
             PaperProps={{ sx: { mt: 1, minWidth: 190, borderRadius: '16px', bgcolor: surface, color: textMain, boxShadow: '0 16px 40px rgba(15,23,42,0.2)' } }}
           >
             <MenuItem onClick={() => { setMenuAnchor(null); goHome(); }}>{L('Home', 'මුල් පිටුව', 'முகப்பு')}</MenuItem>
-            <MenuItem onClick={() => { setMenuAnchor(null); goSurvey(); }}>{L('Industry Survey', 'කර්මාන්ත සමීක්ෂණය', 'தொழில் ஆய்வு')}</MenuItem>
+            <MenuItem onClick={() => { setMenuAnchor(null); navigate('/mydashboard'); }}>{L('Dashboard', 'උපකරණ පුවරුව', 'கட்டுப்பாடு')}</MenuItem>
+            <MenuItem onClick={() => { setMenuAnchor(null); goSurvey(); }}>{L('Industry Survey', 'දත්ත රැස් කිරීම', 'தரவு சேகரிப்பு')}</MenuItem>
             <Divider />
             {isAuthenticated ? (
               [
-                <MenuItem key="dash" onClick={() => { setMenuAnchor(null); navigate(userInfo?.realm_roles?.includes('super_admin') ? '/admins' : '/user'); }}>{L('Dashboard', 'උපකරණ පුවරුව', 'கட்டுப்பாடு')}</MenuItem>,
+                <MenuItem key="forms" onClick={() => { setMenuAnchor(null); navigate('/user'); }}>{L('Location form', 'ස්ථාන පෝරමය', 'இடப் படிவம்')}</MenuItem>,
                 <MenuItem key="logout" onClick={() => { setMenuAnchor(null); logout(); }} sx={{ color: '#ef4444' }}>{L('Logout', 'ඉවත් වන්න', 'வெளியேறு')}</MenuItem>,
               ]
             ) : !isLoading ? (

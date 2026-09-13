@@ -21,6 +21,7 @@ const GnPageFooter: React.FC<GnPageFooterProps> = () => {
       desc: 'A modern data intelligence platform delivering regional demographic insights and advanced analytics for the nation.',
       quickLinks: 'Quick Links',
       industrySurvey: 'Industry Survey',
+      dataGather: 'Dashboard',
       boundaries: 'Boundaries',
       land: 'Land',
       roads: 'Roads',
@@ -47,7 +48,8 @@ const GnPageFooter: React.FC<GnPageFooterProps> = () => {
     si: {
       desc: 'ජාතිය සඳහා කලාපීය ජනවිකාස තොරතුරු සහ උසස් දත්ත විශ්ලේෂණ සපයන නවීන දත්ත වේදිකාවක්.',
       quickLinks: 'ඉක්මන් සබැඳි',
-      industrySurvey: 'කර්මාන්ත සමීක්ෂණය',
+      industrySurvey: 'දත්ත රැස් කිරීම',
+      dataGather: 'උපකරණ පුවරුව',
       boundaries: 'මායිම්',
       land: 'ඉඩම්',
       roads: 'මාර්ග',
@@ -74,7 +76,8 @@ const GnPageFooter: React.FC<GnPageFooterProps> = () => {
     ta: {
       desc: 'நாட்டிற்கான பிராந்திய மக்கள்தொகை நுண்ணறிவு மற்றும் மேம்பட்ட பகுப்பாய்வுகளை வழங்கும் நவீன தரவு தளம்.',
       quickLinks: 'விரைவு இணைப்புகள்',
-      industrySurvey: 'தொழில் ஆய்வு',
+      industrySurvey: 'தரவு சேகரிப்பு',
+      dataGather: 'கட்டுப்பாடு',
       boundaries: 'எல்லைகள்',
       land: 'நிலம்',
       roads: 'சாலைகள்',
@@ -136,6 +139,9 @@ const GnPageFooter: React.FC<GnPageFooterProps> = () => {
                 </Typography>
                 <Typography component={Link} to={targetUrl} variant="body2" sx={{ display: 'block', color: '#38bdf8', mb: 1.5, textDecoration: 'none', cursor: 'pointer', fontWeight: 'bold' }}>
                   {t.industrySurvey}
+                </Typography>
+                <Typography component={Link} to="/fill-data" variant="body2" sx={{ display: 'block', color: '#38bdf8', mb: 1.5, textDecoration: 'none', cursor: 'pointer', fontWeight: 'bold' }}>
+                  {t.dataGather}
                 </Typography>
                 {[t.boundaries, t.land, t.roads, t.naturalLocation, t.flora].map((item) => (
                   <Typography key={item} variant="body2" sx={{ color: '#94a3b8', mb: 1.5, cursor: 'default' }}>

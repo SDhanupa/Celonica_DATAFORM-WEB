@@ -324,4 +324,22 @@ class IndustrySurveyController extends Controller
             return response()->json(['error' => 'Internal Server Error'], 500);
         }
     }
+    public function mySurveys(Request $request)
+    {
+        $userId = $this->requireIdentity($request);
+        if (!$userId) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        try {
+            $surveys = IndustrySurvey::where('user_id', $userId)
+                ->orderBy('updated_at', 'desc')
+                ->get();
+
+            return response()->json($surveys);
+        } catch (\Exception $e) {
+            Log::error('Error fetching my surveys: ' . $e->getMessage());
+            return response()->json(['error' => 'Internal Server Error'], 500);
+        }
+    }
 }

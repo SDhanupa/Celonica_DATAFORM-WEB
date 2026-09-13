@@ -41,7 +41,8 @@ const ProfilePage: React.FC<ProfileModalProps> = ({ open, onClose }) => {
   const { data, refetch } = useQuery(GET_ME, { errorPolicy: 'ignore' });
 
   const admin = data?.me || data?.meUser;
-  const role = data?.me?.role || userInfo?.realm_roles?.[0] || 'USER';
+  const filteredRoles = userInfo?.realm_roles?.filter((r: string) => r !== 'offline_access' && r !== 'uma_authorization' && !r.startsWith('default-roles-'));
+  const role = data?.me?.role || filteredRoles?.[0] || 'USER';
 
   const [editOpen, setEditOpen] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });

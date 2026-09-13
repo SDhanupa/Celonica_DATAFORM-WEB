@@ -12,6 +12,7 @@ import {
   Alert,
   MenuItem,
 } from '@mui/material';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { useMutation, gql } from '@apollo/client';
 import { useAuth } from '../auth/AuthProvider';
 
@@ -41,6 +42,39 @@ interface OnboardingModalProps {
   open: boolean;
   onComplete: () => void;
 }
+
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#818cf8',
+    },
+    background: {
+      paper: '#1e1e2d',
+    },
+  },
+  shape: {
+    borderRadius: 12,
+  },
+  components: {
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-root': {
+            backgroundColor: 'rgba(0, 0, 0, 0.25)',
+            transition: 'background-color 0.2s',
+            '&:hover': {
+              backgroundColor: 'rgba(0, 0, 0, 0.4)',
+            },
+            '&.Mui-focused': {
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            }
+          }
+        }
+      }
+    }
+  }
+});
 
 export default function OnboardingModal({ open, onComplete }: OnboardingModalProps) {
   const { userInfo } = useAuth();
@@ -74,14 +108,15 @@ export default function OnboardingModal({ open, onComplete }: OnboardingModalPro
   };
 
   return (
-    <Dialog disableEscapeKeyDown open={open} maxWidth="sm" fullWidth PaperProps={{
-      sx: {
-        background: 'rgba(20, 20, 35, 0.95)',
-        backdropFilter: 'blur(10px)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        color: 'white'
-      }
-    }}>
+    <ThemeProvider theme={darkTheme}>
+      <Dialog disableEscapeKeyDown open={open} maxWidth="sm" fullWidth PaperProps={{
+        sx: {
+          background: 'rgba(15, 23, 42, 0.95)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          color: 'white'
+        }
+      }}>
       <DialogTitle component="div">
         <Typography variant="h5" sx={{ fontWeight: 600, color: '#4F46E5', mb: 1 }}>
           Welcome to Ceylonica!
@@ -201,5 +236,6 @@ export default function OnboardingModal({ open, onComplete }: OnboardingModalPro
         </DialogActions>
       </form>
     </Dialog>
+    </ThemeProvider>
   );
 }

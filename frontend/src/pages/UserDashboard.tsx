@@ -969,6 +969,19 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             >
               Industry Survey
             </Button>
+            {isAuthenticated && !userInfo?.realm_roles?.includes('super_admin') && (
+              <Button
+                onClick={() => navigate('/user')}
+                disableRipple
+                sx={{
+                  textTransform: 'none', fontWeight: 600, fontSize: '0.88rem', borderRadius: '10px',
+                  color: isDarkMode ? '#cbd5e1' : '#334155', px: 1.5, boxShadow: 'none',
+                  '&:hover': { bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)', boxShadow: 'none', transform: 'none' },
+                }}
+              >
+                Location form
+              </Button>
+            )}
           </Box>
 
           {/* Right actions */}
@@ -993,7 +1006,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             {isAuthenticated ? (
               <>
                 <Button
-                  onClick={() => { if (userInfo?.realm_roles?.includes('super_admin')) navigate('/admins'); else navigate('/user'); }}
+                  onClick={() => {
+                    if (userInfo?.realm_roles?.includes('super_admin')) navigate('/admins');
+                    else navigate('/mydashboard');
+                  }}
                   disableRipple
                   sx={{ textTransform: 'none', fontWeight: 600, fontSize: '0.85rem', color: isDarkMode ? '#cbd5e1' : '#334155', boxShadow: 'none', '&:hover': { bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)', boxShadow: 'none', transform: 'none' } }}
                 >

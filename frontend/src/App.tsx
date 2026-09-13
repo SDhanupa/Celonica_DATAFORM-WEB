@@ -20,6 +20,9 @@ import { UsersPage, ReportsPage } from './pages/PlaceholderPages';
 import RegistrationPage from './pages/RegistrationPage';
 import QuestionsPage from './pages/QuestionsPage';
 import BulkDataPage from './pages/BulkDataPage';
+import UserDashboard from './pages/UserDashboard';
+import MySubmissionsDashboard from './pages/MySubmissionsDashboard';
+import MyDashboard from './pages/MyDashboard';
 import SurveyPage from './pages/SurveyPage';
 import CategoriesPage from './pages/CategoriesPage';
 import DynamicCategoryWrapper from './components/DynamicCategoryWrapper';
@@ -84,6 +87,16 @@ const App: React.FC = () => {
                 element={
                   <ProtectedRoute>
                     <UserPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/mydashboard"
+                element={
+                  <ProtectedRoute>
+                    <AdminLayout>
+                      <MyDashboard />
+                    </AdminLayout>
                   </ProtectedRoute>
                 }
               />
@@ -278,7 +291,19 @@ const App: React.FC = () => {
 
 
               {/* Default redirects */}
-              <Route path="/dashboard" element={<Navigate to="/gnpage" replace />} />
+              <Route 
+                path="/dashboard" 
+                element={<Navigate to="/fill-data" replace />} 
+              />
+
+              <Route 
+                path="/fill-data" 
+                element={
+                  <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator', 'user']}>
+                    <MySubmissionsDashboard />
+                  </ProtectedRoute>
+                } 
+              />
               
               <Route
                 path="/admin/industry-surveys"

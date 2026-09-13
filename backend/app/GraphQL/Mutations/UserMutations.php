@@ -190,7 +190,17 @@ class UserMutations
         if (isset($args['gender'])) $updateData['gender'] = $args['gender'];
 
         if (!empty($updateData)) {
-            $user->update($updateData);
+            try {
+                $user->update($updateData);
+            } catch (\Exception $e) {
+                if (str_contains($e->getMessage(), 'users_nic_unique')) {
+                    throw new \Exception('This NIC number is already registered to another account.');
+                }
+                if (str_contains($e->getMessage(), 'users_mobile_number_unique') || str_contains($e->getMessage(), 'users_mobile_unique')) {
+                    throw new \Exception('This Mobile Number is already registered to another account.');
+                }
+                throw $e;
+            }
         }
 
         return $user;

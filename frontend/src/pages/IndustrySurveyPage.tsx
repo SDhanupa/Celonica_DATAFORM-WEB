@@ -284,6 +284,38 @@ const IndustrySurveyPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+  const [duplicatePromptOpen, setDuplicatePromptOpen] = useState(false);
+  const [otpRequiredAlertOpen, setOtpRequiredAlertOpen] = useState(false);
+
+  useEffect(() => {
+    const checkUserSurveys = async () => {
+      if (!token) return;
+      
+      const forceNew = localStorage.getItem('force_new_submission');
+      if (forceNew) {
+        localStorage.removeItem('force_new_submission');
+        return;
+      }
+
+      const draftStr = ccode ? localStorage.getItem(`survey_draft_${ccode}`) : null;
+      if (draftStr) return; 
+
+      try {
+        const res = await fetch('/api/my-industry-surveys', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            setDuplicatePromptOpen(true);
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    checkUserSurveys();
+  }, [token, ccode]);
   const [otpDialogOpen, setOtpDialogOpen] = useState(false);
   const [otpCode, setOtpCode] = useState('');
   const [showLoginPopup, setShowLoginPopup] = useState(false);
@@ -898,6 +930,69 @@ const IndustrySurveyPage: React.FC = () => {
       >
         {L('Save & continue later', 'සුරකින්න හා පසුව දිගටම කරන්න', 'சேமித்து பින்னர் தொடரவும்')}
       </Button>
+
+      <Dialog PaperProps={dialogPaperProps} open={duplicatePromptOpen} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <CheckCircleRoundedIcon color="primary" />
+          <Typography variant="h6" fontWeight="bold">
+            {language === 'si' ? 'ඔබට දැනටමත් ගිණුමක් ඇත' : 'You Already Have a Submission'}
+          </Typography>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Typography variant="body1">
+            {language === 'si' 
+              ? 'ඔබ දැනටමත් සමීක්ෂණයක් සම්පූර්ණ කර ඇත. ඔබට තවත් ව්‍යාපාරයක් සඳහා නව සමීක්ෂණයක් ආරම්භ කිරීමට අවශ්‍යද?'
+              : 'You have already submitted a survey or have one in progress. Do you need to add another business?'}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, py: 2 }}>
+          <Button 
+            onClick={() => {
+              setDuplicatePromptOpen(false);
+              navigate('/fill-data');
+            }}
+            variant="outlined"
+            color="inherit"
+          >
+            {language === 'si' ? 'නැත, මගේ උපකරණ පුවරුවට යන්න' : 'No, go to Dashboard'}
+          </Button>
+          <Button 
+            onClick={() => setDuplicatePromptOpen(false)} 
+            variant="contained" 
+            color="primary"
+          >
+            {language === 'si' ? 'ඔව්, නව සමීක්ෂණයක් ආරම්භ කරන්න' : 'Yes, add another one'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog PaperProps={dialogPaperProps} open={otpRequiredAlertOpen} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'warning.main' }}>
+          <ErrorOutlineRoundedIcon />
+          <Typography variant="h6" fontWeight="bold">
+            {language === 'si' ? 'අවධානයයි' : 'Attention'}
+          </Typography>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Typography variant="body1">
+            {language === 'si' 
+              ? 'ඉදිරිපත් කිරීමට පෙර ඔබගේ දුරකථන අංකය තහවුරු කරන්න.' 
+              : 'Please verify your mobile number (OTP) before submitting.'}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, py: 2 }}>
+          <Button 
+            onClick={() => {
+              setOtpRequiredAlertOpen(false);
+              setCurrentStep(0);
+            }} 
+            variant="contained" 
+            color="primary"
+          >
+            {language === 'si' ? 'හරි' : 'OK'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 
@@ -1005,9 +1100,7 @@ const IndustrySurveyPage: React.FC = () => {
         const body = await response.json().catch(() => null);
         const reason = body?.error && typeof body.error === 'string' ? body.error : null;
         if (response.status === 422 && reason?.toLowerCase().includes('verif')) {
-          alert(language === 'si'
-            ? 'ඉදිරිපත් කිරීමට පෙර ඔබගේ දුරකථන අංකය තහවුරු කරන්න.'
-            : 'Please verify your mobile number (OTP) before submitting.');
+          setOtpRequiredAlertOpen(true);
         } else if (response.status === 403) {
           alert(language === 'si'
             ? 'මෙම සමීක්ෂණය සංස්කරණය කිරීමට ඔබට අවසර නැත.'
@@ -1489,7 +1582,7 @@ const IndustrySurveyPage: React.FC = () => {
       )}
 
       {/* Success Dialog */}
-      <Dialog PaperProps={dialogPaperProps} open={successDialogOpen} onClose={() => setSuccessDialogOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog PaperProps={dialogPaperProps} open={successDialogOpen} onClose={() => { setSuccessDialogOpen(false); navigate('/fill-data'); }} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ fontWeight: 'bold', color: 'success.main', display: 'flex', alignItems: 'center', gap: 1 }}>
           {language === 'si' ? 'සාර්ථකයි!' : language === 'ta' ? 'வெற்றி!' : 'Success!'}
         </DialogTitle>
@@ -1509,7 +1602,7 @@ const IndustrySurveyPage: React.FC = () => {
           )}
         </DialogContent>
         <DialogActions sx={{ p: 2, pt: 0 }}>
-          <Button variant="contained" color="success" onClick={() => setSuccessDialogOpen(false)}>
+          <Button variant="contained" color="success" onClick={() => { setSuccessDialogOpen(false); navigate('/fill-data'); }}>
             {language === 'si' ? 'හරි' : language === 'ta' ? 'சரி' : 'OK'}
           </Button>
         </DialogActions>
