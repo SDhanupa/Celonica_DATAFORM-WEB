@@ -4,13 +4,20 @@ import org.jboss.logging.Logger;
 import org.keycloak.authentication.FormAction;
 import org.keycloak.authentication.FormContext;
 import org.keycloak.authentication.ValidationContext;
-import org.keycloak.events.Errors;
 import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.models.AuthenticatorConfigModel;
+import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.FormMessage;
+import org.keycloak.policy.PasswordPolicyManagerProvider;
+import org.keycloak.policy.PolicyError;
+import org.keycloak.sessions.AuthenticationSessionModel;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 import jakarta.ws.rs.core.MultivaluedMap;
 import java.security.SecureRandom;
@@ -20,108 +27,201 @@ import java.util.List;
 public class SmsRegistrationFormAction implements FormAction {
 
     private static final Logger logger = Logger.getLogger(SmsRegistrationFormAction.class);
-    private static final String AUTH_NOTE_REG_OTP = "sms-reg-otp";
+
+    // AuthNote keys — all stored server-side, never lost between steps
+    private static final String NOTE_OTP         = "sms-reg-otp";
+    private static final String NOTE_PENDING      = "sms-reg-otp-pending";
+    private static final String NOTE_PASSWORD     = "sms-reg-password";
+    private static final String NOTE_FIRST        = "sms-reg-firstName";
+    private static final String NOTE_LAST         = "sms-reg-lastName";
+    private static final String NOTE_EMAIL        = "sms-reg-email";
+    private static final String NOTE_USERNAME     = "sms-reg-username";
+    private static final String NOTE_NIC          = "sms-reg-nic";
+    private static final String NOTE_MOBILE       = "sms-reg-mobile";
 
     @Override
     public void buildPage(FormContext context, LoginFormsProvider form) {
-        // Nothing special to add to the first registration page built by Keycloak
+        AuthenticationSessionModel s = context.getAuthenticationSession();
+        if (!"true".equals(s.getAuthNote(NOTE_PENDING))) return;
+
+        // Inject ALL saved Step-1 data as FTL attributes for the OTP page
+        form.setAttribute("otpPending",   "true");
+        setAttribute(form, "savedFirstName", s.getAuthNote(NOTE_FIRST));
+        setAttribute(form, "savedLastName",  s.getAuthNote(NOTE_LAST));
+        setAttribute(form, "savedEmail",     s.getAuthNote(NOTE_EMAIL));
+        setAttribute(form, "savedUsername",  s.getAuthNote(NOTE_USERNAME));
+        setAttribute(form, "savedNic",       s.getAuthNote(NOTE_NIC));
+        setAttribute(form, "savedMobile",    s.getAuthNote(NOTE_MOBILE));
+        setAttribute(form, "savedPassword",  s.getAuthNote(NOTE_PASSWORD));
+    }
+
+    private void setAttribute(LoginFormsProvider form, String key, String value) {
+        if (value != null) form.setAttribute(key, value);
     }
 
     @Override
     public void validate(ValidationContext context) {
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
+        AuthenticationSessionModel s = context.getAuthenticationSession();
         List<FormMessage> errors = new ArrayList<>();
 
-        String mobileNumber = formData.getFirst("user.attributes.mobile_number");
+        String enteredOtp = formData.getFirst("otp");
+
+        // ── STEP 2: OTP verification ──────────────────────────────────────
+        if (enteredOtp != null && !enteredOtp.trim().isEmpty()) {
+            String expected = s.getAuthNote(NOTE_OTP);
+            logger.infof("OTP Step 2 - entered: '%s', expected: '%s'", enteredOtp.trim(), expected);
+
+            if (expected != null && expected.equals(enteredOtp.trim())) {
+                // Clear all our notes
+                clearNotes(s);
+                context.success();
+            } else {
+                errors.add(new FormMessage("otp", "Invalid OTP. Please try again."));
+                context.validationError(formData, errors);
+            }
+            return;
+        }
+
+        // ── STEP 1: Validate fields and send OTP ─────────────────────────
         
-        if (mobileNumber == null || mobileNumber.trim().isEmpty()) {
+        // 1. Validate Password first!
+        String password = formData.getFirst("password");
+        String passwordConfirm = formData.getFirst("password-confirm");
+        
+        if (password == null || password.trim().isEmpty()) {
+            errors.add(new FormMessage("password", "missingPasswordMessage"));
+            context.validationError(formData, errors);
+            return;
+        }
+        if (!password.equals(passwordConfirm)) {
+            errors.add(new FormMessage("password-confirm", "notMatchPasswordMessage"));
+            context.validationError(formData, errors);
+            return;
+        }
+        
+        // Create a dummy UserModel proxy to prevent NullPointerException in Password Policy evaluation
+        UserModel dummyUser = (UserModel) Proxy.newProxyInstance(
+            UserModel.class.getClassLoader(),
+            new Class[] { UserModel.class },
+            new InvocationHandler() {
+                @Override
+                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                    if (method.getName().equals("getUsername")) {
+                        return formData.getFirst("username");
+                    }
+                    if (method.getReturnType().equals(boolean.class)) {
+                        return false;
+                    }
+                    return null;
+                }
+            }
+        );
+
+        PolicyError policyError = context.getSession().getProvider(PasswordPolicyManagerProvider.class)
+                .validate(context.getRealm(), dummyUser, password);
+        if (policyError != null) {
+            errors.add(new FormMessage("password", policyError.getMessage(), policyError.getParameters()));
+            context.validationError(formData, errors);
+            return;
+        }
+
+        String mobile = formData.getFirst("user.attributes.mobile_number");
+        if (mobile == null || mobile.trim().isEmpty()) {
             errors.add(new FormMessage("user.attributes.mobile_number", "Mobile number is required."));
             context.validationError(formData, errors);
             return;
         }
 
-        // Check if OTP was submitted (meaning we are on step 2 of registration)
-        String enteredOtp = formData.getFirst("otp");
-        if (enteredOtp != null && !enteredOtp.isEmpty()) {
-            String expectedOtp = context.getAuthenticationSession().getAuthNote(AUTH_NOTE_REG_OTP);
-            if (expectedOtp != null && expectedOtp.equals(enteredOtp)) {
-                // OTP is correct! Clear note and succeed.
-                context.getAuthenticationSession().removeAuthNote(AUTH_NOTE_REG_OTP);
-                context.success();
-                return;
-            } else {
-                errors.add(new FormMessage("otp", "Invalid OTP entered."));
-                context.validationError(formData, errors);
-                return;
-            }
-        }
-
-        // If no OTP was submitted, we need to send one and challenge the user
-        String otp = String.format("%08d", new SecureRandom().nextInt(100000000));
-        
-        // We will pull the TextWare credentials from the Realm's Authenticator Config 
-        // Note: For a FormAction, getting config is slightly trickier if not explicitly bound.
-        // We assume the user has bound the config to the SMS Authenticator somewhere in the realm, 
-        // or we can just pull it directly via a known alias if needed. For simplicity, if config is null here,
-        // we might fail. To make it robust, you can fetch the AuthenticatorConfigModel from the realm.
-        AuthenticatorConfigModel config = null;
-        if (context.getRealm().getAuthenticatorConfigsStream() != null) {
-            config = context.getRealm().getAuthenticatorConfigsStream()
-                .filter(c -> c.getConfig() != null && c.getConfig().containsKey(SmsAuthenticatorFactory.CONF_USERNAME))
-                .findFirst()
-                .orElse(null);
-        }
-
-        if (config == null) {
-            logger.error("TextWare configuration not found in realm.");
-            errors.add(new FormMessage(null, "System configuration error. SMS disabled."));
+        String nic = formData.getFirst("user.attributes.nic");
+        if (nic == null || !nic.matches("^(\\d{9}[vVxX]|\\d{12})$")) {
+            errors.add(new FormMessage("user.attributes.nic",
+                    "Invalid NIC. Must be 12 digits or 9 digits followed by V or X."));
             context.validationError(formData, errors);
             return;
         }
 
-        String username = config.getConfig().get(SmsAuthenticatorFactory.CONF_USERNAME);
-        String password = config.getConfig().get(SmsAuthenticatorFactory.CONF_PASSWORD);
-        String senderId = config.getConfig().get(SmsAuthenticatorFactory.CONF_SENDER_ID);
-        String message = "Ceylonica registration - please verify your number. Your 8-digit verification code is: " + otp + ". This code is secure and valid for one use only.";
+        // Get SMS config from realm
+        AuthenticatorConfigModel config = context.getRealm().getAuthenticatorConfigsStream()
+                .filter(c -> c.getConfig() != null
+                        && c.getConfig().containsKey(SmsAuthenticatorFactory.CONF_USERNAME))
+                .findFirst().orElse(null);
 
-        boolean sent = TextWareSmsClient.sendSms(username, password, senderId, mobileNumber, message);
-
-        if (sent) {
-            context.getAuthenticationSession().setAuthNote(AUTH_NOTE_REG_OTP, otp);
-            // Challenge the user to enter the OTP by reloading the form but flagging it requires OTP
-            context.getAuthenticationSession().setAuthNote("REQUIRE_REG_OTP", "true");
-            
-            // In a standard FormAction, validationError forces the form to reload with our data.
-            // We use this trick to show the OTP field on the same register.ftl page.
-            errors.add(new FormMessage("otp", "An 8-digit code has been sent to your mobile."));
+        if (config == null) {
+            logger.error("TextWare SMS configuration not found in realm.");
+            errors.add(new FormMessage(null, "System error: SMS not configured."));
             context.validationError(formData, errors);
-        } else {
-            errors.add(new FormMessage("user.attributes.mobile_number", "Failed to send SMS to this number."));
-            context.validationError(formData, errors);
+            return;
         }
+
+        // Generate OTP and send SMS
+        String otp = String.format("%08d", new SecureRandom().nextInt(100000000));
+        String smsUser  = config.getConfig().get(SmsAuthenticatorFactory.CONF_USERNAME);
+        String smsPw    = config.getConfig().get(SmsAuthenticatorFactory.CONF_PASSWORD);
+        String smsSrc   = config.getConfig().get(SmsAuthenticatorFactory.CONF_SENDER_ID);
+        String msg      = "Ceylonica verification code: " + otp + ". Valid for one use only.";
+
+        boolean sent = TextWareSmsClient.sendSms(smsUser, smsPw, smsSrc, mobile.trim(), msg);
+
+        if (!sent) {
+            errors.add(new FormMessage("user.attributes.mobile_number", "SMS send failed. Please try again."));
+            context.validationError(formData, errors);
+            return;
+        }
+
+        // Save ALL Step-1 data in AuthNotes so they survive the round-trip
+        s.setAuthNote(NOTE_OTP,      otp);
+        s.setAuthNote(NOTE_PENDING,  "true");
+        s.setAuthNote(NOTE_FIRST,    nvl(formData.getFirst("firstName")));
+        s.setAuthNote(NOTE_LAST,     nvl(formData.getFirst("lastName")));
+        s.setAuthNote(NOTE_EMAIL,    nvl(formData.getFirst("email")));
+        s.setAuthNote(NOTE_USERNAME, nvl(formData.getFirst("username")));
+        s.setAuthNote(NOTE_NIC,      nvl(nic));
+        s.setAuthNote(NOTE_MOBILE,   nvl(mobile.trim()));
+        s.setAuthNote(NOTE_PASSWORD, nvl(formData.getFirst("password")));
+
+        // Show the OTP form (validationError re-renders the page)
+        errors.add(new FormMessage("otp", "An 8-digit code has been sent to your mobile."));
+        context.validationError(formData, errors);
     }
 
     @Override
     public void success(FormContext context) {
-        // Validation already verified the OTP. We just need to save the mobile number if it wasn't saved by the profile.
-        // Keycloak's new declarative user profile actually handles saving user.attributes.mobile_number automatically.
+        // Send welcome SMS
+        AuthenticationSessionModel s = context.getAuthenticationSession();
+        String mobile    = context.getHttpRequest().getDecodedFormParameters()
+                                   .getFirst("user.attributes.mobile_number");
+        String firstName = context.getHttpRequest().getDecodedFormParameters().getFirst("firstName");
+        String lastName  = context.getHttpRequest().getDecodedFormParameters().getFirst("lastName");
+
+        AuthenticatorConfigModel config = context.getRealm().getAuthenticatorConfigsStream()
+                .filter(c -> c.getConfig() != null
+                        && c.getConfig().containsKey(SmsAuthenticatorFactory.CONF_USERNAME))
+                .findFirst().orElse(null);
+
+        if (config != null && mobile != null && !mobile.isEmpty()) {
+            String fullName = ((firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "")).trim();
+            TextWareSmsClient.sendSms(
+                    config.getConfig().get(SmsAuthenticatorFactory.CONF_USERNAME),
+                    config.getConfig().get(SmsAuthenticatorFactory.CONF_PASSWORD),
+                    config.getConfig().get(SmsAuthenticatorFactory.CONF_SENDER_ID),
+                    mobile.trim(),
+                    "Welcome to Ceylonica, " + fullName + "! Your registration is complete."
+            );
+        }
     }
 
-    @Override
-    public boolean requiresUser() {
-        return false; // User doesn't exist yet!
+    private void clearNotes(AuthenticationSessionModel s) {
+        for (String k : new String[]{NOTE_OTP, NOTE_PENDING, NOTE_PASSWORD,
+                NOTE_FIRST, NOTE_LAST, NOTE_EMAIL, NOTE_USERNAME, NOTE_NIC, NOTE_MOBILE}) {
+            s.removeAuthNote(k);
+        }
     }
 
-    @Override
-    public boolean configuredFor(KeycloakSession session, RealmModel realm, UserModel user) {
-        return true;
-    }
+    private String nvl(String v) { return v != null ? v : ""; }
 
-    @Override
-    public void setRequiredActions(KeycloakSession session, RealmModel realm, UserModel user) {
-    }
-
-    @Override
-    public void close() {
-    }
+    @Override public boolean requiresUser() { return false; }
+    @Override public boolean configuredFor(KeycloakSession s, RealmModel r, UserModel u) { return true; }
+    @Override public void setRequiredActions(KeycloakSession s, RealmModel r, UserModel u) {}
+    @Override public void close() {}
 }

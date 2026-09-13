@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthProvider';
 import keycloak from './keycloak';
 import { Box, CircularProgress, Typography } from '@mui/material';
@@ -41,18 +41,26 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
   }
 
   if (!isAuthenticated) {
-    // Redirect directly to Keycloak — no custom login page
-    keycloak.login({ redirectUri: window.location.origin + location.pathname, prompt: 'login' });
+    // Admin-only pages redirect back to themselves after login.
+    // All other pages (including user-only pages like /gnpage) redirect to /mydashboard after login.
+    const isAdminOnlyPage = allowedRoles && allowedRoles.length > 0 &&
+      allowedRoles.every(r => ['admin', 'superadmin', 'moderator'].includes(r.toLowerCase()));
+
+    const redirectAfterLogin = isAdminOnlyPage
+      ? window.location.origin + location.pathname
+      : window.location.origin + '/mydashboard';
+
+    keycloak.login({ redirectUri: redirectAfterLogin, prompt: 'login' });
     return null;
   }
 
   if (allowedRoles && allowedRoles.length > 0) {
     const userRoles = userInfo?.realm_roles || [];
     const hasRole = allowedRoles.some((role) => userRoles.includes(role));
-    
+
     if (!hasRole) {
-      // Redirect unauthorized users to their dashboard or home
-      return <Navigate to="/user" replace />;
+      // Redirect unauthorized users to their dashboard
+      return <Navigate to="/mydashboard" replace />;
     }
   }
 
