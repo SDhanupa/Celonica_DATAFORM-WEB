@@ -6,7 +6,7 @@ import { useLocation } from 'react-router-dom';
 const LoginPage: React.FC = () => {
   const { login, isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
-  const from = location.state?.from?.pathname || '/mydashboard';
+  const from = location.state?.from?.pathname || '/gnpage';
 
   useEffect(() => {
     if (!isLoading) {

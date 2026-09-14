@@ -55,6 +55,7 @@ Route::middleware(['throttle:20,1', 'keycloak.admin'])->group(function () {
     Route::post('/industry-survey', [IndustrySurveyController::class, 'store']);
     Route::post('/industry-survey/generate-reg-number', [IndustrySurveyController::class, 'generateRegNumber']);
     Route::get('/my-industry-surveys', [IndustrySurveyController::class, 'mySurveys']);
+    Route::delete('/industry-survey/{id}', [IndustrySurveyController::class, 'destroy']);
 });
 
 // OTP routes stay outside the auth group: verifying phone ownership is a
@@ -111,3 +112,19 @@ Route::get('/uploads/{path}', function($path) {
     }
     abort(404);
 })->where('path', '.*');
+
+// ─── Public Business Profile Routes (No Auth) ───────────────────────────────
+use App\Http\Controllers\PublicBusinessController;
+
+Route::middleware('throttle:120,1')->group(function () {
+    Route::get('/public/business/{regNumber}', [PublicBusinessController::class, 'show'])
+        ->where('regNumber', '.*');
+    Route::get('/public/surveys-by-ccode/{ccode}', [PublicBusinessController::class, 'byCcode']);
+    Route::get('/public/business/{regNumber}/qr-image', [PublicBusinessController::class, 'qrImage'])
+        ->where('regNumber', '.*');
+});
+
+Route::middleware('throttle:10,1')->group(function () {
+    Route::post('/public/qr-otp/send', [PublicBusinessController::class, 'sendQrOtp']);
+    Route::post('/public/qr-otp/verify', [PublicBusinessController::class, 'verifyQrOtp']);
+});

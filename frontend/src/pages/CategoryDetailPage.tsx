@@ -425,6 +425,19 @@ const CategoryDetailPage: React.FC = () => {
   const catName = category?.name ?? categorySlug ?? 'Category';
   const catIcon = iconForSlug(categorySlug);
 
+  /* ── Industry survey businesses for location-1-4 ── */
+  const [industrySurveys, setIndustrySurveys] = useState<any[]>([]);
+  const [surveysLoading, setSurveysLoading] = useState(false);
+
+  React.useEffect(() => {
+    if (categorySlug !== 'location-1-4' || !ccode) return;
+    setSurveysLoading(true);
+    fetch(`/api/public/surveys-by-ccode/${ccode}`)
+      .then(r => r.json())
+      .then(data => { setIndustrySurveys(Array.isArray(data) ? data : []); setSurveysLoading(false); })
+      .catch(() => setSurveysLoading(false));
+  }, [categorySlug, ccode]);
+
   const gnPageUrl = `/gnpage/${gnName}/${ccode}`;
   const gnDisplayName = decodeURIComponent(gnName ?? '').replace(/-/g, ' ');
 
@@ -721,6 +734,81 @@ const CategoryDetailPage: React.FC = () => {
             onLoaded={handleSectionLoaded}
           />
         ))}
+
+        {/* ── Registered Businesses (Industry Surveys) for location-1-4 ── */}
+        {categorySlug === 'location-1-4' && industrySurveys.length > 0 && (
+          <Box sx={{ mt: 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2.5 }}>
+              <Typography sx={{
+                fontSize: '0.72rem', fontWeight: 700, color: tc.muted,
+                textTransform: 'uppercase', letterSpacing: '0.6px', whiteSpace: 'nowrap',
+              }}>
+                Registered Businesses ({industrySurveys.length})
+              </Typography>
+              <Box sx={{ flex: 1, height: '1px', bgcolor: tc.border }} />
+            </Box>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' }, gap: 2 }}>
+              {industrySurveys.map((s: any) => (
+                <Box
+                  key={s.id}
+                  onClick={() => navigate(`/business/${encodeURIComponent(s.reg_number)}`)}
+                  sx={{
+                    p: 2.5, borderRadius: '16px', cursor: 'pointer',
+                    bgcolor: tc.card, border: `1px solid ${tc.border}`,
+                    transition: 'all 0.25s ease',
+                    '&:hover': {
+                      bgcolor: tc.tint, borderColor: ACCENT,
+                      transform: 'translateY(-3px)',
+                      boxShadow: isDarkMode ? '0 8px 32px rgba(0,0,0,0.4)' : '0 8px 32px rgba(0,0,0,0.08)',
+                    },
+                  }}
+                >
+                  {s.b_photo && (
+                    <Box sx={{
+                      width: '100%', height: 120, borderRadius: '12px', overflow: 'hidden',
+                      mb: 1.5, bgcolor: isDarkMode ? 'rgba(255,255,255,0.04)' : '#f1f5f9',
+                    }}>
+                      <Box
+                        component="img"
+                        src={`/api/uploads/${s.b_photo}`}
+                        alt={s.b_name}
+                        sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        onError={(e: any) => { e.target.style.display = 'none'; }}
+                      />
+                    </Box>
+                  )}
+                  <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: tc.text, mb: 0.5, lineHeight: 1.3 }}>
+                    {s.b_name || 'Unnamed Business'}
+                  </Typography>
+                  {s.b_type_name && (
+                    <Typography sx={{ fontSize: '0.78rem', color: tc.muted, mb: 0.75 }}>
+                      {s.b_type_name}
+                    </Typography>
+                  )}
+                  <Box sx={{
+                    display: 'inline-flex', alignItems: 'center', gap: 0.5,
+                    bgcolor: isDarkMode ? 'rgba(99,102,241,0.12)' : 'rgba(37,99,235,0.08)',
+                    borderRadius: '8px', px: 1, py: 0.3,
+                  }}>
+                    <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: ACCENT, letterSpacing: '0.02em' }}>
+                      {s.reg_number}
+                    </Typography>
+                  </Box>
+                  {s.status === 'approved' && (
+                    <Typography sx={{ fontSize: '0.7rem', color: '#10b981', fontWeight: 600, mt: 0.75 }}>
+                      ✓ Verified
+                    </Typography>
+                  )}
+                </Box>
+              ))}
+            </Box>
+          </Box>
+        )}
+        {categorySlug === 'location-1-4' && surveysLoading && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+            <CircularProgress size={28} sx={{ color: ACCENT }} />
+          </Box>
+        )}
 
         {/* Empty state — shown only once every section has reported in and none has data */}
         {showEmptyState && (

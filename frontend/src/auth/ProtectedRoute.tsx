@@ -42,13 +42,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
 
   if (!isAuthenticated) {
     // Admin-only pages redirect back to themselves after login.
-    // All other pages (including user-only pages like /gnpage) redirect to /mydashboard after login.
+    // All other pages (including user-only pages like /gnpage) redirect to /gnpage after login.
     const isAdminOnlyPage = allowedRoles && allowedRoles.length > 0 &&
       allowedRoles.every(r => ['admin', 'superadmin', 'moderator'].includes(r.toLowerCase()));
 
     const redirectAfterLogin = isAdminOnlyPage
       ? window.location.origin + location.pathname
-      : window.location.origin + '/mydashboard';
+      : window.location.origin + '/gnpage';
 
     keycloak.login({ redirectUri: redirectAfterLogin, prompt: 'login' });
     return null;

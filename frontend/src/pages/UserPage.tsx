@@ -147,7 +147,7 @@ const UserPage: React.FC = () => {
               Home
             </Typography>
             <Typography sx={{ color: '#cbd5e1', fontWeight: 300 }}>|</Typography>
-            <Typography onClick={() => navigate('/user')} sx={{ cursor: 'pointer', transition: 'all 0.2s', color: '#0f172a', fontWeight: 600 }}>
+            <Typography onClick={() => navigate('/mydashboard')} sx={{ cursor: 'pointer', transition: 'all 0.2s', color: '#0f172a', fontWeight: 600 }}>
               Dashboard
             </Typography>
             <Typography sx={{ color: '#cbd5e1', fontWeight: 300 }}>|</Typography>

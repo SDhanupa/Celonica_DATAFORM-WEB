@@ -504,8 +504,21 @@ const IndustrySurveyPage: React.FC = () => {
       scrollToFirstError();
       return;
     }
+    if (currentStep === 0 && !isMobileVerified) {
+      setGenericAlertPopup({
+        open: true,
+        title: language === 'si' ? 'අවධානයයි' : 'Attention',
+        message: language === 'si' ? 'කරුණාකර මොබයිල් අංකය තහවුරු කරන්න (Verify Mobile Number).' : 'Please verify your mobile number (OTP) before proceeding.'
+      });
+      return;
+    }
     before?.();
     goToStep(next);
+    
+    // Auto-sync draft to backend silently on step progression
+    if (next > 0) {
+      handleSaveDraft(false, next);
+    }
   };
 
   const goPrev = (prev: number) => goToStep(prev);
@@ -573,6 +586,7 @@ const IndustrySurveyPage: React.FC = () => {
   const [gpsCoordinates, setGpsCoordinates] = useState<{ lat: number, lng: number } | null>(null);
   const [gpsChecking, setGpsChecking] = useState(false);
   const [gpsWrongLocationPopup, setGpsWrongLocationPopup] = useState<{ lat: number, lng: number } | null>(null);
+  const [genericAlertPopup, setGenericAlertPopup] = useState<{ open: boolean, title: string, message: string } | null>(null);
 
   // Universal draft key works with or without ccode
   const draftKey = ccode ? `survey_draft_${ccode}` : `survey_draft_user_${userInfo?.sub || 'anon'}`;
@@ -658,10 +672,11 @@ const IndustrySurveyPage: React.FC = () => {
     return res;
   };
 
-  const handleSaveDraft = async () => {
+  const handleSaveDraft = async (showPopup = true, stepOverride?: number) => {
+    const stepToSave = stepOverride !== undefined ? stepOverride : currentStep;
     const draftData = {
       formValues,
-      currentStep,
+      currentStep: stepToSave,
       surveyStartTime: surveyStartTime?.toISOString() || new Date().toISOString(),
       gpsCoordinates,
     };
@@ -701,20 +716,21 @@ const IndustrySurveyPage: React.FC = () => {
         const body = await res.json().catch(() => null);
         const reason = body?.error && typeof body.error === 'string' ? body.error : null;
         console.warn('Draft saved locally but backend sync failed:', reason || res.status);
-        alert(
-          language === 'si'
-            ? `ෆෝරමය ඔබගේ උපාංගයේ සුරැකිණි, නමුත් සර්වරයට යැවීමට අසමත් විය.${reason ? ` (${reason})` : ''}`
-            : `Saved on this device, but syncing to the server failed.${reason ? ` (${reason})` : ''}`
-        );
+        if (showPopup) {
+          alert(
+            language === 'si'
+              ? `ෆෝරමය ඔබගේ උපාංගයේ සුරැකිණි, නමුත් සර්වරයට යැවීමට අසමත් විය.${reason ? ` (${reason})` : ''}`
+              : `Saved on this device, but syncing to the server failed.${reason ? ` (${reason})` : ''}`
+          );
+        }
       }
     } catch (err) {
       console.error('Failed to sync draft to server', err);
     }
 
-    // Local save (above) always succeeds, and that's what "continue later"
-    // actually depends on — so acknowledge it regardless of whether the
-    // best-effort backend sync came through.
-    setSaveDraftDialogOpen(true);
+    if (showPopup) {
+      setSaveDraftDialogOpen(true);
+    }
   };
 
   const questions = data?.questions || [];
@@ -985,7 +1001,7 @@ const IndustrySurveyPage: React.FC = () => {
   const handleSendOtp = async () => {
     const mobile = formValues['b_mobile'];
     if (!mobile) {
-      alert(language === 'si' ? 'කරුණාකර මොබයිල් අංකය ඇතුළත් කරන්න' : 'Please enter a mobile number first.');
+      setGenericAlertPopup({ open: true, title: language === 'si' ? 'අවධානයයි' : 'Attention', message: language === 'si' ? 'කරුණාකර මොබයිල් අංකය ඇතුළත් කරන්න' : 'Please enter a mobile number first.' });
       return;
     }
     setOtpSending(true);
@@ -999,12 +1015,12 @@ const IndustrySurveyPage: React.FC = () => {
       if (res.ok && data.success) {
         setOtpDialogOpen(true);
       } else if (res.status === 429) {
-        alert(language === 'si' ? 'කරුණාකර මොහොතක් රැඳී නැවත උත්සාහ කරන්න' : 'Please wait a moment before requesting another code.');
+        setGenericAlertPopup({ open: true, title: language === 'si' ? 'අවධානයයි' : 'Attention', message: language === 'si' ? 'කරුණාකර මොහොතක් රැඳී නැවත උත්සාහ කරන්න' : 'Please wait a moment before requesting another code.' });
       } else {
-        alert(language === 'si' ? 'අසාර්ථකයි' : 'Failed');
+        setGenericAlertPopup({ open: true, title: language === 'si' ? 'දෝෂයකි' : 'Error', message: language === 'si' ? 'අසාර්ථකයි' : 'Failed' });
       }
     } catch {
-      alert(language === 'si' ? 'දෝෂයක් ඇතිවිය' : 'Error');
+      setGenericAlertPopup({ open: true, title: language === 'si' ? 'දෝෂයකි' : 'Error', message: language === 'si' ? 'දෝෂයක් ඇතිවිය' : 'Error' });
     } finally {
       setOtpSending(false);
     }
@@ -1017,26 +1033,19 @@ const IndustrySurveyPage: React.FC = () => {
       const res = await fetch('/api/otp/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        // Field name must match OtpController::verify()'s validated input —
-        // this previously sent `otp`, which the backend has never accepted
-        // (it validates/reads `code`), so every verification attempt 422'd
-        // regardless of whether the code entered was correct.
         body: JSON.stringify({ mobile, code: otpCode })
       });
       const data = await res.json();
       if (res.ok && data.success) {
         setIsMobileVerified(true);
-        // The backend requires this exact token at final submission — it's
-        // what makes "Verified" mean something server-side rather than being
-        // a client-only checkmark.
         setMobileVerificationToken(data.verification_token ?? null);
         setOtpDialogOpen(false);
-        alert(language === 'si' ? 'සාර්ථකයි' : 'Success');
+        setGenericAlertPopup({ open: true, title: language === 'si' ? 'සාර්ථකයි' : 'Success', message: language === 'si' ? 'සාර්ථකයි' : 'Success' });
       } else {
-        alert(language === 'si' ? 'වැරදි කේතයකි' : 'Invalid OTP');
+        setGenericAlertPopup({ open: true, title: language === 'si' ? 'අවධානයයි' : 'Attention', message: language === 'si' ? 'වැරදි කේතයකි' : 'Invalid OTP' });
       }
     } catch {
-      alert(language === 'si' ? 'දෝෂයක් ඇතිවිය' : 'Error');
+      setGenericAlertPopup({ open: true, title: language === 'si' ? 'දෝෂයකි' : 'Error', message: language === 'si' ? 'දෝෂයක් ඇතිවිය' : 'Error' });
     } finally {
       setOtpVerifying(false);
     }
@@ -1301,6 +1310,7 @@ const IndustrySurveyPage: React.FC = () => {
                         type="tel"
                         inputProps={{ inputMode: 'tel', autoComplete: 'tel' }}
                         value={formValues['b_mobile'] || ''}
+                        disabled={isMobileVerified}
                         onChange={(e) => {
                           const next = e.target.value;
                           handleInputChange('b_mobile', next);
@@ -2082,6 +2092,23 @@ const IndustrySurveyPage: React.FC = () => {
         <DialogActions sx={{ p: 2, pt: 0 }}>
           <Button variant="contained" color="primary" onClick={handleLoginClick} fullWidth>
             {language === 'si' ? 'ලොග් වන්න' : language === 'ta' ? 'உள்நுழைக' : 'Login Now'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Generic Alert Popup */}
+      <Dialog PaperProps={dialogPaperProps} open={genericAlertPopup?.open || false} onClose={() => setGenericAlertPopup(null)} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ fontWeight: 'bold' }}>
+          {genericAlertPopup?.title}
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            {genericAlertPopup?.message}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, pt: 0 }}>
+          <Button variant="contained" color="primary" onClick={() => setGenericAlertPopup(null)}>
+            {language === 'si' ? 'හරි' : 'OK'}
           </Button>
         </DialogActions>
       </Dialog>

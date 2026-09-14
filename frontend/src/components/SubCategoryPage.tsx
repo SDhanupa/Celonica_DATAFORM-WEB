@@ -306,7 +306,7 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
             <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 1.5, fontWeight: 600, fontSize: '0.95rem' }}>
               <Typography onClick={() => navigate('/gnpage')} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', '&:hover': { opacity: 0.7 } }}>Home</Typography>
               <Typography sx={{ opacity: 0.4, fontWeight: 300 }}>|</Typography>
-              <Typography onClick={() => navigate('/user')} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', '&:hover': { opacity: 0.7 } }}>Dashboard</Typography>
+              <Typography onClick={() => navigate('/mydashboard')} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', '&:hover': { opacity: 0.7 } }}>Dashboard</Typography>
               <Typography sx={{ opacity: 0.4, fontWeight: 300 }}>|</Typography>
               <Typography onClick={() => logout()} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', color: '#ef4444', '&:hover': { opacity: 0.7 } }}>Logout</Typography>
               <Typography sx={{ opacity: 0.4, fontWeight: 300 }}>|</Typography>

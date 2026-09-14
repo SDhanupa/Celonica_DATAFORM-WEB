@@ -38,6 +38,8 @@ import ApprovalsPage from './pages/ApprovalsPage';
 import IndustrySurveyPage from './pages/IndustrySurveyPage';
 import AdminIndustrySurveys from './pages/AdminIndustrySurveys';
 import AdminIndustrySurveysQuestions from './pages/AdminIndustrySurveysQuestions';
+import BusinessProfilePage from './pages/BusinessProfilePage';
+import BusinessQRPage from './pages/BusinessQRPage';
 
 
 const App: React.FC = () => {
@@ -76,6 +78,15 @@ const App: React.FC = () => {
                 path="/industry-survey/:gnName/:ccode"
                 element={<IndustrySurveyPage />}
               />
+              {/* Public business profile pages — no login required */}
+              <Route
+                path="/business/:regNumber"
+                element={<BusinessProfilePage />}
+              />
+              <Route
+                path="/business/:regNumber/qr"
+                element={<BusinessQRPage />}
+              />
               {/* Category detail pages — accessible by super admin */}
               <Route
                 path="/gnpage/:gnName/:ccode/:categorySlug"
@@ -93,7 +104,7 @@ const App: React.FC = () => {
               <Route
                 path="/mydashboard"
                 element={
-                  <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator']}>
+                  <ProtectedRoute>
                     <AdminLayout>
                       <MyDashboard />
                     </AdminLayout>
@@ -191,7 +202,7 @@ const App: React.FC = () => {
               <Route
                 path="/user-submissions"
                 element={
-                  <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator', 'user']}>
+                  <ProtectedRoute>
                     <AdminLayout>
                       <UserSubmissionsPage />
                     </AdminLayout>
@@ -299,7 +310,7 @@ const App: React.FC = () => {
               <Route 
                 path="/fill-data" 
                 element={
-                  <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator', 'user']}>
+                  <ProtectedRoute>
                     <MySubmissionsDashboard />
                   </ProtectedRoute>
                 } 

@@ -147,11 +147,38 @@ const DashboardPage: React.FC = () => {
   const roles = userInfo?.realm_roles || [];
   const isAdmin = roles.includes('super_admin') || roles.includes('admin') || roles.includes('moderator');
 
+  const isWebAdminRoute = window.location.pathname.startsWith('/admin');
+
+  if (isAdmin && isWebAdminRoute) {
+    return (
+      <Box sx={{ pb: 4 }}>
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h4" fontWeight="800" color="#1e293b" gutterBottom>
+            Welcome back, {adminName}
+          </Typography>
+          <Typography variant="subtitle1" color="text.secondary">
+            Here's what's happening across the platform today.
+          </Typography>
+        </Box>
+        <Grid container spacing={3}>
+          <Grid item xs={12} sm={6} md={3}>
+            <StatCard title="Total Admins" value={stats.totalAdmins} subtitle="System administrators" icon={<AdminsIcon />} color="primary" />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <StatCard title="Active Admins" value={stats.activeAdmins} subtitle="Currently active" icon={<PersonAddIcon />} color="success" />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <StatCard title="Total Users" value={stats.totalUsers} subtitle="Registered citizens" icon={<UsersIcon />} color="info" />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <StatCard title="Total Reports" value={stats.totalReports} subtitle="Submitted reports" icon={<AssessmentIcon />} color="warning" />
+          </Grid>
+        </Grid>
+      </Box>
+    );
+  }
+
   // /gnpage is the public census data explorer - ALWAYS show UserDashboard here.
-  // Admins can visit their admin panel via /admins, /users, /approvals, etc.
-  // We only show the admin panel when gnName AND ccode are both missing AND the user
-  // navigated here via an admin route (handled by separate admin-only routes).
-  // On the /gnpage route, always show UserDashboard regardless of role.
   return (
     <Box>
       <UserDashboard user={data?.me || data?.meUser || userInfo} />
