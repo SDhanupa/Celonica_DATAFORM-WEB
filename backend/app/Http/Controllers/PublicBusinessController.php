@@ -192,7 +192,7 @@ class PublicBusinessController extends Controller
             return response()->json(['error' => 'Invalid or expired download token'], 401);
         }
 
-        $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
+        $frontendUrl = env('FRONTEND_URL', 'https://ceystem.com');
         $profileUrl = $frontendUrl . '/business/' . urlencode($regNumber);
 
         try {

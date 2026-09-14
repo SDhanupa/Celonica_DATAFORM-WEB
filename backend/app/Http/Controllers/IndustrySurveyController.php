@@ -514,7 +514,7 @@ class IndustrySurveyController extends Controller
                 try {
                     $apiUrl = config('services.textware.api_url');
                     if ($apiUrl) {
-                        $loginLink = env('FRONTEND_URL', 'http://localhost:5173') . '/login';
+                        $loginLink = env('FRONTEND_URL', 'https://ceystem.com') . '/login';
                         $message = "Welcome to Ceylonica! Your account is created. Username: {$username} Password: {$password}. Login at: {$loginLink}";
                         
                         Http::get($apiUrl, [
@@ -575,7 +575,7 @@ class IndustrySurveyController extends Controller
                 return;
             }
 
-            $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
+            $frontendUrl = env('FRONTEND_URL', 'https://ceystem.com');
             $profileLink = $frontendUrl . '/business/' . urlencode($regNumber);
             $qrLink = $frontendUrl . '/business/' . urlencode($regNumber) . '/qr';
             $bName = $fv['b_name'] ?? 'Business';
