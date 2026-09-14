@@ -140,7 +140,7 @@ class IndustrySurveyController extends Controller
                         }
                     }
 
-                    if (!$isAdmin && $survey->user_id !== $userId && $survey->user_id !== $targetUserId) {
+                    if (!$isAdmin && $survey->user_id !== $userId && $survey->user_id !== $targetUserId && $survey->created_by !== $userId) {
                         return response()->json(['error' => 'You do not have permission to modify this survey'], 403);
                     }
                     if ($survey->status === 'approved') {
@@ -150,6 +150,7 @@ class IndustrySurveyController extends Controller
                     $data['user_id'] = $survey->user_id;
                     $survey->update($data);
                 } else {
+                    $data['created_by'] = $userId;
                     $survey = IndustrySurvey::create($data);
                 }
 
@@ -361,7 +362,10 @@ class IndustrySurveyController extends Controller
         }
 
         try {
-            $surveys = IndustrySurvey::where('user_id', $userId)
+            $surveys = IndustrySurvey::where(function($query) use ($userId) {
+                    $query->where('user_id', $userId)
+                          ->orWhere('created_by', $userId);
+                })
                 ->orderBy('updated_at', 'desc')
                 ->get();
 
