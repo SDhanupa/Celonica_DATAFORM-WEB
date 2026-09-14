@@ -294,7 +294,6 @@ const IndustrySurveyPage: React.FC = () => {
       
       const forceNew = localStorage.getItem('force_new_submission');
       if (forceNew) {
-        localStorage.removeItem('force_new_submission');
         return;
       }
 
@@ -592,9 +591,16 @@ const IndustrySurveyPage: React.FC = () => {
   const draftKey = ccode ? `survey_draft_${ccode}` : `survey_draft_user_${userInfo?.sub || 'anon'}`;
 
   useEffect(() => {
+    const forceNew = localStorage.getItem('force_new_submission');
+    if (forceNew) {
+      localStorage.removeItem('force_new_submission');
+      localStorage.removeItem(draftKey);
+      localStorage.removeItem(`${draftKey}_db_id`);
+    }
+
     // On route change: check for existing draft and silently resume
     const draftStr = localStorage.getItem(draftKey);
-    if (draftStr) {
+    if (draftStr && !forceNew) {
       try {
         const draft = JSON.parse(draftStr);
         if (draft.formValues && Object.keys(draft.formValues).length > 0) {
