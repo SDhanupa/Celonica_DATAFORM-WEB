@@ -1432,7 +1432,7 @@ const IndustrySurveyPage: React.FC = () => {
                   </Box>
 
                   <Box>
-                    <QuestionLabel fieldKey="q_address" text={getDynamicLabel('q_address', 'Residential Address', 'නියාසික ලිපිනය', 'குடியிருப்பு முகவரி')} />
+                    <QuestionLabel fieldKey="q_address" text={getDynamicLabel('q_address', 'Residential Address', 'නේවාසික ලිපිනය', 'குடியிருப்பு முகவரி')} />
                     <TextField fullWidth variant="outlined" size="small" multiline rows={2} value={formValues['q_address'] || ''} onChange={(e) => handleInputChange('q_address', e.target.value)} />
                   </Box>
 

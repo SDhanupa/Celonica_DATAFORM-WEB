@@ -138,7 +138,7 @@ class BusinessSurveyQuestionSeeder extends Seeder
         "key": "q_address",
         "type": "custom",
         "en": "Residential Address",
-        "si": "නියාසික ලිපිනය",
+        "si": "නේවාසික ලිපිනය",
         "ta": "குடியிருப்பு முகவரி"
     },
     {
