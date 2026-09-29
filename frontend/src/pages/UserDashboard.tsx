@@ -5,17 +5,30 @@ import { Box, Typography, Button, Container, Grid, FormControl, useTheme, useMed
 import { useQuery } from '@apollo/client';
 import { GET_P_DISTRICTS, GET_P_DISTRICT_WITH_GNS, GET_GN_BY_COORDINATES, GET_GN_BY_CCODE } from '../graphql/queries';
 import { useAuth } from '../auth/AuthProvider';
+import { useLanguage } from '../context/LanguageContext';
 import { useNavigate, useParams } from 'react-router-dom';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import SearchIcon from '@mui/icons-material/Search';
 import MenuIcon from '@mui/icons-material/Menu';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import PinDropRoundedIcon from '@mui/icons-material/PinDropRounded';
+import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
+import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
+import TagRoundedIcon from '@mui/icons-material/TagRounded';
+import Tooltip from '@mui/material/Tooltip';
 import { CATEGORIES } from './CategoryDetailPage';
 import GnPageFooter from '../components/GnPageFooter';
 import { VillageMap } from '../components/VillageMap';
 import { GnTopHeaderBar } from '../components/GnTopHeaderBar';
 import { DemographicCards } from '../components/DemographicCards';
+import VillageQuickStats from '../components/VillageQuickStats';
+import MobileDashboard from '../components/mobile/MobileDashboard';
+import ContributeBanner from '../components/contribute/ContributeBanner';
+import { useContributeCopy } from '../components/contribute/copy';
+import { saveVillage } from '../components/contribute/village';
 
 
 const tChart = {
@@ -135,7 +148,10 @@ interface UserDashboardProps {
 const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const theme = useTheme();
   const isMobileView = useMediaQuery(theme.breakpoints.down('sm'));
+  // Phone / small-tablet layout. Desktop (md and up) keeps the original web view untouched.
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'), { noSsr: true });
   const { login, register, userInfo, isAuthenticated, logout, isLoading } = useAuth();
+  const { language, setLanguage } = useLanguage();
   const navigate = useNavigate();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const themeColors = getThemeColors(isDarkMode);
@@ -156,7 +172,6 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const [selectedCity, setSelectedCity] = useState<string>('');
 
   const [showLocationModal, setShowLocationModal] = useState<boolean>(!ccode);
-  const [language, setLanguage] = useState<'en' | 'si' | 'ta'>('en');
   const t = tChart[language] || tChart.en;
   const [showManualForm, setShowManualForm] = useState(!ccode && !window.matchMedia('(max-width: 600px)').matches);
   const canContinue = !showManualForm
@@ -191,19 +206,20 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const handleMobileMenuClose = () => { setMobileMenuAnchor(null); };
 
   const [catMenuAnchor, setCatMenuAnchor] = useState<null | HTMLElement>(null);
+  const [copiedCode, setCopiedCode] = useState<boolean>(false);
 
   // Search Logic Queries (Always active so dropdowns are always populated)
   const { data: districtsData, loading: districtsLoading, error: districtsError } = useQuery(GET_P_DISTRICTS, {
     fetchPolicy: 'cache-first',
   });
-  console.log('Districts query:', { districtsData, districtsLoading, districtsError });
+
 
   const { data: gnData, loading: gnLoading, error: gnError } = useQuery(GET_P_DISTRICT_WITH_GNS, {
     variables: { id: selectedDistrict },
     skip: !selectedDistrict,
     fetchPolicy: 'cache-first',
   });
-  console.log('GN Data query:', { gnData, gnLoading, gnError });
+
 
   const uniqueCities = React.useMemo(() => {
     if (!gnData?.pDistrict?.gramaNiladharis) return [];
@@ -243,6 +259,22 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   });
 
   const activeGn = urlGnData?.gnByCcode || autoGnData?.gnByCoordinates;
+  const { t: contributeCopy } = useContributeCopy();
+
+  /** Contributing from a village page means contributing to *that* village. */
+  const rememberActiveVillage = () => {
+    if (!activeGn) return;
+    const { boundary: _boundary, police: _police, ...village } = activeGn as any;
+    saveVillage(village);
+  };
+  const startContributing = () => {
+    rememberActiveVillage();
+    navigate('/user');
+  };
+  const joinToContribute = () => {
+    rememberActiveVillage();
+    register(`${window.location.origin}/user`);
+  };
 
   // Geolocation Effect
   useEffect(() => {
@@ -272,10 +304,11 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   // Sync active GN with District, DS, and Village dropdown selectors
   useEffect(() => {
     if (activeGn) {
+      const activeDistName = (activeGn.pDistrict?.admin2NameEn || activeGn.disEn || '').trim();
       const distId = activeGn.pDistrict?.id ||
         districtsData?.pDistricts?.find((d: any) =>
-          d.admin2NameEn === activeGn.pDistrict?.admin2NameEn ||
-          d.nameEn === activeGn.pDistrict?.admin2NameEn ||
+          (d.admin2NameEn || '').trim() === activeDistName ||
+          (d.nameEn || '').trim() === activeDistName ||
           d.id === activeGn.pDistrict?.id
         )?.id || '';
       if (distId) setSelectedDistrict(distId);
@@ -283,7 +316,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         setSelectedCity(activeGn.divisionalSecretariatCode || activeGn.dsEn);
       }
       if (activeGn.id || activeGn.CCODE) {
-        setSelectedGN(activeGn.id || activeGn.CCODE);
+        setSelectedGN(String(activeGn.id || activeGn.CCODE));
       }
     }
   }, [activeGn, districtsData]);
@@ -338,7 +371,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
     const g = activeGn;
     displayCity = language === 'en' ? g?.dsEn : language === 'si' ? g?.dsSi : g?.dsTa;
     displayGN = language === 'en' ? g?.nameEn : language === 'si' ? g?.nameSi : g?.nameTa;
-    displayCCODE = g?.CCODE || '';
+    displayCCODE = g?.CCODE || g?.code || ccode || '';
     if (g?.pGn) {
       populationData = {
         both: g.pGn.populationBoth || 0,
@@ -428,7 +461,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         const g = gnData?.pDistrict?.gramaNiladharis?.find((x: any) => String(x.id) === String(selectedGN) || x.CCODE === selectedGN || x.ccode === selectedGN);
         if (g) {
           displayGN = language === 'en' ? g.nameEn : language === 'si' ? g.nameSi : g.nameTa;
-          displayCCODE = g.CCODE || '';
+          displayCCODE = g.CCODE || g.code || g.ccode || selectedGN || '';
           if (g.pGn) {
             populationData = {
               both: g.pGn.populationBoth || 0,
@@ -563,25 +596,12 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             {language}
           </Box>
 
-          {/* Logo */}
-          <Box
-            sx={{
-              width: 88,
-              height: 88,
-              borderRadius: '50%',
-              bgcolor: 'rgba(255,255,255,0.15)',
-              backdropFilter: 'blur(10px)',
-              border: '3px solid rgba(255,255,255,0.5)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-            }}
-          >
+          {/* Plain Transparent PNG Logos */}
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3, my: 0.5 }}>
             <img
               src="/logo.png"
               alt="Ceylonica Logo"
-              style={{ height: '72px', width: '72px', objectFit: 'contain', borderRadius: '50%' }}
+              style={{ height: '56px', width: 'auto', objectFit: 'contain' }}
             />
           </Box>
 
@@ -816,6 +836,66 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         </DialogActions>
       </Dialog>
 
+      {isMobile ? (
+        <MobileDashboard
+          isDarkMode={isDarkMode}
+          onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
+          onCycleLanguage={cycleLanguage}
+          isAuthenticated={isAuthenticated}
+          isLoading={isLoading}
+          login={login}
+          register={register}
+          logout={logout}
+          userInfo={userInfo}
+          displayGN={displayGN}
+          displayDistrict={displayDistrict}
+          displayCity={displayCity}
+          displayCCODE={displayCCODE}
+          activeGn={activeGn}
+          districts={districtsData?.pDistricts || []}
+          selectedDistrict={selectedDistrict}
+          onDistrictChange={(d) => { setSelectedDistrict(d); setSelectedCity(''); setSelectedGN(''); }}
+          dsDivisions={uniqueCities}
+          selectedCity={selectedCity}
+          onCityChange={(c) => { setSelectedCity(c); setSelectedGN(''); }}
+          gramaNiladharis={filteredGNs}
+          selectedGN={selectedGN}
+          onGNChange={(g) => {
+            setSelectedGN(g);
+            const chosen = gnData?.pDistrict?.gramaNiladharis?.find((x: any) => x.id === g || x.CCODE === g);
+            if (chosen && chosen.CCODE && chosen.nameEn) navigate(`/gnpage/${encodeURIComponent(chosen.nameEn.replace(/ /g, '-'))}/${encodeURIComponent(chosen.CCODE)}`);
+          }}
+          onOpenCategory={(slug) => {
+            const tGn = (displayGN || activeGn?.nameEn || gnName || 'Pahalagama').replace(/ /g, '-');
+            const tCc = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'RATPA';
+            navigate(`/gnpage/${encodeURIComponent(tGn)}/${encodeURIComponent(tCc)}/${slug}`);
+          }}
+          populationData={populationData}
+          gnEconomyData={gnEconomyData}
+          housingOwnershipData={housingOwnershipData}
+          housingWallData={housingWallData}
+          housingUnitData={housingUnitData}
+          toiletFacilityData={toiletFacilityData}
+          drinkingWaterData={drinkingWaterData}
+          solidWasteData={solidWasteData}
+          roomsData={roomsData}
+          roofData={roofData}
+          religionData={religionData}
+          householdHeadData={householdHeadData}
+          contributeSlot={
+            <ContributeBanner
+              compact
+              ccode={displayCCODE || activeGn?.CCODE}
+              villageName={displayGN || activeGn?.nameEn || ''}
+              isAuthenticated={isAuthenticated}
+              isDarkMode={isDarkMode}
+              onContribute={startContributing}
+              onJoin={joinToContribute}
+            />
+          }
+        />
+      ) : (
+      <>
       {/* ── MAIN DASHBOARD VIEW ────────────────────────────────────────── */}
       <Box
         sx={{
@@ -826,111 +906,163 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           overflow: 'hidden',
         }}
       >
-        {/* Background Image with adaptive overlays */}
+        {/* Flat background wash — no stock photography */}
         <Box
           sx={{
             position: 'absolute',
             top: 0,
             left: 0,
             right: 0,
-            bottom: 0,
-            backgroundImage: isDarkMode 
-              ? 'linear-gradient(rgba(15,23,42,0.8), rgba(15,23,42,0.9)), url(/hero-background-new.jpeg)' 
-              : 'linear-gradient(rgba(255,255,255,0.75), rgba(255,255,255,0.9)), url(/hero-background-new.jpeg)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundAttachment: 'fixed',
+            height: 420,
+            background: isDarkMode
+              ? 'radial-gradient(90% 60% at 50% -10%, rgba(37,99,235,0.16) 0%, rgba(15,23,42,0) 65%)'
+              : 'radial-gradient(90% 60% at 50% -10%, rgba(37,99,235,0.08) 0%, rgba(255,255,255,0) 65%)',
             zIndex: 0,
+            pointerEvents: 'none',
           }}
         />
 
-        {/* ── FULL WIDTH TOP NAVBAR ── */}
-        <Box sx={{
-          position: 'absolute',
-          top: 0, left: 0, right: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          bgcolor: '#111827', // Dark navy/gray as in image
-          px: { xs: 2, sm: 4 }, py: 1.2,
-          zIndex: 10,
-        }}>
-          {/* Theme & Search */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1 }}>
-            <IconButton onClick={() => setIsDarkMode(!isDarkMode)} size="small" sx={{ color: '#d1d5db' }}>
-              {isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
-            </IconButton>
-            <IconButton onClick={() => { window.location.href = '/gnpage'; }} size="small" sx={{ color: '#d1d5db' }}>
-              <SearchIcon fontSize="small" />
-            </IconButton>
+        {/* ── STICKY TOP NAVBAR (flat, no dark bar / no stock imagery) ── */}
+        <Box
+          component="header"
+          sx={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 20,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 2,
+            bgcolor: isDarkMode ? 'rgba(15,23,42,0.85)' : 'rgba(255,255,255,0.85)',
+            backdropFilter: 'blur(14px)',
+            borderBottom: isDarkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(15,23,42,0.07)',
+            px: { md: 4, lg: 6, xl: 8 },
+            py: 1.3,
+            animation: 'fadeInDown 0.4s ease both',
+          }}
+        >
+          {/* Wordmark */}
+          <Box
+            onClick={() => navigate(gnName && ccode ? `/gnpage/${gnName}/${ccode}` : '/gnpage')}
+            sx={{ display: 'flex', alignItems: 'center', gap: 1.1, cursor: 'pointer', flexShrink: 0 }}
+          >
+            <Box component="img" src="/logo.png" alt="Ceylonica" sx={{ height: 30, width: 30, objectFit: 'contain' }} />
+            <Typography sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 800, fontSize: '1.15rem', color: isDarkMode ? '#f8fafc' : '#0f172a', letterSpacing: '-0.01em' }}>
+              Ceylonica
+            </Typography>
           </Box>
 
-          {/* Center Button */}
-          <Box sx={{ display: 'flex', justifyContent: 'center', flex: 1 }}>
+          {/* Center nav links — flat text buttons, no dividers */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            {[
+              { label: 'Home', onClick: () => navigate(gnName && ccode ? `/gnpage/${gnName}/${ccode}` : '/gnpage') },
+            ].map((item) => (
+              <Button
+                key={item.label}
+                onClick={item.onClick}
+                disableRipple
+                sx={{
+                  textTransform: 'none', fontWeight: 600, fontSize: '0.88rem', borderRadius: '10px',
+                  color: isDarkMode ? '#cbd5e1' : '#334155', px: 1.5, boxShadow: 'none',
+                  '&:hover': { bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)', boxShadow: 'none', transform: 'none' },
+                }}
+              >
+                {item.label}
+              </Button>
+            ))}
             <Button
-              variant="contained"
-              size="small"
-              onClick={() => { register(window.location.href); }}
+              onClick={(e) => setCatMenuAnchor(e.currentTarget as HTMLElement)}
+              disableRipple
+              endIcon={<KeyboardArrowDownIcon sx={{ fontSize: '1.1rem !important' }} />}
               sx={{
-                bgcolor: '#3b82f6',
-                color: '#fff',
-                textTransform: 'none',
-                fontWeight: 600,
-                px: 3,
-                borderRadius: '20px',
-                '&:hover': { bgcolor: '#2563eb' }
+                textTransform: 'none', fontWeight: 600, fontSize: '0.88rem', borderRadius: '10px',
+                color: isDarkMode ? '#cbd5e1' : '#334155', px: 1.5, boxShadow: 'none',
+                '&:hover': { bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)', boxShadow: 'none', transform: 'none' },
               }}
             >
-              Join with us
+              Categories
+            </Button>
+            <Menu anchorEl={catMenuAnchor} open={Boolean(catMenuAnchor)} onClose={() => setCatMenuAnchor(null)}
+              PaperProps={{ sx: { bgcolor: isDarkMode ? '#111827' : '#ffffff', border: isDarkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e5e9f0', borderRadius: '14px', minWidth: 220, boxShadow: '0 16px 36px rgba(15,23,42,0.14)', mt: 1 } }}>
+              {CATEGORIES.map((cat) => (
+                <MenuItem key={cat.slug} onClick={() => { setCatMenuAnchor(null); const tGn = (displayGN || activeGn?.nameEn || gnName || 'Pahalagama').replace(/ /g, '-'); const tCc = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'RATPA'; navigate(`/gnpage/${encodeURIComponent(tGn)}/${encodeURIComponent(tCc)}/${cat.slug}`); }} sx={{ fontWeight: 500, fontSize: '0.88rem', color: isDarkMode ? '#e2e8f0' : '#1e293b', py: 0.9, px: 2 }}>{cat.name}</MenuItem>
+              ))}
+            </Menu>
+            <Button
+              onClick={() => navigate(gnName && ccode ? `/industry-survey/${gnName}/${ccode}` : '/industry-survey')}
+              disableRipple
+              sx={{
+                textTransform: 'none', fontWeight: 600, fontSize: '0.88rem', borderRadius: '10px',
+                color: isDarkMode ? '#cbd5e1' : '#334155', px: 1.5, boxShadow: 'none',
+                '&:hover': { bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)', boxShadow: 'none', transform: 'none' },
+              }}
+            >
+              Industry Survey
             </Button>
           </Box>
 
-          {/* Desktop Links */}
-          <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', justifyContent: 'flex-end', gap: 2, fontWeight: 500, fontSize: '0.9rem', flex: 1 }}>
-            <Typography onClick={() => navigate(gnName && ccode ? `/gnpage/${gnName}/${ccode}` : '/gnpage')} sx={{ cursor: 'pointer', color: '#d1d5db', '&:hover': { color: '#fff' } }}>Home</Typography>
-            <Typography sx={{ opacity: 0.3, color: '#9ca3af' }}>|</Typography>
-            <Typography onClick={(e) => setCatMenuAnchor(e.currentTarget as HTMLElement)} sx={{ cursor: 'pointer', color: '#d1d5db', '&:hover': { color: '#fff' } }}>Categories ▾</Typography>
-            <Menu anchorEl={catMenuAnchor} open={Boolean(catMenuAnchor)} onClose={() => setCatMenuAnchor(null)}
-              PaperProps={{ sx: { bgcolor: isDarkMode ? 'rgba(15,23,42,0.97)' : 'rgba(255,255,255,0.97)', backdropFilter: 'blur(16px)', borderRadius: '16px', minWidth: 230, boxShadow: '0 16px 36px rgba(0,0,0,0.2)', mt: 1 } }}>
-              {CATEGORIES.map((cat) => (
-                <MenuItem key={cat.slug} onClick={() => { setCatMenuAnchor(null); const tGn = (displayGN || activeGn?.nameEn || gnName || 'Pahalagama').replace(/ /g, '-'); const tCc = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'RATPA'; navigate(`/gnpage/${encodeURIComponent(tGn)}/${encodeURIComponent(tCc)}/${cat.slug}`); }} sx={{ fontWeight: 500, color: isDarkMode ? '#e2e8f0' : '#1e293b', py: 0.8, px: 2 }}>{cat.name}</MenuItem>
-              ))}
-            </Menu>
-            <Typography sx={{ opacity: 0.3, color: '#9ca3af' }}>|</Typography>
+          {/* Right actions */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, flexShrink: 0 }}>
+            <Box
+              onClick={cycleLanguage}
+              role="button"
+              aria-label="Change language"
+              sx={{
+                display: 'flex', alignItems: 'center', gap: 0.4, cursor: 'pointer',
+                px: 1.1, height: 34, borderRadius: '9px',
+                bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)',
+                color: isDarkMode ? '#e2e8f0' : '#334155', fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase',
+              }}
+            >
+              {language}
+            </Box>
+            <IconButton onClick={() => setIsDarkMode(!isDarkMode)} size="small" sx={{ width: 34, height: 34, color: isDarkMode ? '#e2e8f0' : '#334155' }}>
+              {isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
+            </IconButton>
+            <Box sx={{ width: '1px', height: 20, bgcolor: isDarkMode ? 'rgba(255,255,255,0.12)' : 'rgba(15,23,42,0.1)', mx: 0.3 }} />
             {isAuthenticated ? (
               <>
-                <Typography onClick={() => { if (userInfo?.realm_roles?.includes('super_admin')) navigate('/admins'); else navigate('/user'); }} sx={{ cursor: 'pointer', color: '#d1d5db', '&:hover': { color: '#fff' } }}>Dashboard</Typography>
-                <Typography sx={{ opacity: 0.3, color: '#9ca3af' }}>|</Typography>
-                <Typography onClick={() => logout()} sx={{ cursor: 'pointer', color: '#f87171', '&:hover': { opacity: 0.8 } }}>Logout</Typography>
+                <Button
+                  onClick={() => { if (userInfo?.realm_roles?.includes('super_admin')) navigate('/admins'); else navigate('/user'); }}
+                  disableRipple
+                  sx={{ textTransform: 'none', fontWeight: 600, fontSize: '0.85rem', color: isDarkMode ? '#cbd5e1' : '#334155', boxShadow: 'none', '&:hover': { bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)', boxShadow: 'none', transform: 'none' } }}
+                >
+                  {userInfo?.realm_roles?.includes('super_admin') ? 'Dashboard' : contributeCopy.navContribute}
+                </Button>
+                <Button
+                  onClick={() => logout()}
+                  disableRipple
+                  sx={{ textTransform: 'none', fontWeight: 600, fontSize: '0.85rem', color: '#dc2626', boxShadow: 'none', '&:hover': { bgcolor: 'rgba(220,38,38,0.08)', boxShadow: 'none', transform: 'none' } }}
+                >
+                  Logout
+                </Button>
               </>
             ) : !isLoading ? (
               <>
-                <Typography onClick={() => login(window.location.href)} sx={{ cursor: 'pointer', color: '#d1d5db', '&:hover': { color: '#fff' } }}>Login</Typography>
-                <Typography sx={{ opacity: 0.3, color: '#9ca3af' }}>|</Typography>
-                <Typography onClick={() => register(window.location.href)} sx={{ cursor: 'pointer', color: '#d1d5db', '&:hover': { color: '#fff' } }}>Signup</Typography>
+                <Button
+                  onClick={() => login(window.location.href)}
+                  disableRipple
+                  sx={{ textTransform: 'none', fontWeight: 600, fontSize: '0.85rem', color: isDarkMode ? '#cbd5e1' : '#334155', boxShadow: 'none', '&:hover': { bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)', boxShadow: 'none', transform: 'none' } }}
+                >
+                  Login
+                </Button>
+                <Button
+                  variant="contained"
+                  disableElevation
+                  onClick={joinToContribute}
+                  sx={{
+                    textTransform: 'none', fontWeight: 700, fontSize: '0.85rem', borderRadius: '9px',
+                    bgcolor: '#2563eb', color: '#fff', px: 2, boxShadow: 'none',
+                    '&:hover': { bgcolor: '#1d4ed8', boxShadow: 'none', transform: 'none' },
+                  }}
+                >
+                  {contributeCopy.bannerCtaGuest}
+                </Button>
               </>
             ) : null}
-            <Typography sx={{ opacity: 0.3, color: '#9ca3af' }}>|</Typography>
-            <Typography onClick={cycleLanguage} sx={{ cursor: 'pointer', textTransform: 'uppercase', fontWeight: 700, color: '#60a5fa', '&:hover': { opacity: 0.8 } }}>{language}</Typography>
-          </Box>
-
-          {/* Mobile Hamburger */}
-          <Box sx={{ display: { xs: 'flex', sm: 'none' }, alignItems: 'center' }}>
-            <IconButton onClick={handleMobileMenuClick} size="small" sx={{ color: '#fff', p: 0.5 }}><MenuIcon /></IconButton>
-            <Menu anchorEl={mobileMenuAnchor} open={isMobileMenuOpen} onClose={handleMobileMenuClose}
-              PaperProps={{ sx: { bgcolor: isDarkMode ? 'rgba(30,30,30,0.95)' : 'rgba(255,255,255,0.95)', backdropFilter: 'blur(16px)', borderRadius: '16px', minWidth: 180 } }}>
-              <MenuItem onClick={() => { handleMobileMenuClose(); navigate(gnName && ccode ? `/gnpage/${gnName}/${ccode}` : '/gnpage'); }}>Home</MenuItem>
-              {isAuthenticated ? [
-                <MenuItem key="dash" onClick={() => { handleMobileMenuClose(); navigate('/user'); }}>Dashboard</MenuItem>,
-                <MenuItem key="logout" onClick={() => { handleMobileMenuClose(); logout(); }} sx={{ color: '#ef4444' }}>Logout</MenuItem>,
-              ] : [
-                <MenuItem key="login" onClick={() => { handleMobileMenuClose(); login(window.location.href); }}>Login</MenuItem>,
-                <MenuItem key="signup" onClick={() => { handleMobileMenuClose(); register(window.location.href); }}>Signup</MenuItem>,
-              ]}
-              <Divider />
-              <MenuItem onClick={() => { handleMobileMenuClose(); cycleLanguage(); }} sx={{ fontWeight: 'bold', color: '#3b82f6' }}>Language: {language.toUpperCase()}</MenuItem>
-            </Menu>
           </Box>
         </Box>
-        <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1, pt: { xs: 7, md: 7 }, pb: 4, px: { xs: 2, md: 4, lg: 6, xl: 8 } }}>
+        <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1, pt: { md: 4 }, pb: 4, px: { xs: 2, md: 4, lg: 6, xl: 8 } }}>
 
           {/* ── TOP HEADER GLASS BAR (Location Selectors & Categories Ribbon) ── */}
           <GnTopHeaderBar
@@ -947,7 +1079,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
               const chosen = gnData?.pDistrict?.gramaNiladharis?.find((x: any) => x.id === g || x.CCODE === g);
               if (chosen && chosen.CCODE && chosen.nameEn) navigate(`/gnpage/${encodeURIComponent(chosen.nameEn.replace(/ /g, '-'))}/${encodeURIComponent(chosen.CCODE)}`);
             }}
-            language={language}
+
             onCycleLanguage={cycleLanguage}
             isDarkMode={isDarkMode}
             onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
@@ -960,70 +1092,254 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             }}
           />
 
-          {/* ── LARGE GN NAME DISPLAY ── */}
-          <Box sx={{ mt: 0, mb: { xs: 1, md: 2 }, px: 2, display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr auto 1fr' }, alignItems: 'center', gap: { xs: 1, md: 2 }, width: '100%' }}>
-            {/* Spacer for perfect center alignment */}
-            <Box sx={{ display: { xs: 'none', md: 'block' } }} />
-
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: { xs: 1, sm: 1.5, md: 2 } }}>
-              <Box 
-                component="img" 
-                src="/logo.png" 
-                alt="CDIC Logo" 
-                sx={{ 
-                  height: { xs: '2.2rem', sm: '3rem', md: '3.8rem', lg: '4.5rem' }, 
-                  width: 'auto',
-                  objectFit: 'contain' 
-                }} 
-              />
-              <Typography
-                variant="h1"
-                sx={{
-                  fontFamily: '"Playfair Display", "Merriweather", "Georgia", serif',
-                  fontWeight: 900,
-                  fontSize: { xs: '2rem', sm: '2.8rem', md: '3.5rem', lg: '4.2rem' },
-                  color: isDarkMode ? '#f8fafc' : '#0f172a',
-                  lineHeight: 1,
-                  letterSpacing: '-0.02em',
-                  wordBreak: 'break-word',
-                  textAlign: 'center',
-                  textShadow: isDarkMode ? '0 10px 30px rgba(0,0,0,0.8)' : '0 10px 30px rgba(255,255,255,0.8)',
-                  mb: 0,
+          {/* ── SINGLE INLINE ROW: CHARTS · VILLAGE IDENTITY + KPIs · MAP ──
+              All three panels share one viewport row so nothing needs scrolling. */}
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', md: '1fr 0.85fr 1fr', lg: '1.05fr 0.92fr 1.05fr' },
+              gap: { xs: 2.5, lg: 3 },
+              alignItems: 'stretch',
+              mt: 0.5,
+              mb: 6,
+              minHeight: { md: 420, lg: 440 },
+            }}
+          >
+            {/* ── 1 · SURVEY & CENSUS CHARTS ── */}
+            <Box sx={{ display: 'flex', minWidth: 0, animation: 'fadeInUp 0.5s ease 160ms both' }}>
+              <DemographicCards
+                populationData={populationData}
+                gnEconomyData={gnEconomyData}
+                housingOwnershipData={housingOwnershipData}
+                housingWallData={housingWallData}
+                housingUnitData={housingUnitData}
+                toiletFacilityData={toiletFacilityData}
+                drinkingWaterData={drinkingWaterData}
+                solidWasteData={solidWasteData}
+                roomsData={roomsData}
+                roofData={roofData}
+                religionData={religionData}
+                householdHeadData={householdHeadData}
+                isDarkMode={isDarkMode}
+                layout="narrow"
+                showQuickStats={false}
+                onOpenCategory={(slug) => {
+                  const targetGn = (displayGN || activeGn?.nameEn || gnName || 'Pahalagama').replace(/ /g, '-');
+                  const targetCcode = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'RATPA';
+                  navigate(`/gnpage/${encodeURIComponent(targetGn)}/${encodeURIComponent(targetCcode)}/${slug}`);
                 }}
-              >
-                {displayGN || 'Sammanthranapura'}
-              </Typography>
+              />
             </Box>
 
-            <Box sx={{ display: 'flex', justifyContent: { xs: 'center', md: 'flex-start' } }}>
+            {/* ── 2 · VILLAGE IDENTITY + KPIs ── */}
+          <Box
+            key={displayGN || 'default'}
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              minWidth: 0,
+              width: '100%',
+              textAlign: 'center',
+            }}
+          >
+            {/* Plain Transparent Branding PNGs (No box, No borders) */}
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: { xs: 2.5, md: 3 }, mb: 1.6, animation: 'fadeInUp 0.35s ease both' }}>
+              <Box
+                component="img"
+                src="/logo.png"
+                alt="Ceylonica Logo"
+                sx={{
+                  height: { xs: 36, md: 40, lg: 44 },
+                  width: 'auto',
+                  objectFit: 'contain',
+                  filter: 'drop-shadow(0 3px 10px rgba(0,0,0,0.1))',
+                  transition: 'transform 0.25s ease',
+                  '&:hover': { transform: 'scale(1.05)' },
+                }}
+              />
+            </Box>
+
+            {(displayDistrict || displayCity) && (
+              <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: isDarkMode ? '#94a3b8' : '#64748b', textTransform: 'uppercase', letterSpacing: '0.8px', mb: 1, animation: 'fadeInUp 0.4s ease 40ms both' }}>
+                {[displayDistrict, displayCity].filter(Boolean).join('  ›  ')}
+              </Typography>
+            )}
+
+            <Typography
+              variant="h1"
+              sx={{
+                fontFamily: '"Playfair Display", "Merriweather", "Georgia", serif',
+                fontWeight: 800,
+                fontSize: { xs: '2rem', sm: '2.2rem', md: '2rem', lg: '2.4rem' },
+                color: isDarkMode ? '#f8fafc' : '#0f172a',
+                lineHeight: 1.05,
+                letterSpacing: '-0.02em',
+                wordBreak: 'break-word',
+                textAlign: 'inherit',
+                mb: 0,
+                animation: 'fadeInUp 0.45s ease 80ms both',
+              }}
+            >
+              {displayGN || 'Sammanthranapura'}
+            </Typography>
+
+            {/* ── PROMINENT MODERN AREA CODE SHOWCASE ── */}
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                gap: 1,
+                justifyContent: 'center',
+                mt: 1.2,
+                animation: 'fadeInUp 0.45s ease 90ms both',
+              }}
+            >
+              {displayCCODE && (
+                <Box
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 1.1,
+                    px: { xs: 1.5, md: 1.8 },
+                    py: { xs: 0.65, md: 0.7 },
+                    borderRadius: '14px',
+                    background: isDarkMode
+                      ? 'linear-gradient(135deg, rgba(37,99,235,0.22) 0%, rgba(30,58,138,0.35) 100%)'
+                      : 'linear-gradient(135deg, rgba(239,246,255,0.95) 0%, rgba(219,234,254,0.8) 100%)',
+                    border: isDarkMode
+                      ? '1.5px solid rgba(96,165,250,0.5)'
+                      : '1.5px solid rgba(37,99,235,0.35)',
+                    boxShadow: isDarkMode
+                      ? '0 6px 24px rgba(37,99,235,0.28), inset 0 1px 1px rgba(255,255,255,0.15)'
+                      : '0 6px 20px rgba(37,99,235,0.12), inset 0 1px 1px rgba(255,255,255,0.9)',
+                    backdropFilter: 'blur(12px)',
+                    transition: 'all 0.25s ease',
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      boxShadow: isDarkMode
+                        ? '0 8px 30px rgba(37,99,235,0.45)'
+                        : '0 8px 24px rgba(37,99,235,0.2)',
+                    }
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: 30,
+                      height: 30,
+                      borderRadius: '9px',
+                      bgcolor: isDarkMode ? 'rgba(59,130,246,0.35)' : '#2563eb',
+                      color: '#ffffff',
+                      boxShadow: '0 2px 8px rgba(37,99,235,0.3)',
+                    }}
+                  >
+                    <PinDropRoundedIcon sx={{ fontSize: '1.15rem' }} />
+                  </Box>
+
+                  <Box sx={{ textAlign: 'left' }}>
+                    <Typography
+                      sx={{
+                        fontSize: '0.68rem',
+                        fontWeight: 800,
+                        textTransform: 'uppercase',
+                        letterSpacing: '1.2px',
+                        color: isDarkMode ? '#93c5fd' : '#1d4ed8',
+                        lineHeight: 1.1,
+                      }}
+                    >
+                      {language === 'si' ? 'ග්‍රාම නිලධාරී වසම් කේතය (AREA CODE)' : language === 'ta' ? 'கிராம அலுவலர் பிரிவு குறியீடு (AREA CODE)' : 'GN DIVISION AREA CODE'}
+                    </Typography>
+                    <Typography
+                      component="div"
+                      sx={{
+                        fontFamily: "'JetBrains Mono', 'Roboto Mono', 'Plus Jakarta Sans', monospace",
+                        fontWeight: 900,
+                        fontSize: { xs: '1.1rem', md: '1.3rem' },
+                        color: isDarkMode ? '#ffffff' : '#0f172a',
+                        letterSpacing: '2px',
+                        lineHeight: 1.2,
+                        mt: 0.1,
+                      }}
+                    >
+                      {displayCCODE}
+                    </Typography>
+                  </Box>
+
+                  {/* Quick Copy Button */}
+                  <Tooltip title={copiedCode ? (language === 'si' ? 'පිටපත් විය!' : language === 'ta' ? 'நகலெடுக்கப்பட்டது!' : 'Copied to Clipboard!') : (language === 'si' ? 'කේතය පිටපත් කරන්න' : language === 'ta' ? 'குறியீட்டை நகலெடு' : 'Copy Area Code')}>
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        navigator.clipboard.writeText(displayCCODE);
+                        setCopiedCode(true);
+                        setTimeout(() => setCopiedCode(false), 2200);
+                      }}
+                      sx={{
+                        ml: 0.5,
+                        p: 0.75,
+                        color: copiedCode ? '#10b981' : (isDarkMode ? '#93c5fd' : '#2563eb'),
+                        bgcolor: copiedCode
+                          ? (isDarkMode ? 'rgba(16,185,129,0.2)' : 'rgba(16,185,129,0.12)')
+                          : (isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(37,99,235,0.08)'),
+                        borderRadius: '9px',
+                        transition: 'all 0.2s ease',
+                        '&:hover': {
+                          bgcolor: isDarkMode ? 'rgba(255,255,255,0.16)' : 'rgba(37,99,235,0.18)',
+                          transform: 'scale(1.08)',
+                        }
+                      }}
+                    >
+                      {copiedCode ? <CheckRoundedIcon sx={{ fontSize: '1.2rem', color: '#10b981' }} /> : <ContentCopyRoundedIcon sx={{ fontSize: '1.2rem' }} />}
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              )}
+
               <Button
-                variant="outlined"
                 size="small"
                 onClick={() => setIsAboutModalOpen(true)}
+                startIcon={<InfoOutlinedIcon sx={{ fontSize: '1rem !important' }} />}
+                disableRipple
                 sx={{
-                  mt: { xs: 1, md: 1.5 },
-                  px: 1.5,
-                  py: 0.25,
-                  fontSize: '0.75rem',
-                  borderRadius: '20px',
+                  px: 1.6,
+                  py: 0.4,
+                  fontSize: '0.78rem',
+                  borderRadius: '9px',
                   textTransform: 'none',
-                  fontWeight: 700,
-                  color: isDarkMode ? '#ffffff' : '#0f172a',
-                  backgroundColor: isDarkMode ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.8)',
-                  backdropFilter: 'blur(4px)',
-                  borderColor: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.3)',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  fontWeight: 600,
+                  color: isDarkMode ? '#cbd5e1' : '#475569',
+                  bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)',
+                  boxShadow: 'none',
+                  transition: 'background-color 0.2s ease',
                   '&:hover': {
-                    backgroundColor: isDarkMode ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,1)',
-                    borderColor: isDarkMode ? '#ffffff' : '#000000',
+                    bgcolor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(15,23,42,0.08)',
+                    boxShadow: 'none',
+                    transform: 'none',
                   }
                 }}
               >
-                {language === 'si' ? 'ගම පිළිබඳව' : language === 'ta' ? 'கிராமத்தைப் பற்றி' : 'About Village'}
+                {language === 'si' ? 'ගම පිළිබඳව' : language === 'ta' ? 'கிராමத்தைப் பற்றி' : 'About Village'}
               </Button>
             </Box>
-            
-            <Dialog 
+
+            {/* ── AT-A-GLANCE KPIs (lifted into the hero so they sit above the fold) ── */}
+            <Box sx={{ mt: { xs: 1.8, md: 2 }, animation: 'fadeInUp 0.5s ease 140ms both' }}>
+              <VillageQuickStats
+                populationData={populationData}
+                gnEconomyData={gnEconomyData}
+                housingOwnershipData={housingOwnershipData}
+                roomsData={roomsData}
+                isDarkMode={isDarkMode}
+                variant="compact"
+                orientation="column"
+              />
+            </Box>
+
+            <Dialog
               open={isAboutModalOpen} 
               onClose={() => setIsAboutModalOpen(false)}
               maxWidth="sm"
@@ -1071,49 +1387,31 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             </Dialog>
           </Box>
 
-          {/* ── 2-COLUMN RESPONSIVE DASHBOARD LAYOUT ── */}
-          <Grid container spacing={4} alignItems="stretch" sx={{ mb: 6 }}>
-            {/* Left Column (Now Demographics): Demographic Cards (Village Population & Survey Census Categories) */}
-            <Grid item xs={12} md={6} lg={6} sx={{ display: 'flex', flexDirection: 'column' }}>
-              <DemographicCards
-                populationData={populationData}
-                gnEconomyData={gnEconomyData}
-                housingOwnershipData={housingOwnershipData}
-                housingWallData={housingWallData}
-                housingUnitData={housingUnitData}
-                toiletFacilityData={toiletFacilityData}
-                drinkingWaterData={drinkingWaterData}
-                solidWasteData={solidWasteData}
-                roomsData={roomsData}
-                roofData={roofData}
-                religionData={religionData}
-                householdHeadData={householdHeadData}
-                language={language}
-                isDarkMode={isDarkMode}
-                onOpenCategory={(slug) => {
-                  const targetGn = (displayGN || activeGn?.nameEn || gnName || 'Pahalagama').replace(/ /g, '-');
-                  const targetCcode = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'RATPA';
-                  navigate(`/gnpage/${encodeURIComponent(targetGn)}/${encodeURIComponent(targetCcode)}/${slug}`);
-                }}
-              />
-            </Grid>
-
-            {/* Right Column (Now Map): Village Map Card */}
-            <Grid item xs={12} md={6} lg={6} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-              {/* Village Map Card */}
-              <Box sx={{ width: '100%', maxWidth: '95%', mx: 'auto' }}>
+            {/* ── 3 · VILLAGE MAP ── */}
+            <Box sx={{ display: 'flex', minWidth: 0, animation: 'fadeInUp 0.5s ease 240ms both' }}>
+              <Box sx={{ width: '100%', height: { xs: 300, sm: 360, md: '100%' }, minHeight: { md: 420, lg: 440 } }}>
                 <VillageMap
                   gnName={displayGN}
                   district={displayDistrict}
                   dsDivision={displayCity}
                   ccode={displayCCODE}
                   boundary={activeGn?.boundary}
-                  height={400}
-                  language={language}
+                  height="100%"
                 />
               </Box>
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
+
+          <Box sx={{ mt: -2, mb: 2, animation: 'fadeInUp 0.5s ease 320ms both' }}>
+            <ContributeBanner
+              ccode={displayCCODE || activeGn?.CCODE}
+              villageName={displayGN || activeGn?.nameEn || ''}
+              isAuthenticated={isAuthenticated}
+              isDarkMode={isDarkMode}
+              onContribute={startContributing}
+              onJoin={joinToContribute}
+            />
+          </Box>
         </Container>
       </Box>
 
@@ -1130,6 +1428,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           </Fab>
         </Box>
       </Fade>
+      </>
+      )}
     </Box>
   );
 };

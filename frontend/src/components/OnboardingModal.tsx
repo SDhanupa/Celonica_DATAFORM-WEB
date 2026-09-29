@@ -82,7 +82,7 @@ export default function OnboardingModal({ open, onComplete }: OnboardingModalPro
         color: 'white'
       }
     }}>
-      <DialogTitle>
+      <DialogTitle component="div">
         <Typography variant="h5" sx={{ fontWeight: 600, color: '#4F46E5', mb: 1 }}>
           Welcome to Ceylonica!
         </Typography>

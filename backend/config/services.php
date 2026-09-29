@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'textware' => [
+        'api_url' => env('TEXTWARE_API_URL'),
+        'username' => env('TEXTWARE_USERNAME'),
+        'password' => env('TEXTWARE_PASSWORD'),
+        'sender_id' => env('TEXTWARE_SENDER_ID'),
+    ],
+
 ];

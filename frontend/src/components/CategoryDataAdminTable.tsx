@@ -45,6 +45,12 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
   const [bulkDeleteModalOpen, setBulkDeleteModalOpen] = useState(false);
   const [clearAllModalOpen, setClearAllModalOpen] = useState(false);
   
+  // Bulk Generate state
+  const [bulkGenerateSkippedModalOpen, setBulkGenerateSkippedModalOpen] = useState(false);
+  const [bulkGenerateSkippedNames, setBulkGenerateSkippedNames] = useState<string[]>([]);
+  const [bulkGenerateStats, setBulkGenerateStats] = useState<{ total: number; generated: number }>({ total: 0, generated: 0 });
+  const [bulkGenerateExcludeIds, setBulkGenerateExcludeIds] = useState<number[]>([]);
+  
   // Fetch data function extracted so it can be re-used after edit/delete
   const fetchData = async () => {
     try {
@@ -59,6 +65,7 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
       if (searchQuery) params.append('search', searchQuery);
       params.append('limit', paginationModel.pageSize.toString());
       params.append('offset', (paginationModel.page * paginationModel.pageSize).toString());
+      params.append('is_admin', 'true');
       
       const queryString = params.toString() ? '?' + params.toString() : '';
 
@@ -222,6 +229,110 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
       }
     } catch (err: any) {
       alert('Error deleting: ' + err.message);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleBulkGenerateSubmit = async () => {
+    if (rowSelectionModel.length === 0) return;
+    
+    const rowsToProcess = rowSelectionModel.map(id => data.find(r => r.id === id)).filter(Boolean);
+    const skippedNames: string[] = [];
+    let generatedCount = 0;
+    
+    setActionLoading(true);
+    
+    for (const row of rowsToProcess) {
+        const rowName = row.name_en || row.name_si || row.name_ta || `ID: ${row.id}`;
+        if (row.reg_number) {
+           skippedNames.push(`${rowName} (Already has a Reg Number)`);
+           continue;
+        }
+        if (!canGenerateRegNumber(row)) {
+           skippedNames.push(`${rowName} (Missing required data: name, province, district, DS, or GN)`);
+           continue;
+        }
+        
+        try {
+           const response = await fetch(`/api/category-data/${slug}/${row.id}/generate-reg-number`, {
+             method: 'POST',
+             headers: {
+               'Authorization': `Bearer ${token}`,
+               'Accept': 'application/json'
+             }
+           });
+           const res = await response.json();
+           if (res.success) {
+               generatedCount++;
+           } else {
+               skippedNames.push(`${rowName} (Error: ${res.message})`);
+           }
+        } catch (err: any) {
+           skippedNames.push(`${rowName} (Error: ${err.message})`);
+        }
+    }
+    
+    setActionLoading(false);
+    fetchData(); // Refresh data to show new reg numbers
+    setRowSelectionModel([]); // clear selection
+    
+    // Always show summary if we skipped something, else just an alert/snackbar
+    if (skippedNames.length > 0) {
+        setBulkGenerateStats({ total: rowsToProcess.length, generated: generatedCount });
+        setBulkGenerateSkippedNames(skippedNames);
+        setBulkGenerateSkippedModalOpen(true);
+    } else {
+        setSnackbar({ open: true, message: `✅ Successfully generated Reg Numbers for ${generatedCount} records.`, severity: 'success' });
+    }
+  };
+
+  const handleGenerateAllSubmit = async (isContinue: boolean = false) => {
+    try {
+      setActionLoading(true);
+      
+      const currentExcludeIds = isContinue ? bulkGenerateExcludeIds : [];
+      if (!isContinue) {
+          setBulkGenerateExcludeIds([]); // reset if starting fresh
+          setBulkGenerateStats({ total: 0, generated: 0 });
+          setBulkGenerateSkippedNames([]);
+      }
+
+      const response = await fetch(`/api/category-data/${slug}/generate-all-reg-numbers`, {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ exclude_ids: currentExcludeIds })
+      });
+      const result = await response.json();
+      if (result.success) {
+        setRowSelectionModel([]);
+        fetchData();
+        
+        const newTotal = (isContinue ? bulkGenerateStats.total : 0) + result.total;
+        const newGenerated = (isContinue ? bulkGenerateStats.generated : 0) + result.generated;
+        const newSkippedNames = isContinue ? [...bulkGenerateSkippedNames, ...(result.skipped || [])] : (result.skipped || []);
+        const newExcludeIds = isContinue ? [...bulkGenerateExcludeIds, ...(result.skipped_ids || [])] : (result.skipped_ids || []);
+
+        setBulkGenerateStats({ total: newTotal, generated: newGenerated });
+        setBulkGenerateSkippedNames(newSkippedNames);
+        setBulkGenerateExcludeIds(newExcludeIds);
+
+        // Even if we generated 1000, we show the summary modal so they can click "Next 1000"
+        // if result.total === 1000, it means there are probably more left.
+        if (result.total > 0 || newSkippedNames.length > 0) {
+            setBulkGenerateSkippedModalOpen(true);
+        } else {
+            setSnackbar({ open: true, message: `✅ Successfully generated Reg Numbers for all eligible records.`, severity: 'success' });
+        }
+      } else {
+        alert('Failed to generate all: ' + (result.message || 'Unknown error'));
+      }
+    } catch (err: any) {
+      alert('Error generating all: ' + err.message);
     } finally {
       setActionLoading(false);
     }
@@ -444,16 +555,36 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
         
         <Box sx={{ display: 'flex', gap: 2 }}>
           {rowSelectionModel.length > 0 && (
-            <Button 
-              variant="contained" 
-              color="error" 
-              startIcon={<DeleteIcon />}
-              onClick={() => setBulkDeleteModalOpen(true)}
-              disabled={actionLoading}
-            >
-              Delete Selected ({rowSelectionModel.length})
-            </Button>
+            <>
+              <Button 
+                variant="contained" 
+                color="secondary" 
+                startIcon={<TagIcon />}
+                onClick={handleBulkGenerateSubmit}
+                disabled={actionLoading}
+              >
+                Gen Reg # ({rowSelectionModel.length})
+              </Button>
+              <Button 
+                variant="contained" 
+                color="error" 
+                startIcon={<DeleteIcon />}
+                onClick={() => setBulkDeleteModalOpen(true)}
+                disabled={actionLoading}
+              >
+                Delete Selected ({rowSelectionModel.length})
+              </Button>
+            </>
           )}
+          <Button 
+            variant="outlined" 
+            color="secondary" 
+            startIcon={<TagIcon />}
+            onClick={() => handleGenerateAllSubmit(false)}
+            disabled={actionLoading || data.length === 0}
+          >
+            Gen Reg # (All Data)
+          </Button>
           <Button 
             variant="outlined" 
             color="error" 
@@ -580,6 +711,40 @@ const CategoryDataAdminTable: React.FC<CategoryDataAdminTableProps> = ({ slug, d
           <Button onClick={() => setBulkDeleteModalOpen(false)} color="inherit" disabled={actionLoading}>Cancel</Button>
           <Button onClick={handleBulkDeleteSubmit} variant="contained" color="error" disabled={actionLoading}>
             {actionLoading ? 'Deleting...' : 'Delete Selected'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      
+      {/* Bulk Generate Skipped Summary Dialog */}
+      <Dialog open={bulkGenerateSkippedModalOpen} onClose={() => setBulkGenerateSkippedModalOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Bulk Generate Summary</DialogTitle>
+        <DialogContent dividers>
+          <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold' }}>
+            Successfully generated: {bulkGenerateStats.generated} / {bulkGenerateStats.total}
+          </Typography>
+          {bulkGenerateSkippedNames.length > 0 && (
+            <>
+              <Typography color="error" sx={{ mt: 2, mb: 1, fontWeight: 'bold' }}>
+                The following records were skipped:
+              </Typography>
+              <Box sx={{ maxHeight: 200, overflow: 'auto', bgcolor: 'rgba(0,0,0,0.03)', p: 1, borderRadius: 1 }}>
+                <ul style={{ margin: 0, paddingLeft: '20px' }}>
+                  {bulkGenerateSkippedNames.map((name, index) => (
+                    <li key={index}>
+                      <Typography variant="body2">{name}</Typography>
+                    </li>
+                  ))}
+                </ul>
+              </Box>
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setBulkGenerateSkippedModalOpen(false)} color="inherit" disabled={actionLoading}>
+            Close
+          </Button>
+          <Button onClick={() => handleGenerateAllSubmit(true)} variant="contained" color="secondary" disabled={actionLoading}>
+            {actionLoading ? 'Processing...' : 'Process Next 1000'}
           </Button>
         </DialogActions>
       </Dialog>

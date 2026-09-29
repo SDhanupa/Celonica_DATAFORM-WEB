@@ -1,7 +1,9 @@
 import React from 'react';
+import { useLanguage } from '../context/LanguageContext';
 import { Box, Typography, Container, useTheme, useMediaQuery } from '@mui/material';
 
 interface HousingOwnershipChartProps {
+  isDarkMode?: boolean;
   data?: {
     owned_by_member?: number;
     rent_gov?: number;
@@ -11,8 +13,7 @@ interface HousingOwnershipChartProps {
     other?: number;
   };
   location_name?: string;
-  language?: 'en' | 'si' | 'ta';
-}
+  }
 
 // Colors for the 6 categories
 const palette = [
@@ -63,7 +64,8 @@ const categoryKeys = [
   'other',
 ];
 
-export default function HousingOwnershipChart({ isDarkMode = false,  data, location_name, language = 'en' }: HousingOwnershipChartProps) {
+export default function HousingOwnershipChart({ isDarkMode = false,  data, location_name}: HousingOwnershipChartProps) {
+  const { language } = useLanguage();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 

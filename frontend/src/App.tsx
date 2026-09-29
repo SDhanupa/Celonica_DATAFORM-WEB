@@ -5,6 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { ApolloProvider } from '@apollo/client';
 import theme from './theme/theme';
 import { AuthProvider } from './auth/AuthProvider';
+import { LanguageProvider } from './context/LanguageContext';
 import ProtectedRoute from './auth/ProtectedRoute';
 import AdminLayout from './components/AdminLayout';
 import apolloClient from './api/apolloClient';
@@ -14,6 +15,8 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import AdminsPage from './pages/AdminsPage';
 import UserPage from './pages/UserPage';
+import MyContributionsPage from './pages/MyContributionsPage';
+import RapidFirePage from './pages/RapidFirePage';
 
 import { UsersPage, ReportsPage } from './pages/PlaceholderPages';
 import RegistrationPage from './pages/RegistrationPage';
@@ -31,15 +34,20 @@ import TrsConnectionsPage from './pages/TrsConnectionsPage';
 import DistrictProvinceConnectionsPage from './pages/DistrictProvinceConnectionsPage';
 import CategoryDetailPage from './pages/CategoryDetailPage';
 import ApprovalsPage from './pages/ApprovalsPage';
+import IndustrySurveyPage from './pages/IndustrySurveyPage';
+import AdminIndustrySurveys from './pages/AdminIndustrySurveys';
+import AdminIndustrySurveysQuestions from './pages/AdminIndustrySurveysQuestions';
+
 
 const App: React.FC = () => {
   return (
     <ApolloProvider client={apolloClient}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Router>
-          <AuthProvider>
-            <Routes>
+      <LanguageProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Router>
+            <AuthProvider>
+              <Routes>
               {/* Public */}
               <Route path="/login" element={<LoginPage />} />
 
@@ -59,6 +67,14 @@ const App: React.FC = () => {
                 path="/gnpage/:gnName/:ccode"
                 element={<DashboardPage />}
               />
+              <Route
+                path="/industry-survey"
+                element={<IndustrySurveyPage />}
+              />
+              <Route
+                path="/industry-survey/:gnName/:ccode"
+                element={<IndustrySurveyPage />}
+              />
               {/* Category detail pages — accessible by super admin */}
               <Route
                 path="/gnpage/:gnName/:ccode/:categorySlug"
@@ -70,6 +86,22 @@ const App: React.FC = () => {
                 element={
                   <ProtectedRoute>
                     <UserPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/user/rapid-fire"
+                element={
+                  <ProtectedRoute>
+                    <RapidFirePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/user/contributions"
+                element={
+                  <ProtectedRoute>
+                    <MyContributionsPage />
                   </ProtectedRoute>
                 }
               />
@@ -117,6 +149,16 @@ const App: React.FC = () => {
                   <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator']}>
                     <AdminLayout>
                       <QuestionsPage />
+                    </AdminLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/industry-survey-questions"
+                element={
+                  <ProtectedRoute allowedRoles={['super_admin', 'admin']}>
+                    <AdminLayout>
+                      <AdminIndustrySurveysQuestions />
                     </AdminLayout>
                   </ProtectedRoute>
                 }
@@ -255,11 +297,23 @@ const App: React.FC = () => {
 
               {/* Default redirects */}
               <Route path="/dashboard" element={<Navigate to="/gnpage" replace />} />
+              
+              <Route
+                path="/admin/industry-surveys"
+                element={
+                  <ProtectedRoute allowedRoles={['super_admin']}>
+                    <AdminLayout>
+                      <AdminIndustrySurveys />
+                    </AdminLayout>
+                  </ProtectedRoute>
+                }
+              />
               <Route path="*" element={<Navigate to="/gnpage" replace />} />
             </Routes>
           </AuthProvider>
         </Router>
       </ThemeProvider>
+      </LanguageProvider>
     </ApolloProvider>
   );
 };

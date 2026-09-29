@@ -79,6 +79,7 @@ class CategoryDataUploadController extends Controller
                 $table->string('image_path')->nullable();
                 $table->unsignedBigInteger('added_by_user_id')->nullable();
                 $table->boolean('is_approved')->default(true);
+                $table->string('status')->default('pending');
                 $table->boolean('coordinate_mismatch')->default(false);
                 $table->boolean('is_update_proposal')->default(false);
                 $table->timestamps();
@@ -286,8 +287,8 @@ class CategoryDataUploadController extends Controller
         if ($tableExists) {
         $query = DB::table($tableName);
 
-        // Only show approved bulk records on the public GN page
-        if (Schema::hasColumn($tableName, 'is_approved')) {
+        // Only show approved bulk records on the public GN page, admins see everything
+        if (Schema::hasColumn($tableName, 'is_approved') && !$request->has('is_admin')) {
             $query->where($tableName . '.is_approved', true);
         }
 
@@ -314,40 +315,7 @@ class CategoryDataUploadController extends Controller
         }
         if ($request->has('gn_id') && $request->input('gn_id')) {
             $gnCode = strtoupper($request->input('gn_id'));
-            
-            $gnQuery = DB::table('grama_niladharis')->where('CCODE', $gnCode);
-            if (is_numeric($gnCode)) {
-                $gnQuery->orWhere('id', $gnCode);
-            }
-            $gn = $gnQuery->first();
-            
-            $gnNames = [];
-            if ($gn) {
-                if ($gn->name_en) $gnNames[] = $gn->name_en;
-                if ($gn->name_si) $gnNames[] = $gn->name_si;
-                if ($gn->name_ta) $gnNames[] = $gn->name_ta;
-            }
-
-            $query->where(function($q) use ($tableName, $gnCode, $gn, $gnNames) {
-                // 1. Matched perfectly via joined table or explicit gn_id
-                $q->where($tableName . '.gn_id', $gn ? $gn->id : $gnCode)
-                  ->orWhere($tableName . '.gn_id', $gnCode)
-                  // 2. Unmapped but has a generated reg_number with this CCODE
-                  ->orWhere($tableName . '.reg_number', 'ilike', $gnCode . '/%');
-                  
-                // 3. Unmapped but raw location data perfectly matches this GN
-                if ($gn && !empty($gnNames)) {
-                    $q->orWhere(function($subQ) use ($tableName, $gnNames, $gn) {
-                        $subQ->whereIn($tableName . '.raw_gn', $gnNames);
-                        if ($gn->ds_en) {
-                            $subQ->where($tableName . '.raw_ds', $gn->ds_en);
-                        }
-                        if ($gn->dis_en) {
-                            $subQ->where($tableName . '.raw_district', $gn->dis_en);
-                        }
-                    });
-                }
-            });
+            \App\Support\GnRecordScope::apply($query, $tableName, $gnCode, \App\Support\GnRecordScope::resolveGn($gnCode));
         }
 
         // Special flag to only return NULL data (unmapped)
@@ -420,8 +388,11 @@ class CategoryDataUploadController extends Controller
             $categoryIds = [$category->id];
             $this->collectDescendantIds($category->id, $categoryIds);
 
-            $submissionsQuery = \App\Models\CategorySubmission::whereIn('category_id', $categoryIds)
-                ->where('status', 'approved');
+            $submissionsQuery = \App\Models\CategorySubmission::whereIn('category_id', $categoryIds);
+            
+            if (!$request->has('is_admin')) {
+                $submissionsQuery->where('status', 'approved');
+            }
 
             if ($gnCode !== null) {
                 $submissionsQuery->where('gn_code', $gnCode);
@@ -522,6 +493,26 @@ class CategoryDataUploadController extends Controller
         return response()->json([
             'success' => true,
             'categories' => $categories
+        ]);
+    }
+
+    public function getAllCategories()
+    {
+        $categories = \App\Models\Category::whereNotNull('parent_id')->get(['slug', 'name_en', 'name_si', 'name_ta', 'parent_id']);
+        
+        $formattedCategories = $categories->map(function($cat) {
+            return [
+                'slug' => $cat->slug,
+                'nameEn' => $cat->name_en,
+                'nameSi' => $cat->name_si,
+                'nameTa' => $cat->name_ta,
+                'parent_id' => $cat->parent_id
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'tables' => $formattedCategories
         ]);
     }
 
@@ -861,24 +852,152 @@ class CategoryDataUploadController extends Controller
         }
     }
 
+    public function searchAllData(Request $request)
+    {
+        $query = $request->query('q');
+        if (!$query || strlen($query) < 2) {
+            return response()->json(['success' => true, 'data' => []]);
+        }
+
+        $tables = DB::select("SELECT table_name FROM information_schema.tables WHERE table_name LIKE 'category_data_%'");
+        $allMatches = [];
+
+        foreach ($tables as $table) {
+            $tableName = $table->table_name;
+            $slug = str_replace('_', '-', substr($tableName, 14));
+            
+            $dbQuery = DB::table($tableName)
+                ->where('is_approved', true)
+                ->where(function($q) use ($query) {
+                    $q->where('name_en', 'ILIKE', '%' . $query . '%')
+                      ->orWhere('name_si', 'ILIKE', '%' . $query . '%')
+                      ->orWhere('name_ta', 'ILIKE', '%' . $query . '%')
+                      ->orWhere('reg_number', 'ILIKE', '%' . $query . '%');
+                })
+                ->limit(20);
+                
+            $results = $dbQuery->get();
+            
+            foreach ($results as $result) {
+                // Fetch GN context
+                $gn = DB::table('grama_niladharis')->where('id', $result->gn_id)->first();
+                if ($gn) {
+                    $disEn = $gn->dis_en ?? '';
+                    $dsEn = $gn->ds_en ?? '';
+                    $nameEn = $gn->name_en ?? '';
+                    $ccode = $gn->CCODE ?? '';
+                    $gnDisplay = trim("{$disEn} - {$dsEn} - {$nameEn} ({$ccode})", ' -()');
+
+                    $allMatches[] = [
+                        'id' => $result->id,
+                        'slug' => $slug,
+                        'nameEn' => $result->name_en,
+                        'nameSi' => $result->name_si,
+                        'nameTa' => $result->name_ta,
+                        'regNumber' => $result->reg_number,
+                        'gn_id' => $result->gn_id,
+                        'ccode' => $ccode,
+                        'gn_display' => $gnDisplay,
+                        'gn_district' => $disEn,
+                        'gn_ds' => $dsEn,
+                    ];
+                }
+                
+                // Hard limit to avoid huge payload
+                if (count($allMatches) >= 20) {
+                    break 2; // Break both loops
+                }
+            }
+        }
+
+        return response()->json(['success' => true, 'data' => $allMatches]);
+    }
+
     public function submitSurveyData(Request $request, $slug)
     {
+        // This endpoint is public and creates a table on first use, so it must
+        // only ever do that for a category that actually exists — otherwise any
+        // caller could create arbitrary tables just by varying the URL.
+        if (!preg_match('/^[a-z0-9-]{1,120}$/', (string) $slug) || !DB::table('categories')->where('slug', $slug)->exists()) {
+            return response()->json(['success' => false, 'message' => 'Unknown category.'], 404);
+        }
+
+        $request->validate([
+            'reg_number' => ['nullable', 'string', 'max:64'],
+            'gn_code' => ['nullable', 'string', 'max:32'],
+            'name_en' => ['nullable', 'string', 'max:255'],
+            'name_si' => ['nullable', 'string', 'max:255'],
+            'name_ta' => ['nullable', 'string', 'max:255'],
+            'name_singlish' => ['nullable', 'string', 'max:255'],
+            'raw_province' => ['nullable', 'string', 'max:120'],
+            'raw_district' => ['nullable', 'string', 'max:120'],
+            'raw_ds' => ['nullable', 'string', 'max:120'],
+            'raw_gn' => ['nullable', 'string', 'max:120'],
+            'mobile' => ['nullable', 'string', 'max:32'],
+            'address' => ['nullable', 'string', 'max:1000'],
+            'contact_person_name' => ['nullable', 'string', 'max:255'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+            'image_path' => ['nullable', 'string', 'max:500'],
+            'coordinate_mismatch' => ['nullable', 'boolean'],
+        ]);
+
         $tableName = 'category_data_' . str_replace('-', '_', $slug);
 
         if (!Schema::hasTable($tableName)) {
-            // Need to create the table structure if this is the first submission
-            // But usually the category is created with an empty table. Let's fail if it doesn't exist.
-            return response()->json(['success' => false, 'message' => 'Table does not exist.'], 400);
+            Schema::create($tableName, function (Blueprint $table) {
+                $table->id();
+                $table->string('district_id')->nullable();
+                $table->string('ds_division_code')->nullable();
+                $table->string('gn_id')->nullable();
+                $table->string('raw_province')->nullable();
+                $table->string('raw_district')->nullable();
+                $table->string('raw_ds')->nullable();
+                $table->string('raw_gn')->nullable();
+                $table->string('final_province')->nullable();
+                $table->string('final_district')->nullable();
+                $table->string('final_ds')->nullable();
+                $table->string('final_gn')->nullable();
+                $table->string('reg_number')->nullable();
+                $table->string('name_si')->nullable();
+                $table->string('name_en')->nullable();
+                $table->string('name_ta')->nullable();
+                $table->string('name_singlish')->nullable();
+                $table->string('longitude')->nullable();
+                $table->string('latitude')->nullable();
+                $table->string('mobile')->nullable();
+                $table->text('description')->nullable();
+                $table->string('contact_person_name')->nullable();
+                $table->text('address')->nullable();
+                $table->string('image_path')->nullable();
+                $table->unsignedBigInteger('added_by_user_id')->nullable();
+                $table->boolean('is_approved')->default(true);
+                $table->string('status')->default('pending');
+                $table->boolean('coordinate_mismatch')->default(false);
+                $table->boolean('is_update_proposal')->default(false);
+                $table->timestamps();
+            });
         }
+
+        \App\Support\CategoryDataSchema::ensureContributorColumn($tableName);
 
         $payload = $request->all();
         $isUpdate = !empty($payload['reg_number']);
         
         $regNumber = $payload['reg_number'] ?? null;
         
+        $mappedGnId = null;
+        $mappedDsCode = null;
+        $mappedDistrictId = null;
+        $finalProvince = null;
+        $finalDistrict = null;
+        $finalDs = null;
+        $finalGn = null;
+
         // Generate new Reg Number if not provided
         if (!$regNumber) {
             $gnCode = $payload['gn_code'] ?? null;
+            $gn = null;
             if (!$gnCode && !empty($payload['raw_gn'])) {
                 $gn = $this->resolveGramaNiladhari(
                     $payload['raw_gn'],
@@ -886,6 +1005,22 @@ class CategoryDataUploadController extends Controller
                     $payload['raw_district'] ?? null
                 );
                 $gnCode = $gn ? ($gn->CCODE ?: $gn->code) : null;
+            } elseif ($gnCode) {
+                // If gn_code was passed directly, try to resolve it to get mapping info
+                $gn = DB::table('grama_niladharis')
+                        ->where('CCODE', $gnCode)
+                        ->orWhere('code', $gnCode)
+                        ->first();
+            }
+
+            if ($gn) {
+                $mappedGnId = $gn->id;
+                $mappedDsCode = $gn->divisional_secretariat_code;
+                $mappedDistrictId = $gn->district_code;
+                $finalProvince = $gn->pro_en;
+                $finalDistrict = $gn->dis_en;
+                $finalDs = $gn->ds_en;
+                $finalGn = $gn->name_en;
             }
 
             // If GN code could not be resolved, do NOT generate — leave reg_number null
@@ -908,6 +1043,13 @@ class CategoryDataUploadController extends Controller
         }
 
         $insertData = [
+            'gn_id' => $mappedGnId,
+            'district_id' => $mappedDistrictId,
+            'ds_division_code' => $mappedDsCode,
+            'final_province' => $finalProvince,
+            'final_district' => $finalDistrict,
+            'final_ds' => $finalDs,
+            'final_gn' => $finalGn,
             'reg_number' => $regNumber,
             'name_en' => $payload['name_en'] ?? null,
             'name_si' => $payload['name_si'] ?? null,
@@ -923,7 +1065,9 @@ class CategoryDataUploadController extends Controller
             'longitude' => $payload['longitude'] ?? null,
             'latitude' => $payload['latitude'] ?? null,
             'image_path' => $payload['image_path'] ?? null,
-            'added_by_user_id' => auth()->id() ?? null,
+            // Set by OptionalKeycloakAuth from a verified token only; null for
+            // anonymous contributions. (`auth()->id()` is always null in this app.)
+            'contributor_sub' => $request->attributes->get('keycloak_sub'),
             'is_approved' => false,
             'status' => 'pending',
             'is_update_proposal' => $isUpdate,
@@ -935,8 +1079,16 @@ class CategoryDataUploadController extends Controller
         DB::table($tableName)->insert($insertData);
 
         $this->invalidateCategoryCache($slug);
+        \App\Http\Controllers\ContributionController::forgetVillageCache($payload['gn_code'] ?? null);
 
-        return response()->json(['success' => true, 'message' => 'Data submitted successfully.', 'reg_number' => $regNumber]);
+        return response()->json([
+            'success' => true,
+            'message' => 'Data submitted successfully.',
+            'reg_number' => $regNumber,
+            'status' => 'pending',
+            'is_update_proposal' => $isUpdate,
+            'credited' => $insertData['contributor_sub'] !== null,
+        ]);
     }
 
     public function approveData(Request $request, $slug, $id)
@@ -1123,6 +1275,141 @@ class CategoryDataUploadController extends Controller
             'success'    => true,
             'reg_number' => $regNumber,
             'message'    => "Reg number generated: {$regNumber}"
+        ]);
+    }
+
+    /**
+     * Generate reg numbers for ALL rows in a category that don't have one yet.
+     */
+    public function generateAllRegNumbers(Request $request, $slug)
+    {
+        set_time_limit(300); // Allow up to 5 minutes for bulk generation
+        
+        $tableName = 'category_data_' . str_replace('-', '_', $slug);
+
+        if (!Schema::hasTable($tableName)) {
+            return response()->json(['success' => false, 'message' => 'Table not found.'], 404);
+        }
+
+        // Ensure final_* columns exist (older tables may not have them)
+        if (!Schema::hasColumn($tableName, 'final_province')) {
+            Schema::table($tableName, function (Blueprint $table) {
+                $table->string('final_province')->nullable();
+                $table->string('final_district')->nullable();
+                $table->string('final_ds')->nullable();
+                $table->string('final_gn')->nullable();
+            });
+        }
+
+        $excludeIds = $request->input('exclude_ids', []);
+
+        $rowsQuery = DB::table($tableName)
+            ->whereNull('reg_number');
+            
+        if (!empty($excludeIds)) {
+            $rowsQuery->whereNotIn('id', $excludeIds);
+        }
+
+        $rows = $rowsQuery->select(
+                $tableName . '.*',
+                DB::raw("COALESCE({$tableName}.final_province, {$tableName}.raw_province) as province_name"),
+                DB::raw("COALESCE({$tableName}.final_district, {$tableName}.raw_district) as district_name"),
+                DB::raw("COALESCE({$tableName}.final_ds, {$tableName}.raw_ds) as ds_name"),
+                DB::raw("COALESCE({$tableName}.final_gn, {$tableName}.raw_gn) as gn_name")
+            )
+            ->limit(1000)
+            ->get();
+
+        $category = DB::table('categories')->where('slug', $slug)->first();
+        $cCode = $category ? ($category->code ?? 'CAT') : 'CAT';
+
+        $generatedCount = 0;
+        $skippedNames = [];
+        $skippedIds = [];
+        $gnSequenceMap = [];
+        $gnCache = []; // In-memory cache to avoid repeated DB lookups for the same GN
+
+        DB::beginTransaction();
+        try {
+            foreach ($rows as $row) {
+            $rowName = $row->name_en ?: ($row->name_si ?: ($row->name_ta ?: "ID: {$row->id}"));
+
+            $requiredFields = [
+                'name_ta'       => $row->name_ta,
+                'Province'      => $row->province_name,
+                'District'      => $row->district_name,
+                'DS Division'   => $row->ds_name,
+                'GN Name'       => $row->gn_name,
+            ];
+            
+            $hasMissing = false;
+            foreach ($requiredFields as $label => $value) {
+                if (empty($value)) {
+                    $skippedNames[] = "{$rowName} (Missing required data: {$label})";
+                    $skippedIds[] = $row->id;
+                    $hasMissing = true;
+                    break;
+                }
+            }
+            if ($hasMissing) continue;
+
+            $gnName = trim($row->gn_name);
+            
+            // Use cache to prevent duplicate DB queries
+            $cacheKey = md5($gnName . '|' . $row->ds_name . '|' . $row->district_name . '|' . ($row->gn_id ?? ''));
+            if (array_key_exists($cacheKey, $gnCache)) {
+                $gn = $gnCache[$cacheKey];
+            } else {
+                $gn = $this->resolveGramaNiladhari($gnName, $row->ds_name, $row->district_name, $row->gn_id ?? null);
+                $gnCache[$cacheKey] = $gn;
+            }
+
+            if (!$gn) {
+                $skippedNames[] = "{$rowName} (GN Division '{$gnName}' not found in system)";
+                $skippedIds[] = $row->id;
+                continue;
+            }
+
+            $gnCode = $gn->CCODE ?: $gn->code;
+            if (!$gnCode) {
+                $skippedNames[] = "{$rowName} (GN Division '{$gnName}' lacks valid code)";
+                $skippedIds[] = $row->id;
+                continue;
+            }
+
+            if (!isset($gnSequenceMap[$gnCode])) {
+                $existingCount = DB::table($tableName)
+                    ->where('reg_number', 'like', $gnCode . '/%')
+                    ->count();
+                $gnSequenceMap[$gnCode] = $existingCount + 1;
+            }
+
+            $sequence = $gnSequenceMap[$gnCode]++;
+            $regNumber = $gnCode . '/' . $cCode . '/' . str_pad($sequence, 2, '0', STR_PAD_LEFT);
+
+            DB::table($tableName)->where('id', $row->id)->update([
+                'reg_number' => $regNumber,
+                'updated_at' => now(),
+            ]);
+
+            $generatedCount++;
+        }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], 500);
+        }
+
+        if ($generatedCount > 0) {
+            $this->invalidateCategoryCache($slug);
+        }
+
+        return response()->json([
+            'success'     => true,
+            'generated'   => $generatedCount,
+            'total'       => $rows->count(),
+            'skipped'     => $skippedNames,
+            'skipped_ids' => $skippedIds
         ]);
     }
 

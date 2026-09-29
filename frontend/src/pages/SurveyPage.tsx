@@ -1,16 +1,39 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Box, Typography, Button, Card, CardContent, TextField, CircularProgress,
-  Autocomplete, Snackbar, Alert as MuiAlert, Dialog, DialogTitle, DialogContent, DialogActions, Divider
+  Alert,
+  Autocomplete,
+  Box,
+  Button,
+  Chip,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  Paper,
+  Stack,
+  TextField,
+  Typography,
 } from '@mui/material';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import MyLocationIcon from '@mui/icons-material/MyLocation';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery, useLazyQuery } from '@apollo/client';
+import { alpha } from '@mui/material/styles';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useLazyQuery, useQuery } from '@apollo/client';
+import AddAPhotoOutlinedIcon from '@mui/icons-material/AddAPhotoOutlined';
+import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
+import HistoryRoundedIcon from '@mui/icons-material/HistoryRounded';
+import MyLocationRoundedIcon from '@mui/icons-material/MyLocationRounded';
 import { GET_GN_BY_COORDINATES, GET_P_DISTRICTS, GET_P_DISTRICT_WITH_GNS } from '../graphql/queries';
 import { useAuth } from '../auth/AuthProvider';
+import { ApiError, submitContribution, SubmitResult } from '../api/contributions';
+import { fill, useContributeCopy } from '../components/contribute/copy';
+import { readSavedVillage, villageName } from '../components/contribute/village';
 
-interface FormData {
+interface ContributionForm {
   reg_number: string;
   name_en: string;
   name_si: string;
@@ -30,37 +53,59 @@ interface FormData {
   coordinate_mismatch: boolean;
 }
 
+const EMPTY_DETAILS = {
+  reg_number: '',
+  name_en: '',
+  name_si: '',
+  name_ta: '',
+  name_singlish: '',
+  mobile: '',
+  contact_person_name: '',
+  address: '',
+  longitude: '',
+  latitude: '',
+  image_path: '',
+  coordinate_mismatch: false,
+};
+
 interface SurveyPageProps {
-  slug: string;
+  slug?: string;
+  /** Shown in the heading and thank-you message. */
+  categoryName?: string;
+  onBackToTopics?: () => void;
 }
 
-const SurveyPage: React.FC<SurveyPageProps> = ({ slug }) => {
+const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp, categoryName, onBackToTopics }) => {
+  const params = useParams<{ slug: string }>();
+  const slug = slugProp ?? params.slug ?? '';
   const navigate = useNavigate();
-  const { token } = useAuth();
-  
-  const [formData, setFormData] = useState<FormData>({
-    reg_number: '', name_en: '', name_si: '', name_ta: '', name_singlish: '',
-    raw_province: '', raw_district: '', raw_ds: '', raw_gn: '', gn_code: '',
-    mobile: '', contact_person_name: '', address: '', longitude: '', latitude: '',
-    image_path: '', coordinate_mismatch: false
-  });
+  const { getToken, isAuthenticated, login } = useAuth();
+  const { t, language } = useContributeCopy();
 
-  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState<ContributionForm>({ ...EMPTY_DETAILS, raw_province: '', raw_district: '', raw_ds: '', raw_gn: '', gn_code: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [locating, setLocating] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-  const [imageUploading, setImageUploading] = useState(false);
-  
+  const [fieldErrors, setFieldErrors] = useState<{ location?: boolean; name?: boolean }>({});
+  const [result, setResult] = useState<SubmitResult | null>(null);
+  const [geoPrompt, setGeoPrompt] = useState(false);
+  const [existingName, setExistingName] = useState<string | null>(null);
+
   const [nameOptions, setNameOptions] = useState<any[]>([]);
-  const [nameSearch, setNameSearch] = useState('');
-  
-  // Location States
+  const [nameInput, setNameInput] = useState('');
+
   const [selectedProvince, setSelectedProvince] = useState<any>(null);
   const [selectedDistrict, setSelectedDistrict] = useState<any>(null);
   const [selectedCity, setSelectedCity] = useState<any>(null);
   const [selectedGN, setSelectedGN] = useState<any>(null);
+  const autoSelected = useRef(false);
 
-  // Queries
-  const { data: districtsData, loading: districtsLoading } = useQuery(GET_P_DISTRICTS, { fetchPolicy: 'cache-first' });
+  const village = readSavedVillage();
+  const vName = villageName(village, language);
+  const catName = categoryName || slug;
+
+  const { data: districtsData } = useQuery(GET_P_DISTRICTS, { fetchPolicy: 'cache-first' });
   const { data: gnData, loading: gnLoading } = useQuery(GET_P_DISTRICT_WITH_GNS, {
     variables: { id: selectedDistrict?.id },
     skip: !selectedDistrict,
@@ -68,315 +113,537 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug }) => {
   });
   const [getGnByCoords] = useLazyQuery(GET_GN_BY_COORDINATES);
 
-  // Name Autocomplete Search
+  const patch = (values: Partial<ContributionForm>) => setForm((prev) => ({ ...prev, ...values }));
+
+  /* ── Existing-entry search (to propose updates rather than duplicates) ── */
   useEffect(() => {
-    const hasLocationFilter = formData.raw_province || formData.raw_district || formData.raw_ds || formData.raw_gn;
-    
-    if (nameSearch.length > 0 || hasLocationFilter) {
-      const delay = setTimeout(async () => {
-        try {
-          const params = new URLSearchParams();
-          if (nameSearch) params.append('query', nameSearch);
-          if (formData.raw_province) params.append('province', formData.raw_province);
-          if (formData.raw_district) params.append('district', formData.raw_district);
-          if (formData.raw_ds) params.append('ds', formData.raw_ds);
-          if (formData.raw_gn) params.append('gn', formData.raw_gn);
-
-          const res = await fetch(`/api/search-category-data/${slug}?${params.toString()}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-          const json = await res.json();
-          if (json.success) setNameOptions(json.data);
-        } catch (e) {
-          console.error(e);
-        }
-      }, 500);
-      return () => clearTimeout(delay);
-    } else {
+    if (!nameInput.trim() || existingName) {
       setNameOptions([]);
+      return;
     }
-  }, [nameSearch, slug, formData.raw_province, formData.raw_district, formData.raw_ds, formData.raw_gn]);
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
+      try {
+        const query = new URLSearchParams({ query: nameInput.trim() });
+        if (form.raw_district) query.append('district', form.raw_district);
+        if (form.raw_ds) query.append('ds', form.raw_ds);
+        if (form.raw_gn) query.append('gn', form.raw_gn);
+        const res = await fetch(`/api/search-category-data/${encodeURIComponent(slug)}?${query}`, { signal: controller.signal, headers: { Accept: 'application/json' } });
+        const json = await res.json();
+        if (json.success) setNameOptions(json.data || []);
+      } catch {
+        /* suggestions are a convenience; failure leaves the field usable */
+      }
+    }, 350);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [nameInput, slug, form.raw_district, form.raw_ds, form.raw_gn, existingName]);
 
-  const handleNameSelect = (option: any) => {
-    if (option) {
-      setFormData(prev => ({
-        ...prev,
-        reg_number: option.reg_number || '',
-        name_en: option.name_en || '',
-        name_si: option.name_si || '',
-        name_ta: option.name_ta || '',
-        name_singlish: option.name_singlish || '',
-        mobile: option.mobile || '',
-        contact_person_name: option.contact_person_name || '',
-        address: option.address || ''
-      }));
-    }
-  };
-
-  // Cascading Location Logic
-  const uniqueProvinces = useMemo(() => {
-    if (!districtsData?.pDistricts) return [];
+  /* ── Cascading location pickers ───────────────────────────────────────── */
+  const provinces = useMemo(() => {
     const map = new Map();
-    districtsData.pDistricts.forEach((d: any) => {
-      if (d.pProvince) map.set(d.pProvince.id, d.pProvince);
-    });
+    (districtsData?.pDistricts || []).forEach((d: any) => d.pProvince && map.set(d.pProvince.id, d.pProvince));
     return Array.from(map.values());
   }, [districtsData]);
 
-  const filteredDistricts = useMemo(() => {
-    if (!selectedProvince || !districtsData?.pDistricts) return [];
-    return districtsData.pDistricts.filter((d: any) => d.pProvince?.id === selectedProvince.id);
-  }, [selectedProvince, districtsData]);
+  const districts = useMemo(
+    () => (selectedProvince ? (districtsData?.pDistricts || []).filter((d: any) => d.pProvince?.id === selectedProvince.id) : []),
+    [selectedProvince, districtsData],
+  );
 
-  const uniqueCities = useMemo(() => {
-    if (!gnData?.pDistrict?.gramaNiladharis) return [];
+  const dsDivisions = useMemo(() => {
     const map = new Map();
-    gnData.pDistrict.gramaNiladharis.forEach((gn: any) => {
-      if (gn.divisionalSecretariatCode) map.set(gn.divisionalSecretariatCode, gn);
-    });
+    (gnData?.pDistrict?.gramaNiladharis || []).forEach((gn: any) => gn.divisionalSecretariatCode && map.set(gn.divisionalSecretariatCode, gn));
     return Array.from(map.values());
   }, [gnData]);
 
-  const filteredGNs = useMemo(() => {
-    if (!selectedCity || !gnData?.pDistrict?.gramaNiladharis) return [];
-    return gnData.pDistrict.gramaNiladharis.filter((gn: any) => gn.divisionalSecretariatCode === selectedCity.divisionalSecretariatCode);
-  }, [selectedCity, gnData]);
+  const gnDivisions = useMemo(
+    () => (selectedCity ? (gnData?.pDistrict?.gramaNiladharis || []).filter((gn: any) => gn.divisionalSecretariatCode === selectedCity.divisionalSecretariatCode) : []),
+    [selectedCity, gnData],
+  );
 
-  // Sync state to formData
   useEffect(() => {
-    setFormData(prev => ({
-      ...prev,
+    patch({
       raw_province: selectedProvince?.nameEn || selectedProvince?.admin1NameEn || '',
       raw_district: selectedDistrict?.admin2NameEn || '',
       raw_ds: selectedCity?.dsEn || '',
       raw_gn: selectedGN?.nameEn || selectedGN?.gnName || '',
-      gn_code: selectedGN?.CCODE || selectedGN?.code || ''
-    }));
+      gn_code: selectedGN?.CCODE || selectedGN?.code || '',
+    });
   }, [selectedProvince, selectedDistrict, selectedCity, selectedGN]);
 
-  // Auto-Select Logic
+  // Pre-fill from the contributor's chosen village, once.
   useEffect(() => {
-    try {
-      const locStr = localStorage.getItem('user_selected_location') || sessionStorage.getItem('user_selected_location');
-      if (locStr && districtsData?.pDistricts) {
-        const loc = JSON.parse(locStr);
-        
-        // Auto-select Province and District
-        let foundDistrict = null;
-        if (loc.pDistrict?.id) {
-           foundDistrict = districtsData.pDistricts.find((d: any) => d.id === loc.pDistrict.id);
-        } else if (loc.divisionalSecretariatCode) {
-           const dsPrefix = loc.divisionalSecretariatCode.substring(0, 2);
-           foundDistrict = districtsData.pDistricts.find((d: any) => String(d.admin2Pcode) === dsPrefix);
-        }
-
-        if (foundDistrict && !selectedDistrict) {
-           setSelectedDistrict(foundDistrict);
-           if (foundDistrict.pProvince) setSelectedProvince(foundDistrict.pProvince);
-        }
-      }
-    } catch(e) {}
-  }, [districtsData, selectedDistrict]);
+    if (autoSelected.current || !village || !districtsData?.pDistricts || selectedDistrict) return;
+    let district = null;
+    if ((village as any).pDistrict?.id) {
+      district = districtsData.pDistricts.find((d: any) => d.id === (village as any).pDistrict.id);
+    } else if (typeof (village as any).divisionalSecretariatCode === 'string') {
+      const prefix = (village as any).divisionalSecretariatCode.substring(0, 2);
+      district = districtsData.pDistricts.find((d: any) => String(d.admin2Pcode) === prefix);
+    }
+    if (district) {
+      setSelectedDistrict(district);
+      if (district.pProvince) setSelectedProvince(district.pProvince);
+    }
+  }, [districtsData, village, selectedDistrict]);
 
   useEffect(() => {
-    try {
-      const locStr = localStorage.getItem('user_selected_location') || sessionStorage.getItem('user_selected_location');
-      if (locStr && gnData?.pDistrict?.gramaNiladharis) {
-        const loc = JSON.parse(locStr);
-        
-        let foundGN = gnData.pDistrict.gramaNiladharis.find((g: any) => g.id === loc.id || g.CCODE === loc.CCODE || g.code === loc.code);
-        if (foundGN) {
-           if (!selectedGN) setSelectedGN(foundGN);
-           
-           if (!selectedCity && foundGN.divisionalSecretariatCode) {
-               const foundCity = gnData.pDistrict.gramaNiladharis.find((g: any) => g.divisionalSecretariatCode === foundGN.divisionalSecretariatCode);
-               if (foundCity) setSelectedCity(foundCity);
-           }
-        }
-      }
-    } catch(e) {}
-  }, [gnData, selectedGN, selectedCity]);
+    if (autoSelected.current || !village || !gnData?.pDistrict?.gramaNiladharis) return;
+    const gns = gnData.pDistrict.gramaNiladharis;
+    const gn = gns.find((g: any) => g.id === (village as any).id || (village.CCODE && g.CCODE === village.CCODE) || (village.code && g.code === village.code));
+    if (gn) {
+      setSelectedGN(gn);
+      const ds = gns.find((g: any) => g.divisionalSecretariatCode === gn.divisionalSecretariatCode);
+      if (ds) setSelectedCity(ds);
+    }
+    autoSelected.current = true;
+  }, [gnData, village]);
 
-  // Geolocation
-  const [geoPrompt, setGeoPrompt] = useState(false);
-  const handleGeoConfirm = () => {
+  /* ── Evidence ─────────────────────────────────────────────────────────── */
+  const captureLocation = () => {
     setGeoPrompt(false);
-    if (navigator.geolocation) {
-      setLoading(true);
-      navigator.geolocation.getCurrentPosition(async (position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-        setFormData(prev => ({ ...prev, latitude: String(lat), longitude: String(lng) }));
-        
-        // Validate coordinates
-        if (formData.raw_gn) {
-          try {
-            const { data } = await getGnByCoords({ variables: { lat, lng } });
-            if (data?.gnByCoordinates && data.gnByCoordinates.code !== formData.raw_gn && data.gnByCoordinates.CCODE !== formData.raw_gn) {
-              setFormData(prev => ({ ...prev, coordinate_mismatch: true }));
-              alert("Warning: Your current GPS location does not match the selected Grama Niladhari boundary. Data will still be saved, but marked for review.");
-            } else {
-              setFormData(prev => ({ ...prev, coordinate_mismatch: false }));
-            }
-          } catch (e) {
-            console.error('Failed to validate coords', e);
-          }
-        }
-        setLoading(false);
-      }, (err) => {
-        setLoading(false);
-        setError("Failed to get location: " + err.message);
-      });
-    } else {
-      setError("Geolocation is not supported by this browser.");
-    }
-  };
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setImageUploading(true);
-    const form = new FormData();
-    form.append('file', file);
-    try {
-      const res = await fetch('/api/upload-survey-image', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: form
-      });
-      const data = await res.json();
-      if (data.success) {
-        setFormData(prev => ({ ...prev, image_path: data.image_path }));
-      } else {
-        throw new Error(data.message);
-      }
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setImageUploading(false);
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (!formData.raw_province || !formData.raw_district || !formData.raw_ds || !formData.raw_gn) {
-      setError("Location fields (Province, District, DS, GN) are mandatory.");
+    if (!navigator.geolocation) {
+      setError('Geolocation is not supported by this browser.');
       return;
     }
-    setLoading(true);
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude: lat, longitude: lng } = position.coords;
+        let mismatch = false;
+        if (form.gn_code) {
+          try {
+            const { data } = await getGnByCoords({ variables: { lat, lng } });
+            const found = data?.gnByCoordinates;
+            // Compare codes to codes: the old check compared a code with the GN
+            // *name*, so it flagged almost every capture as a mismatch.
+            mismatch = Boolean(found && found.CCODE !== form.gn_code && found.code !== form.gn_code);
+          } catch {
+            /* unverifiable is not the same as mismatched */
+          }
+        }
+        patch({ latitude: lat.toFixed(6), longitude: lng.toFixed(6), coordinate_mismatch: mismatch });
+        setLocating(false);
+      },
+      (err) => {
+        setLocating(false);
+        setError(err.message);
+      },
+      { enableHighAccuracy: true, timeout: 15000 },
+    );
+  };
+
+  const uploadPhoto = async (file: File) => {
+    setUploading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/submit-survey-data/${slug}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(formData)
-      });
-      const data = await res.json();
-      if (data.success) {
-        setSuccess(true);
-        setTimeout(() => navigate('/'), 2000);
-      } else {
-        throw new Error(data.message);
-      }
+      const body = new FormData();
+      body.append('file', file);
+      const res = await fetch('/api/upload-survey-image', { method: 'POST', body, headers: { Accept: 'application/json' } });
+      const json = await res.json().catch(() => null);
+      if (!res.ok || !json?.success) throw new Error(json?.message || 'Upload failed');
+      patch({ image_path: json.image_path });
     } catch (err: any) {
       setError(err.message);
     } finally {
-      setLoading(false);
+      setUploading(false);
     }
   };
 
-  return (
-    <Box sx={{ maxWidth: 800, mx: 'auto', mt: 4, px: 2 }}>
-      <Typography variant="h4" sx={{ mb: 4, fontWeight: 'bold' }}>Submit Category Data</Typography>
-      <Card sx={{ mb: 4 }}>
-        <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          
-          {/* 1. Location */}
-          <Typography variant="h6" color="primary" sx={{ mt: 2 }}>1. Location (Mandatory)</Typography>
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <Autocomplete fullWidth options={uniqueProvinces} getOptionLabel={(o) => o.nameEn || o.admin1NameEn || ''} value={selectedProvince} onChange={(e, v) => { setSelectedProvince(v); setSelectedDistrict(null); setSelectedCity(null); setSelectedGN(null); }} renderInput={(p) => <TextField {...p} label="Province" required />} />
-            <Autocomplete fullWidth options={filteredDistricts} getOptionLabel={(o) => o.admin2NameEn || ''} value={selectedDistrict} onChange={(e, v) => { setSelectedDistrict(v); setSelectedCity(null); setSelectedGN(null); }} disabled={!selectedProvince} renderInput={(p) => <TextField {...p} label="District" required />} />
-          </Box>
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <Autocomplete fullWidth options={uniqueCities} getOptionLabel={(o) => o.dsEn || ''} value={selectedCity} onChange={(e, v) => { setSelectedCity(v); setSelectedGN(null); }} disabled={!selectedDistrict || gnLoading} renderInput={(p) => <TextField {...p} label="DS Division" required />} />
-            <Autocomplete fullWidth options={filteredGNs} getOptionLabel={(o) => o.nameEn || o.gnName || o.code || ''} value={selectedGN} onChange={(e, v) => setSelectedGN(v)} disabled={!selectedCity || gnLoading} renderInput={(p) => <TextField {...p} label="GN Division" required />} />
-          </Box>
+  /* ── Submit ───────────────────────────────────────────────────────────── */
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    const locationMissing = !form.raw_province || !form.raw_district || !form.raw_ds || !form.raw_gn;
+    const nameMissing = !form.name_en.trim() && !form.name_si.trim() && !form.name_ta.trim();
+    setFieldErrors({ location: locationMissing, name: nameMissing });
+    if (locationMissing || nameMissing) {
+      setError(locationMissing ? t.errLocation : t.errName);
+      return;
+    }
 
-          <Divider sx={{ my: 3 }} />
+    setSubmitting(true);
+    setError(null);
+    try {
+      const token = isAuthenticated ? await getToken() : undefined;
+      if (isAuthenticated && !token) throw new ApiError(t.errSession, 401);
+      setResult(await submitContribution(slug, { ...form, name_en: form.name_en.trim() }, token));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      setError(err instanceof ApiError && err.status === 401 ? t.errSession : (err as Error).message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
-          {/* 2. Basic Details */}
-          <Typography variant="h6" color="primary">2. Basic Details</Typography>
-          <Autocomplete
-            freeSolo
-            options={nameOptions}
-            getOptionLabel={(o: any) => o.name_en ? `${o.name_en}${o.name_si ? ` / ${o.name_si}` : ''}${o.name_ta ? ` / ${o.name_ta}` : ''}` : (typeof o === 'string' ? o : '')}
-            onInputChange={(e, val) => setNameSearch(val)}
-            onChange={(e, val) => handleNameSelect(val)}
-            renderInput={(params) => <TextField {...params} label="Search or Enter Name (EN/SI/TA)" fullWidth />}
+  const addAnother = () => {
+    setForm((prev) => ({ ...prev, ...EMPTY_DETAILS }));
+    setExistingName(null);
+    setNameInput('');
+    setFieldErrors({});
+    setResult(null);
+  };
+
+  const backToTopics = () => (onBackToTopics ? onBackToTopics() : navigate('/user'));
+
+  /* ── Thank-you ────────────────────────────────────────────────────────── */
+  if (result) {
+    return (
+      <Paper elevation={0} sx={{ maxWidth: 640, mx: 'auto', p: { xs: 3, sm: 5 }, borderRadius: '24px', border: 1, borderColor: 'divider', textAlign: 'center' }}>
+        <Box
+          sx={{
+            width: 72,
+            height: 72,
+            mx: 'auto',
+            mb: 2.5,
+            borderRadius: '50%',
+            display: 'grid',
+            placeItems: 'center',
+            bgcolor: 'success.main',
+            color: '#fff',
+            boxShadow: (theme) => `0 0 0 10px ${alpha(theme.palette.success.main, 0.12)}`,
+          }}
+        >
+          <CheckRoundedIcon sx={{ fontSize: 38 }} />
+        </Box>
+        <Typography component="h2" sx={{ fontSize: { xs: '1.5rem', sm: '1.8rem' }, fontWeight: 700, letterSpacing: '-0.03em', mb: 1 }}>
+          {t.thanksTitle}
+        </Typography>
+        <Typography color="text.secondary" sx={{ maxWidth: 460, mx: 'auto', mb: 3, lineHeight: 1.6 }}>
+          {vName ? fill(t.thanksBody, { category: catName, village: vName }) : fill(t.thanksBodyNoVillage, { category: catName })}
+        </Typography>
+
+        <Stack direction="row" spacing={1} sx={{ justifyContent: 'center', flexWrap: 'wrap', rowGap: 1, mb: 4 }}>
+          {result.reg_number && <Chip label={`${t.thanksReg}: ${result.reg_number}`} sx={{ fontFamily: 'monospace', fontWeight: 600 }} />}
+          <Chip
+            label={result.credited ? t.thanksCredited : t.thanksAnonymous}
+            color={result.credited ? 'success' : 'default'}
+            variant="outlined"
           />
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <TextField
-              label="Name (SI)"
-              fullWidth
-              value={formData.name_si}
-              onChange={(e) => setFormData(f => ({...f, name_si: e.target.value}))}
-              helperText={formData.name_si ? "Auto-filled — edit if incorrect" : ""}
-              FormHelperTextProps={{ sx: { color: 'info.main', fontSize: '0.72rem' } }}
+        </Stack>
+
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ justifyContent: 'center' }}>
+          <Button variant="contained" disableElevation startIcon={<AddRoundedIcon />} onClick={addAnother} sx={{ py: 1.25, px: 2.5 }}>
+            {t.addAnother}
+          </Button>
+          {isAuthenticated && (
+            <Button variant="outlined" startIcon={<HistoryRoundedIcon />} onClick={() => navigate('/user/contributions')} sx={{ py: 1.25, boxShadow: 'none', '&:hover': { boxShadow: 'none', transform: 'none' } }}>
+              {t.navMyContributions}
+            </Button>
+          )}
+          <Button color="inherit" onClick={backToTopics} sx={{ py: 1.25, boxShadow: 'none', color: 'text.secondary', '&:hover': { boxShadow: 'none', transform: 'none' } }}>
+            {t.backToTopics}
+          </Button>
+        </Stack>
+      </Paper>
+    );
+  }
+
+  /* ── Form ─────────────────────────────────────────────────────────────── */
+  return (
+    <Box component="form" noValidate onSubmit={handleSubmit} sx={{ maxWidth: 760, mx: 'auto' }}>
+      <Box sx={{ mb: 3 }}>
+        <Typography component="h2" sx={{ fontSize: { xs: '1.45rem', sm: '1.75rem' }, fontWeight: 700, letterSpacing: '-0.03em' }}>
+          {fill(t.formTitle, { category: catName })}
+        </Typography>
+        <Typography color="text.secondary" sx={{ mt: 0.5 }}>
+          {vName ? fill(t.formSubtitle, { village: vName }) : t.formSubtitleNoVillage}
+        </Typography>
+      </Box>
+
+      {!isAuthenticated && (
+        <Alert
+          severity="info"
+          sx={{ mb: 2, borderRadius: '14px' }}
+          action={
+            <Button color="inherit" size="small" onClick={() => login(window.location.href)} sx={{ boxShadow: 'none' }}>
+              {t.signIn}
+            </Button>
+          }
+        >
+          {t.signInToBeCredited}
+        </Alert>
+      )}
+
+      <Stack spacing={2}>
+        <FormSection index={1} title={t.stepLocation} error={fieldErrors.location}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+            <Autocomplete
+              options={provinces}
+              getOptionLabel={(o: any) => o.nameEn || o.admin1NameEn || ''}
+              value={selectedProvince}
+              onChange={(_, v) => {
+                setSelectedProvince(v);
+                setSelectedDistrict(null);
+                setSelectedCity(null);
+                setSelectedGN(null);
+              }}
+              renderInput={(p) => <TextField {...p} label={t.province} required error={fieldErrors.location && !form.raw_province} />}
             />
-            <TextField
-              label="Name (TA)"
-              fullWidth
-              value={formData.name_ta}
-              onChange={(e) => setFormData(f => ({...f, name_ta: e.target.value}))}
-              helperText={formData.name_ta ? "Auto-filled — edit if incorrect" : ""}
-              FormHelperTextProps={{ sx: { color: 'info.main', fontSize: '0.72rem' } }}
+            <Autocomplete
+              options={districts}
+              getOptionLabel={(o: any) => o.admin2NameEn || ''}
+              value={selectedDistrict}
+              disabled={!selectedProvince}
+              onChange={(_, v) => {
+                setSelectedDistrict(v);
+                setSelectedCity(null);
+                setSelectedGN(null);
+              }}
+              renderInput={(p) => <TextField {...p} label={t.district} required error={fieldErrors.location && !form.raw_district} />}
+            />
+            <Autocomplete
+              options={dsDivisions}
+              getOptionLabel={(o: any) => o.dsEn || ''}
+              value={selectedCity}
+              disabled={!selectedDistrict || gnLoading}
+              onChange={(_, v) => {
+                setSelectedCity(v);
+                setSelectedGN(null);
+              }}
+              renderInput={(p) => <TextField {...p} label={t.dsDivision} required error={fieldErrors.location && !form.raw_ds} />}
+            />
+            <Autocomplete
+              options={gnDivisions}
+              getOptionLabel={(o: any) => o.nameEn || o.gnName || o.code || ''}
+              value={selectedGN}
+              disabled={!selectedCity || gnLoading}
+              onChange={(_, v) => setSelectedGN(v)}
+              renderInput={(p) => <TextField {...p} label={t.gnDivision} required error={fieldErrors.location && !form.raw_gn} />}
             />
           </Box>
+        </FormSection>
 
-          <TextField label="Mobile" fullWidth value={formData.mobile} onChange={(e) => setFormData(f => ({...f, mobile: e.target.value}))} />
-          <TextField label="Contact Person Name" fullWidth value={formData.contact_person_name} onChange={(e) => setFormData(f => ({...f, contact_person_name: e.target.value}))} />
-          <TextField label="Address" fullWidth multiline rows={2} value={formData.address} onChange={(e) => setFormData(f => ({...f, address: e.target.value}))} />
+        <FormSection index={2} title={t.stepDetails} error={fieldErrors.name}>
+          <Stack spacing={2}>
+            {existingName ? (
+              <Alert
+                icon={<EditNoteRoundedIcon />}
+                severity="info"
+                sx={{ borderRadius: '12px' }}
+                action={
+                  <Button
+                    color="inherit"
+                    size="small"
+                    onClick={() => {
+                      setExistingName(null);
+                      patch({ reg_number: '' });
+                    }}
+                    sx={{ boxShadow: 'none' }}
+                  >
+                    {t.newEntryInstead}
+                  </Button>
+                }
+              >
+                {fill(t.updatingExisting, { name: existingName })}
+              </Alert>
+            ) : null}
+            <Autocomplete
+              freeSolo
+              options={nameOptions}
+              filterOptions={(o) => o}
+              inputValue={nameInput}
+              onInputChange={(_, value, reason) => {
+                setNameInput(value);
+                // Typing a name *is* the English name — previously it was only
+                // saved when an existing entry was picked from the list.
+                if (reason === 'input' && !existingName) patch({ name_en: value });
+              }}
+              onChange={(_, option: any) => {
+                if (!option || typeof option === 'string') return;
+                setExistingName(option.name_en || option.name_si || option.name_ta || option.reg_number);
+                patch({
+                  reg_number: option.reg_number || '',
+                  name_en: option.name_en || '',
+                  name_si: option.name_si || '',
+                  name_ta: option.name_ta || '',
+                  name_singlish: option.name_singlish || '',
+                  mobile: option.mobile || '',
+                  contact_person_name: option.contact_person_name || '',
+                  address: option.address || '',
+                });
+              }}
+              getOptionLabel={(o: any) => (typeof o === 'string' ? o : o.name_en || o.name_si || o.name_ta || '')}
+              renderOption={(props, o: any) => {
+                const { key: _key, ...rest } = props as React.HTMLAttributes<HTMLLIElement> & { key: React.Key };
+                return (
+                  <Box component="li" key={o.reg_number || o.id} {...rest} sx={{ display: 'block !important' }}>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      {[o.name_en, o.name_si, o.name_ta].filter(Boolean).join(' · ')}
+                    </Typography>
+                    {o.reg_number && (
+                      <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
+                        {o.reg_number}
+                      </Typography>
+                    )}
+                  </Box>
+                );
+              }}
+              renderInput={(p) => (
+                <TextField {...p} label={t.nameLabel} helperText={t.nameHelper} required error={fieldErrors.name} inputProps={{ ...p.inputProps, maxLength: 255 }} />
+              )}
+            />
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+              <TextField label={t.nameSi} value={form.name_si} onChange={(e) => patch({ name_si: e.target.value })} inputProps={{ maxLength: 255 }} />
+              <TextField label={t.nameTa} value={form.name_ta} onChange={(e) => patch({ name_ta: e.target.value })} inputProps={{ maxLength: 255 }} />
+              <TextField
+                label={t.mobile}
+                value={form.mobile}
+                onChange={(e) => patch({ mobile: e.target.value.replace(/[^\d+\s-]/g, '') })}
+                inputProps={{ inputMode: 'tel', maxLength: 32 }}
+              />
+              <TextField label={t.contactPerson} value={form.contact_person_name} onChange={(e) => patch({ contact_person_name: e.target.value })} inputProps={{ maxLength: 255 }} />
+            </Box>
+            <TextField label={t.address} value={form.address} onChange={(e) => patch({ address: e.target.value })} multiline minRows={2} inputProps={{ maxLength: 1000 }} />
+          </Stack>
+        </FormSection>
 
-          <Typography variant="h6" color="primary" sx={{ mt: 2 }}>3. Geolocation & Media</Typography>
-          <Button variant="outlined" startIcon={<MyLocationIcon />} onClick={() => setGeoPrompt(true)} disabled={loading}>
-            Get Current Location
+        <FormSection index={3} title={t.stepEvidence} optional={t.optional}>
+          <Stack spacing={2}>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ alignItems: { sm: 'center' } }}>
+              <Button
+                variant="outlined"
+                startIcon={locating ? <CircularProgress size={18} /> : <MyLocationRoundedIcon />}
+                onClick={() => setGeoPrompt(true)}
+                disabled={locating}
+                sx={{ boxShadow: 'none', '&:hover': { boxShadow: 'none', transform: 'none' } }}
+              >
+                {t.captureLocation}
+              </Button>
+              {form.latitude && form.longitude && (
+                <Chip icon={<CheckRoundedIcon />} color="success" variant="outlined" label={`${t.locationCaptured} · ${form.latitude}, ${form.longitude}`} sx={{ maxWidth: '100%' }} />
+              )}
+            </Stack>
+            {form.coordinate_mismatch && (
+              <Alert severity="warning" sx={{ borderRadius: '12px' }}>
+                {t.locationMismatch}
+              </Alert>
+            )}
+
+            {form.image_path ? (
+              <Box sx={{ position: 'relative', alignSelf: 'flex-start' }}>
+                <Box
+                  component="img"
+                  src={`/api/uploads/survey_images/${form.image_path}`}
+                  alt=""
+                  sx={{ display: 'block', maxWidth: '100%', maxHeight: 220, borderRadius: '12px', border: 1, borderColor: 'divider', objectFit: 'contain' }}
+                />
+                <IconButton
+                  size="small"
+                  aria-label="Remove photo"
+                  onClick={() => patch({ image_path: '' })}
+                  sx={{ position: 'absolute', top: 8, right: 8, bgcolor: 'background.paper', border: 1, borderColor: 'divider', '&:hover': { bgcolor: 'background.paper' } }}
+                >
+                  <CloseRoundedIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            ) : null}
+            <Button
+              component="label"
+              variant="outlined"
+              startIcon={uploading ? <CircularProgress size={18} /> : <AddAPhotoOutlinedIcon />}
+              disabled={uploading}
+              sx={{ height: 64, borderStyle: 'dashed', boxShadow: 'none', '&:hover': { boxShadow: 'none', transform: 'none', borderStyle: 'dashed' } }}
+            >
+              {uploading ? t.uploading : form.image_path ? t.replacePhoto : t.uploadPhoto}
+              <input
+                type="file"
+                hidden
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) uploadPhoto(file);
+                  e.target.value = '';
+                }}
+              />
+            </Button>
+          </Stack>
+        </FormSection>
+      </Stack>
+
+      {error && (
+        <Alert severity="error" sx={{ mt: 2, borderRadius: '12px' }} onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
+
+      <Box
+        sx={{
+          position: 'sticky',
+          bottom: 0,
+          mt: 3,
+          py: 2,
+          bgcolor: (theme) => alpha(theme.palette.background.default, 0.92),
+          backdropFilter: 'blur(8px)',
+          zIndex: 2,
+        }}
+      >
+        <Button
+          type="submit"
+          variant="contained"
+          disableElevation
+          size="large"
+          fullWidth
+          disabled={submitting || uploading || locating}
+          startIcon={submitting ? <CircularProgress size={20} color="inherit" /> : <CheckRoundedIcon />}
+          sx={{ py: 1.5, fontSize: '1rem' }}
+        >
+          {submitting ? t.submitting : t.submit}
+        </Button>
+      </Box>
+
+      <Dialog open={geoPrompt} onClose={() => setGeoPrompt(false)} PaperProps={{ sx: { borderRadius: '18px' } }}>
+        <DialogTitle sx={{ fontWeight: 700 }}>{t.geoConfirmTitle}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>{t.geoConfirmBody}</DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setGeoPrompt(false)} sx={{ boxShadow: 'none' }}>
+            {t.geoConfirmNo}
           </Button>
-          {(formData.latitude && formData.longitude) && (
-            <Typography variant="body2" color="success.main">Coordinates Captured: {formData.latitude}, {formData.longitude}</Typography>
-          )}
-
-          <Button component="label" variant="outlined" startIcon={imageUploading ? <CircularProgress size={20} /> : <CloudUploadIcon />} disabled={imageUploading} sx={{ height: 60, borderStyle: 'dashed' }}>
-            {imageUploading ? 'Uploading...' : 'Upload Image'}
-            <input type="file" hidden accept="image/*" onChange={handleImageUpload} />
+          <Button variant="contained" disableElevation onClick={captureLocation} autoFocus>
+            {t.geoConfirmYes}
           </Button>
-          {formData.image_path && (
-            <img src={`/api/uploads/survey_images/${formData.image_path}`} alt="Preview" style={{ maxWidth: '100%', maxHeight: 200, borderRadius: 8, objectFit: 'contain' }} />
-          )}
-
-          <Button variant="contained" color="primary" size="large" onClick={handleSubmit} disabled={loading} sx={{ mt: 4 }}>
-            {loading ? <CircularProgress size={24} color="inherit" /> : 'Submit Data'}
-          </Button>
-        </CardContent>
-      </Card>
-
-      <Dialog open={geoPrompt} onClose={() => setGeoPrompt(false)}>
-        <DialogTitle>Confirm Location</DialogTitle>
-        <DialogContent>Are you currently located exactly at this facility/property?</DialogContent>
-        <DialogActions>
-          <Button onClick={() => setGeoPrompt(false)}>No, Skip</Button>
-          <Button variant="contained" onClick={handleGeoConfirm} autoFocus>Yes, Capture Location</Button>
         </DialogActions>
       </Dialog>
-
-      <Snackbar open={!!error} autoHideDuration={6000} onClose={() => setError(null)}>
-        <MuiAlert severity="error" onClose={() => setError(null)}>{error}</MuiAlert>
-      </Snackbar>
-      <Snackbar open={success} autoHideDuration={6000}>
-        <MuiAlert severity="success">Data submitted successfully!</MuiAlert>
-      </Snackbar>
     </Box>
   );
 };
+
+const FormSection: React.FC<{ index: number; title: string; optional?: string; error?: boolean; children: React.ReactNode }> = ({ index, title, optional, error, children }) => (
+  <Paper
+    component="fieldset"
+    elevation={0}
+    sx={{ m: 0, p: { xs: 2, sm: 3 }, borderRadius: '18px', border: 1, borderColor: error ? 'error.main' : 'divider', minWidth: 0 }}
+  >
+    <Stack component="legend" direction="row" spacing={1.25} sx={{ alignItems: 'center', mb: 2.5, p: 0, float: 'left', width: '100%' }}>
+      <Box
+        sx={{
+          width: 28,
+          height: 28,
+          borderRadius: '50%',
+          display: 'grid',
+          placeItems: 'center',
+          fontSize: '0.8rem',
+          fontWeight: 700,
+          bgcolor: (theme) => alpha(theme.palette.primary.main, 0.1),
+          color: 'primary.main',
+          flexShrink: 0,
+        }}
+      >
+        {index}
+      </Box>
+      <Typography sx={{ fontWeight: 700 }}>{title}</Typography>
+      {optional && (
+        <Typography variant="caption" color="text.secondary">
+          · {optional}
+        </Typography>
+      )}
+    </Stack>
+    <Box sx={{ clear: 'both' }}>{children}</Box>
+  </Paper>
+);
+
 export default SurveyPage;

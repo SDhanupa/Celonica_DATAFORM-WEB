@@ -25,6 +25,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 
 import ProfilePage from '../pages/ProfilePage';
+import GlobalSearchBar from './GlobalSearchBar';
+
 
 import { useQuery } from '@apollo/client';
 import { GET_ME } from '../graphql/queries';
@@ -84,6 +86,11 @@ const TopBar: React.FC = () => {
               </Button>
             </Box>
           )}
+        </Box>
+
+        {/* Center Search Bar */}
+        <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', mx: 2 }}>
+          <GlobalSearchBar isDarkMode={false} />
         </Box>
 
         {/* Right Controls */}

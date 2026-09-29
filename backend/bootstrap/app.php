@@ -13,13 +13,17 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         // Apply CORS globally so GraphQL endpoint accepts cross-origin requests
+        // Identity keys are stripped from every request, guarded or not, so a
+        // client can never pre-seed `current_admin` / `keycloak_sub`.
         $middleware->use([
             \Illuminate\Http\Middleware\HandleCors::class,
+            \App\Http\Middleware\StripClientIdentityKeys::class,
         ]);
 
         // Register Keycloak guard as a named alias for use on routes
         $middleware->alias([
             'keycloak.admin' => \App\Http\Middleware\KeycloakAuthGuard::class,
+            'keycloak.optional' => \App\Http\Middleware\OptionalKeycloakAuth::class,
             'super_admin' => \App\Http\Middleware\SuperAdminMiddleware::class,
         ]);
     })

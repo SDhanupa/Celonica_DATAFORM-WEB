@@ -56,6 +56,9 @@ type Question {
     questionTextEn: String! @rename(attribute: "question_text_en")
     questionTextSi: String @rename(attribute: "question_text_si")
     questionTextTa: String @rename(attribute: "question_text_ta")
+    explanationEn: String @rename(attribute: "explanation_en")
+    explanationSi: String @rename(attribute: "explanation_si")
+    explanationTa: String @rename(attribute: "explanation_ta")
     inputType: String! @rename(attribute: "input_type")
     isRepeater: Boolean! @rename(attribute: "is_repeater")
     sortOrder: Int! @rename(attribute: "sort_order")
@@ -141,6 +144,10 @@ type Query {
     categoryBySlug(slug: String!): Category @cache(maxAge: 3600)
         @field(resolver: "App\\GraphQL\\Queries\\CategoryQueries@categoryBySlug")
 
+    "Get all descendants of a root slug as a flat searchable list with breadcrumbs"
+    categoriesByRootSlug(rootSlug: String!): [FlatCategory!]!
+        @field(resolver: "App\\GraphQL\\Queries\\CategoryQueries@categoriesByRootSlug")
+
     "Get all answers for questions in a specific category"
     categoryAnswers(categoryId: ID!): [UserAnswer!]!
         @field(resolver: "App\\GraphQL\\Queries\\QuestionQueries@categoryAnswers")
@@ -212,6 +219,17 @@ type District {
     nameEn: String
     nameSi: String
     nameTa: String
+}
+
+type FlatCategory {
+    id: ID!
+    slug: String!
+    nameEn: String!
+    nameSi: String!
+    nameTa: String!
+    parentId: ID
+    breadcrumb: String!
+    depth: Int!
 }
 
 type Category {
@@ -336,6 +354,9 @@ type Mutation {
         questionTextEn: String @rename(attribute: "question_text_en")
         questionTextSi: String @rename(attribute: "question_text_si")
         questionTextTa: String @rename(attribute: "question_text_ta")
+        explanationEn: String @rename(attribute: "explanation_en")
+        explanationSi: String @rename(attribute: "explanation_si")
+        explanationTa: String @rename(attribute: "explanation_ta")
         inputType: String @rename(attribute: "input_type")
         isRepeater: Boolean @rename(attribute: "is_repeater")
         sortOrder: Int @rename(attribute: "sort_order")

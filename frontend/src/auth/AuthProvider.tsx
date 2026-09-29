@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 import keycloak from './keycloak';
 import { useApolloClient, gql } from '@apollo/client';
 
@@ -6,12 +6,22 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   token: string | undefined;
+  /**
+   * Returns a token guaranteed valid for the next 30s, refreshing it first if
+   * needed. Access tokens live ~5 minutes, so long-lived admin screens must call
+   * this per request rather than reusing the `token` captured at render time.
+   */
+  getToken: () => Promise<string | undefined>;
   userInfo: {
     name?: string;
     email?: string;
     sub?: string;
     preferred_username?: string;
     realm_roles?: string[];
+    given_name?: string;
+    family_name?: string;
+    role?: string;
+    id?: string;
   } | null;
   logout: () => void;
   login: (redirectUri?: string) => void;
@@ -38,8 +48,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userInfo, setUserInfo] = useState<AuthContextType['userInfo']>(null);
+  const [token, setToken] = useState<string | undefined>(undefined);
   const isRun = React.useRef(false);
   const apolloClient = useApolloClient();
+
+  const getToken = useCallback(async () => {
+    if (!keycloak.authenticated) return undefined;
+    try {
+      await keycloak.updateToken(30);
+    } catch {
+      return undefined;
+    }
+    setToken(keycloak.token);
+    return keycloak.token;
+  }, []);
 
   useEffect(() => {
     if (isRun.current) return;
@@ -54,6 +76,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       })
       .then((authenticated) => {
         setIsAuthenticated(authenticated);
+        setToken(keycloak.token);
         if (authenticated && keycloak.tokenParsed) {
           setUserInfo({
             name: keycloak.tokenParsed['name'],
@@ -74,12 +97,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setIsLoading(false);
       });
 
-    // Auto-refresh token 30 seconds before expiry
+    // Auto-refresh token 30 seconds before expiry. Publishing the refreshed token
+    // to state is what keeps `useAuth().token` from going stale: without it every
+    // consumer keeps sending the first token until a full page reload.
     keycloak.onTokenExpired = () => {
-      keycloak.updateToken(30).catch(() => {
-        keycloak.logout();
-      });
+      keycloak.updateToken(30)
+        .then(() => setToken(keycloak.token))
+        .catch(() => {
+          keycloak.logout();
+        });
     };
+
+    keycloak.onAuthRefreshSuccess = () => setToken(keycloak.token);
+    keycloak.onAuthSuccess = () => setToken(keycloak.token);
+    keycloak.onAuthLogout = () => setToken(undefined);
   }, []);
 
   const logout = () => {
@@ -99,7 +130,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       value={{
         isAuthenticated,
         isLoading,
-        token: keycloak.token,
+        token,
+        getToken,
         userInfo,
         logout,
         login,

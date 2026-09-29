@@ -49,8 +49,8 @@ class OnboardingMutations
                     'gender' => $gender,
                 ]);
             } else {
-                // Insert new user
-                DB::table('users')->insert([
+                // Insert new user using Eloquent so HasUuids generates an ID
+                User::create([
                     'name' => $firstName . ' ' . $lastName,
                     'email' => $email,
                     'password' => bcrypt(Str::random(16)),
@@ -60,8 +60,6 @@ class OnboardingMutations
                     'dob' => $dob,
                     'gender' => $gender,
                     'keycloak_sub' => $sub,
-                    'created_at' => now(),
-                    'updated_at' => now(),
                 ]);
             }
 

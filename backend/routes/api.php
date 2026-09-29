@@ -17,24 +17,72 @@ use App\Http\Controllers\ImageUploadController;
 // Health check
 Route::get('/health', fn() => response()->json(['status' => 'ok', 'service' => 'Ceylonica Admin API']));
 
-// Public API Endpoints
+use App\Http\Controllers\IndustrySurveyController;
+
+// Public API Endpoints — read-only + survey submission (throttled)
 Route::middleware('throttle:30,1')->get('/guest-token', function() {
     $token = bin2hex(random_bytes(32));
     \Illuminate\Support\Facades\Cache::put('guest_token_' . $token, true, now()->addHours(24));
     return response()->json(['token' => $token, 'expires_in' => 86400]);
 });
 
+Route::middleware('throttle:60,1')->get('/search-gns', [\App\Http\Controllers\SearchController::class, 'searchGns']);
+
 Route::middleware('throttle:120,1')->group(function () {
     Route::get('/category-data-tables', [\App\Http\Controllers\CategoryDataUploadController::class, 'getBulkDataCategories']);
+    Route::get('/all-categories', [\App\Http\Controllers\CategoryDataUploadController::class, 'getAllCategories']);
+    Route::get('/search-all-data', [\App\Http\Controllers\CategoryDataUploadController::class, 'searchAllData']);
     Route::get('/category-data/{slug}', [\App\Http\Controllers\CategoryDataUploadController::class, 'getData']);
     Route::get('/category-tables/{slug}', [\App\Http\Controllers\CategoryTablesController::class, 'getTablesForCategory']);
     Route::post('/upload-survey-image', [\App\Http\Controllers\CategoryDataUploadController::class, 'uploadSurveyImage']);
     Route::get('/search-category-data/{slug}', [\App\Http\Controllers\CategoryDataUploadController::class, 'searchCategoryData']);
+
+    // Public read: the survey form needs to load questions without auth
+    Route::get('/business-survey-questions', [App\Http\Controllers\Api\BusinessSurveyQuestionController::class, 'index']);
+
+    // Village progress is public: it is counts only, and it is what invites a
+    // visitor to contribute in the first place.
+    Route::get('/contributions/village/{ccode}', [\App\Http\Controllers\ContributionController::class, 'village']);
+});
+
+// Anyone may contribute village data; a signed-in contributor is credited.
+Route::middleware(['throttle:30,1', 'keycloak.optional'])->group(function () {
     Route::post('/submit-survey-data/{slug}', [\App\Http\Controllers\CategoryDataUploadController::class, 'submitSurveyData']);
 });
 
-Route::middleware(['throttle:120,1', 'keycloak.admin'])->group(function () {
-    Route::get('/user-submissions', [\App\Http\Controllers\CategoryDataUploadController::class, 'getUserSubmissions']);
+Route::middleware(['throttle:60,1', 'keycloak.admin'])->group(function () {
+    Route::get('/contributions/mine', [\App\Http\Controllers\ContributionController::class, 'mine']);
+});
+
+// Rapid fire rounds: signed-in only, because answers are attributed and deduped per person.
+Route::middleware(['throttle:180,1', 'keycloak.admin'])->prefix('rapid-fire')->group(function () {
+    Route::get('/decks', [\App\Http\Controllers\RapidFireController::class, 'decks']);
+    Route::post('/sessions', [\App\Http\Controllers\RapidFireController::class, 'start']);
+    Route::post('/sessions/{id}/answers', [\App\Http\Controllers\RapidFireController::class, 'answer']);
+    Route::post('/sessions/{id}/complete', [\App\Http\Controllers\RapidFireController::class, 'complete']);
+});
+
+// Industry Survey submission — the page itself always requires a real Keycloak
+// login before a user can reach the form (see IndustrySurveyPage.tsx's
+// login-redirect effect), so every legitimate caller already carries a valid
+// Bearer token. `keycloak.admin` (misleadingly named — it authenticates any
+// verified token, admin or not) enforces that server-side too: previously
+// these routes had no auth at all, and IndustrySurveyController read identity
+// via `$request->user()`, which this custom guard never populates — so
+// `user_id` was null on every row and the ownership check was a permanent
+// no-op regardless of who called it. [2026-09-11 auth/IDOR fix]
+Route::middleware(['throttle:20,1', 'keycloak.admin'])->group(function () {
+    Route::post('/industry-survey', [IndustrySurveyController::class, 'store']);
+    Route::post('/industry-survey/generate-reg-number', [IndustrySurveyController::class, 'generateRegNumber']);
+});
+
+// OTP routes stay outside the auth group: verifying phone ownership is a
+// precondition of reaching a fully-authenticated state on some flows and must
+// not itself require one. Both are still rate-limited, and OtpController adds
+// a per-mobile send cooldown on top of the per-IP throttle below.
+Route::middleware('throttle:20,1')->group(function () {
+    Route::post('/otp/send', [\App\Http\Controllers\OtpController::class, 'send']);
+    Route::post('/otp/verify', [\App\Http\Controllers\OtpController::class, 'verify']);
 });
 
 
@@ -47,6 +95,11 @@ Route::middleware(['keycloak.admin'])->get('/locations', function () {
 
 // Protected API Endpoints (Super Admin Only)
 Route::middleware(['keycloak.admin', 'super_admin'])->group(function () {
+    Route::get('/industry-surveys', [IndustrySurveyController::class, 'index']);
+    Route::patch('/industry-surveys/{id}/approve', [IndustrySurveyController::class, 'approve']);
+
+    Route::get('/user-submissions', [\App\Http\Controllers\CategoryDataUploadController::class, 'getUserSubmissions']);
+
     Route::post('/upload-category-image', [ImageUploadController::class, 'upload']);
     Route::post('/upload-category-data', [\App\Http\Controllers\CategoryDataUploadController::class, 'upload']);
     Route::put('/category-data/{slug}/{id}', [\App\Http\Controllers\CategoryDataUploadController::class, 'updateData']);
@@ -56,9 +109,17 @@ Route::middleware(['keycloak.admin', 'super_admin'])->group(function () {
     Route::post('/category-data/{slug}/{id}/image', [\App\Http\Controllers\CategoryDataUploadController::class, 'uploadImage']);
     Route::post('/category-data/{slug}/{id}/approve', [\App\Http\Controllers\CategoryDataUploadController::class, 'approveData']);
     Route::post('/category-data/{slug}/{id}/replace', [\App\Http\Controllers\CategoryDataUploadController::class, 'replaceData']);
+    Route::post('/category-data/{slug}/generate-all-reg-numbers', [\App\Http\Controllers\CategoryDataUploadController::class, 'generateAllRegNumbers']);
     Route::post('/category-data/{slug}/{id}/generate-reg-number', [\App\Http\Controllers\CategoryDataUploadController::class, 'generateRegNumber']);
-});
 
+    // [C-01 FIX] Business Survey Questions write operations — super_admin only
+    // `all` differs from the public GET by including inactive rows, which the
+    // builder needs in order to show and re-enable a deactivated question.
+    Route::get('/business-survey-questions/all', [App\Http\Controllers\Api\BusinessSurveyQuestionController::class, 'adminIndex']);
+    Route::post('/business-survey-questions', [App\Http\Controllers\Api\BusinessSurveyQuestionController::class, 'store']);
+    Route::put('/business-survey-questions/{id}', [App\Http\Controllers\Api\BusinessSurveyQuestionController::class, 'update']);
+    Route::delete('/business-survey-questions/{id}', [App\Http\Controllers\Api\BusinessSurveyQuestionController::class, 'destroy']);
+});
 
 
 // Serve images through PHP since frontend Nginx container doesn't share the volume

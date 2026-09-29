@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 import { Box, Typography, Button, FormControl, CircularProgress, Alert, Dialog, DialogContent, DialogActions, Autocomplete, TextField, Divider, useTheme } from '@mui/material';
 import { useQuery } from '@apollo/client';
 import { GET_ALL_LOCATIONS, GET_GN_BY_COORDINATES } from '../graphql/queries';
@@ -7,11 +8,12 @@ interface LocationSelectorModalProps {
   open: boolean;
   onClose?: () => void;
   onLocationSelected?: (gn: any) => void;
-  language?: 'en' | 'si' | 'ta';
   isDarkMode?: boolean;
+  language?: string;
 }
 
-const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onClose, onLocationSelected, language = 'en', isDarkMode = false }) => {
+const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onClose, onLocationSelected, isDarkMode = false }) => {
+  const { language } = useLanguage();
   const themeColors = {
     primary: '#00A8FF',
     textMuted: isDarkMode ? '#AAAAAA' : '#666666',
@@ -97,17 +99,20 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
     let loadedGn: any = null;
     if (!showManualForm && activeGn) {
       loadedGn = activeGn;
-    } else if (showManualForm && selectedGN && gnData?.pDistrict?.gramaNiladharis) {
-      const found = gnData.pDistrict.gramaNiladharis.find((x: any) => x.id === selectedGN);
-      if (found) {
-        loadedGn = {
-          ...found,
-          pDistrict: {
-            id: gnData.pDistrict.id,
-            admin2NameEn: gnData.pDistrict.admin2NameEn,
-            pProvince: gnData.pDistrict.pProvince
-          }
-        };
+    } else if (showManualForm && selectedGN && allLocationsData?.pDistricts) {
+      const currentDistrict = allLocationsData.pDistricts.find((d: any) => d.id === selectedDistrict);
+      if (currentDistrict && currentDistrict.gramaNiladharis) {
+        const found = currentDistrict.gramaNiladharis.find((x: any) => x.id === selectedGN);
+        if (found) {
+          loadedGn = {
+            ...found,
+            pDistrict: {
+              id: currentDistrict.id,
+              admin2NameEn: currentDistrict.admin2NameEn,
+              pProvince: currentDistrict.pProvince
+            }
+          };
+        }
       }
     }
 
@@ -156,24 +161,12 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
           position: 'relative',
         }}
       >
-        <Box
-          sx={{
-            width: 88,
-            height: 88,
-            borderRadius: '50%',
-            bgcolor: 'rgba(255,255,255,0.15)',
-            backdropFilter: 'blur(10px)',
-            border: '3px solid rgba(255,255,255,0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-          }}
-        >
+        {/* Plain Transparent PNG Logos (No border, No box) */}
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3, my: 0.5 }}>
           <img
             src="/logo.png"
             alt="Ceylonica Logo"
-            style={{ height: '72px', width: '72px', objectFit: 'contain', borderRadius: '50%' }}
+            style={{ height: '56px', width: 'auto', objectFit: 'contain' }}
           />
         </Box>
 

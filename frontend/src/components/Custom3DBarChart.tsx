@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../context/LanguageContext';
 import { Box, Typography, Container, useTheme, useMediaQuery, CircularProgress } from '@mui/material';
 import { useQuery } from '@apollo/client';
 import { GET_HOUSING_DATA } from '../graphql/queries';
@@ -8,7 +9,6 @@ interface Custom3DBarChartProps {
   city_code?: string;
   gn_id?: string | number;
   location_name?: string;
-  language?: 'en' | 'si' | 'ta';
   isDarkMode?: boolean;
 }
 
@@ -28,7 +28,7 @@ const palette = [
   { color: '#00cec9', gradient: 'linear-gradient(to right, #00b894 0%, #00cec9 40%, #00cec9 60%, #00b894 100%)', topColor: '#81ecec' },
 ];
 
-const desktopCategoryLabels = [
+const desktopCategoryLabels: { key: string; label: string; sumKeys?: string[] }[] = [
   { key: 'before_80', label: 'Before 1980' },
   { key: 'y_1980_1989', label: '1980 - 1989' },
   { key: 'y_1990_1994', label: '1990 - 1994' },
@@ -43,7 +43,7 @@ const desktopCategoryLabels = [
   { key: 'y_2011', label: '2011' },
 ];
 
-const mobileCategoryLabels = [
+const mobileCategoryLabels: { key: string; label: string; sumKeys?: string[] }[] = [
   { key: 'group_before_90', label: 'Before 1990', sumKeys: ['before_80', 'y_1980_1989'] },
   { key: 'group_90s', label: '1990 - 1999', sumKeys: ['y_1990_1994', 'y_1995_1999'] },
   { key: 'group_early_00s', label: '2000 - 2006', sumKeys: ['y_2000_2004', 'y_2005', 'y_2006'] },
@@ -51,7 +51,8 @@ const mobileCategoryLabels = [
   { key: 'group_2010s', label: '2010 & Newer', sumKeys: ['y_2010', 'y_2011'] },
 ];
 
-export default function Custom3DBarChart({ isDarkMode = false,  district_id, city_code, gn_id, location_name, language = 'en' }: Custom3DBarChartProps) {
+export default function Custom3DBarChart({ isDarkMode = false,  district_id, city_code, gn_id, location_name}: Custom3DBarChartProps) {
+  const { language } = useLanguage();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -80,7 +81,7 @@ export default function Custom3DBarChart({ isDarkMode = false,  district_id, cit
   const chartData = categories.map((cat, index) => {
     let value = 0;
     if (isMobile && cat.sumKeys) {
-      value = cat.sumKeys.reduce((sum, key) => sum + Number(housingData[key] || 0), 0);
+      value = cat.sumKeys.reduce((sum: number, key: string) => sum + Number(housingData[key] || 0), 0);
     } else {
       value = Number(housingData[cat.key] || 0);
     }

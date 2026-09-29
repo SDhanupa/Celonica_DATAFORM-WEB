@@ -1,36 +1,35 @@
-# Chat History & Tasks Completed
+# Development Context - Today's Updates (Global Search Bar & Routing)
 
-Here is a log of the recent requests and the tasks we completed during this session to improve the UI/UX of the Ceylonica web application:
+This file contains the context of the recent features built so you can easily load it into a new chat to resume development.
 
-1. **"MY Village rfemove this and make ccode biger"**
-   - Removed the "MY Village" text and enlarged the CCODE/Location display in the header.
+## 1. Backend Search Implementation
+- **File**: `backend/app/Http/Controllers/SearchController.php`
+- **Route**: `GET /api/search-gns?q={query}` (added in `backend/routes/api.php` with `throttle:60,1`).
+- **Functionality**: 
+  - Searches `grama_niladharis` table across `name_en`, `name_si`, `name_ta`, `CCODE`, `ds_en`, `ds_si`, `ds_ta`.
+  - Uses `LOWER()` for PostgreSQL cross-compatibility and case-insensitive matching.
+  - Returns formatted data mapping the GN, District (`disEn`), and DS Division (`dsEn`).
 
-2. **"add a button here in center as join with us"**
-   - Added a "Join with us" button perfectly centered in the top navigation bar.
+## 2. Frontend Global Search Component
+- **File**: `frontend/src/components/GlobalSearchBar.tsx`
+- **Functionality**:
+  - Implements a stunning, glassmorphism UI for global searches.
+  - Queries local Categories and Subcategories, and fetches GNs from the new `/api/search-gns` backend.
+  - Formats GN results hierarchically: GN Name prominent, with `District › DS` beneath it.
+  - Directly handles navigation (e.g., `navigate('/gnpage/${gnName}/${ccode}')`).
 
-3. **"show this logo next to vilage name left side same size as vilage name"**
-   - Added the CDIC logo next to the village name, matching its size and making it responsive.
+## 3. Navbar Integrations
+- Replaced the simple search icons with `GlobalSearchBar` in three key places:
+  1. `frontend/src/components/GnTopHeaderBar.tsx` (Middle of the bar). Added `zIndex: 1000` and `position: 'relative'` to fix dropdown overlapping issues over the demographic charts.
+  2. `frontend/src/components/TopBar.tsx` (Admin dashboard bar).
+  3. `frontend/src/pages/CategoryDetailPage.tsx` (Pill-shaped category navigation).
 
-4. **"add logo above Ceylonica in fotter" & "keep both locatation logo"**
-   - Added the CDIC logo to the footer above the "Ceylonica" branding, while keeping the one next to the village name.
+## 4. Dashboard Location Syncing Fixes
+- **File**: `frontend/src/pages/UserDashboard.tsx`
+- **Fixes**:
+  - The GN dropdown in `GnTopHeaderBar` uses `String(gn.id)` values. Modified the sync logic in `UserDashboard.tsx` to wrap `activeGn.id` in `String()` so the Material-UI `<Select>` perfectly matches and selects the GN.
+  - Some database GNs have a missing `pDistrict` relationship (null). Updated `UserDashboard.tsx` to fallback to matching the raw `activeGn.disEn` (District English Name) against the master district array, ensuring the District dropdown is never left blank.
 
-5. **"make fotter logo biger"**
-   - Increased the size of the footer logo to make it more prominent.
-
-6. **"make bacground white color"**
-   - Changed the main application background to clean white for Light Mode.
-
-7. **"make containaras like a dark glass tansparant look not much dark just a bit"**
-   - Applied a beautiful glassmorphism effect (frosted glass with a slight dark tint and blur) to the Demographic Cards and Village Map containers.
-
-8. **"show bacground image in light mood and add ler of wite leavr tansparant to it so wite will show look better"**
-   - Brought the background image back to Light Mode but added a strong white gradient overlay (75% to 90% opacity) so the image sits faintly behind a bright white layer.
-
-9. **"fix fotter make it better"**
-   - Cleaned up the footer layout: scaled the logo down slightly (100px) so it's not overwhelming, evenly spaced out the link columns (`space-between`), and fixed the scroll-to-top button overlapping the bottom-right text.
-
-10. **"in dark mood this need to show theas doant show clealy fix it"**
-    - Fixed the District, DS Division, and Village dropdown selectors in Dark Mode so their text and icons are a readable light gray instead of dark text on a dark background.
-
-11. **"push to git"**
-    - Successfully pushed all the code and UI styling updates to your GitHub repository.
+## 5. GraphQL Modifications
+- **File**: `frontend/src/graphql/queries.ts`
+- **Updates**: Added `disEn` to the `GET_GN_BY_CCODE` query to support the fallback district matching logic mentioned above.

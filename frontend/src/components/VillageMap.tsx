@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 import { Box, Typography, IconButton, Tooltip, Divider, useTheme } from '@mui/material';
 import { MapContainer, TileLayer, Polygon, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -69,14 +70,16 @@ function MapCustomControls({
 }
 
 export interface VillageMapProps {
-  gnName: string;
   gnName?: string;
   district?: string;
   dsDivision?: string;
   ccode?: string;
   boundary?: any;
   height?: number | string;
-  language?: 'en' | 'si' | 'ta';
+  /** Immersive/background mode: drops the card chrome (border, radius, shadow)
+   *  and the "VILLAGE MAP" header pill, and lowers the floating controls so a
+   *  separate app bar can sit above them. Used by the mobile map-background view. */
+  immersive?: boolean;
 }
 
 export const VillageMap: React.FC<VillageMapProps> = ({
@@ -86,8 +89,9 @@ export const VillageMap: React.FC<VillageMapProps> = ({
   ccode,
   boundary,
   height = 520,
-  language = 'en',
+  immersive = false,
 }) => {
+  const { language } = useLanguage();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const mapTitle = language === 'si' ? 'ගම් සිතියම' : language === 'ta' ? 'கிராம வரைபடம்' : 'VILLAGE MAP';
@@ -111,7 +115,9 @@ export const VillageMap: React.FC<VillageMapProps> = ({
             ? raw[0][0]
             : raw;
 
-        return ring.map((pt: [number, number]) => [pt[1], pt[0]] as [number, number]);
+        return ring
+          .map((pt: [number, number]) => [pt[1], pt[0]] as [number, number])
+          .filter((p: [number, number]) => Number.isFinite(p[0]) && Number.isFinite(p[1]));
       }
     } catch (e) {
       console.error('Error parsing GN polygon:', e);
@@ -153,24 +159,34 @@ export const VillageMap: React.FC<VillageMapProps> = ({
     return parcels;
   }, [boundary]);
 
-  // Compute center & bounding box
-  const minLat = boundary?.minLat ?? 6.9271;
-  const maxLat = boundary?.maxLat ?? 6.9271;
-  const minLng = boundary?.minLng ?? 79.8612;
-  const maxLng = boundary?.maxLng ?? 79.8612;
+  // Compute center & bounding box.
+  // `?? fallback` does NOT catch NaN (NaN is a number), and a single NaN in the
+  // boundary would produce a NaN center and make Leaflet throw
+  // "Invalid LatLng (NaN, NaN)" — which, now that the map renders as the mobile
+  // background, would blank the whole page. So coerce every coordinate through a
+  // finite check and fall back to Colombo when any is missing/invalid.
+  const COLOMBO_LAT = 6.9271;
+  const COLOMBO_LNG = 79.8612;
+  const finite = (v: any): number | null => (typeof v === 'number' && Number.isFinite(v) ? v : null);
 
-  const centerLat = (minLat + maxLat) / 2 || 6.9271;
-  const centerLng = (minLng + maxLng) / 2 || 79.8612;
+  const bMinLat = finite(boundary?.minLat);
+  const bMaxLat = finite(boundary?.maxLat);
+  const bMinLng = finite(boundary?.minLng);
+  const bMaxLng = finite(boundary?.maxLng);
+  const hasValidBounds = bMinLat !== null && bMaxLat !== null && bMinLng !== null && bMaxLng !== null;
+
+  const centerLat = hasValidBounds ? (bMinLat! + bMaxLat!) / 2 : COLOMBO_LAT;
+  const centerLng = hasValidBounds ? (bMinLng! + bMaxLng!) / 2 : COLOMBO_LNG;
 
   const bounds: [[number, number], [number, number]] | null = useMemo(() => {
-    if (boundary?.minLat && boundary?.maxLat && boundary?.minLng && boundary?.maxLng) {
+    if (hasValidBounds) {
       return [
-        [boundary.minLat, boundary.minLng],
-        [boundary.maxLat, boundary.maxLng],
+        [bMinLat!, bMinLng!],
+        [bMaxLat!, bMaxLng!],
       ];
     }
     return null;
-  }, [boundary]);
+  }, [hasValidBounds, bMinLat, bMaxLat, bMinLng, bMaxLng]);
 
   return (
     <Box
@@ -178,16 +194,24 @@ export const VillageMap: React.FC<VillageMapProps> = ({
         position: 'relative',
         width: '100%',
         height: height,
-        borderRadius: '24px',
+        borderRadius: immersive ? 0 : '20px',
         overflow: 'hidden',
-        boxShadow: isDark
-          ? '0 16px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.15)'
-          : '0 16px 40px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.1)',
-        bgcolor: isDark ? 'rgba(15, 23, 42, 0.7)' : 'rgba(0, 0, 0, 0.12)',
-        backdropFilter: 'blur(20px)',
+        boxShadow: immersive
+          ? 'none'
+          : isDark
+          ? 'none'
+          : '0 1px 2px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.06)',
+        border: immersive
+          ? 'none'
+          : isDark
+          ? '1px solid rgba(255,255,255,0.08)'
+          : '1px solid #e5e9f0',
+        bgcolor: isDark ? '#111827' : '#ffffff',
+        animation: 'fadeIn 0.5s ease both',
       }}
     >
       {/* ── CARD HEADER (VILLAGE MAP / ගම් සිතියම) ────────────────── */}
+      {!immersive && (
       <Box
         sx={{
           position: 'absolute',
@@ -225,12 +249,13 @@ export const VillageMap: React.FC<VillageMapProps> = ({
           </Typography>
         </Box>
       </Box>
+      )}
 
       {/* ── LEFT FLOATING CONTROLS (+, -, Fullscreen, Compass) ──────── */}
       <Box
         sx={{
           position: 'absolute',
-          top: 70,
+          top: immersive ? 96 : 70,
           left: 16,
           zIndex: 1000,
           display: 'flex',
@@ -293,7 +318,7 @@ export const VillageMap: React.FC<VillageMapProps> = ({
       <Box
         sx={{
           position: 'absolute',
-          top: 70,
+          top: immersive ? 96 : 70,
           right: 16,
           zIndex: 1000,
           display: 'flex',
