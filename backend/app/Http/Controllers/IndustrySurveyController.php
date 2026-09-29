@@ -19,18 +19,16 @@ class IndustrySurveyController extends Controller
     /**
      * Resolve the caller's identity as set by KeycloakAuthGuard.
      *
-     * The guard authenticates via `$request->merge([...])`, not Laravel's Auth
-     * facade — `$request->user()` is always null here regardless of token
-     * validity, and reading it (as this controller used to) silently treats
-     * every caller, authenticated or not, as anonymous. `keycloak_sub` is only
-     * present for a real, verified JWT; a guest token or an onboarding-only
-     * session (no DB user/admin row yet) leaves it null, which this endpoint
-     * must refuse — a survey has to be owned by someone identifiable so the
-     * ownership check below is a check, not a formality.
+     * `$request->user()` is always null in this app (the guard never calls
+     * Auth::login), and `$request->input('keycloak_sub')` shares a bag with
+     * client-supplied parameters — with a public guest token a caller could
+     * post someone else's sub and act as them. Request attributes are only
+     * writable server-side. A guest token leaves the sub unset, which this
+     * endpoint must refuse: a survey has to be owned by someone identifiable.
      */
     private function requireIdentity(Request $request): ?string
     {
-        $sub = $request->input('keycloak_sub');
+        $sub = $request->attributes->get('keycloak_sub');
         return is_string($sub) && $sub !== '' ? $sub : null;
     }
 

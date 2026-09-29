@@ -15,6 +15,8 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import AdminsPage from './pages/AdminsPage';
 import UserPage from './pages/UserPage';
+import MyContributionsPage from './pages/MyContributionsPage';
+import RapidFirePage from './pages/RapidFirePage';
 
 import { UsersPage, ReportsPage } from './pages/PlaceholderPages';
 import RegistrationPage from './pages/RegistrationPage';
@@ -84,6 +86,22 @@ const App: React.FC = () => {
                 element={
                   <ProtectedRoute>
                     <UserPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/user/rapid-fire"
+                element={
+                  <ProtectedRoute>
+                    <RapidFirePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/user/contributions"
+                element={
+                  <ProtectedRoute>
+                    <MyContributionsPage />
                   </ProtectedRoute>
                 }
               />

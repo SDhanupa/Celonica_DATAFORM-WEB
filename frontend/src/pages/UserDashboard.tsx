@@ -26,6 +26,9 @@ import { GnTopHeaderBar } from '../components/GnTopHeaderBar';
 import { DemographicCards } from '../components/DemographicCards';
 import VillageQuickStats from '../components/VillageQuickStats';
 import MobileDashboard from '../components/mobile/MobileDashboard';
+import ContributeBanner from '../components/contribute/ContributeBanner';
+import { useContributeCopy } from '../components/contribute/copy';
+import { saveVillage } from '../components/contribute/village';
 
 
 const tChart = {
@@ -256,6 +259,22 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   });
 
   const activeGn = urlGnData?.gnByCcode || autoGnData?.gnByCoordinates;
+  const { t: contributeCopy } = useContributeCopy();
+
+  /** Contributing from a village page means contributing to *that* village. */
+  const rememberActiveVillage = () => {
+    if (!activeGn) return;
+    const { boundary: _boundary, police: _police, ...village } = activeGn as any;
+    saveVillage(village);
+  };
+  const startContributing = () => {
+    rememberActiveVillage();
+    navigate('/user');
+  };
+  const joinToContribute = () => {
+    rememberActiveVillage();
+    register(`${window.location.origin}/user`);
+  };
 
   // Geolocation Effect
   useEffect(() => {
@@ -863,6 +882,17 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           roofData={roofData}
           religionData={religionData}
           householdHeadData={householdHeadData}
+          contributeSlot={
+            <ContributeBanner
+              compact
+              ccode={displayCCODE || activeGn?.CCODE}
+              villageName={displayGN || activeGn?.nameEn || ''}
+              isAuthenticated={isAuthenticated}
+              isDarkMode={isDarkMode}
+              onContribute={startContributing}
+              onJoin={joinToContribute}
+            />
+          }
         />
       ) : (
       <>
@@ -997,7 +1027,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                   disableRipple
                   sx={{ textTransform: 'none', fontWeight: 600, fontSize: '0.85rem', color: isDarkMode ? '#cbd5e1' : '#334155', boxShadow: 'none', '&:hover': { bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)', boxShadow: 'none', transform: 'none' } }}
                 >
-                  Dashboard
+                  {userInfo?.realm_roles?.includes('super_admin') ? 'Dashboard' : contributeCopy.navContribute}
                 </Button>
                 <Button
                   onClick={() => logout()}
@@ -1019,14 +1049,14 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                 <Button
                   variant="contained"
                   disableElevation
-                  onClick={() => register(window.location.href)}
+                  onClick={joinToContribute}
                   sx={{
                     textTransform: 'none', fontWeight: 700, fontSize: '0.85rem', borderRadius: '9px',
                     bgcolor: '#2563eb', color: '#fff', px: 2, boxShadow: 'none',
                     '&:hover': { bgcolor: '#1d4ed8', boxShadow: 'none', transform: 'none' },
                   }}
                 >
-                  Join with us
+                  {contributeCopy.bannerCtaGuest}
                 </Button>
               </>
             ) : null}
@@ -1370,6 +1400,17 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                 />
               </Box>
             </Box>
+          </Box>
+
+          <Box sx={{ mt: -2, mb: 2, animation: 'fadeInUp 0.5s ease 320ms both' }}>
+            <ContributeBanner
+              ccode={displayCCODE || activeGn?.CCODE}
+              villageName={displayGN || activeGn?.nameEn || ''}
+              isAuthenticated={isAuthenticated}
+              isDarkMode={isDarkMode}
+              onContribute={startContributing}
+              onJoin={joinToContribute}
+            />
           </Box>
         </Container>
       </Box>

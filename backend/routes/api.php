@@ -36,10 +36,30 @@ Route::middleware('throttle:120,1')->group(function () {
     Route::get('/category-tables/{slug}', [\App\Http\Controllers\CategoryTablesController::class, 'getTablesForCategory']);
     Route::post('/upload-survey-image', [\App\Http\Controllers\CategoryDataUploadController::class, 'uploadSurveyImage']);
     Route::get('/search-category-data/{slug}', [\App\Http\Controllers\CategoryDataUploadController::class, 'searchCategoryData']);
-    Route::post('/submit-survey-data/{slug}', [\App\Http\Controllers\CategoryDataUploadController::class, 'submitSurveyData']);
 
     // Public read: the survey form needs to load questions without auth
     Route::get('/business-survey-questions', [App\Http\Controllers\Api\BusinessSurveyQuestionController::class, 'index']);
+
+    // Village progress is public: it is counts only, and it is what invites a
+    // visitor to contribute in the first place.
+    Route::get('/contributions/village/{ccode}', [\App\Http\Controllers\ContributionController::class, 'village']);
+});
+
+// Anyone may contribute village data; a signed-in contributor is credited.
+Route::middleware(['throttle:30,1', 'keycloak.optional'])->group(function () {
+    Route::post('/submit-survey-data/{slug}', [\App\Http\Controllers\CategoryDataUploadController::class, 'submitSurveyData']);
+});
+
+Route::middleware(['throttle:60,1', 'keycloak.admin'])->group(function () {
+    Route::get('/contributions/mine', [\App\Http\Controllers\ContributionController::class, 'mine']);
+});
+
+// Rapid fire rounds: signed-in only, because answers are attributed and deduped per person.
+Route::middleware(['throttle:180,1', 'keycloak.admin'])->prefix('rapid-fire')->group(function () {
+    Route::get('/decks', [\App\Http\Controllers\RapidFireController::class, 'decks']);
+    Route::post('/sessions', [\App\Http\Controllers\RapidFireController::class, 'start']);
+    Route::post('/sessions/{id}/answers', [\App\Http\Controllers\RapidFireController::class, 'answer']);
+    Route::post('/sessions/{id}/complete', [\App\Http\Controllers\RapidFireController::class, 'complete']);
 });
 
 // Industry Survey submission — the page itself always requires a real Keycloak

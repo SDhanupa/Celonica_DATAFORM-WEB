@@ -315,40 +315,7 @@ class CategoryDataUploadController extends Controller
         }
         if ($request->has('gn_id') && $request->input('gn_id')) {
             $gnCode = strtoupper($request->input('gn_id'));
-            
-            $gnQuery = DB::table('grama_niladharis')->where('CCODE', $gnCode);
-            if (is_numeric($gnCode)) {
-                $gnQuery->orWhere('id', $gnCode);
-            }
-            $gn = $gnQuery->first();
-            
-            $gnNames = [];
-            if ($gn) {
-                if ($gn->name_en) $gnNames[] = $gn->name_en;
-                if ($gn->name_si) $gnNames[] = $gn->name_si;
-                if ($gn->name_ta) $gnNames[] = $gn->name_ta;
-            }
-
-            $query->where(function($q) use ($tableName, $gnCode, $gn, $gnNames) {
-                // 1. Matched perfectly via joined table or explicit gn_id
-                $q->where($tableName . '.gn_id', $gn ? $gn->id : $gnCode)
-                  ->orWhere($tableName . '.gn_id', $gnCode)
-                  // 2. Unmapped but has a generated reg_number with this CCODE
-                  ->orWhere($tableName . '.reg_number', 'ilike', $gnCode . '/%');
-                  
-                // 3. Unmapped but raw location data perfectly matches this GN
-                if ($gn && !empty($gnNames)) {
-                    $q->orWhere(function($subQ) use ($tableName, $gnNames, $gn) {
-                        $subQ->whereIn($tableName . '.raw_gn', $gnNames);
-                        if ($gn->ds_en) {
-                            $subQ->where($tableName . '.raw_ds', $gn->ds_en);
-                        }
-                        if ($gn->dis_en) {
-                            $subQ->where($tableName . '.raw_district', $gn->dis_en);
-                        }
-                    });
-                }
-            });
+            \App\Support\GnRecordScope::apply($query, $tableName, $gnCode, \App\Support\GnRecordScope::resolveGn($gnCode));
         }
 
         // Special flag to only return NULL data (unmapped)
@@ -948,6 +915,33 @@ class CategoryDataUploadController extends Controller
 
     public function submitSurveyData(Request $request, $slug)
     {
+        // This endpoint is public and creates a table on first use, so it must
+        // only ever do that for a category that actually exists — otherwise any
+        // caller could create arbitrary tables just by varying the URL.
+        if (!preg_match('/^[a-z0-9-]{1,120}$/', (string) $slug) || !DB::table('categories')->where('slug', $slug)->exists()) {
+            return response()->json(['success' => false, 'message' => 'Unknown category.'], 404);
+        }
+
+        $request->validate([
+            'reg_number' => ['nullable', 'string', 'max:64'],
+            'gn_code' => ['nullable', 'string', 'max:32'],
+            'name_en' => ['nullable', 'string', 'max:255'],
+            'name_si' => ['nullable', 'string', 'max:255'],
+            'name_ta' => ['nullable', 'string', 'max:255'],
+            'name_singlish' => ['nullable', 'string', 'max:255'],
+            'raw_province' => ['nullable', 'string', 'max:120'],
+            'raw_district' => ['nullable', 'string', 'max:120'],
+            'raw_ds' => ['nullable', 'string', 'max:120'],
+            'raw_gn' => ['nullable', 'string', 'max:120'],
+            'mobile' => ['nullable', 'string', 'max:32'],
+            'address' => ['nullable', 'string', 'max:1000'],
+            'contact_person_name' => ['nullable', 'string', 'max:255'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+            'image_path' => ['nullable', 'string', 'max:500'],
+            'coordinate_mismatch' => ['nullable', 'boolean'],
+        ]);
+
         $tableName = 'category_data_' . str_replace('-', '_', $slug);
 
         if (!Schema::hasTable($tableName)) {
@@ -984,6 +978,8 @@ class CategoryDataUploadController extends Controller
                 $table->timestamps();
             });
         }
+
+        \App\Support\CategoryDataSchema::ensureContributorColumn($tableName);
 
         $payload = $request->all();
         $isUpdate = !empty($payload['reg_number']);
@@ -1069,7 +1065,9 @@ class CategoryDataUploadController extends Controller
             'longitude' => $payload['longitude'] ?? null,
             'latitude' => $payload['latitude'] ?? null,
             'image_path' => $payload['image_path'] ?? null,
-            'added_by_user_id' => auth()->id() ?? null,
+            // Set by OptionalKeycloakAuth from a verified token only; null for
+            // anonymous contributions. (`auth()->id()` is always null in this app.)
+            'contributor_sub' => $request->attributes->get('keycloak_sub'),
             'is_approved' => false,
             'status' => 'pending',
             'is_update_proposal' => $isUpdate,
@@ -1081,8 +1079,16 @@ class CategoryDataUploadController extends Controller
         DB::table($tableName)->insert($insertData);
 
         $this->invalidateCategoryCache($slug);
+        \App\Http\Controllers\ContributionController::forgetVillageCache($payload['gn_code'] ?? null);
 
-        return response()->json(['success' => true, 'message' => 'Data submitted successfully.', 'reg_number' => $regNumber]);
+        return response()->json([
+            'success' => true,
+            'message' => 'Data submitted successfully.',
+            'reg_number' => $regNumber,
+            'status' => 'pending',
+            'is_update_proposal' => $isUpdate,
+            'credited' => $insertData['contributor_sub'] !== null,
+        ]);
     }
 
     public function approveData(Request $request, $slug, $id)

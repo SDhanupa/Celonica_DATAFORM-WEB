@@ -2,83 +2,53 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Alert,
   Autocomplete,
-  Avatar,
   Box,
   Button,
-  ButtonBase,
   Card,
   CardActionArea,
   Chip,
   Container,
-  Divider,
   InputAdornment,
-  ListItemIcon,
-  Menu,
-  MenuItem,
   Paper,
   Skeleton,
   Stack,
   TextField,
-  Tooltip,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography,
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
+import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import BoltRoundedIcon from '@mui/icons-material/BoltRounded';
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
-import ArrowOutwardRoundedIcon from '@mui/icons-material/ArrowOutwardRounded';
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
-import EditLocationAltOutlinedIcon from '@mui/icons-material/EditLocationAltOutlined';
-import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import LayersRoundedIcon from '@mui/icons-material/LayersRounded';
-import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
+import HourglassTopRoundedIcon from '@mui/icons-material/HourglassTopRounded';
 import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
+import StorefrontRoundedIcon from '@mui/icons-material/StorefrontRounded';
+import VolunteerActivismRoundedIcon from '@mui/icons-material/VolunteerActivismRounded';
 import { useAuth } from '../auth/AuthProvider';
 import LocationSelectorModal from '../components/LocationSelectorModal';
 import { getCategoryVisual } from '../components/categories/categoryVisuals';
+import UserTopBar from '../components/contribute/UserTopBar';
+import VillageProgressCard from '../components/contribute/VillageProgressCard';
+import { fill, localName, useContributeCopy } from '../components/contribute/copy';
+import { readSavedVillage, saveVillage, SavedVillage, villageCode, villageName, villagePath } from '../components/contribute/village';
+import { useMyContributions, useVillageProgress, VillageCategoryProgress } from '../api/contributions';
 import { GET_CATEGORIES } from '../graphql/queries';
-
-const LOCATION_KEY = 'user_selected_location';
 
 interface SearchOption {
   type: 'category' | 'subcategory';
   label: string;
-  labelSi: string;
+  secondary: string;
   slug: string;
+  rootSlug: string;
   parentName: string | null;
 }
-
-/** A corrupted or hand-edited storage entry must not take the whole page down. */
-const readSavedLocation = (): any | null => {
-  const raw = sessionStorage.getItem(LOCATION_KEY) || localStorage.getItem(LOCATION_KEY);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw);
-  } catch {
-    sessionStorage.removeItem(LOCATION_KEY);
-    localStorage.removeItem(LOCATION_KEY);
-    return null;
-  }
-};
-
-const regionPath = (loc: any) =>
-  `/gnpage/${encodeURIComponent(String(loc.nameEn || '').replace(/ /g, '-'))}/${encodeURIComponent(loc.CCODE)}`;
-
-const greetingFor = (date: Date) => {
-  const hour = date.getHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 17) return 'Good afternoon';
-  return 'Good evening';
-};
-
-/** Several categories store the English name in `nameSi`; repeating it adds noise, not information. */
-const sinhalaName = (item: { nameEn?: string; nameSi?: string }): string => {
-  const si = (item.nameSi || '').trim();
-  return si && si !== (item.nameEn || '').trim() ? si : '';
-};
 
 const countDescendants = (children: any[] | undefined): number =>
   (children || []).reduce((sum, child) => sum + 1 + countDescendants(child.children), 0);
@@ -98,16 +68,21 @@ const quietButton = {
 };
 
 const UserPage: React.FC = () => {
-  const { userInfo, logout } = useAuth();
+  const { userInfo } = useAuth();
+  const { t, language } = useContributeCopy();
   const navigate = useNavigate();
+  const topicsRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
-  const [selectedLocation, setSelectedLocation] = useState<any>(readSavedLocation);
-  const [showLocationModal, setShowLocationModal] = useState<boolean>(() => !readSavedLocation());
-  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
+  const [village, setVillage] = useState<SavedVillage | null>(readSavedVillage);
+  const [showLocationModal, setShowLocationModal] = useState<boolean>(() => !readSavedVillage());
   const [searchInput, setSearchInput] = useState('');
+  const [filter, setFilter] = useState<'all' | 'needs'>('all');
 
+  const ccode = villageCode(village);
   const { data: catData, loading: catLoading, error: catError, refetch } = useQuery(GET_CATEGORIES);
+  const progress = useVillageProgress(ccode);
+  const mine = useMyContributions();
 
   useEffect(() => {
     if (!userInfo) return;
@@ -132,344 +107,197 @@ const UserPage: React.FC = () => {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
 
-  const categories: any[] = useMemo(() => {
-    const list = [...(catData?.categories || [])];
-    // Categories with content first; within each group keep the curated order.
-    return list.sort((a, b) => {
-      const aOpen = a.children?.length ? 0 : 1;
-      const bOpen = b.children?.length ? 0 : 1;
-      return aOpen - bOpen || (a.sortOrder ?? 0) - (b.sortOrder ?? 0);
-    });
-  }, [catData]);
+  const categories: any[] = useMemo(
+    () => [...(catData?.categories || [])].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
+    [catData],
+  );
 
-  const totalSubcategories = useMemo(() => categories.reduce((sum, c) => sum + countDescendants(c.children), 0), [categories]);
+  const progressBySlug = useMemo(() => {
+    const map = new Map<string, VillageCategoryProgress>();
+    progress.data?.categories.forEach((c) => map.set(c.slug, c));
+    return map;
+  }, [progress.data]);
+
+  const visibleCategories = useMemo(
+    () => (filter === 'needs' && progress.data ? categories.filter((c) => !(progressBySlug.get(c.slug)?.records)) : categories),
+    [filter, categories, progressBySlug, progress.data],
+  );
 
   const searchOptions = useMemo<SearchOption[]>(() => {
     const options: SearchOption[] = [];
-    const walk = (children: any[] | undefined, parentPath: string, rootName: string) => {
+    const walk = (children: any[] | undefined, parentPath: string, root: any) => {
       (children || []).forEach((child) => {
         const slug = `${parentPath}/${child.slug}`;
-        options.push({ type: 'subcategory', label: child.nameEn || '', labelSi: sinhalaName(child), slug, parentName: rootName });
-        walk(child.children, slug, rootName);
+        options.push({ type: 'subcategory', label: child.nameEn || '', secondary: '', slug, rootSlug: root.slug, parentName: localName(root, language) });
+        walk(child.children, slug, root);
       });
     };
     categories.forEach((cat) => {
-      options.push({ type: 'category', label: cat.nameEn || '', labelSi: sinhalaName(cat), slug: cat.slug, parentName: null });
-      walk(cat.children, cat.slug, cat.nameEn || '');
+      const label = localName(cat, language);
+      options.push({ type: 'category', label, secondary: label !== cat.nameEn ? cat.nameEn : '', slug: cat.slug, rootSlug: cat.slug, parentName: null });
+      walk(cat.children, cat.slug, cat);
     });
     return options;
-  }, [categories]);
+  }, [categories, language]);
 
-  const handleLocationSelected = useCallback((gn: any) => {
-    setSelectedLocation(gn);
-    const serialised = JSON.stringify(gn);
-    sessionStorage.setItem(LOCATION_KEY, serialised);
-    localStorage.setItem(LOCATION_KEY, serialised);
+  const handleVillageSelected = useCallback((gn: any) => {
+    saveVillage(gn);
+    setVillage(gn);
     setShowLocationModal(false);
   }, []);
 
-  const displayName = userInfo?.name || userInfo?.preferred_username || 'there';
-  const firstName = displayName.split(' ')[0];
-  const initial = displayName.charAt(0).toUpperCase();
+  const scrollToTopics = () => topicsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? t.greetingMorning : hour < 17 ? t.greetingAfternoon : t.greetingEvening;
+  const firstName = (userInfo?.given_name || userInfo?.name || userInfo?.preferred_username || '').split(' ')[0];
+  const vName = villageName(village, language);
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', overflowX: 'hidden' }}>
-      {/* ── Header ───────────────────────────────────────────────────────── */}
-      <Box
-        component="header"
-        sx={{
-          position: 'sticky',
-          top: 0,
-          zIndex: (t) => t.zIndex.appBar,
-          bgcolor: (t) => alpha(t.palette.background.paper, 0.8),
-          backdropFilter: 'saturate(180%) blur(14px)',
-          borderBottom: 1,
-          borderColor: 'divider',
-        }}
-      >
-        <Container maxWidth="lg" sx={{ height: { xs: 56, sm: 64 }, display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 }, px: { xs: 2, sm: 3 } }}>
-          <ButtonBase
-            onClick={() => navigate('/gnpage')}
-            aria-label="Ceylonica home"
-            sx={{ borderRadius: '10px', p: 0.5, gap: 1.25, '&:focus-visible': { outline: 2, outlineColor: 'primary.main' } }}
-          >
-            <Box
-              sx={{
-                width: 32,
-                height: 32,
-                borderRadius: '10px',
-                background: (t) => `linear-gradient(135deg, ${t.palette.primary.main}, ${t.palette.primary.dark})`,
-                color: 'primary.contrastText',
-                display: 'grid',
-                placeItems: 'center',
-                fontWeight: 700,
-                fontSize: '0.95rem',
-                boxShadow: (t) => `0 4px 12px ${alpha(t.palette.primary.main, 0.35)}`,
-              }}
-            >
-              C
-            </Box>
-            <Typography sx={{ fontWeight: 700, fontSize: '1.05rem', letterSpacing: '-0.02em' }}>Ceylonica</Typography>
-          </ButtonBase>
+      <UserTopBar onChangeVillage={() => setShowLocationModal(true)} />
 
-          <Box sx={{ flex: 1 }} />
-
-          <Button color="inherit" startIcon={<HomeOutlinedIcon />} onClick={() => navigate('/gnpage')} sx={{ display: { xs: 'none', sm: 'inline-flex' }, ...quietButton }}>
-            Home
-          </Button>
-
-          <Tooltip title="Account">
-            <ButtonBase
-              onClick={(e) => setMenuAnchor(e.currentTarget)}
-              aria-label="Open account menu"
-              aria-haspopup="menu"
-              aria-expanded={Boolean(menuAnchor)}
-              sx={{
-                borderRadius: 999,
-                pl: 0.5,
-                pr: { xs: 0.5, sm: 1.5 },
-                py: 0.5,
-                gap: 1,
-                border: 1,
-                borderColor: 'divider',
-                bgcolor: 'background.paper',
-                transition: 'background-color 150ms ease, border-color 150ms ease',
-                '&:hover': { bgcolor: 'action.hover' },
-                '&:focus-visible': { outline: 2, outlineColor: 'primary.main', outlineOffset: 2 },
-              }}
-            >
-              <Avatar sx={{ width: 30, height: 30, bgcolor: 'primary.main', fontSize: '0.85rem', fontWeight: 600 }}>{initial}</Avatar>
-              <Typography variant="body2" sx={{ fontWeight: 600, display: { xs: 'none', sm: 'block' }, maxWidth: 160 }} noWrap>
-                {displayName}
-              </Typography>
-            </ButtonBase>
-          </Tooltip>
-
-          <Menu
-            anchorEl={menuAnchor}
-            open={Boolean(menuAnchor)}
-            onClose={() => setMenuAnchor(null)}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-            slotProps={{ paper: { sx: { mt: 1, minWidth: 240, borderRadius: '14px', border: 1, borderColor: 'divider', boxShadow: '0 16px 40px rgba(23,43,58,0.12)' } } }}
-          >
-            <Box sx={{ px: 2, py: 1.5 }}>
-              <Typography variant="body2" sx={{ fontWeight: 600 }} noWrap>
-                {displayName}
-              </Typography>
-              {userInfo?.email && (
-                <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block' }}>
-                  {userInfo.email}
-                </Typography>
-              )}
-            </Box>
-            <Divider />
-            <MenuItem
-              onClick={() => {
-                setMenuAnchor(null);
-                navigate('/gnpage');
-              }}
-              sx={{ display: { sm: 'none' } }}
-            >
-              <ListItemIcon>
-                <HomeOutlinedIcon fontSize="small" />
-              </ListItemIcon>
-              Home
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                setMenuAnchor(null);
-                setShowLocationModal(true);
-              }}
-            >
-              <ListItemIcon>
-                <EditLocationAltOutlinedIcon fontSize="small" />
-              </ListItemIcon>
-              Change region
-            </MenuItem>
-            <MenuItem onClick={() => logout()} sx={{ color: 'error.main' }}>
-              <ListItemIcon sx={{ color: 'error.main' }}>
-                <LogoutRoundedIcon fontSize="small" />
-              </ListItemIcon>
-              Log out
-            </MenuItem>
-          </Menu>
-        </Container>
-      </Box>
-
-      {/* ── Hero band ────────────────────────────────────────────────────── */}
+      {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <Box
         sx={{
           position: 'relative',
-          background: (t) => `linear-gradient(180deg, ${alpha(t.palette.primary.main, 0.08)} 0%, ${alpha(t.palette.primary.main, 0)} 100%)`,
+          background: (theme) => `linear-gradient(180deg, ${alpha(theme.palette.success.main, 0.07)} 0%, ${alpha(theme.palette.primary.main, 0.03)} 55%, ${alpha(theme.palette.primary.main, 0)} 100%)`,
           '&::before': {
             content: '""',
             position: 'absolute',
             inset: 0,
-            backgroundImage: (t) => `radial-gradient(${alpha(t.palette.primary.main, 0.16)} 1px, transparent 1px)`,
+            backgroundImage: (theme) => `radial-gradient(${alpha(theme.palette.success.main, 0.16)} 1px, transparent 1px)`,
             backgroundSize: '22px 22px',
-            maskImage: 'linear-gradient(180deg, #000 0%, transparent 85%)',
-            WebkitMaskImage: 'linear-gradient(180deg, #000 0%, transparent 85%)',
+            maskImage: 'linear-gradient(180deg, #000 0%, transparent 80%)',
+            WebkitMaskImage: 'linear-gradient(180deg, #000 0%, transparent 80%)',
             pointerEvents: 'none',
           },
         }}
       >
-        <Container maxWidth="lg" sx={{ position: 'relative', px: { xs: 2, sm: 3 }, pt: { xs: 3.5, md: 6 }, pb: { xs: 3, md: 5 } }}>
-          <Typography
-            variant="overline"
-            sx={{ color: 'primary.main', fontWeight: 700, letterSpacing: '0.12em', display: 'block', mb: 0.5, lineHeight: 1.6 }}
-          >
-            {greetingFor(new Date())}
+        <Container maxWidth="lg" sx={{ position: 'relative', px: { xs: 2, sm: 3 }, pt: { xs: 3.5, md: 6 }, pb: { xs: 3, md: 4 } }}>
+          <Typography variant="overline" sx={{ color: 'success.main', fontWeight: 700, letterSpacing: '0.12em', display: 'block', mb: 0.5, lineHeight: 1.6 }}>
+            {greeting}
+            {firstName ? `, ${firstName}` : ''}
           </Typography>
           <Typography
             component="h1"
-            sx={{ fontSize: { xs: '1.9rem', sm: '2.4rem', md: '2.9rem' }, fontWeight: 700, letterSpacing: '-0.035em', lineHeight: 1.1, mb: 1.25 }}
+            sx={{ fontSize: { xs: '1.9rem', sm: '2.4rem', md: '2.9rem' }, fontWeight: 700, letterSpacing: '-0.035em', lineHeight: 1.12, mb: 1.5, maxWidth: 760 }}
           >
-            Welcome back, {firstName}
+            {vName ? fill(t.heroTitle, { village: vName }) : t.heroTitleNoVillage}
           </Typography>
-          <Typography color="text.secondary" sx={{ fontSize: { xs: '0.95rem', sm: '1.05rem' }, maxWidth: 560, mb: 2.5 }}>
-            {selectedLocation
-              ? 'Explore data and surveys for your region, or search any category.'
-              : 'Choose your region to see the data and surveys that apply to you.'}
+          <Typography color="text.secondary" sx={{ fontSize: { xs: '0.95rem', sm: '1.05rem' }, maxWidth: 640, mb: { xs: 3, md: 4 }, lineHeight: 1.6 }}>
+            {village ? t.heroBody : t.heroBodyNoVillage}
           </Typography>
 
-          {selectedLocation && !catLoading && !catError && categories.length > 0 && (
-            <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1, mb: { xs: 3, md: 4 } }}>
-              <StatPill icon={<GridViewRoundedIcon />} label={`${categories.length} categories`} />
-              <StatPill icon={<LayersRoundedIcon />} label={`${totalSubcategories} subcategories`} />
-            </Stack>
-          )}
-
-          {/* Region */}
-          <Paper
-            elevation={0}
-            sx={{
-              p: { xs: 2, sm: 3 },
-              borderRadius: { xs: '16px', sm: '20px' },
-              border: 1,
-              borderColor: 'divider',
-              boxShadow: '0 1px 2px rgba(23,43,58,0.04), 0 12px 32px rgba(23,43,58,0.06)',
-              mb: selectedLocation ? 2 : 0,
-            }}
-          >
-            {selectedLocation ? (
-              <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 2, md: 3 }} sx={{ alignItems: { md: 'center' } }}>
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1.5 }}>
-                    <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main', boxShadow: (t) => `0 0 0 4px ${alpha(t.palette.success.main, 0.15)}` }} />
-                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                      Your region
-                    </Typography>
-                  </Stack>
-
-                  {/* Stacked rows on phones, a single breadcrumb line from sm up. */}
-                  <Box
-                    component="nav"
-                    aria-label="Selected region"
-                    sx={{
-                      display: 'flex',
-                      flexDirection: { xs: 'column', sm: 'row' },
-                      alignItems: { sm: 'center' },
-                      flexWrap: { sm: 'wrap' },
-                      gap: { xs: 0, sm: 1 },
-                    }}
-                  >
-                    <RegionCrumb label="District" value={selectedLocation.pDistrict?.admin2NameEn} />
-                    <Separator />
-                    <RegionCrumb label="DS Division" value={selectedLocation.dsEn} />
-                    <Separator />
-                    <RegionCrumb label="Grama Niladhari" value={selectedLocation.nameEn} emphasis />
-                  </Box>
-                </Box>
-
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ flexShrink: 0 }}>
+          {village ? (
+            <VillageProgressCard
+              progress={progress.data}
+              loading={progress.loading}
+              error={Boolean(progress.error)}
+              onRetry={progress.refetch}
+              actions={
+                <>
+                  <Button variant="contained" disableElevation startIcon={<AddRoundedIcon />} onClick={scrollToTopics} sx={{ py: 1.25, px: 2.5 }}>
+                    {t.startContributing}
+                  </Button>
                   <Button
-                    variant="contained"
-                    disableElevation
-                    endIcon={<ArrowForwardRoundedIcon />}
-                    onClick={() => navigate(regionPath(selectedLocation))}
-                    sx={{ py: 1.25, px: 2.5, width: { xs: '100%', sm: 'auto' } }}
+                    variant="outlined"
+                    startIcon={<StorefrontRoundedIcon />}
+                    onClick={() => navigate(`/industry-survey/${encodeURIComponent(String(village.nameEn || '').replace(/ /g, '-'))}/${encodeURIComponent(ccode || '')}`)}
+                    sx={{ py: 1.25, px: 2.5, boxShadow: 'none', '&:hover': { boxShadow: 'none', transform: 'none' } }}
                   >
-                    Open region dashboard
+                    {t.registerBusiness}
                   </Button>
-                  <Button color="inherit" startIcon={<EditLocationAltOutlinedIcon />} onClick={() => setShowLocationModal(true)} sx={{ py: 1.25, width: { xs: '100%', sm: 'auto' }, ...quietButton }}>
-                    Change
+                  <Box sx={{ flex: 1, display: { xs: 'none', sm: 'block' } }} />
+                  <Button color="inherit" endIcon={<ArrowForwardRoundedIcon />} onClick={() => navigate(villagePath(village))} sx={{ py: 1.25, ...quietButton }}>
+                    {t.openVillagePage}
                   </Button>
-                </Stack>
-              </Stack>
-            ) : (
+                </>
+              }
+            />
+          ) : (
+            <Paper elevation={0} sx={{ p: { xs: 2.5, sm: 3 }, borderRadius: '20px', border: 1, borderColor: 'divider' }}>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2.5} sx={{ alignItems: { sm: 'center' } }}>
-                <Box
-                  sx={{
-                    width: 52,
-                    height: 52,
-                    borderRadius: '14px',
-                    display: 'grid',
-                    placeItems: 'center',
-                    flexShrink: 0,
-                    bgcolor: (t) => alpha(t.palette.success.main, 0.1),
-                    color: 'success.main',
-                  }}
-                >
+                <Box sx={{ width: 52, height: 52, borderRadius: '14px', display: 'grid', placeItems: 'center', flexShrink: 0, bgcolor: (theme) => alpha(theme.palette.success.main, 0.1), color: 'success.main' }}>
                   <PlaceOutlinedIcon />
                 </Box>
                 <Box sx={{ flex: 1 }}>
-                  <Typography variant="h4" component="h2" sx={{ mb: 0.5 }}>
-                    No region selected
-                  </Typography>
+                  <Typography sx={{ fontWeight: 700, fontSize: '1.1rem', mb: 0.5 }}>{t.chooseVillage}</Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Pick your district, DS division and Grama Niladhari division. You can change it any time.
+                    {t.chooseVillageHint}
                   </Typography>
                 </Box>
                 <Button variant="contained" disableElevation onClick={() => setShowLocationModal(true)} sx={{ py: 1.25, px: 2.5, flexShrink: 0, width: { xs: '100%', sm: 'auto' } }}>
-                  Choose region
+                  {t.chooseVillage}
                 </Button>
               </Stack>
-            )}
-          </Paper>
+            </Paper>
+          )}
+        </Container>
+      </Box>
 
-          {selectedLocation && (
+      {village && (
+        <Container component="main" maxWidth="lg" sx={{ px: { xs: 2, sm: 3 }, pb: { xs: 6, md: 10 } }}>
+          {/* ── My impact ──────────────────────────────────────────────── */}
+          <MyImpact data={mine.data} loading={mine.loading} onViewAll={() => navigate('/user/contributions')} />
+          <RapidFirePromo onPlay={() => navigate('/user/rapid-fire')} />
+
+          {/* ── What can you add? ──────────────────────────────────────── */}
+          <Box ref={topicsRef} sx={{ scrollMarginTop: 88, pt: { xs: 4, md: 5 } }}>
+            <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ alignItems: { md: 'flex-end' }, justifyContent: 'space-between', mb: 2.5 }}>
+              <Box sx={{ maxWidth: 620 }}>
+                <Typography component="h2" sx={{ fontSize: { xs: '1.2rem', sm: '1.4rem' }, fontWeight: 700, letterSpacing: '-0.02em' }}>
+                  {t.whatToAddTitle}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                  {t.whatToAddBody}
+                </Typography>
+              </Box>
+              <ToggleButtonGroup
+                size="small"
+                exclusive
+                value={filter}
+                onChange={(_, value) => value && setFilter(value)}
+                sx={{ flexShrink: 0, '& .MuiToggleButton-root': { px: 1.75, textTransform: 'none', fontWeight: 600 } }}
+              >
+                <ToggleButton value="all">{t.filterAll}</ToggleButton>
+                <ToggleButton value="needs" disabled={!progress.data}>
+                  {t.filterNeeds}
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Stack>
+
             <Autocomplete<SearchOption>
               options={searchOptions}
               inputValue={searchInput}
               onInputChange={(_, value) => setSearchInput(value)}
-              getOptionLabel={(o) => (o.labelSi ? `${o.label} (${o.labelSi})` : o.label)}
+              getOptionLabel={(o) => o.label}
               isOptionEqualToValue={(a, b) => a.slug === b.slug}
               filterOptions={(options, state) => {
                 const keywords = state.inputValue.toLowerCase().split(/\s+/).filter(Boolean);
-                if (!keywords.length) return options;
-                return options.filter((o) => {
-                  const text = `${o.label} ${o.labelSi} ${o.parentName || ''}`.toLowerCase();
-                  return keywords.every((kw) => text.includes(kw));
-                });
+                if (!keywords.length) return options.slice(0, 50);
+                return options.filter((o) => keywords.every((kw) => `${o.label} ${o.secondary} ${o.parentName || ''}`.toLowerCase().includes(kw))).slice(0, 50);
               }}
-              onChange={(_, value) => {
-                if (value) navigate(`/user/categories/${value.slug}`);
-              }}
-              noOptionsText="No matching categories"
+              onChange={(_, value) => value && navigate(`/user/categories/${value.slug}`)}
+              noOptionsText={t.noResults}
               loading={catLoading}
               renderOption={(props, option) => {
-                const { key: _ignoredKey, ...rest } = props as React.HTMLAttributes<HTMLLIElement> & { key: React.Key };
-                const root = categories.find((c) => c.nameEn === (option.parentName || option.label));
-                const { Icon, color } = getCategoryVisual(root || { nameEn: option.parentName || option.label });
+                const { key: _key, ...rest } = props as React.HTMLAttributes<HTMLLIElement> & { key: React.Key };
+                const { Icon, color } = getCategoryVisual({ slug: option.rootSlug });
                 return (
-                  <Box component="li" key={`${option.type}:${option.slug}`} {...rest} sx={{ display: 'flex !important', alignItems: 'center', gap: 1.5, py: '10px !important' }}>
+                  <Box component="li" key={option.slug} {...rest} sx={{ display: 'flex !important', alignItems: 'center', gap: 1.5, py: '10px !important' }}>
                     <Box sx={{ width: 32, height: 32, borderRadius: '9px', display: 'grid', placeItems: 'center', flexShrink: 0, bgcolor: alpha(color, 0.1) }}>
                       <Icon sx={{ fontSize: 18, color }} />
                     </Box>
                     <Box sx={{ minWidth: 0 }}>
                       <Typography variant="body2" sx={{ fontWeight: 600 }} noWrap>
                         {option.label}
-                        {option.labelSi && (
-                          <Box component="span" sx={{ color: 'text.secondary', fontWeight: 400 }}>
-                            {' '}
-                            · {option.labelSi}
-                          </Box>
-                        )}
                       </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {option.parentName ? `in ${option.parentName}` : 'Category'}
-                      </Typography>
+                      {option.parentName && (
+                        <Typography variant="caption" color="text.secondary">
+                          {option.parentName}
+                        </Typography>
+                      )}
                     </Box>
                   </Box>
                 );
@@ -478,8 +306,8 @@ const UserPage: React.FC = () => {
                 <TextField
                   {...params}
                   inputRef={searchRef}
-                  placeholder="Search any category"
-                  inputProps={{ ...params.inputProps, 'aria-label': 'Search categories and subcategories' }}
+                  placeholder={t.searchPlaceholder}
+                  inputProps={{ ...params.inputProps, 'aria-label': t.searchPlaceholder }}
                   InputProps={{
                     ...params.InputProps,
                     startAdornment: (
@@ -487,297 +315,189 @@ const UserPage: React.FC = () => {
                         <SearchRoundedIcon sx={{ color: 'text.secondary' }} />
                       </InputAdornment>
                     ),
-                    endAdornment: (
-                      <>
-                        {!searchInput && (
-                          <Box
-                            component="kbd"
-                            aria-hidden
-                            sx={{
-                              display: { xs: 'none', sm: 'inline-flex' },
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              minWidth: 22,
-                              height: 22,
-                              px: 0.75,
-                              mr: 1,
-                              borderRadius: '6px',
-                              border: 1,
-                              borderColor: 'divider',
-                              bgcolor: 'background.default',
-                              color: 'text.secondary',
-                              fontFamily: 'inherit',
-                              fontSize: '0.75rem',
-                              fontWeight: 600,
-                            }}
-                          >
-                            /
-                          </Box>
-                        )}
-                        {params.InputProps.endAdornment}
-                      </>
-                    ),
-                    sx: {
-                      bgcolor: 'background.paper',
-                      borderRadius: '14px',
-                      py: '7px !important',
-                      boxShadow: '0 1px 2px rgba(23,43,58,0.04)',
-                      '& fieldset': { borderColor: 'divider' },
-                      '&:hover fieldset': { borderColor: 'text.disabled' },
-                    },
+                    sx: { bgcolor: 'background.paper', borderRadius: '14px', py: '7px !important', '& fieldset': { borderColor: 'divider' } },
                   }}
                 />
               )}
+              sx={{ mb: 2.5 }}
             />
-          )}
-        </Container>
-      </Box>
 
-      {/* ── Categories ───────────────────────────────────────────────────── */}
-      {selectedLocation && (
-        <Container component="main" maxWidth="lg" sx={{ px: { xs: 2, sm: 3 }, pt: { xs: 2, md: 3 }, pb: { xs: 6, md: 10 } }}>
-          <Stack direction="row" sx={{ alignItems: 'flex-end', justifyContent: 'space-between', mb: { xs: 1.5, sm: 2.5 }, gap: 2 }}>
-            <Box>
-              <Typography component="h2" sx={{ fontSize: { xs: '1.15rem', sm: '1.35rem' }, fontWeight: 700, letterSpacing: '-0.02em' }}>
-                Browse categories
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' } }}>
-                Choose a category to explore its subcategories and data.
-              </Typography>
-            </Box>
-          </Stack>
-
-          {catError ? (
-            <Alert
-              severity="error"
-              sx={{ borderRadius: '14px' }}
-              action={
-                <Button color="inherit" size="small" onClick={() => refetch()} sx={{ boxShadow: 'none' }}>
-                  Retry
-                </Button>
-              }
-            >
-              Categories could not be loaded. Check your connection and try again.
-            </Alert>
-          ) : catLoading ? (
-            <CategoryGrid>
-              {Array.from({ length: 10 }).map((_, i) => (
-                <Paper key={i} variant="outlined" sx={{ p: { xs: 1.5, sm: 2.25 }, borderRadius: '16px', display: 'flex', flexDirection: { xs: 'row', sm: 'column' }, gap: 1.5, alignItems: { xs: 'center', sm: 'stretch' } }}>
-                  <Skeleton variant="rounded" width={44} height={44} sx={{ borderRadius: '12px', flexShrink: 0 }} />
-                  <Box sx={{ flex: 1 }}>
-                    <Skeleton width="75%" height={22} />
+            {catError ? (
+              <Alert
+                severity="error"
+                sx={{ borderRadius: '14px' }}
+                action={
+                  <Button color="inherit" size="small" onClick={() => refetch()} sx={{ boxShadow: 'none' }}>
+                    {t.retry}
+                  </Button>
+                }
+              >
+                {t.categoriesError}
+              </Alert>
+            ) : catLoading ? (
+              <TopicGrid>
+                {Array.from({ length: 10 }).map((_, i) => (
+                  <Paper key={i} variant="outlined" sx={{ p: 2.25, borderRadius: '16px' }}>
+                    <Skeleton variant="rounded" width={44} height={44} sx={{ borderRadius: '12px', mb: 2 }} />
+                    <Skeleton width="70%" height={22} />
                     <Skeleton width="45%" height={18} />
-                  </Box>
-                </Paper>
-              ))}
-            </CategoryGrid>
-          ) : categories.length === 0 ? (
-            <Paper variant="outlined" sx={{ p: 5, borderRadius: '16px', textAlign: 'center' }}>
-              <CategoryOutlinedIcon sx={{ fontSize: 36, color: 'text.disabled', mb: 1 }} />
-              <Typography sx={{ fontWeight: 600 }}>No categories yet</Typography>
-              <Typography variant="body2" color="text.secondary">
-                Categories will appear here once they are published.
-              </Typography>
-            </Paper>
-          ) : (
-            <CategoryGrid>
-              {categories.map((cat) => (
-                <CategoryCard key={cat.id} category={cat} onOpen={() => navigate(`/user/categories/${cat.slug}`)} />
-              ))}
-            </CategoryGrid>
-          )}
+                  </Paper>
+                ))}
+              </TopicGrid>
+            ) : visibleCategories.length === 0 ? (
+              <Paper variant="outlined" sx={{ p: 5, borderRadius: '16px', textAlign: 'center' }}>
+                <CategoryOutlinedIcon sx={{ fontSize: 36, color: 'text.disabled', mb: 1 }} />
+                <Typography sx={{ fontWeight: 600 }}>{categories.length ? t.noResults : t.noCategories}</Typography>
+              </Paper>
+            ) : (
+              <TopicGrid>
+                {visibleCategories.map((cat) => (
+                  <TopicCard
+                    key={cat.id}
+                    category={cat}
+                    progress={progressBySlug.get(cat.slug)}
+                    progressLoaded={Boolean(progress.data)}
+                    onOpen={() => navigate(`/user/categories/${cat.slug}`)}
+                  />
+                ))}
+              </TopicGrid>
+            )}
+          </Box>
         </Container>
       )}
 
-      <LocationSelectorModal open={showLocationModal} onClose={() => setShowLocationModal(false)} onLocationSelected={handleLocationSelected} />
+      <LocationSelectorModal open={showLocationModal} onClose={() => setShowLocationModal(false)} onLocationSelected={handleVillageSelected} />
     </Box>
   );
 };
 
-/* ── Presentational pieces ────────────────────────────────────────────────── */
+/* ── My impact strip ──────────────────────────────────────────────────────── */
 
-const StatPill: React.FC<{ icon: React.ReactElement; label: string }> = ({ icon, label }) => (
-  <Chip
-    icon={icon}
-    label={label}
-    size="small"
-    sx={{
-      height: 28,
-      px: 0.5,
-      fontWeight: 600,
-      fontSize: '0.78rem',
-      bgcolor: 'background.paper',
-      border: 1,
-      borderColor: 'divider',
-      color: 'text.secondary',
-      '& .MuiChip-icon': { fontSize: 16, color: 'primary.main' },
-    }}
-  />
-);
+const MyImpact: React.FC<{ data: ReturnType<typeof useMyContributions>['data']; loading: boolean; onViewAll: () => void }> = ({ data, loading, onViewAll }) => {
+  const { t } = useContributeCopy();
+  const s = data?.summary;
 
-const Separator: React.FC = () => (
-  <>
-    <ChevronRightRoundedIcon aria-hidden sx={{ color: 'text.disabled', fontSize: 20, display: { xs: 'none', sm: 'block' } }} />
-    <Divider sx={{ display: { xs: 'block', sm: 'none' }, borderStyle: 'dashed', my: 1 }} />
-  </>
-);
+  return (
+    <Paper variant="outlined" sx={{ mt: { xs: 1, md: 0 }, p: { xs: 2, sm: 2.5 }, borderRadius: '18px' }}>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 2, sm: 3 }} sx={{ alignItems: { sm: 'center' } }}>
+        <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', minWidth: { sm: 200 } }}>
+          <Box sx={{ width: 40, height: 40, borderRadius: '12px', display: 'grid', placeItems: 'center', bgcolor: (theme) => alpha(theme.palette.success.main, 0.1), color: 'success.main', flexShrink: 0 }}>
+            <VolunteerActivismRoundedIcon fontSize="small" />
+          </Box>
+          <Typography sx={{ fontWeight: 700 }}>{t.myImpactTitle}</Typography>
+        </Stack>
 
-const RegionCrumb: React.FC<{ label: string; value?: string; emphasis?: boolean }> = ({ label, value, emphasis }) => (
-  <Box
-    sx={{
-      minWidth: 0,
-      display: 'flex',
-      flexDirection: { xs: 'row', sm: 'column' },
-      justifyContent: { xs: 'space-between', sm: 'flex-start' },
-      alignItems: { xs: 'center', sm: 'flex-start' },
-      gap: { xs: 2, sm: 0 },
-    }}
-  >
-    <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.3, flexShrink: 0 }}>
+        {loading ? (
+          <Skeleton width="60%" height={28} />
+        ) : !s || s.total === 0 ? (
+          <Typography variant="body2" color="text.secondary" sx={{ flex: 1 }}>
+            {t.myImpactEmpty}
+          </Typography>
+        ) : (
+          <Stack direction="row" spacing={{ xs: 2.5, sm: 4 }} sx={{ flex: 1, flexWrap: 'wrap', rowGap: 1 }}>
+            <ImpactFigure icon={<AddRoundedIcon sx={{ fontSize: 16 }} />} label={t.myImpactTotal} value={s.total} />
+            <ImpactFigure icon={<CheckCircleRoundedIcon sx={{ fontSize: 16, color: 'success.main' }} />} label={t.myImpactApproved} value={s.approved} />
+            <ImpactFigure icon={<HourglassTopRoundedIcon sx={{ fontSize: 16, color: 'warning.main' }} />} label={t.myImpactReview} value={s.in_review} />
+          </Stack>
+        )}
+
+        {s && s.total > 0 && (
+          <Button endIcon={<ChevronRightRoundedIcon />} onClick={onViewAll} sx={{ ...quietButton, color: 'primary.main', alignSelf: { xs: 'flex-start', sm: 'center' } }}>
+            {t.viewAll}
+          </Button>
+        )}
+      </Stack>
+    </Paper>
+  );
+};
+
+const ImpactFigure: React.FC<{ icon: React.ReactNode; label: string; value: number }> = ({ icon, label, value }) => (
+  <Stack direction="row" spacing={0.75} sx={{ alignItems: 'baseline' }}>
+    <Box sx={{ alignSelf: 'center', display: 'flex' }}>{icon}</Box>
+    <Typography sx={{ fontWeight: 700, fontSize: '1.15rem' }}>{value}</Typography>
+    <Typography variant="body2" color="text.secondary">
       {label}
     </Typography>
-    <Typography
-      sx={{
-        fontWeight: emphasis ? 700 : 600,
-        fontSize: emphasis ? { xs: '0.95rem', sm: '1.05rem' } : '0.95rem',
-        color: emphasis ? 'primary.main' : 'text.primary',
-        textAlign: { xs: 'right', sm: 'left' },
-      }}
-      noWrap
-    >
-      {value || '—'}
-    </Typography>
-  </Box>
+  </Stack>
 );
 
-const CategoryGrid: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <Box
-    sx={{
-      display: 'grid',
-      gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)', lg: 'repeat(5, 1fr)' },
-      gap: { xs: 1.25, sm: 2 },
-    }}
-  >
-    {children}
-  </Box>
+/* ── Rapid fire promo ──────────────────────────────────────────────────────── */
+
+const RapidFirePromo: React.FC<{ onPlay: () => void }> = ({ onPlay }) => {
+  const { t } = useContributeCopy();
+  return (
+    <Box
+      component="section"
+      aria-label={t.rfPromoTitle}
+      sx={{
+        mt: 2,
+        p: { xs: 2.5, sm: 3 },
+        borderRadius: '20px',
+        color: '#fff',
+        position: 'relative',
+        overflow: 'hidden',
+        background: 'linear-gradient(120deg, #1E3A8A 0%, #1677C8 60%, #0EA5A4 100%)',
+        boxShadow: '0 16px 36px rgba(22,119,200,0.25)',
+      }}
+    >
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2.5} sx={{ alignItems: { sm: 'center' }, position: 'relative' }}>
+        <Box sx={{ width: 52, height: 52, borderRadius: '16px', display: 'grid', placeItems: 'center', flexShrink: 0, background: 'linear-gradient(135deg, #FCD34D, #F59E0B)', color: '#78350F' }}>
+          <BoltRoundedIcon sx={{ fontSize: 30 }} />
+        </Box>
+        <Box sx={{ flex: 1 }}>
+          <Typography sx={{ color: 'inherit', fontWeight: 800, fontSize: '1.2rem', letterSpacing: '-0.01em' }}>{t.rfPromoTitle}</Typography>
+          <Typography sx={{ color: 'inherit', opacity: 0.88, mt: 0.25 }}>{t.rfPromoBody}</Typography>
+        </Box>
+        <Button
+          onClick={onPlay}
+          endIcon={<ArrowForwardRoundedIcon />}
+          sx={{ flexShrink: 0, px: 2.5, py: 1.2, borderRadius: 999, fontWeight: 800, bgcolor: '#fff', color: 'primary.dark', boxShadow: 'none', '&:hover': { bgcolor: '#fff', boxShadow: '0 8px 20px rgba(0,0,0,0.2)' } }}
+        >
+          {t.rfPromoCta}
+        </Button>
+      </Stack>
+    </Box>
+  );
+};
+
+/* ── Topic cards ──────────────────────────────────────────────────────────── */
+
+const TopicGrid: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)', lg: 'repeat(5, 1fr)' }, gap: { xs: 1.25, sm: 2 } }}>{children}</Box>
 );
 
 /**
- * Vertical tile from sm up; a compact list row on phones, where a column of
- * tall cards would make users scroll past ten screens to find one category.
+ * Vertical tile from sm up; a compact row on phones. The status line tells the
+ * contributor whether their village already has data here or needs it.
  */
-const CategoryCard: React.FC<{ category: any; onOpen: () => void }> = ({ category, onOpen }) => {
-  const available = Boolean(category.children?.length);
-  const subCount = countDescendants(category.children);
+const TopicCard: React.FC<{ category: any; progress?: VillageCategoryProgress; progressLoaded: boolean; onOpen: () => void }> = ({
+  category,
+  progress,
+  progressLoaded,
+  onOpen,
+}) => {
+  const { t, language } = useContributeCopy();
   const { Icon, color } = getCategoryVisual(category);
-  const preview: string[] = (category.children || []).slice(0, 2).map((c: any) => c.nameEn).filter(Boolean);
-  const remaining = (category.children?.length || 0) - preview.length;
-  const secondary = sinhalaName(category);
+  const topics = countDescendants(category.children);
+  const records = progress?.records ?? 0;
+  const needsData = progressLoaded && records === 0;
+  const name = localName(category, language);
+  const secondary = name !== category.nameEn ? category.nameEn : '';
+  const recordsText = records === 1 ? t.recordsInVillageOne : fill(t.recordsInVillage, { n: records.toLocaleString() });
+  const statusText = !progressLoaded ? '' : needsData ? t.needsData : recordsText;
 
-  const body = (
-    <Box
-      sx={{
-        p: { xs: 1.5, sm: 2.25 },
-        height: '100%',
-        display: 'flex',
-        flexDirection: { xs: 'row', sm: 'column' },
-        alignItems: { xs: 'center', sm: 'stretch' },
-        gap: { xs: 1.5, sm: 0 },
-      }}
-    >
-      <Stack direction="row" sx={{ alignItems: 'flex-start', justifyContent: 'space-between', mb: { sm: 2 } }}>
-        <Box
-          className="cat-icon"
-          sx={{
-            width: { xs: 44, sm: 48 },
-            height: { xs: 44, sm: 48 },
-            borderRadius: '14px',
-            display: 'grid',
-            placeItems: 'center',
-            flexShrink: 0,
-            bgcolor: alpha(color, available ? 0.1 : 0.06),
-            color: available ? color : 'text.disabled',
-            transition: 'background-color 200ms ease, color 200ms ease, transform 200ms ease',
-          }}
-        >
-          <Icon sx={{ fontSize: { xs: 22, sm: 24 } }} />
-        </Box>
-        {available && (
-          <Box
-            className="cat-arrow"
-            sx={{
-              display: { xs: 'none', sm: 'grid' },
-              placeItems: 'center',
-              width: 30,
-              height: 30,
-              borderRadius: '50%',
-              color: 'text.disabled',
-              transition: 'background-color 200ms ease, color 200ms ease, transform 200ms ease',
-            }}
-          >
-            <ArrowOutwardRoundedIcon sx={{ fontSize: 17 }} />
-          </Box>
-        )}
-      </Stack>
-
-      <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-        <Typography sx={{ fontWeight: 600, fontSize: { xs: '0.95rem', sm: '1rem' }, lineHeight: 1.3, letterSpacing: '-0.01em', color: available ? 'text.primary' : 'text.secondary' }} noWrap>
-          {category.nameEn}
-        </Typography>
-        {secondary && (
-          <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem', mt: 0.25 }} noWrap>
-            {secondary}
-          </Typography>
-        )}
-
-        {available && preview.length > 0 && (
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{
-              display: { xs: 'none', sm: '-webkit-box' },
-              mt: 1.25,
-              lineHeight: 1.5,
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-              opacity: 0.85,
-            }}
-          >
-            {preview.join(' · ')}
-            {remaining > 0 ? ` · +${remaining} more` : ''}
-          </Typography>
-        )}
-
-        <Box sx={{ flex: 1, display: { xs: 'none', sm: 'block' }, minHeight: 12 }} />
-
-        <Box sx={{ mt: { xs: 0.5, sm: 1.75 } }}>
-          {available ? (
-            <Box
-              component="span"
-              sx={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 0.5,
-                px: { sm: 1 },
-                py: { sm: 0.25 },
-                borderRadius: 999,
-                bgcolor: { sm: alpha(color, 0.08) },
-                color: { xs: 'text.secondary', sm: color },
-                fontSize: '0.72rem',
-                fontWeight: 600,
-              }}
-            >
-              <LayersRoundedIcon sx={{ fontSize: 13 }} />
-              {subCount} {subCount === 1 ? 'subcategory' : 'subcategories'}
-            </Box>
-          ) : (
-            <Chip label="No data yet" size="small" sx={{ height: 22, fontSize: '0.7rem', fontWeight: 500, bgcolor: 'action.hover', color: 'text.secondary' }} />
-          )}
-        </Box>
-      </Box>
-
-      {available && <ChevronRightRoundedIcon sx={{ display: { xs: 'block', sm: 'none' }, color: 'text.disabled', flexShrink: 0 }} />}
+  const status = !progressLoaded ? (
+    <Skeleton width={90} height={20} />
+  ) : needsData ? (
+    <Chip
+      size="small"
+      label={t.needsData}
+      sx={{ height: 22, fontSize: '0.7rem', fontWeight: 700, bgcolor: (theme) => alpha(theme.palette.warning.main, 0.12), color: 'warning.dark' }}
+    />
+  ) : (
+    <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, fontSize: '0.75rem', fontWeight: 600, color: 'success.dark' }}>
+      <CheckCircleRoundedIcon sx={{ fontSize: 14 }} />
+      {recordsText}
     </Box>
   );
 
@@ -789,31 +509,56 @@ const CategoryCard: React.FC<{ category: any; onOpen: () => void }> = ({ categor
         borderRadius: '16px',
         boxShadow: '0 1px 2px rgba(23,43,58,0.04)',
         border: 1,
-        borderColor: 'divider',
-        bgcolor: available ? 'background.paper' : 'transparent',
+        borderColor: needsData ? (theme) => alpha(theme.palette.warning.main, 0.35) : 'divider',
+        bgcolor: 'background.paper',
         transition: 'border-color 200ms ease, box-shadow 250ms ease, transform 250ms ease',
-        ...(available && {
-          '&:hover': {
-            borderColor: alpha(color, 0.45),
-            boxShadow: `0 14px 32px ${alpha(color, 0.14)}`,
-            transform: 'translateY(-3px)',
-            '& .cat-icon': { bgcolor: color, color: '#fff', transform: 'scale(1.04)' },
-            '& .cat-arrow': { bgcolor: alpha(color, 0.1), color, transform: 'translate(2px, -2px)' },
-          },
-          '&:focus-within': { borderColor: color, boxShadow: `0 0 0 3px ${alpha(color, 0.18)}` },
-        }),
+        '&:hover': {
+          borderColor: alpha(color, 0.5),
+          boxShadow: `0 14px 32px ${alpha(color, 0.14)}`,
+          transform: 'translateY(-3px)',
+          '& .topic-icon': { bgcolor: color, color: '#fff' },
+          '& .topic-add': { bgcolor: color, color: '#fff' },
+        },
+        '&:focus-within': { borderColor: color, boxShadow: `0 0 0 3px ${alpha(color, 0.18)}` },
         ...reducedMotion,
       }}
     >
-      {available ? (
-        <CardActionArea onClick={onOpen} aria-label={`Open ${category.nameEn}, ${subCount} subcategories`} sx={{ height: '100%', '& .MuiCardActionArea-focusHighlight': { bgcolor: color } }}>
-          {body}
-        </CardActionArea>
-      ) : (
-        <Box aria-disabled="true" aria-label={`${category.nameEn}, no data yet`}>
-          {body}
+      <CardActionArea
+        onClick={onOpen}
+        aria-label={statusText ? `${name}. ${statusText}` : name}
+        sx={{ height: '100%', '& .MuiCardActionArea-focusHighlight': { bgcolor: color } }}
+      >
+        <Box sx={{ p: { xs: 1.5, sm: 2.25 }, height: '100%', display: 'flex', flexDirection: { xs: 'row', sm: 'column' }, alignItems: { xs: 'center', sm: 'stretch' }, gap: { xs: 1.5, sm: 0 } }}>
+          <Stack direction="row" sx={{ alignItems: 'flex-start', justifyContent: 'space-between', mb: { sm: 2 } }}>
+            <Box
+              className="topic-icon"
+              sx={{ width: { xs: 44, sm: 48 }, height: { xs: 44, sm: 48 }, borderRadius: '14px', display: 'grid', placeItems: 'center', flexShrink: 0, bgcolor: alpha(color, 0.1), color, transition: 'background-color 200ms ease, color 200ms ease' }}
+            >
+              <Icon sx={{ fontSize: { xs: 22, sm: 24 } }} />
+            </Box>
+            <Box
+              className="topic-add"
+              aria-hidden
+              sx={{ display: { xs: 'none', sm: 'grid' }, placeItems: 'center', width: 30, height: 30, borderRadius: '50%', color: 'text.disabled', border: 1, borderColor: 'divider', transition: 'background-color 200ms ease, color 200ms ease' }}
+            >
+              <AddRoundedIcon sx={{ fontSize: 18 }} />
+            </Box>
+          </Stack>
+
+          <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+            <Typography sx={{ fontWeight: 600, fontSize: { xs: '0.95rem', sm: '1rem' }, lineHeight: 1.3, letterSpacing: '-0.01em' }} noWrap>
+              {name}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem', mt: 0.25 }} noWrap>
+              {secondary || fill(t.topicsCount, { n: topics })}
+            </Typography>
+            <Box sx={{ flex: 1, display: { xs: 'none', sm: 'block' }, minHeight: 12 }} />
+            <Box sx={{ mt: { xs: 0.75, sm: 1.75 } }}>{status}</Box>
+          </Box>
+
+          <ChevronRightRoundedIcon sx={{ display: { xs: 'block', sm: 'none' }, color: 'text.disabled', flexShrink: 0 }} />
         </Box>
-      )}
+      </CardActionArea>
     </Card>
   );
 };
