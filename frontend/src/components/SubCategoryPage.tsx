@@ -33,7 +33,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import QuizIcon from '@mui/icons-material/Quiz';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import ExploreIcon from '@mui/icons-material/Explore';
 import CategoryDialog from './CategoryDialog';
 import BulkUploadDialog from './BulkUploadDialog';
 import CategoryDataList from './CategoryDataList';
@@ -42,6 +41,8 @@ import QuestionDialog from './QuestionDialog';
 import { useAuth } from '../auth/AuthProvider';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { TextField, RadioGroup, FormControlLabel, Radio, Snackbar, Alert } from '@mui/material';
+import { useLanguage } from '../context/LanguageContext';
+import UserTopBar from './contribute/UserTopBar';
 
 interface SubCategoryPageProps {
   slug: string;
@@ -49,9 +50,15 @@ interface SubCategoryPageProps {
 }
 
 const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
-  const [lang, setLang] = useState<'en' | 'si' | 'ta'>('en');
+  // Contributors follow the app-wide language (the top bar switches it); the
+  // admin view keeps its own page-local toggle.
+  const isUserArea = backUrl.startsWith('/user');
+  const globalLanguage = useLanguage();
+  const [localLang, setLocalLang] = useState<'en' | 'si' | 'ta'>('en');
+  const lang = isUserArea ? globalLanguage.language : localLang;
+  const setLang = isUserArea ? globalLanguage.setLanguage : setLocalLang;
   const navigate = useNavigate();
-  const { userInfo, logout } = useAuth();
+  const { userInfo } = useAuth();
   const client = useApolloClient();
   
   const roles = userInfo?.realm_roles || [];
@@ -276,46 +283,10 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
   const ancestors = [...(parentCategory.ancestors || [])].reverse();
   let currentPath = '/categories';
 
-  const isUserArea = backUrl.startsWith('/user');
-
   return (
     <>
-      {isUserArea && (
-        <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 3 }, display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, pointerEvents: 'none' }}>
-          <Box sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexWrap: 'wrap',
-            gap: { xs: 1.5, sm: 3 },
-            pointerEvents: 'auto',
-            bgcolor: 'rgba(255,255,255,0.6)',
-            backdropFilter: 'blur(10px)',
-            px: { xs: 2, sm: 3 },
-            py: { xs: 1, sm: 1.5 },
-            borderRadius: 30,
-            color: '#000000',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-            maxWidth: 'max-content'
-          }}>
-            <Box sx={{ display: 'flex', gap: 0.5 }}>
-              <IconButton onClick={() => navigate('/gnpage')} size="small" sx={{ color: '#000000', p: 0.5, transition: 'transform 0.2s', '&:hover': { transform: 'scale(1.1)' } }}>
-                <ExploreIcon fontSize="small" />
-              </IconButton>
-            </Box>
-            <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 1.5, fontWeight: 600, fontSize: '0.95rem' }}>
-              <Typography onClick={() => navigate('/gnpage')} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', '&:hover': { opacity: 0.7 } }}>Home</Typography>
-              <Typography sx={{ opacity: 0.4, fontWeight: 300 }}>|</Typography>
-              <Typography onClick={() => navigate('/mydashboard')} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', '&:hover': { opacity: 0.7 } }}>Dashboard</Typography>
-              <Typography sx={{ opacity: 0.4, fontWeight: 300 }}>|</Typography>
-              <Typography onClick={() => logout()} sx={{ cursor: 'pointer', transition: 'opacity 0.2s', color: '#ef4444', '&:hover': { opacity: 0.7 } }}>Logout</Typography>
-              <Typography sx={{ opacity: 0.4, fontWeight: 300 }}>|</Typography>
-              <Typography sx={{ fontWeight: 600 }}>{userInfo?.preferred_username || userInfo?.name || 'User'}</Typography>
-            </Box>
-          </Box>
-        </Box>
-      )}
-      <Box sx={{ p: 4, pt: isUserArea ? 12 : 4, maxWidth: 1200, mx: 'auto' }}>
+      {isUserArea && <UserTopBar />}
+      <Box sx={{ p: { xs: 2, sm: 4 }, maxWidth: 1200, mx: 'auto' }}>
         <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
           <MuiLink component={RouterLink} underline="hover" color="inherit" to={isUserArea ? backUrl : "/categories"}>
             {lang === 'en' ? 'Categories' : lang === 'si' ? 'වර්ග' : 'வகைகள்'}
@@ -369,7 +340,7 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
               </Button>
             </>
           )}
-          <Box>
+          <Box sx={{ display: isUserArea ? 'none' : 'block' }}>
             <Button 
               variant={lang === 'en' ? 'contained' : 'outlined'} 
               onClick={() => setLang('en')}
@@ -535,7 +506,11 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
       {/* User Wizard View */}
       {!isAdmin && categories.length === 0 && (
         <Box sx={{ mt: 6 }}>
-          <SurveyPage slug={slug} />
+          <SurveyPage
+            slug={slug}
+            categoryName={lang === 'en' ? parentCategory.nameEn : lang === 'si' ? (parentCategory.nameSi || parentCategory.nameEn) : (parentCategory.nameTa || parentCategory.nameEn)}
+            onBackToTopics={() => navigate(backUrl)}
+          />
         </Box>
       )}
 

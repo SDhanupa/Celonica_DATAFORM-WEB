@@ -63,6 +63,8 @@ interface MobileDashboardProps {
   roofData?: any;
   religionData?: any;
   householdHeadData?: any;
+  /** Rendered prominently in the sheet, under the village identity. */
+  contributeSlot?: React.ReactNode;
 }
 
 const MobileDashboard: React.FC<MobileDashboardProps> = (props) => {
@@ -73,7 +75,7 @@ const MobileDashboard: React.FC<MobileDashboardProps> = (props) => {
     districts, selectedDistrict, onDistrictChange,
     dsDivisions, selectedCity, onCityChange,
     gramaNiladharis, selectedGN, onGNChange,
-    onOpenCategory, populationData,
+    onOpenCategory, populationData, contributeSlot,
   } = props;
 
   const navigate = useNavigate();
@@ -306,6 +308,8 @@ const MobileDashboard: React.FC<MobileDashboardProps> = (props) => {
               />
             </Box>
           </Box>
+
+          {contributeSlot && <Box sx={{ mb: 2.5 }}>{contributeSlot}</Box>}
 
           {/* Search */}
           <Box sx={{ mb: 2.5, display: 'flex', justifyContent: 'center' }}>

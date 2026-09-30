@@ -15,14 +15,14 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import AdminsPage from './pages/AdminsPage';
 import UserPage from './pages/UserPage';
+import MyContributionsPage from './pages/MyContributionsPage';
+import RapidFirePage from './pages/RapidFirePage';
+import MyDashboard from './pages/MyDashboard';
 
 import { UsersPage, ReportsPage } from './pages/PlaceholderPages';
 import RegistrationPage from './pages/RegistrationPage';
 import QuestionsPage from './pages/QuestionsPage';
 import BulkDataPage from './pages/BulkDataPage';
-import UserDashboard from './pages/UserDashboard';
-import MySubmissionsDashboard from './pages/MySubmissionsDashboard';
-import MyDashboard from './pages/MyDashboard';
 import SurveyPage from './pages/SurveyPage';
 import CategoriesPage from './pages/CategoriesPage';
 import DynamicCategoryWrapper from './components/DynamicCategoryWrapper';
@@ -38,8 +38,6 @@ import ApprovalsPage from './pages/ApprovalsPage';
 import IndustrySurveyPage from './pages/IndustrySurveyPage';
 import AdminIndustrySurveys from './pages/AdminIndustrySurveys';
 import AdminIndustrySurveysQuestions from './pages/AdminIndustrySurveysQuestions';
-import BusinessProfilePage from './pages/BusinessProfilePage';
-import BusinessQRPage from './pages/BusinessQRPage';
 
 
 const App: React.FC = () => {
@@ -78,15 +76,6 @@ const App: React.FC = () => {
                 path="/industry-survey/:gnName/:ccode"
                 element={<IndustrySurveyPage />}
               />
-              {/* Public business profile pages — no login required */}
-              <Route
-                path="/business/:regNumber"
-                element={<BusinessProfilePage />}
-              />
-              <Route
-                path="/business/:regNumber/qr"
-                element={<BusinessQRPage />}
-              />
               {/* Category detail pages — accessible by super admin */}
               <Route
                 path="/gnpage/:gnName/:ccode/:categorySlug"
@@ -102,12 +91,28 @@ const App: React.FC = () => {
                 }
               />
               <Route
+                path="/user/rapid-fire"
+                element={
+                  <ProtectedRoute>
+                    <RapidFirePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/mydashboard"
                 element={
                   <ProtectedRoute>
                     <AdminLayout>
                       <MyDashboard />
                     </AdminLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/user/contributions"
+                element={
+                  <ProtectedRoute>
+                    <MyContributionsPage />
                   </ProtectedRoute>
                 }
               />
@@ -202,7 +207,7 @@ const App: React.FC = () => {
               <Route
                 path="/user-submissions"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator', 'user']}>
                     <AdminLayout>
                       <UserSubmissionsPage />
                     </AdminLayout>
@@ -302,19 +307,7 @@ const App: React.FC = () => {
 
 
               {/* Default redirects */}
-              <Route 
-                path="/dashboard" 
-                element={<Navigate to="/fill-data" replace />} 
-              />
-
-              <Route 
-                path="/fill-data" 
-                element={
-                  <ProtectedRoute>
-                    <MySubmissionsDashboard />
-                  </ProtectedRoute>
-                } 
-              />
+              <Route path="/dashboard" element={<Navigate to="/gnpage" replace />} />
               
               <Route
                 path="/admin/industry-surveys"
