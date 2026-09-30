@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Alert, Box, Button, Paper, Stack, Typography } from '@mui/material';
-import { alpha } from '@mui/material/styles';
 import { keyframes } from '@mui/system';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import EmojiEventsRoundedIcon from '@mui/icons-material/EmojiEventsRounded';
@@ -8,6 +7,7 @@ import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
 import ReplayRoundedIcon from '@mui/icons-material/ReplayRounded';
 import { getCategoryVisual } from '../categories/categoryVisuals';
 import { fill, localName, useContributeCopy } from '../contribute/copy';
+import { ink } from '../contribute/tokens';
 import type { CompleteResponse, RapidFireCard, RapidFireRules } from './api';
 import { rankFor } from './scoring';
 
@@ -35,15 +35,15 @@ const Results: React.FC<ResultsProps> = ({ summary, score, bestStreak, cardsCoun
   const checked = summary ? summary.yes + summary.no - summary.hasty : 0;
 
   return (
-    <Box sx={{ minHeight: '100dvh', position: 'relative', overflow: 'hidden', background: 'radial-gradient(120% 80% at 50% 0%, #1F4FA8 0%, #0F2B63 45%, #0A1A3D 100%)', px: { xs: 2, sm: 3 }, py: { xs: 4, sm: 6 } }}>
+    <Box sx={{ minHeight: '100dvh', position: 'relative', overflow: 'hidden', background: `linear-gradient(180deg, ${ink[800]} 0%, ${ink[900]} 60%)`, px: { xs: 2, sm: 3 }, py: { xs: 4, sm: 6 } }}>
       {finalScore > 0 && <Confetti />}
 
-      <Box sx={{ maxWidth: 620, mx: 'auto', position: 'relative', zIndex: 1 }}>
+      <Box sx={{ maxWidth: 600, mx: 'auto', position: 'relative', zIndex: 1 }}>
         <Box sx={{ textAlign: 'center', color: '#fff', mb: 3 }}>
-          <Box sx={{ width: 76, height: 76, mx: 'auto', mb: 2, borderRadius: '24px', display: 'grid', placeItems: 'center', background: 'linear-gradient(135deg, #FCD34D, #F59E0B)', color: '#78350F', boxShadow: '0 16px 36px rgba(245,158,11,0.45)' }}>
-            <EmojiEventsRoundedIcon sx={{ fontSize: 42 }} />
+          <Box sx={{ width: 68, height: 68, mx: 'auto', mb: 2, borderRadius: '18px', display: 'grid', placeItems: 'center', bgcolor: '#fff', color: ink[900], boxShadow: '0 16px 36px rgba(0,0,0,0.3)' }}>
+            <EmojiEventsRoundedIcon sx={{ fontSize: 38 }} />
           </Box>
-          <Typography sx={{ fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', fontSize: '0.8rem', color: '#FCD34D' }}>{t[rank]}</Typography>
+          <Typography sx={{ fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', fontSize: '0.78rem', color: 'rgba(255,255,255,0.7)' }}>{t[rank]}</Typography>
           <Typography component="h1" sx={{ color: 'inherit', fontWeight: 800, fontSize: { xs: '1.8rem', sm: '2.2rem' }, letterSpacing: '-0.03em' }}>
             {t.rfResultsTitle}
           </Typography>
@@ -59,32 +59,32 @@ const Results: React.FC<ResultsProps> = ({ summary, score, bestStreak, cardsCoun
           </Alert>
         )}
 
-        <Paper elevation={0} sx={{ borderRadius: '24px', p: { xs: 2.5, sm: 3 }, mb: 2 }}>
+        <Paper elevation={0} sx={{ borderRadius: '16px', p: { xs: 2.5, sm: 3 }, mb: 2 }}>
           <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, textAlign: 'center' }}>
-            <Stat label={t.rfBestStreak} value={bestStreak} color="#F59E0B" />
-            <Stat label={t.rfYes} value={summary?.yes ?? 0} color="#16A34A" />
-            <Stat label={t.rfNo} value={summary?.no ?? 0} color="#E11D48" />
-            <Stat label={t.rfSkipped} value={(summary?.skipped ?? 0) + (summary?.unplayed ?? 0)} color="#64748B" />
+            <Stat label={t.rfBestStreak} value={bestStreak} />
+            <Stat label={t.rfYes} value={summary?.yes ?? 0} />
+            <Stat label={t.rfNo} value={summary?.no ?? 0} />
+            <Stat label={t.rfSkipped} value={(summary?.skipped ?? 0) + (summary?.unplayed ?? 0)} muted />
           </Box>
 
           {summary && summary.yes_topics.length > 0 && (
-            <Box sx={{ mt: 3, pt: 2.5, borderTop: 1, borderColor: 'divider' }}>
-              <Typography sx={{ fontWeight: 800 }}>{t.rfYesTitle}</Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+            <Box sx={{ mt: 3, pt: 2.5, borderTop: '1px solid', borderColor: ink[100] }}>
+              <Typography sx={{ fontWeight: 700, color: ink[900] }}>{t.rfYesTitle}</Typography>
+              <Typography variant="body2" sx={{ color: ink[500], mb: 1.5 }}>
                 {t.rfYesBody}
               </Typography>
               <Stack spacing={1}>
                 {summary.yes_topics.map((card) => {
-                  const { Icon, color } = getCategoryVisual({ slug: card.deck_slug, nameEn: card.deck_name_en });
+                  const { Icon } = getCategoryVisual({ slug: card.deck_slug, nameEn: card.deck_name_en });
                   return (
-                    <Stack key={card.id} direction="row" spacing={1.5} sx={{ alignItems: 'center', p: 1.25, borderRadius: '14px', bgcolor: 'background.default' }}>
-                      <Box sx={{ width: 36, height: 36, borderRadius: '10px', display: 'grid', placeItems: 'center', bgcolor: alpha(color, 0.12), color, flexShrink: 0 }}>
+                    <Stack key={card.id} direction="row" spacing={1.5} sx={{ alignItems: 'center', p: 1.25, borderRadius: '10px', bgcolor: ink[50] }}>
+                      <Box sx={{ width: 34, height: 34, borderRadius: '9px', display: 'grid', placeItems: 'center', bgcolor: ink[100], color: ink[700], flexShrink: 0 }}>
                         <Icon fontSize="small" />
                       </Box>
-                      <Typography sx={{ flex: 1, fontWeight: 600, minWidth: 0 }} noWrap>
+                      <Typography sx={{ flex: 1, fontWeight: 600, minWidth: 0, color: ink[900] }} noWrap>
                         {localName(card, language)}
                       </Typography>
-                      <Button size="small" variant="outlined" startIcon={<AddRoundedIcon />} onClick={() => onAddDetails(card)} sx={{ flexShrink: 0, boxShadow: 'none', '&:hover': { boxShadow: 'none', transform: 'none' } }}>
+                      <Button size="small" startIcon={<AddRoundedIcon />} onClick={() => onAddDetails(card)} sx={{ flexShrink: 0, textTransform: 'none', fontWeight: 600, color: ink[700], border: '1px solid', borderColor: ink[200], boxShadow: 'none', '&:hover': { boxShadow: 'none', transform: 'none', bgcolor: ink[50], borderColor: ink[300] } }}>
                         {t.rfAddDetails}
                       </Button>
                     </Stack>
@@ -100,15 +100,15 @@ const Results: React.FC<ResultsProps> = ({ summary, score, bestStreak, cardsCoun
             onClick={onPlayAgain}
             startIcon={<ReplayRoundedIcon />}
             fullWidth
-            sx={{ py: 1.6, borderRadius: '16px', fontWeight: 800, fontSize: '1.05rem', color: '#78350F', background: 'linear-gradient(135deg, #FCD34D, #F59E0B)', boxShadow: '0 12px 28px rgba(245,158,11,0.4)', '&:hover': { filter: 'brightness(1.05)', boxShadow: '0 16px 32px rgba(245,158,11,0.5)' } }}
+            sx={{ py: 1.5, borderRadius: '12px', fontWeight: 700, fontSize: '1.02rem', textTransform: 'none', color: ink[900], bgcolor: '#fff', boxShadow: 'none', '&:hover': { bgcolor: 'rgba(255,255,255,0.9)', boxShadow: 'none', transform: 'none' } }}
           >
             {t.rfPlayAgain}
           </Button>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-            <Button onClick={onOtherDeck} startIcon={<GridViewRoundedIcon />} fullWidth sx={{ py: 1.25, borderRadius: '14px', color: '#fff', bgcolor: 'rgba(255,255,255,0.1)', boxShadow: 'none', '&:hover': { bgcolor: 'rgba(255,255,255,0.18)', boxShadow: 'none', transform: 'none' } }}>
+            <Button onClick={onOtherDeck} startIcon={<GridViewRoundedIcon />} fullWidth sx={{ py: 1.15, borderRadius: '12px', textTransform: 'none', fontWeight: 600, color: '#fff', bgcolor: 'rgba(255,255,255,0.1)', boxShadow: 'none', '&:hover': { bgcolor: 'rgba(255,255,255,0.18)', boxShadow: 'none', transform: 'none' } }}>
               {t.rfOtherDeck}
             </Button>
-            <Button onClick={onBack} fullWidth sx={{ py: 1.25, borderRadius: '14px', color: 'rgba(255,255,255,0.85)', boxShadow: 'none', '&:hover': { bgcolor: 'rgba(255,255,255,0.08)', boxShadow: 'none', transform: 'none' } }}>
+            <Button onClick={onBack} fullWidth sx={{ py: 1.15, borderRadius: '12px', textTransform: 'none', fontWeight: 600, color: 'rgba(255,255,255,0.8)', boxShadow: 'none', '&:hover': { bgcolor: 'rgba(255,255,255,0.08)', boxShadow: 'none', transform: 'none' } }}>
               {t.rfBackToContribute}
             </Button>
           </Stack>
@@ -118,10 +118,10 @@ const Results: React.FC<ResultsProps> = ({ summary, score, bestStreak, cardsCoun
   );
 };
 
-const Stat: React.FC<{ label: string; value: number; color: string }> = ({ label, value, color }) => (
-  <Box sx={{ py: 1.25, borderRadius: '14px', bgcolor: alpha(color, 0.08) }}>
-    <Typography sx={{ fontWeight: 800, fontSize: '1.5rem', color, lineHeight: 1.1 }}>{value}</Typography>
-    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }} noWrap>
+const Stat: React.FC<{ label: string; value: number; muted?: boolean }> = ({ label, value, muted }) => (
+  <Box sx={{ py: 1.25, borderRadius: '10px', bgcolor: ink[50] }}>
+    <Typography sx={{ fontWeight: 700, fontSize: '1.5rem', color: muted ? ink[400] : ink[900], lineHeight: 1.1 }}>{value}</Typography>
+    <Typography variant="caption" sx={{ color: ink[500], fontWeight: 500 }} noWrap>
       {label}
     </Typography>
   </Box>
@@ -157,7 +157,8 @@ const fall = keyframes`
   100% { transform: translate3d(var(--drift), 105vh, 0) rotate(var(--spin)); opacity: 0.9; }
 `;
 
-const CONFETTI_COLORS = ['#FCD34D', '#16A34A', '#38BDF8', '#F472B6', '#FB923C', '#A78BFA'];
+// Monochrome celebration: white and greys, no rainbow.
+const CONFETTI_COLORS = ['#FFFFFF', 'rgba(255,255,255,0.85)', 'rgba(255,255,255,0.55)', 'rgba(255,255,255,0.35)'];
 
 const Confetti: React.FC = () => {
   const pieces = useMemo(

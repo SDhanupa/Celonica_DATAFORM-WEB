@@ -17,7 +17,6 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { alpha } from '@mui/material/styles';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useLazyQuery, useQuery } from '@apollo/client';
 import AddAPhotoOutlinedIcon from '@mui/icons-material/AddAPhotoOutlined';
@@ -32,6 +31,7 @@ import { useAuth } from '../auth/AuthProvider';
 import { ApiError, submitContribution, SubmitResult } from '../api/contributions';
 import { fill, useContributeCopy } from '../components/contribute/copy';
 import { readSavedVillage, villageName } from '../components/contribute/village';
+import { ghostButton, ink, inkButton } from '../components/contribute/tokens';
 
 interface ContributionForm {
   reg_number: string;
@@ -291,49 +291,48 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp, categoryName, o
   /* ── Thank-you ────────────────────────────────────────────────────────── */
   if (result) {
     return (
-      <Paper elevation={0} sx={{ maxWidth: 640, mx: 'auto', p: { xs: 3, sm: 5 }, borderRadius: '24px', border: 1, borderColor: 'divider', textAlign: 'center' }}>
+      <Paper elevation={0} sx={{ maxWidth: 620, mx: 'auto', p: { xs: 3, sm: 5 }, borderRadius: '16px', border: '1px solid', borderColor: ink[200], textAlign: 'center' }}>
         <Box
           sx={{
-            width: 72,
-            height: 72,
+            width: 64,
+            height: 64,
             mx: 'auto',
             mb: 2.5,
             borderRadius: '50%',
             display: 'grid',
             placeItems: 'center',
-            bgcolor: 'success.main',
+            bgcolor: ink[900],
             color: '#fff',
-            boxShadow: (theme) => `0 0 0 10px ${alpha(theme.palette.success.main, 0.12)}`,
+            boxShadow: `0 0 0 8px ${ink[100]}`,
           }}
         >
-          <CheckRoundedIcon sx={{ fontSize: 38 }} />
+          <CheckRoundedIcon sx={{ fontSize: 34 }} />
         </Box>
-        <Typography component="h2" sx={{ fontSize: { xs: '1.5rem', sm: '1.8rem' }, fontWeight: 700, letterSpacing: '-0.03em', mb: 1 }}>
+        <Typography component="h2" sx={{ fontSize: { xs: '1.45rem', sm: '1.75rem' }, fontWeight: 700, letterSpacing: '-0.03em', color: ink[900], mb: 1 }}>
           {t.thanksTitle}
         </Typography>
-        <Typography color="text.secondary" sx={{ maxWidth: 460, mx: 'auto', mb: 3, lineHeight: 1.6 }}>
+        <Typography sx={{ color: ink[500], maxWidth: 460, mx: 'auto', mb: 3, lineHeight: 1.6 }}>
           {vName ? fill(t.thanksBody, { category: catName, village: vName }) : fill(t.thanksBodyNoVillage, { category: catName })}
         </Typography>
 
         <Stack direction="row" spacing={1} sx={{ justifyContent: 'center', flexWrap: 'wrap', rowGap: 1, mb: 4 }}>
-          {result.reg_number && <Chip label={`${t.thanksReg}: ${result.reg_number}`} sx={{ fontFamily: 'monospace', fontWeight: 600 }} />}
+          {result.reg_number && <Chip label={`${t.thanksReg}: ${result.reg_number}`} sx={{ fontFamily: 'monospace', fontWeight: 600, bgcolor: ink[100], color: ink[700] }} />}
           <Chip
             label={result.credited ? t.thanksCredited : t.thanksAnonymous}
-            color={result.credited ? 'success' : 'default'}
-            variant="outlined"
+            sx={result.credited ? { bgcolor: ink[900], color: '#fff', fontWeight: 600 } : { bgcolor: 'transparent', color: ink[600], fontWeight: 600, border: '1px solid', borderColor: ink[300] }}
           />
         </Stack>
 
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ justifyContent: 'center' }}>
-          <Button variant="contained" disableElevation startIcon={<AddRoundedIcon />} onClick={addAnother} sx={{ py: 1.25, px: 2.5 }}>
+          <Button disableElevation startIcon={<AddRoundedIcon />} onClick={addAnother} sx={{ py: 1, px: 2.25, ...inkButton }}>
             {t.addAnother}
           </Button>
           {isAuthenticated && (
-            <Button variant="outlined" startIcon={<HistoryRoundedIcon />} onClick={() => navigate('/user/contributions')} sx={{ py: 1.25, boxShadow: 'none', '&:hover': { boxShadow: 'none', transform: 'none' } }}>
+            <Button startIcon={<HistoryRoundedIcon />} onClick={() => navigate('/user/contributions')} sx={{ py: 1, px: 2.25, ...ghostButton }}>
               {t.navMyContributions}
             </Button>
           )}
-          <Button color="inherit" onClick={backToTopics} sx={{ py: 1.25, boxShadow: 'none', color: 'text.secondary', '&:hover': { boxShadow: 'none', transform: 'none' } }}>
+          <Button onClick={backToTopics} sx={{ py: 1, boxShadow: 'none', textTransform: 'none', fontWeight: 600, color: ink[500], '&:hover': { boxShadow: 'none', transform: 'none', bgcolor: ink[100] } }}>
             {t.backToTopics}
           </Button>
         </Stack>
@@ -345,10 +344,10 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp, categoryName, o
   return (
     <Box component="form" noValidate onSubmit={handleSubmit} sx={{ maxWidth: 760, mx: 'auto' }}>
       <Box sx={{ mb: 3 }}>
-        <Typography component="h2" sx={{ fontSize: { xs: '1.45rem', sm: '1.75rem' }, fontWeight: 700, letterSpacing: '-0.03em' }}>
+        <Typography component="h2" sx={{ fontSize: { xs: '1.4rem', sm: '1.7rem' }, fontWeight: 700, letterSpacing: '-0.03em', color: ink[900] }}>
           {fill(t.formTitle, { category: catName })}
         </Typography>
-        <Typography color="text.secondary" sx={{ mt: 0.5 }}>
+        <Typography sx={{ color: ink[500], mt: 0.5 }}>
           {vName ? fill(t.formSubtitle, { village: vName }) : t.formSubtitleNoVillage}
         </Typography>
       </Box>
@@ -513,7 +512,7 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp, categoryName, o
                 {t.captureLocation}
               </Button>
               {form.latitude && form.longitude && (
-                <Chip icon={<CheckRoundedIcon />} color="success" variant="outlined" label={`${t.locationCaptured} · ${form.latitude}, ${form.longitude}`} sx={{ maxWidth: '100%' }} />
+                <Chip icon={<CheckRoundedIcon sx={{ color: `${ink[900]} !important` }} />} label={`${t.locationCaptured} · ${form.latitude}, ${form.longitude}`} sx={{ maxWidth: '100%', bgcolor: ink[100], color: ink[700], fontWeight: 500 }} />
               )}
             </Stack>
             {form.coordinate_mismatch && (
@@ -569,41 +568,30 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp, categoryName, o
         </Alert>
       )}
 
-      <Box
-        sx={{
-          position: 'sticky',
-          bottom: 0,
-          mt: 3,
-          py: 2,
-          bgcolor: (theme) => alpha(theme.palette.background.default, 0.92),
-          backdropFilter: 'blur(8px)',
-          zIndex: 2,
-        }}
-      >
+      <Box sx={{ position: 'sticky', bottom: 0, mt: 3, py: 2, bgcolor: `${ink[50]}EB`, backdropFilter: 'blur(8px)', zIndex: 2 }}>
         <Button
           type="submit"
-          variant="contained"
           disableElevation
           size="large"
           fullWidth
           disabled={submitting || uploading || locating}
           startIcon={submitting ? <CircularProgress size={20} color="inherit" /> : <CheckRoundedIcon />}
-          sx={{ py: 1.5, fontSize: '1rem' }}
+          sx={{ py: 1.5, fontSize: '1rem', ...inkButton }}
         >
           {submitting ? t.submitting : t.submit}
         </Button>
       </Box>
 
-      <Dialog open={geoPrompt} onClose={() => setGeoPrompt(false)} PaperProps={{ sx: { borderRadius: '18px' } }}>
-        <DialogTitle sx={{ fontWeight: 700 }}>{t.geoConfirmTitle}</DialogTitle>
+      <Dialog open={geoPrompt} onClose={() => setGeoPrompt(false)} PaperProps={{ sx: { borderRadius: '14px', border: '1px solid', borderColor: ink[200] } }}>
+        <DialogTitle sx={{ fontWeight: 700, color: ink[900] }}>{t.geoConfirmTitle}</DialogTitle>
         <DialogContent>
-          <DialogContentText>{t.geoConfirmBody}</DialogContentText>
+          <DialogContentText sx={{ color: ink[500] }}>{t.geoConfirmBody}</DialogContentText>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setGeoPrompt(false)} sx={{ boxShadow: 'none' }}>
+          <Button onClick={() => setGeoPrompt(false)} sx={{ boxShadow: 'none', textTransform: 'none', fontWeight: 600, color: ink[500] }}>
             {t.geoConfirmNo}
           </Button>
-          <Button variant="contained" disableElevation onClick={captureLocation} autoFocus>
+          <Button disableElevation onClick={captureLocation} autoFocus sx={{ px: 2.25, ...inkButton }}>
             {t.geoConfirmYes}
           </Button>
         </DialogActions>
@@ -616,31 +604,14 @@ const FormSection: React.FC<{ index: number; title: string; optional?: string; e
   <Paper
     component="fieldset"
     elevation={0}
-    sx={{ m: 0, p: { xs: 2, sm: 3 }, borderRadius: '18px', border: 1, borderColor: error ? 'error.main' : 'divider', minWidth: 0 }}
+    sx={{ m: 0, p: { xs: 2, sm: 2.75 }, borderRadius: '14px', border: '1px solid', borderColor: error ? 'error.main' : ink[200], bgcolor: '#fff', minWidth: 0 }}
   >
     <Stack component="legend" direction="row" spacing={1.25} sx={{ alignItems: 'center', mb: 2.5, p: 0, float: 'left', width: '100%' }}>
-      <Box
-        sx={{
-          width: 28,
-          height: 28,
-          borderRadius: '50%',
-          display: 'grid',
-          placeItems: 'center',
-          fontSize: '0.8rem',
-          fontWeight: 700,
-          bgcolor: (theme) => alpha(theme.palette.primary.main, 0.1),
-          color: 'primary.main',
-          flexShrink: 0,
-        }}
-      >
+      <Box sx={{ width: 26, height: 26, borderRadius: '50%', display: 'grid', placeItems: 'center', fontSize: '0.78rem', fontWeight: 700, bgcolor: ink[900], color: '#fff', flexShrink: 0 }}>
         {index}
       </Box>
-      <Typography sx={{ fontWeight: 700 }}>{title}</Typography>
-      {optional && (
-        <Typography variant="caption" color="text.secondary">
-          · {optional}
-        </Typography>
-      )}
+      <Typography sx={{ fontWeight: 700, color: ink[900] }}>{title}</Typography>
+      {optional && <Typography variant="caption" sx={{ color: ink[400] }}>· {optional}</Typography>}
     </Stack>
     <Box sx={{ clear: 'both' }}>{children}</Box>
   </Paper>

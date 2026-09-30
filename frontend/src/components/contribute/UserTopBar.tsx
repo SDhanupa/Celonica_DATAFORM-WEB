@@ -14,7 +14,6 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { alpha } from '@mui/material/styles';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
 import BoltRoundedIcon from '@mui/icons-material/BoltRounded';
@@ -26,6 +25,7 @@ import { useAuth } from '../../auth/AuthProvider';
 import { useLanguage } from '../../context/LanguageContext';
 import { useContributeCopy } from './copy';
 import { readSavedVillage, villagePath } from './village';
+import { ink } from './tokens';
 
 interface UserTopBarProps {
   onChangeVillage?: () => void;
@@ -36,6 +36,27 @@ const NAV = [
   { key: 'rapid', path: '/user/rapid-fire', match: (p: string) => p.startsWith('/user/rapid-fire') },
   { key: 'mine', path: '/user/contributions', match: (p: string) => p.startsWith('/user/contributions') },
 ] as const;
+
+const langToggleSx = {
+  bgcolor: ink[100],
+  borderRadius: '8px',
+  p: '3px',
+  gap: '2px',
+  border: 'none',
+  '& .MuiToggleButton-root': {
+    border: 'none',
+    borderRadius: '6px !important',
+    px: 1.1,
+    py: 0.35,
+    fontSize: '0.72rem',
+    fontWeight: 600,
+    color: ink[500],
+    textTransform: 'none',
+    lineHeight: 1.4,
+    '&.Mui-selected': { bgcolor: ink[900], color: '#fff', '&:hover': { bgcolor: ink[800] } },
+    '&:hover': { bgcolor: ink[200] },
+  },
+};
 
 const UserTopBar: React.FC<UserTopBarProps> = ({ onChangeVillage }) => {
   const { userInfo, logout } = useAuth();
@@ -62,25 +83,23 @@ const UserTopBar: React.FC<UserTopBarProps> = ({ onChangeVillage }) => {
         position: 'sticky',
         top: 0,
         zIndex: (theme) => theme.zIndex.appBar,
-        bgcolor: (theme) => alpha(theme.palette.background.paper, 0.85),
-        backdropFilter: 'saturate(180%) blur(14px)',
-        borderBottom: 1,
-        borderColor: 'divider',
+        bgcolor: 'rgba(251, 251, 252, 0.8)',
+        backdropFilter: 'saturate(180%) blur(16px)',
+        borderBottom: '1px solid',
+        borderColor: ink[200],
       }}
     >
-      <Container maxWidth="lg" sx={{ height: { xs: 56, sm: 64 }, display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.5 }, px: { xs: 2, sm: 3 } }}>
+      <Container maxWidth="lg" sx={{ height: { xs: 54, sm: 60 }, display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.5 }, px: { xs: 2, sm: 3 } }}>
         <ButtonBase
           onClick={() => navigate('/user')}
           aria-label="Ceylonica"
-          sx={{ borderRadius: '10px', p: 0.5, gap: 1.25, flexShrink: 0, '&:focus-visible': { outline: 2, outlineColor: 'primary.main' } }}
+          sx={{ borderRadius: '8px', p: 0.5, gap: 1, flexShrink: 0, '&:focus-visible': { outline: `2px solid ${ink[900]}`, outlineOffset: 2 } }}
         >
-          <Box component="img" src="/logo.png" alt="" sx={{ width: 30, height: 30, objectFit: 'contain' }} />
-          <Typography sx={{ fontWeight: 700, fontSize: '1.05rem', letterSpacing: '-0.02em', display: { xs: 'none', sm: 'block' } }}>
-            Ceylonica
-          </Typography>
+          <Box sx={{ width: 26, height: 26, borderRadius: '7px', bgcolor: ink[900], color: '#fff', display: 'grid', placeItems: 'center', fontWeight: 700, fontSize: '0.9rem' }}>C</Box>
+          <Typography sx={{ fontWeight: 700, fontSize: '1rem', letterSpacing: '-0.02em', color: ink[900], display: { xs: 'none', sm: 'block' } }}>Ceylonica</Typography>
         </ButtonBase>
 
-        <Box component="nav" aria-label="Contributor" sx={{ display: { xs: 'none', md: 'flex' }, gap: 0.5, ml: 2 }}>
+        <Box component="nav" aria-label="Contributor" sx={{ display: { xs: 'none', md: 'flex' }, gap: 0.25, ml: 2 }}>
           {NAV.map((item) => {
             const active = item.match(pathname);
             return (
@@ -88,13 +107,18 @@ const UserTopBar: React.FC<UserTopBarProps> = ({ onChangeVillage }) => {
                 key={item.key}
                 onClick={() => navigate(item.path)}
                 aria-current={active ? 'page' : undefined}
+                disableRipple
                 sx={{
                   boxShadow: 'none',
                   px: 1.5,
-                  fontWeight: 600,
-                  color: active ? 'primary.main' : 'text.secondary',
-                  bgcolor: active ? (theme) => alpha(theme.palette.primary.main, 0.08) : 'transparent',
-                  '&:hover': { boxShadow: 'none', transform: 'none', bgcolor: (theme) => alpha(theme.palette.primary.main, active ? 0.12 : 0.05) },
+                  py: 0.75,
+                  fontSize: '0.875rem',
+                  fontWeight: active ? 600 : 500,
+                  textTransform: 'none',
+                  borderRadius: '8px',
+                  color: active ? ink[900] : ink[500],
+                  bgcolor: active ? ink[100] : 'transparent',
+                  '&:hover': { boxShadow: 'none', transform: 'none', bgcolor: active ? ink[100] : ink[50], color: ink[900] },
                 }}
               >
                 {labels[item.key]}
@@ -105,17 +129,7 @@ const UserTopBar: React.FC<UserTopBarProps> = ({ onChangeVillage }) => {
 
         <Box sx={{ flex: 1 }} />
 
-        <ToggleButtonGroup
-          size="small"
-          exclusive
-          value={language}
-          onChange={(_, value) => value && setLanguage(value)}
-          aria-label="Language"
-          sx={{
-            display: { xs: 'none', sm: 'inline-flex' },
-            '& .MuiToggleButton-root': { px: 1.1, py: 0.35, fontSize: '0.75rem', fontWeight: 600, border: 1, borderColor: 'divider', textTransform: 'none' },
-          }}
-        >
+        <ToggleButtonGroup size="small" exclusive value={language} onChange={(_, value) => value && setLanguage(value)} aria-label="Language" sx={{ display: { xs: 'none', sm: 'inline-flex' }, ...langToggleSx }}>
           <ToggleButton value="si">සිං</ToggleButton>
           <ToggleButton value="ta">த</ToggleButton>
           <ToggleButton value="en">EN</ToggleButton>
@@ -127,18 +141,9 @@ const UserTopBar: React.FC<UserTopBarProps> = ({ onChangeVillage }) => {
             aria-label="Open account menu"
             aria-haspopup="menu"
             aria-expanded={Boolean(menuAnchor)}
-            sx={{
-              borderRadius: 999,
-              p: 0.5,
-              border: 1,
-              borderColor: 'divider',
-              bgcolor: 'background.paper',
-              transition: 'background-color 150ms ease',
-              '&:hover': { bgcolor: 'action.hover' },
-              '&:focus-visible': { outline: 2, outlineColor: 'primary.main', outlineOffset: 2 },
-            }}
+            sx={{ borderRadius: '999px', '&:focus-visible': { outline: `2px solid ${ink[900]}`, outlineOffset: 2 } }}
           >
-            <Avatar sx={{ width: 30, height: 30, bgcolor: 'primary.main', fontSize: '0.85rem', fontWeight: 600 }}>{initial}</Avatar>
+            <Avatar sx={{ width: 30, height: 30, bgcolor: ink[900], fontSize: '0.8rem', fontWeight: 600 }}>{initial}</Avatar>
           </ButtonBase>
         </Tooltip>
 
@@ -148,79 +153,53 @@ const UserTopBar: React.FC<UserTopBarProps> = ({ onChangeVillage }) => {
           onClose={() => setMenuAnchor(null)}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-          slotProps={{ paper: { sx: { mt: 1, minWidth: 250, borderRadius: '14px', border: 1, borderColor: 'divider', boxShadow: '0 16px 40px rgba(23,43,58,0.12)' } } }}
+          slotProps={{ paper: { sx: { mt: 1, minWidth: 244, borderRadius: '12px', border: '1px solid', borderColor: ink[200], boxShadow: '0 12px 32px rgba(10,12,15,0.10)' } } }}
         >
           <Box sx={{ px: 2, py: 1.5 }}>
-            <Typography variant="body2" sx={{ fontWeight: 600 }} noWrap>
+            <Typography variant="body2" sx={{ fontWeight: 600, color: ink[900] }} noWrap>
               {displayName}
             </Typography>
             {userInfo?.email && (
-              <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block' }}>
+              <Typography variant="caption" sx={{ color: ink[500], display: 'block' }} noWrap>
                 {userInfo.email}
               </Typography>
             )}
           </Box>
-          <Divider />
-          {/* Primary nav lives here on phones, where the inline nav is hidden. */}
+          <Divider sx={{ borderColor: ink[200] }} />
           <MenuItem onClick={() => go('/user')} sx={{ display: { md: 'none' } }}>
-            <ListItemIcon>
-              <AddCircleOutlineRoundedIcon fontSize="small" />
-            </ListItemIcon>
+            <ListItemIcon><AddCircleOutlineRoundedIcon fontSize="small" /></ListItemIcon>
             {t.navContribute}
           </MenuItem>
           <MenuItem onClick={() => go('/user/rapid-fire')} sx={{ display: { md: 'none' } }}>
-            <ListItemIcon>
-              <BoltRoundedIcon fontSize="small" />
-            </ListItemIcon>
+            <ListItemIcon><BoltRoundedIcon fontSize="small" /></ListItemIcon>
             {t.navRapidFire}
           </MenuItem>
           <MenuItem onClick={() => go('/user/contributions')} sx={{ display: { md: 'none' } }}>
-            <ListItemIcon>
-              <HistoryRoundedIcon fontSize="small" />
-            </ListItemIcon>
+            <ListItemIcon><HistoryRoundedIcon fontSize="small" /></ListItemIcon>
             {t.navMyContributions}
           </MenuItem>
           {village && (
             <MenuItem onClick={() => go(villagePath(village))}>
-              <ListItemIcon>
-                <MapOutlinedIcon fontSize="small" />
-              </ListItemIcon>
+              <ListItemIcon><MapOutlinedIcon fontSize="small" /></ListItemIcon>
               {t.navHome}
             </MenuItem>
           )}
           {onChangeVillage && (
-            <MenuItem
-              onClick={() => {
-                setMenuAnchor(null);
-                onChangeVillage();
-              }}
-            >
-              <ListItemIcon>
-                <EditLocationAltOutlinedIcon fontSize="small" />
-              </ListItemIcon>
+            <MenuItem onClick={() => { setMenuAnchor(null); onChangeVillage(); }}>
+              <ListItemIcon><EditLocationAltOutlinedIcon fontSize="small" /></ListItemIcon>
               {t.navChangeRegion}
             </MenuItem>
           )}
           <Box sx={{ display: { sm: 'none' }, px: 2, py: 1 }}>
-            <ToggleButtonGroup
-              size="small"
-              exclusive
-              fullWidth
-              value={language}
-              onChange={(_, value) => value && setLanguage(value)}
-              aria-label="Language"
-              sx={{ '& .MuiToggleButton-root': { py: 0.5, fontSize: '0.8rem', fontWeight: 600, textTransform: 'none' } }}
-            >
+            <ToggleButtonGroup size="small" exclusive fullWidth value={language} onChange={(_, value) => value && setLanguage(value)} aria-label="Language" sx={langToggleSx}>
               <ToggleButton value="si">සිංහල</ToggleButton>
               <ToggleButton value="ta">தமிழ்</ToggleButton>
               <ToggleButton value="en">English</ToggleButton>
             </ToggleButtonGroup>
           </Box>
-          <Divider />
+          <Divider sx={{ borderColor: ink[200] }} />
           <MenuItem onClick={() => logout()} sx={{ color: 'error.main' }}>
-            <ListItemIcon sx={{ color: 'error.main' }}>
-              <LogoutRoundedIcon fontSize="small" />
-            </ListItemIcon>
+            <ListItemIcon sx={{ color: 'error.main' }}><LogoutRoundedIcon fontSize="small" /></ListItemIcon>
             {t.navLogout}
           </MenuItem>
         </Menu>

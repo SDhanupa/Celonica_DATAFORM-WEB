@@ -51,7 +51,11 @@ services:
       - KEYCLOAK_ADMIN_CLIENT_SECRET=my-super-secret-keycloak-client-secret
       - FRONTEND_URL=http://localhost:3001
       - SUPER_ADMIN_KEYCLOAK_SUB=51050c63-27d4-40ff-9474-fa4d2ce6a6be
+      # Laravel 11+ reads CACHE_STORE (CACHE_DRIVER is ignored); without this the
+      # cache silently fell back to the database store even though Redis was up.
+      - CACHE_STORE=redis
       - CACHE_DRIVER=redis
+      - REDIS_CLIENT=phpredis
       - SESSION_DRIVER=redis
       - REDIS_HOST=redis
       - REDIS_PASSWORD=null
