@@ -9,13 +9,24 @@ const httpLink = createHttpLink({
 
 const retryLink = new RetryLink({
   delay: {
-    initial: 300,
-    max: Infinity,
+    initial: 1000,
+    max: 10000,
     jitter: true,
   },
   attempts: {
-    max: 5,
-    retryIf: (error, _operation) => !!error,
+    max: 10,
+    retryIf: (error, _operation) => {
+      // Retry if it's a network error (TypeError: Failed to fetch)
+      if (error && error.name === 'TypeError' && error.message === 'Failed to fetch') {
+        return true;
+      }
+      // Or retry if it's a 5xx server error
+      if (error && error.statusCode >= 500) {
+        return true;
+      }
+      // Don't retry on GraphQL validation errors or 4xx errors
+      return !!error && !error.statusCode;
+    },
   },
 });
 
