@@ -50,14 +50,23 @@ class KeycloakTokenVerifier
 
     private function jwks(): array
     {
-        return Cache::remember('keycloak_jwks', 3600, function () {
-            $response = Http::timeout(10)->get(config('keycloak.jwks_url'));
+        try {
+            return Cache::remember('keycloak_jwks', 3600, function () {
+                $response = Http::timeout(3)->get(config('keycloak.jwks_url'));
 
+                if (!$response->successful()) {
+                    throw new RuntimeException('Failed to fetch Keycloak public keys');
+                }
+
+                return $response->json();
+            });
+        } catch (\Illuminate\Contracts\Cache\LockTimeoutException|\Psr\SimpleCache\InvalidArgumentException $e) {
+            // Cache write failed — fetch fresh without caching.
+            $response = Http::timeout(3)->get(config('keycloak.jwks_url'));
             if (!$response->successful()) {
                 throw new RuntimeException('Failed to fetch Keycloak public keys');
             }
-
             return $response->json();
-        });
+        }
     }
 }

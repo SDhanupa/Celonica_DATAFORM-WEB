@@ -53,10 +53,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const apolloClient = useApolloClient();
 
   const getToken = useCallback(async () => {
-    if (!keycloak.authenticated) return undefined;
+    if (!keycloak.authenticated) {
+      console.warn('[Auth] getToken: not authenticated');
+      return undefined;
+    }
     try {
       await keycloak.updateToken(30);
-    } catch {
+    } catch (e) {
+      console.error('[Auth] getToken: updateToken(30) threw:', e);
       return undefined;
     }
     setToken(keycloak.token);

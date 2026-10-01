@@ -20,6 +20,8 @@ interface Options {
    */
   minGapMs?: number;
   maxRetries?: number;
+  /** How long flush() will wait before giving up and resolving anyway. Default 12 s. */
+  flushTimeoutMs?: number;
 }
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -28,7 +30,7 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
  * Sends answers one at a time, in order, so the server sees the same sequence
  * the player produced (streaks depend on it). The UI never waits on it.
  */
-export function useAnswerQueue({ send, onConfirmed, onExpired, onUnauthorized, minGapMs = 350, maxRetries = 3 }: Options) {
+export function useAnswerQueue({ send, onConfirmed, onExpired, onUnauthorized, minGapMs = 250, maxRetries = 3, flushTimeoutMs = 12000 }: Options) {
   const queue = useRef<QueuedAnswer[]>([]);
   const running = useRef(false);
   const lastSentAt = useRef(0);
@@ -40,12 +42,12 @@ export function useAnswerQueue({ send, onConfirmed, onExpired, onUnauthorized, m
   const [pending, setPending] = useState(0);
   const [failed, setFailed] = useState(0);
 
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    disposed.current = false;
+    return () => {
       disposed.current = true;
-    },
-    [],
-  );
+    };
+  }, []);
 
   const settle = useCallback(() => {
     if (queue.current.length === 0 && !running.current) {
@@ -112,14 +114,18 @@ export function useAnswerQueue({ send, onConfirmed, onExpired, onUnauthorized, m
     [pump],
   );
 
-  /** Resolves once every queued answer has been sent (or given up on). */
+  /** Resolves once every queued answer has been sent (or given up on), with a
+   * safety timeout so the results screen is never permanently blocked. */
   const flush = useCallback(
     () =>
       new Promise<void>((resolve) => {
         waiters.current.push(resolve);
         settle();
+        // Failsafe: if the queue still hasn't drained after flushTimeoutMs, resolve
+        // anyway so the game can move to the results screen.
+        setTimeout(resolve, flushTimeoutMs);
       }),
-    [settle],
+    [flushTimeoutMs, settle],
   );
 
   const reset = useCallback(() => {
