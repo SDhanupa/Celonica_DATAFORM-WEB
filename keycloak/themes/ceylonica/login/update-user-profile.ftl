@@ -62,7 +62,7 @@
             <div class="form-group <#if messagesPerField.existsError('nic')>has-error</#if>">
                 <label for="nic" class="input-label">National Identity Card (NIC)</label>
                 <div class="input-wrapper">
-                    <input type="text" id="nic" name="nic" class="pill-input" value="${nicVal}" readonly="readonly" style="background-color: #f3f4f6; color: #6b7280; cursor: not-allowed; pointer-events: none;" />
+                    <input type="text" id="nic" name="nic" class="pill-input" value="${nicVal}" />
                 </div>
                 <#if messagesPerField.existsError('nic')>
                     <span class="field-error-text">${kcSanitize(messagesPerField.get('nic'))?no_esc}</span>
@@ -82,7 +82,7 @@
             <div class="form-group <#if messagesPerField.existsError('mobile_number')>has-error</#if>">
                 <label for="mobile_number" class="input-label">Mobile Number</label>
                 <div class="input-wrapper">
-                    <input type="text" id="mobile_number" name="mobile_number" class="pill-input" value="${mobileVal}" readonly="readonly" style="background-color: #f3f4f6; color: #6b7280; cursor: not-allowed; pointer-events: none;" />
+                    <input type="text" id="mobile_number" name="mobile_number" class="pill-input" value="${mobileVal}" />
                 </div>
                 <#if messagesPerField.existsError('mobile_number')>
                     <span class="field-error-text">${kcSanitize(messagesPerField.get('mobile_number'))?no_esc}</span>

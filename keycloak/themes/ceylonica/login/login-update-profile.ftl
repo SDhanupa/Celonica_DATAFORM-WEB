@@ -1,5 +1,5 @@
 <#import "template.ftl" as layout>
-<@layout.registrationLayout displayMessage=!messagesPerField.existsError('username','email','firstName','lastName','user.attributes.nic','user.attributes.mobile_number'); section>
+<@layout.registrationLayout displayMessage=!messagesPerField.existsError('username','email','firstName','lastName','user.attributes.nic','user.attributes.mobile_number','nic','mobile_number'); section>
     <#if section = "header">
         ${msg("loginProfileTitle")}
     <#elseif section = "form">
@@ -49,23 +49,35 @@
             </div>
 
             <#-- Assuming the user attributes are declared in Keycloak declarative user profile -->
-            <div class="form-group <#if messagesPerField.existsError('user.attributes.nic')>has-error</#if>">
+            <div class="form-group <#if messagesPerField.existsError('user.attributes.nic', 'nic')>has-error</#if>">
                 <label for="user.attributes.nic" class="input-label">National Identity Card (NIC)</label>
                 <div class="input-wrapper">
                     <input type="text" id="user.attributes.nic" name="user.attributes.nic" class="pill-input" value="${(user.attributes.nic!'')}" />
                 </div>
-                <#if messagesPerField.existsError('user.attributes.nic')>
-                    <span class="field-error-text">${kcSanitize(messagesPerField.get('user.attributes.nic'))?no_esc}</span>
+                <#if messagesPerField.existsError('user.attributes.nic', 'nic')>
+                    <span class="field-error-text">
+                        <#if messagesPerField.existsError('user.attributes.nic')>
+                            ${kcSanitize(messagesPerField.get('user.attributes.nic'))?no_esc}
+                        <#else>
+                            ${kcSanitize(messagesPerField.get('nic'))?no_esc}
+                        </#if>
+                    </span>
                 </#if>
             </div>
 
-            <div class="form-group <#if messagesPerField.existsError('user.attributes.mobile_number')>has-error</#if>">
+            <div class="form-group <#if messagesPerField.existsError('user.attributes.mobile_number', 'mobile_number')>has-error</#if>">
                 <label for="user.attributes.mobile_number" class="input-label">Mobile Number</label>
                 <div class="input-wrapper">
                     <input type="text" id="user.attributes.mobile_number" name="user.attributes.mobile_number" class="pill-input" value="${(user.attributes.mobile_number!'')}" />
                 </div>
-                <#if messagesPerField.existsError('user.attributes.mobile_number')>
-                    <span class="field-error-text">${kcSanitize(messagesPerField.get('user.attributes.mobile_number'))?no_esc}</span>
+                <#if messagesPerField.existsError('user.attributes.mobile_number', 'mobile_number')>
+                    <span class="field-error-text">
+                        <#if messagesPerField.existsError('user.attributes.mobile_number')>
+                            ${kcSanitize(messagesPerField.get('user.attributes.mobile_number'))?no_esc}
+                        <#else>
+                            ${kcSanitize(messagesPerField.get('mobile_number'))?no_esc}
+                        </#if>
+                    </span>
                 </#if>
             </div>
 
