@@ -190,7 +190,7 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp, categoryName, o
     // If the cache is so old it's missing the province, fetch it dynamically.
     if (!proEn && ccode) {
       const controller = new AbortController();
-      fetch(`/api/search-gns?gn=${encodeURIComponent(ccode)}`, { signal: controller.signal })
+      fetch(`/api/search-gns?q=${encodeURIComponent(ccode)}`, { signal: controller.signal })
         .then(res => res.json())
         .then(json => {
           if (json.success && json.data?.length > 0) {
