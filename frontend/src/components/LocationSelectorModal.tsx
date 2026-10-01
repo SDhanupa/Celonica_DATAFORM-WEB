@@ -221,9 +221,29 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
               <Autocomplete
                 options={gnOptions}
                 getOptionLabel={(o: any) => {
-                  if (language === 'si') return o.displaySi || o.nameSi || o.nameEn || '';
-                  if (language === 'ta') return o.displayTa || o.nameTa || o.nameEn || '';
-                  return o.display || o.nameEn || '';
+                  const name = language === 'si' ? o.nameSi : language === 'ta' ? o.nameTa : o.nameEn;
+                  const ds = language === 'si' ? o.dsSi : language === 'ta' ? o.dsTa : o.dsEn;
+                  let dis = language === 'si' ? o.disSi : language === 'ta' ? o.disTa : o.disEn;
+                  let pro = language === 'si' ? o.proSi : language === 'ta' ? o.proTa : o.proEn;
+                  
+                  if (language === 'si') {
+                    if (dis && !dis.includes('දිස්ත්‍රික්කය')) dis += ' දිස්ත්‍රික්කය';
+                    if (pro && !pro.includes('පළාත')) pro += ' පළාත';
+                  } else if (language === 'en') {
+                    if (dis && !dis.includes('District')) dis += ' District';
+                    if (pro && !pro.includes('Province')) pro += ' Province';
+                  } else if (language === 'ta') {
+                    if (dis && !dis.includes('மாவட்டம்')) dis += ' மாவட்டம்';
+                    if (pro && !pro.includes('மாகாணம்')) pro += ' மாகாணம்';
+                  }
+
+                  const ccode = o.ccode || o.CCODE || o.code || '';
+                  const parts = [
+                    name ? `${name}${ccode ? ` (${ccode})` : ''}` : (o.nameEn || ''),
+                    ds, dis, pro
+                  ].filter(Boolean);
+
+                  return parts.join(', ');
                 }}
                 value={selectedGN}
                 loading={gnSearching}
@@ -248,18 +268,33 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
                 )}
                 renderOption={(props, option) => {
                   const { key, ...optionProps } = props as any;
+                  const name = language === 'si' ? option.nameSi : language === 'ta' ? option.nameTa : option.nameEn;
+                  const ds = language === 'si' ? option.dsSi : language === 'ta' ? option.dsTa : option.dsEn;
+                  let dis = language === 'si' ? option.disSi : language === 'ta' ? option.disTa : option.disEn;
+                  let pro = language === 'si' ? option.proSi : language === 'ta' ? option.proTa : option.proEn;
+                  
+                  if (language === 'si') {
+                    if (dis && !dis.includes('දිස්ත්‍රික්කය')) dis += ' දිස්ත්‍රික්කය';
+                    if (pro && !pro.includes('පළාත')) pro += ' පළාත';
+                  } else if (language === 'en') {
+                    if (dis && !dis.includes('District')) dis += ' District';
+                    if (pro && !pro.includes('Province')) pro += ' Province';
+                  } else if (language === 'ta') {
+                    if (dis && !dis.includes('மாவட்டம்')) dis += ' மாவட்டம்';
+                    if (pro && !pro.includes('மாகாணம்')) pro += ' மாகாணம்';
+                  }
+
+                  const ccode = option.ccode || option.CCODE || option.code || '';
                   const parts = [
-                    language === 'si' ? option.nameSi : language === 'ta' ? option.nameTa : option.nameEn,
-                    language === 'si' ? option.dsSi : language === 'ta' ? option.dsTa : option.dsEn,
-                    language === 'si' ? option.disSi : language === 'ta' ? option.disTa : option.disEn,
-                    language === 'si' ? option.proSi : language === 'ta' ? option.proTa : option.proEn
+                    name ? `${name}${ccode ? ` (${ccode})` : ''}` : (option.nameEn || ''),
+                    ds, dis, pro
                   ].filter(Boolean);
                   
                   return (
                     <li key={key} {...optionProps}>
                       <Box>
                         <Typography variant="body1" fontWeight="500">
-                          {parts[0]} {option.ccode ? `(${option.ccode})` : ''}
+                          {parts[0]}
                         </Typography>
                         {parts.length > 1 && (
                           <Typography variant="caption" color="text.secondary">
