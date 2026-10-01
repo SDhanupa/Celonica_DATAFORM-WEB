@@ -21,22 +21,28 @@ class PProvince extends Model
 
     public function getPopulationBothAttribute()
     {
-        return PGn::join('grama_niladharis', 'p_gns.grama_niladhari_id', '=', 'grama_niladharis.id')
-                  ->where('grama_niladharis.province_code', $this->admin1Pcode)
-                  ->sum('p_gns.population_both');
+        return \Illuminate\Support\Facades\Cache::remember("p_prov_pop_both_{$this->admin1Pcode}", 86400, function () {
+            return PGn::join('grama_niladharis', 'p_gns.grama_niladhari_id', '=', 'grama_niladharis.id')
+                      ->where('grama_niladharis.province_code', $this->admin1Pcode)
+                      ->sum('p_gns.population_both');
+        });
     }
 
     public function getPopulationMaleAttribute()
     {
-        return PGn::join('grama_niladharis', 'p_gns.grama_niladhari_id', '=', 'grama_niladharis.id')
-                  ->where('grama_niladharis.province_code', $this->admin1Pcode)
-                  ->sum('p_gns.population_male');
+        return \Illuminate\Support\Facades\Cache::remember("p_prov_pop_male_{$this->admin1Pcode}", 86400, function () {
+            return PGn::join('grama_niladharis', 'p_gns.grama_niladhari_id', '=', 'grama_niladharis.id')
+                      ->where('grama_niladharis.province_code', $this->admin1Pcode)
+                      ->sum('p_gns.population_male');
+        });
     }
 
     public function getPopulationFemaleAttribute()
     {
-        return PGn::join('grama_niladharis', 'p_gns.grama_niladhari_id', '=', 'grama_niladharis.id')
-                  ->where('grama_niladharis.province_code', $this->admin1Pcode)
-                  ->sum('p_gns.population_female');
+        return \Illuminate\Support\Facades\Cache::remember("p_prov_pop_female_{$this->admin1Pcode}", 86400, function () {
+            return PGn::join('grama_niladharis', 'p_gns.grama_niladhari_id', '=', 'grama_niladharis.id')
+                      ->where('grama_niladharis.province_code', $this->admin1Pcode)
+                      ->sum('p_gns.population_female');
+        });
     }
 }
