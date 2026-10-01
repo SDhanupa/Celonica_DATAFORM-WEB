@@ -62,12 +62,7 @@ class ContributionController extends Controller
                 $category = $categories->get($slug);
                 $hasStatus = GnRecordScope::hasColumn($table, 'status');
 
-                $columns = array_values(array_filter([
-                    'id', 'reg_number', 'name_en', 'name_si', 'name_ta', 'created_at', 'is_approved', 'is_update_proposal',
-                    $hasStatus ? 'status' : null,
-                    GnRecordScope::hasColumn($table, 'final_gn') ? 'final_gn' : null,
-                    GnRecordScope::hasColumn($table, 'raw_gn') ? 'raw_gn' : null,
-                ], fn ($c) => $c && GnRecordScope::hasColumn($table, $c)));
+                $columns = ['*'];
 
                 DB::table($table)
                     ->where('contributor_sub', $sub)
@@ -85,6 +80,7 @@ class ContributionController extends Controller
                             'status' => $this->placeStatus($row, $hasStatus),
                             'is_update' => (bool) ($row->is_update_proposal ?? false),
                             'created_at' => $row->created_at,
+                            'full_data' => $row,
                         ]);
                     });
             }
@@ -93,7 +89,7 @@ class ContributionController extends Controller
                 ->where('user_id', $sub)
                 ->orderByDesc('updated_at')
                 ->limit(self::MINE_LIMIT)
-                ->get(['id', 'reg_number', 'gn_name', 'ccode', 'status', 'created_at', 'updated_at'])
+                ->get(['*'])
                 ->each(function ($row) use ($items) {
                     $items->push([
                         'id' => "survey:{$row->id}",
@@ -106,6 +102,7 @@ class ContributionController extends Controller
                         'status' => in_array($row->status, ['draft', 'submitted', 'approved'], true) ? $row->status : 'draft',
                         'is_update' => false,
                         'created_at' => $row->updated_at ?? $row->created_at,
+                        'full_data' => $row,
                     ]);
                 });
 

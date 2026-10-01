@@ -14,7 +14,7 @@ const retryLink = new RetryLink({
     jitter: true,
   },
   attempts: {
-    max: 10,
+    max: 2,
     retryIf: (error, _operation) => {
       // Retry if it's a network error (TypeError: Failed to fetch)
       if (error && error.name === 'TypeError' && error.message === 'Failed to fetch') {
