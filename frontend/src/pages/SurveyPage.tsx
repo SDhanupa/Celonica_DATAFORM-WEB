@@ -153,13 +153,13 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp, categoryName, o
     autoSelected.current = true;
     
     // Construct a compatible option object from the village
-    const proEn = (village as any).pDistrict?.pProvince?.admin1NameEn || '';
-    const proSi = (village as any).pDistrict?.pProvince?.admin1NameSi || proEn;
-    const proTa = (village as any).pDistrict?.pProvince?.admin1NameTa || proEn;
+    const proEn = (village as any).pDistrict?.pProvince?.admin1NameEn || (village as any).proEn || '';
+    const proSi = (village as any).pDistrict?.pProvince?.admin1NameSi || (village as any).proSi || proEn;
+    const proTa = (village as any).pDistrict?.pProvince?.admin1NameTa || (village as any).proTa || proEn;
     
-    const disEn = (village as any).pDistrict?.admin2NameEn || '';
-    const disSi = (village as any).pDistrict?.admin2NameSi || disEn;
-    const disTa = (village as any).pDistrict?.admin2NameTa || disEn;
+    const disEn = (village as any).pDistrict?.admin2NameEn || (village as any).disEn || '';
+    const disSi = (village as any).pDistrict?.admin2NameSi || (village as any).disSi || disEn;
+    const disTa = (village as any).pDistrict?.admin2NameTa || (village as any).disTa || disEn;
     
     const dsEn = (village as any).dsEn || '';
     const dsSi = (village as any).dsSi || dsEn;
@@ -168,13 +168,13 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp, categoryName, o
     const nameEn = (village as any).nameEn || '';
     const nameSi = (village as any).nameSi || nameEn;
     const nameTa = (village as any).nameTa || nameEn;
-    const ccode = (village as any).CCODE || (village as any).code || '';
+    const ccode = (village as any).CCODE || (village as any).code || (village as any).ccode || '';
 
     const displayEn = [nameEn ? `${nameEn} (${ccode})` : '', dsEn, disEn, proEn].filter(Boolean).join(', ');
     const displaySi = [nameSi ? `${nameSi} (${ccode})` : '', dsSi, disSi, proSi].filter(Boolean).join(', ');
     const displayTa = [nameTa ? `${nameTa} (${ccode})` : '', dsTa, disTa, proTa].filter(Boolean).join(', ');
 
-    setSelectedGN({
+    const initialGN = {
       ...village,
       proEn, proSi, proTa,
       disEn, disSi, disTa,
@@ -184,7 +184,22 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp, categoryName, o
       display: displayEn,
       displaySi: displaySi,
       displayTa: displayTa
-    });
+    };
+    setSelectedGN(initialGN);
+
+    // If the cache is so old it's missing the province, fetch it dynamically.
+    if (!proEn && ccode) {
+      const controller = new AbortController();
+      fetch(`/api/search-gns?gn=${encodeURIComponent(ccode)}`, { signal: controller.signal })
+        .then(res => res.json())
+        .then(json => {
+          if (json.success && json.data?.length > 0) {
+            const found = json.data.find((g: any) => g.ccode === ccode || g.CCODE === ccode);
+            if (found) setSelectedGN(found);
+          }
+        })
+        .catch(() => {});
+    }
   }, [village]);
 
   // Unified GN Search Autocomplete
