@@ -412,6 +412,7 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp, categoryName, o
                 />
               )}
               renderOption={(props, option) => {
+                const { key, ...optionProps } = props as any;
                 const parts = [
                   language === 'si' ? option.nameSi : language === 'ta' ? option.nameTa : option.nameEn,
                   language === 'si' ? option.dsSi : language === 'ta' ? option.dsTa : option.dsEn,
@@ -420,7 +421,7 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp, categoryName, o
                 ].filter(Boolean);
                 
                 return (
-                  <li {...props}>
+                  <li key={key} {...optionProps}>
                     <Box>
                       <Typography variant="body1" fontWeight="500">
                         {parts[0]} {option.ccode ? `(${option.ccode})` : ''}
