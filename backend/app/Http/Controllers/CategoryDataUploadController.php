@@ -1080,6 +1080,9 @@ class CategoryDataUploadController extends Controller
 
         $this->invalidateCategoryCache($slug);
         \App\Http\Controllers\ContributionController::forgetVillageCache($payload['gn_code'] ?? null);
+        if ($insertData['contributor_sub']) {
+            \App\Http\Controllers\ContributionController::forgetMineCache($insertData['contributor_sub']);
+        }
 
         return response()->json([
             'success' => true,

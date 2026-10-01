@@ -11,7 +11,8 @@
         "firebase/php-jwt": "^7.1",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
-        "nuwave/lighthouse": "^6.67"
+        "nuwave/lighthouse": "^6.67",
+        "predis/predis": "^3.6"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

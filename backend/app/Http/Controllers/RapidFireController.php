@@ -261,6 +261,7 @@ class RapidFireController extends Controller
         if ($response->getStatusCode() === 200 && $ccode) {
             try {
                 ContributionController::forgetVillageCache($ccode);
+                ContributionController::forgetMineCache($sub);
             } catch (\Exception $e) {
                 // Non-fatal: stale cache will expire on its own.
             }
