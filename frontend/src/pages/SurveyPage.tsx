@@ -267,7 +267,7 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp, categoryName, o
   /* ── Submit ───────────────────────────────────────────────────────────── */
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    const locationMissing = !form.raw_province || !form.raw_district || !form.raw_ds || !form.raw_gn;
+    const locationMissing = !form.raw_gn;
     const nameMissing = !form.name_en.trim() && !form.name_si.trim() && !form.name_ta.trim();
     setFieldErrors({ location: locationMissing, name: nameMissing });
     if (locationMissing || nameMissing) {
