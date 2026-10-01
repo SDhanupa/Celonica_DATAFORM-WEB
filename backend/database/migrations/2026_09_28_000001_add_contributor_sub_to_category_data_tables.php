@@ -17,8 +17,12 @@ return new class extends Migration
         // and by GN code.
         if (Schema::hasTable('industry_surveys')) {
             Schema::table('industry_surveys', function (Blueprint $t) {
-                $t->index('user_id', 'industry_surveys_user_id_idx');
-                $t->index('ccode', 'industry_surveys_ccode_idx');
+                try {
+                    $t->index('user_id', 'industry_surveys_user_id_idx');
+                } catch (\Exception $e) {}
+                try {
+                    $t->index('ccode', 'industry_surveys_ccode_idx');
+                } catch (\Exception $e) {}
             });
         }
     }

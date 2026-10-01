@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('industry_surveys', function (Blueprint $table) {
-            $table->string('created_by')->nullable()->after('user_id');
-        });
+        if (!Schema::hasColumn('industry_surveys', 'created_by')) {
+            Schema::table('industry_surveys', function (Blueprint $table) {
+                $table->string('created_by')->nullable()->after('user_id');
+            });
+        }
     }
 
     /**
