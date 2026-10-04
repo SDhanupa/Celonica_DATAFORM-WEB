@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from 'react';
-import { Alert, Box, Button, Chip, Container, Paper, Skeleton, Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
-import { alpha } from '@mui/material/styles';
+import { Alert, Box, Button, ButtonBase, Chip, Container, Paper, Skeleton, Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import { ink, inkButton, segmented, semantic } from '../components/contribute/tokens';
+import { Ambient, CountUp, EASE, enter, lift, spotlight, spotlightMove } from '../components/contribute/motion';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import StorefrontRoundedIcon from '@mui/icons-material/StorefrontRounded';
 import VolunteerActivismRoundedIcon from '@mui/icons-material/VolunteerActivismRounded';
@@ -51,16 +52,28 @@ const MyContributionsPage: React.FC = () => {
   const s = data?.summary;
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: ink[50] }}>
       <UserTopBar />
-      <Container maxWidth="md" sx={{ px: { xs: 2, sm: 3 }, py: { xs: 3.5, md: 6 } }}>
-        <Typography component="h1" sx={{ fontSize: { xs: '1.75rem', sm: '2.2rem' }, fontWeight: 700, letterSpacing: '-0.03em', mb: 0.75 }}>
-          {t.myTitle}
-        </Typography>
-        <Typography color="text.secondary" sx={{ mb: { xs: 3, md: 4 } }}>
-          {t.mySubtitle}
-        </Typography>
-
+      <Box sx={{ position: 'relative', isolation: 'isolate', overflow: 'hidden', bgcolor: ink[900], color: '#fff' }}>
+        <Ambient />
+        <Container maxWidth="md" sx={{ px: { xs: 2, sm: 3 }, pt: { xs: 4, md: 6 }, pb: { xs: 4, md: 5 } }}>
+          <Typography component="h1" sx={{ ...enter(0), fontSize: { xs: '2rem', sm: '2.75rem' }, fontWeight: 800, letterSpacing: '-0.045em', lineHeight: 1.05, mb: 1, background: 'linear-gradient(180deg,#fff 35%,rgba(255,255,255,.55))', WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent' }}>
+            {t.myTitle}
+          </Typography>
+          <Typography sx={{ ...enter(1), color: 'rgba(255,255,255,.6)', mb: { xs: 3, md: 4 }, maxWidth: 560 }}>
+            {t.mySubtitle}
+          </Typography>
+          {!error && (
+            <Box sx={{ ...enter(2), display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)' }, gap: '1px', borderRadius: '20px', overflow: 'hidden', bgcolor: 'rgba(255,255,255,.1)', border: '1px solid rgba(255,255,255,.1)' }}>
+              <SummaryTile label={t.myImpactTotal} value={s?.total} loading={loading} />
+              <SummaryTile label={t.myImpactApproved} value={s?.approved} loading={loading} />
+              <SummaryTile label={t.myImpactReview} value={s?.in_review} loading={loading} />
+              <SummaryTile label={t.villagesCount} value={s?.villages} loading={loading} />
+            </Box>
+          )}
+        </Container>
+      </Box>
+      <Container maxWidth="md" sx={{ px: { xs: 2, sm: 3 }, py: { xs: 3, md: 4 } }}>
         {error ? (
           <Alert
             severity="error"
@@ -75,20 +88,13 @@ const MyContributionsPage: React.FC = () => {
           </Alert>
         ) : (
           <>
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)' }, gap: 1.25, mb: 3 }}>
-              <SummaryTile label={t.myImpactTotal} value={s?.total} loading={loading} />
-              <SummaryTile label={t.myImpactApproved} value={s?.approved} loading={loading} tone="success" />
-              <SummaryTile label={t.myImpactReview} value={s?.in_review} loading={loading} tone="warning" />
-              <SummaryTile label={t.villagesCount} value={s?.villages} loading={loading} />
-            </Box>
-
             {!loading && s && s.total > 0 && (
               <ToggleButtonGroup
                 size="small"
                 exclusive
                 value={filter}
                 onChange={(_, value) => value && setFilter(value)}
-                sx={{ mb: 2, flexWrap: 'wrap', '& .MuiToggleButton-root': { px: 1.75, textTransform: 'none', fontWeight: 600 } }}
+                sx={{ ...segmented, ...enter(3), mb: 2.5, flexWrap: 'wrap', maxWidth: '100%' }}
               >
                 <ToggleButton value="all">{t.myFilterAll}</ToggleButton>
                 <ToggleButton value="review">{t.myFilterReview}</ToggleButton>
@@ -111,14 +117,14 @@ const MyContributionsPage: React.FC = () => {
               </Stack>
             ) : !s || s.total === 0 ? (
               <Paper variant="outlined" sx={{ p: { xs: 4, sm: 6 }, borderRadius: '20px', textAlign: 'center' }}>
-                <Box sx={{ width: 64, height: 64, mx: 'auto', mb: 2, borderRadius: '18px', display: 'grid', placeItems: 'center', bgcolor: (theme) => alpha(theme.palette.success.main, 0.1), color: 'success.main' }}>
+                <Box sx={{ width: 64, height: 64, mx: 'auto', mb: 2, borderRadius: '18px', display: 'grid', placeItems: 'center', bgcolor: ink[100], color: ink[600] }}>
                   <VolunteerActivismRoundedIcon />
                 </Box>
                 <Typography sx={{ fontWeight: 700, fontSize: '1.15rem', mb: 0.75 }}>{t.myEmptyTitle}</Typography>
                 <Typography color="text.secondary" sx={{ maxWidth: 420, mx: 'auto', mb: 3 }}>
                   {t.myEmptyBody}
                 </Typography>
-                <Button variant="contained" disableElevation startIcon={<AddRoundedIcon />} onClick={() => navigate('/user')} sx={{ py: 1.25, px: 2.5 }}>
+                <Button startIcon={<AddRoundedIcon />} onClick={() => navigate('/user')} sx={{ py: 1.25, px: 2.5, borderRadius: 999, fontWeight: 700, ...inkButton }}>
                   {t.startContributing}
                 </Button>
               </Paper>
@@ -127,9 +133,9 @@ const MyContributionsPage: React.FC = () => {
                 {t.noResults}
               </Typography>
             ) : (
-              <Stack component="ul" spacing={1.25} sx={{ listStyle: 'none', p: 0, m: 0 }}>
-                {items.map((item) => (
-                  <ContributionRow key={item.id} item={item} dateFormat={dateFormat} onOpen={() => openItem(item)} />
+              <Stack component="ul" key={filter} spacing={1} sx={{ listStyle: 'none', p: 0, m: 0 }}>
+                {items.map((item, i) => (
+                  <ContributionRow key={item.id} index={i} item={item} dateFormat={dateFormat} onOpen={() => openItem(item)} />
                 ))}
               </Stack>
             )}
@@ -138,7 +144,7 @@ const MyContributionsPage: React.FC = () => {
       </Container>
       
       {/* Submission Details Dialog */}
-      <Dialog open={Boolean(viewItem)} onClose={() => setViewItem(null)} maxWidth="md" fullWidth>
+      <Dialog open={Boolean(viewItem)} onClose={() => setViewItem(null)} maxWidth="md" fullWidth PaperProps={{ sx: { borderRadius: { xs: '20px', sm: '24px' }, m: { xs: 1.5, sm: 4 }, width: { xs: 'calc(100% - 24px)', sm: undefined } } }} slotProps={{ backdrop: { sx: { bgcolor: 'rgba(10,12,15,.45)', backdropFilter: 'blur(6px)' } } }}>
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}>
           <Typography variant="h6" sx={{ fontWeight: 600 }}>
             {viewItem?.title || (viewItem?.kind === 'business_survey' ? t.kindBusiness : t.untitled)}
@@ -147,15 +153,15 @@ const MyContributionsPage: React.FC = () => {
             <CloseRoundedIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent dividers sx={{ bgcolor: 'background.default', p: { xs: 2, sm: 3 } }}>
+        <DialogContent dividers sx={{ bgcolor: ink[50], borderColor: ink[100], p: { xs: 2, sm: 3 } }}>
           {viewItem?.reg_number && (
-            <Alert severity="info" sx={{ mb: 3, borderRadius: '12px', '& .MuiAlert-message': { width: '100%' } }}>
-              <Typography variant="subtitle2">{t.myGeneratedCode || 'Registration Number'}</Typography>
-              <Typography variant="h6" sx={{ fontFamily: 'monospace', mt: 0.5 }}>{viewItem.reg_number}</Typography>
-            </Alert>
+            <Box sx={{ mb: 3, p: 2.5, borderRadius: '16px', bgcolor: ink[900], color: '#fff' }}>
+              <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,.5)' }}>Registration number</Typography>
+              <Typography sx={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontSize: '1.25rem', fontWeight: 700, mt: 0.5, letterSpacing: '0.04em' }}>{viewItem.reg_number}</Typography>
+            </Box>
           )}
           
-          <Paper variant="outlined" sx={{ borderRadius: '12px', overflow: 'hidden' }}>
+          <Paper variant="outlined" sx={{ borderRadius: '16px', overflow: 'hidden', borderColor: ink[100] }}>
             <Grid container>
               {viewItem?.full_data && Object.entries(viewItem.full_data)
                 .filter(([key, val]) => val !== null && val !== '' && key !== 'id' && key !== 'contributor_sub' && key !== 'user_id' && key !== 'category_slug')
@@ -173,8 +179,8 @@ const MyContributionsPage: React.FC = () => {
           </Paper>
         </DialogContent>
         <DialogActions sx={{ p: 2, pt: 1.5 }}>
-          <Button onClick={() => setViewItem(null)} sx={{ fontWeight: 600 }}>
-            {t.myFilterAll || 'Close'}
+          <Button onClick={() => setViewItem(null)} sx={{ fontWeight: 700, borderRadius: 999, px: 3, ...inkButton }}>
+            Close
           </Button>
         </DialogActions>
       </Dialog>
@@ -182,68 +188,77 @@ const MyContributionsPage: React.FC = () => {
   );
 };
 
-const SummaryTile: React.FC<{ label: string; value?: number; loading: boolean; tone?: 'success' | 'warning' }> = ({ label, value, loading, tone }) => (
-  <Paper variant="outlined" sx={{ p: 2, borderRadius: '14px' }}>
-    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }} noWrap>
+const SummaryTile: React.FC<{ label: string; value?: number; loading: boolean }> = ({ label, value, loading }) => (
+  <Box sx={{ p: { xs: 2, sm: 2.25 }, bgcolor: 'rgba(10,12,15,.55)', backdropFilter: 'blur(8px)', transition: 'background-color 200ms ease', '&:hover': { bgcolor: 'rgba(255,255,255,.06)' } }}>
+    <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,.5)' }} noWrap>
       {label}
     </Typography>
     {loading || value === undefined ? (
-      <Skeleton width={40} height={34} />
+      <Skeleton width={40} height={38} sx={{ bgcolor: 'rgba(255,255,255,.1)' }} />
     ) : (
-      <Typography sx={{ fontWeight: 700, fontSize: '1.6rem', letterSpacing: '-0.03em', color: tone && value > 0 ? `${tone}.main` : 'text.primary' }}>{value}</Typography>
+      <Typography sx={{ fontWeight: 800, fontSize: { xs: '1.75rem', sm: '2rem' }, letterSpacing: '-0.05em', lineHeight: 1.15, color: '#fff', fontVariantNumeric: 'tabular-nums' }}>
+        <CountUp value={value} />
+      </Typography>
     )}
-  </Paper>
+  </Box>
 );
 
-const ContributionRow: React.FC<{ item: MyContribution; dateFormat: Intl.DateTimeFormat; onOpen: () => void }> = ({ item, dateFormat, onOpen }) => {
+const STATUS_SX: Record<ContributionStatus, object> = {
+  approved: { bgcolor: ink[900], color: '#fff' },
+  pending: { border: `1px solid ${ink[300]}`, color: ink[700] },
+  submitted: { border: `1px solid ${ink[300]}`, color: ink[700] },
+  draft: { bgcolor: ink[100], color: ink[500] },
+  rejected: { bgcolor: semantic.dangerSoft, color: semantic.danger },
+};
+
+const ContributionRow: React.FC<{ item: MyContribution; index: number; dateFormat: Intl.DateTimeFormat; onOpen: () => void }> = ({ item, index, dateFormat, onOpen }) => {
   const { t } = useContributeCopy();
   const isBusiness = item.kind === 'business_survey';
-  const { Icon, color } = isBusiness ? { Icon: StorefrontRoundedIcon, color: '#7C3AED' } : getCategoryVisual({ slug: item.category?.root_slug || undefined, nameEn: item.category?.root_name_en || undefined });
+  const { Icon } = isBusiness ? { Icon: StorefrontRoundedIcon } : getCategoryVisual({ slug: item.category?.root_slug || undefined, nameEn: item.category?.root_name_en || undefined });
   const status = STATUS_STYLE[item.status] || STATUS_STYLE.pending;
   const title = isBusiness ? t.kindBusiness : item.title || t.untitled;
   const context = isBusiness ? item.reg_number : (item.reg_number ? `${item.reg_number} · ${item.category?.name_en}` : item.category?.name_en);
   const created = item.created_at ? new Date(item.created_at.replace(' ', 'T')) : null;
 
   return (
-    <Paper component="li" variant="outlined" sx={{ borderRadius: '14px', overflow: 'hidden', transition: 'border-color 150ms ease', '&:hover': { borderColor: alpha(color, 0.5) } }}>
-      <Box
-        component="button"
-        type="button"
+    <Box component="li" sx={enter(Math.min(index, 10) + 3, 45)}>
+      <ButtonBase
         onClick={onOpen}
+        onPointerMove={spotlightMove}
         sx={{
-          all: 'unset',
-          boxSizing: 'border-box',
+          ...spotlight(),
+          ...lift,
           width: '100%',
-          cursor: 'pointer',
+          textAlign: 'left',
           display: 'flex',
           alignItems: 'center',
           gap: 2,
           p: { xs: 1.5, sm: 2 },
-          '&:focus-visible': { outline: 2, outlineColor: 'primary.main', outlineOffset: -2, borderRadius: '14px' },
+          borderRadius: '18px',
+          bgcolor: '#fff',
+          border: `1px solid ${ink[100]}`,
+          '&:hover': { ...lift['&:hover'], borderColor: ink[200], '& .row-icon': { bgcolor: ink[900], color: '#fff' }, '& .row-chev': { transform: 'translateX(3px)', color: ink[900] } },
+          '&:focus-visible': { outline: `2px solid ${ink[900]}`, outlineOffset: 2 },
         }}
       >
-        <Box sx={{ width: 44, height: 44, borderRadius: '12px', display: 'grid', placeItems: 'center', flexShrink: 0, bgcolor: alpha(color, 0.1), color }}>
+        <Box className="row-icon" sx={{ width: 44, height: 44, borderRadius: '13px', display: 'grid', placeItems: 'center', flexShrink: 0, bgcolor: ink[100], color: ink[700], transition: 'background-color 250ms ease, color 250ms ease' }}>
           <Icon sx={{ fontSize: 22 }} />
         </Box>
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center', minWidth: 0 }}>
-            <Typography sx={{ fontWeight: 600 }} noWrap>
+            <Typography sx={{ fontWeight: 600, color: ink[900] }} noWrap>
               {title}
             </Typography>
-            {item.is_update && <Chip label={t.updateProposal} size="small" variant="outlined" sx={{ height: 20, fontSize: '0.65rem', flexShrink: 0 }} />}
+            {item.is_update && <Chip label={t.updateProposal} size="small" variant="outlined" sx={{ height: 20, fontSize: '0.65rem', flexShrink: 0, borderColor: ink[200], color: ink[600] }} />}
           </Stack>
-          <Typography variant="body2" color="text.secondary" noWrap>
+          <Typography variant="body2" sx={{ color: ink[400] }} noWrap>
             {[context, item.village, created && !isNaN(created.getTime()) ? dateFormat.format(created) : null].filter(Boolean).join(' · ')}
           </Typography>
         </Box>
-        <Chip
-          label={t[status.key]}
-          size="small"
-          sx={{ flexShrink: 0, fontWeight: 600, fontSize: '0.72rem', bgcolor: (theme) => alpha(theme.palette[status.tone].main, 0.12), color: `${status.tone}.dark` }}
-        />
-        <ChevronRightRoundedIcon sx={{ color: 'text.disabled', flexShrink: 0, display: { xs: 'none', sm: 'block' } }} />
-      </Box>
-    </Paper>
+        <Box sx={{ ...STATUS_SX[item.status], px: 1.25, py: 0.4, borderRadius: 999, fontSize: '0.72rem', fontWeight: 700, flexShrink: 0, whiteSpace: 'nowrap' }}>{t[status.key]}</Box>
+        <ChevronRightRoundedIcon className="row-chev" sx={{ color: ink[300], flexShrink: 0, display: { xs: 'none', sm: 'block' }, transition: `transform 300ms ${EASE}, color 200ms ease` }} />
+      </ButtonBase>
+    </Box>
   );
 };
 

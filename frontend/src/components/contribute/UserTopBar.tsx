@@ -26,6 +26,7 @@ import { useAuth } from '../../auth/AuthProvider';
 import { useLanguage } from '../../context/LanguageContext';
 import { useContributeCopy } from './copy';
 import { readSavedVillage, villagePath } from './village';
+import { ink, segmented } from './tokens';
 
 interface UserTopBarProps {
   onChangeVillage?: () => void;
@@ -62,10 +63,10 @@ const UserTopBar: React.FC<UserTopBarProps> = ({ onChangeVillage }) => {
         position: 'sticky',
         top: 0,
         zIndex: (theme) => theme.zIndex.appBar,
-        bgcolor: (theme) => alpha(theme.palette.background.paper, 0.85),
-        backdropFilter: 'saturate(180%) blur(14px)',
-        borderBottom: 1,
-        borderColor: 'divider',
+        bgcolor: alpha('#FFFFFF', 0.72),
+        backdropFilter: 'saturate(180%) blur(18px)',
+        WebkitBackdropFilter: 'saturate(180%) blur(18px)',
+        borderBottom: `1px solid ${alpha(ink[900], 0.06)}`,
       }}
     >
       <Container maxWidth="lg" sx={{ height: { xs: 56, sm: 64 }, display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.5 }, px: { xs: 2, sm: 3 } }}>
@@ -80,7 +81,7 @@ const UserTopBar: React.FC<UserTopBarProps> = ({ onChangeVillage }) => {
           </Typography>
         </ButtonBase>
 
-        <Box component="nav" aria-label="Contributor" sx={{ display: { xs: 'none', md: 'flex' }, gap: 0.5, ml: 2 }}>
+        <Box component="nav" aria-label="Contributor" sx={{ display: { xs: 'none', md: 'flex' }, gap: 0.25, ml: 2, p: 0.5, borderRadius: 999, bgcolor: alpha(ink[900], 0.04) }}>
           {NAV.map((item) => {
             const active = item.match(pathname);
             return (
@@ -89,12 +90,17 @@ const UserTopBar: React.FC<UserTopBarProps> = ({ onChangeVillage }) => {
                 onClick={() => navigate(item.path)}
                 aria-current={active ? 'page' : undefined}
                 sx={{
-                  boxShadow: 'none',
-                  px: 1.5,
+                  boxShadow: active ? '0 1px 2px rgba(10,12,15,.08), 0 4px 12px rgba(10,12,15,.06)' : 'none',
+                  px: 1.75,
+                  py: 0.6,
+                  minHeight: 0,
+                  borderRadius: 999,
                   fontWeight: 600,
-                  color: active ? 'primary.main' : 'text.secondary',
-                  bgcolor: active ? (theme) => alpha(theme.palette.primary.main, 0.08) : 'transparent',
-                  '&:hover': { boxShadow: 'none', transform: 'none', bgcolor: (theme) => alpha(theme.palette.primary.main, active ? 0.12 : 0.05) },
+                  fontSize: '0.86rem',
+                  color: active ? ink[900] : ink[500],
+                  bgcolor: active ? '#fff' : 'transparent',
+                  transition: 'background-color 250ms ease, color 250ms ease, box-shadow 250ms ease',
+                  '&:hover': { transform: 'none', color: ink[900], bgcolor: active ? '#fff' : alpha(ink[900], 0.05), boxShadow: active ? '0 1px 2px rgba(10,12,15,.08), 0 4px 12px rgba(10,12,15,.06)' : 'none' },
                 }}
               >
                 {labels[item.key]}
@@ -112,8 +118,9 @@ const UserTopBar: React.FC<UserTopBarProps> = ({ onChangeVillage }) => {
           onChange={(_, value) => value && setLanguage(value)}
           aria-label="Language"
           sx={{
+            ...segmented,
             display: { xs: 'none', sm: 'inline-flex' },
-            '& .MuiToggleButton-root': { px: 1.1, py: 0.35, fontSize: '0.75rem', fontWeight: 600, border: 1, borderColor: 'divider', textTransform: 'none' },
+            '& .MuiToggleButtonGroup-grouped': { ...segmented['& .MuiToggleButtonGroup-grouped'], px: 1.1, py: 0.3, fontSize: '0.74rem' },
           }}
         >
           <ToggleButton value="si">සිං</ToggleButton>
@@ -129,16 +136,15 @@ const UserTopBar: React.FC<UserTopBarProps> = ({ onChangeVillage }) => {
             aria-expanded={Boolean(menuAnchor)}
             sx={{
               borderRadius: 999,
-              p: 0.5,
-              border: 1,
-              borderColor: 'divider',
-              bgcolor: 'background.paper',
-              transition: 'background-color 150ms ease',
-              '&:hover': { bgcolor: 'action.hover' },
-              '&:focus-visible': { outline: 2, outlineColor: 'primary.main', outlineOffset: 2 },
+              p: 0.4,
+              border: `1px solid ${ink[200]}`,
+              bgcolor: '#fff',
+              transition: 'border-color 200ms ease, box-shadow 200ms ease',
+              '&:hover': { borderColor: ink[400], boxShadow: `0 0 0 4px ${alpha(ink[900], 0.05)}` },
+              '&:focus-visible': { outline: `2px solid ${ink[900]}`, outlineOffset: 2 },
             }}
           >
-            <Avatar sx={{ width: 30, height: 30, bgcolor: 'primary.main', fontSize: '0.85rem', fontWeight: 600 }}>{initial}</Avatar>
+            <Avatar sx={{ width: 30, height: 30, bgcolor: ink[900], fontSize: '0.85rem', fontWeight: 600 }}>{initial}</Avatar>
           </ButtonBase>
         </Tooltip>
 
