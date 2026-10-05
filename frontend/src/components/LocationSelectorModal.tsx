@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { Box, Typography, Button, FormControl, CircularProgress, Alert, Dialog, DialogContent, DialogActions, Autocomplete, TextField, Divider, useTheme } from '@mui/material';
 import { useQuery } from '@apollo/client';
-import { GET_ALL_LOCATIONS, GET_GN_BY_COORDINATES } from '../graphql/queries';
+import { GET_GN_BY_COORDINATES } from '../graphql/queries';
 
 interface LocationSelectorModalProps {
   open: boolean;
@@ -25,15 +25,35 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
   const [locationError, setLocationError] = useState<string | null>(null);
   const [locating, setLocating] = useState<boolean>(false);
 
-  const [selectedDistrict, setSelectedDistrict] = useState<string>('');
-  const [selectedCity, setSelectedCity] = useState<string>('');
-  const [selectedGN, setSelectedGN] = useState<string>('');
+  const [selectedGN, setSelectedGN] = useState<any>(null);
+  const [gnSearchInput, setGnSearchInput] = useState('');
+  const [gnOptions, setGnOptions] = useState<any[]>([]);
+  const [gnSearching, setGnSearching] = useState(false);
 
-  // Fetch ALL locations at once so everything is 0ms instantaneous when navigating dropdowns.
-  const { data: allLocationsData, loading: allLocationsLoading, error: allLocationsError } = useQuery(GET_ALL_LOCATIONS, {
-    fetchPolicy: 'cache-first',
-  });
-  if (allLocationsError) console.error('Locations query error:', allLocationsError);
+  useEffect(() => {
+    if (!gnSearchInput.trim()) {
+      setGnOptions([]);
+      return;
+    }
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
+      setGnSearching(true);
+      try {
+        const query = new URLSearchParams({ q: gnSearchInput.trim() });
+        const res = await fetch(`/api/search-gns?${query}`, { signal: controller.signal, headers: { Accept: 'application/json' } });
+        const json = await res.json();
+        if (json.success) setGnOptions(json.data || []);
+      } catch {
+        // ignore
+      } finally {
+        setGnSearching(false);
+      }
+    }, 350);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [gnSearchInput]);
 
   const { data: autoGnData, loading: autoGnLoading } = useQuery(GET_GN_BY_COORDINATES, {
     variables: { lat: location?.lat, lng: location?.lng },
@@ -42,78 +62,29 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
   });
 
   const activeGn = autoGnData?.gnByCoordinates;
-  
-  // Extract the GN data for the selected district instantly from memory
-  const districtGNs = React.useMemo(() => {
-    if (!selectedDistrict || !allLocationsData?.pDistricts) return [];
-    const district = allLocationsData.pDistricts.find((d: any) => d.id === selectedDistrict);
-    return district?.gramaNiladharis || [];
-  }, [allLocationsData, selectedDistrict]);
-
-  const uniqueCities = React.useMemo(() => {
-    if (!districtGNs.length) return [];
-    const citiesMap = new Map();
-    districtGNs.forEach((gn: any) => {
-      if (gn.divisionalSecretariatCode && !citiesMap.has(gn.divisionalSecretariatCode)) {
-        citiesMap.set(gn.divisionalSecretariatCode, gn);
-      }
-    });
-    return Array.from(citiesMap.values());
-  }, [districtGNs]);
-
-  const filteredGNs = React.useMemo(() => {
-    if (!districtGNs.length) return [];
-    if (!selectedCity) return districtGNs;
-    return districtGNs.filter((gn: any) => gn.divisionalSecretariatCode === selectedCity);
-  }, [districtGNs, selectedCity]);
 
   const canContinue = !showManualForm
     ? (location !== null || locationError !== null) && !!activeGn
-    : (selectedDistrict !== '' && selectedCity !== '' && selectedGN !== '');
-
-  useEffect(() => {
-    if (open && !showManualForm && !location && !locationError) {
-      setLocating(true);
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            setLocation({
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-            });
-            setLocating(false);
-          },
-          (error) => {
-            setLocationError(error.message || 'Unable to retrieve your location');
-            setLocating(false);
-          }
-        );
-      } else {
-        setLocationError('Geolocation is not supported by your browser');
-        setLocating(false);
-      }
-    }
-  }, [open, showManualForm, location, locationError]);
+    : !!selectedGN;
 
   const handleContinue = () => {
     let loadedGn: any = null;
     if (!showManualForm && activeGn) {
       loadedGn = activeGn;
-    } else if (showManualForm && selectedGN && allLocationsData?.pDistricts) {
-      const currentDistrict = allLocationsData.pDistricts.find((d: any) => d.id === selectedDistrict);
-      if (currentDistrict && currentDistrict.gramaNiladharis) {
-        const found = currentDistrict.gramaNiladharis.find((x: any) => x.id === selectedGN);
-        if (found) {
-          loadedGn = {
-            ...found,
-            pDistrict: {
-              id: currentDistrict.id,
-              admin2NameEn: currentDistrict.admin2NameEn,
-              pProvince: currentDistrict.pProvince
-            }
-          };
+    } else if (showManualForm && selectedGN) {
+      loadedGn = {
+        ...selectedGN,
+        pDistrict: {
+          admin2NameEn: selectedGN.disEn,
+          admin2NameSi: selectedGN.disSi,
+          admin2NameTa: selectedGN.disTa,
+          pProvince: {
+            admin1NameEn: selectedGN.proEn,
+            admin1NameSi: selectedGN.proSi,
+            admin1NameTa: selectedGN.proTa,
+          }
         }
-      }
+      };
     }
 
     if (loadedGn && loadedGn.CCODE && loadedGn.nameEn) {
@@ -248,95 +219,92 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
             <FormControl fullWidth>
               <Autocomplete
-                options={allLocationsData?.pDistricts || []}
-                getOptionLabel={(option: any) => {
-                  if (!option) return '';
-                  const name = language === 'en' ? option.admin2NameEn : language === 'si' ? option.admin2NameSi : option.admin2NameTa;
-                  return name || option.admin2NameEn || option.id || '';
-                }}
-                value={allLocationsData?.pDistricts?.find((d: any) => d.id === selectedDistrict) || null}
-                onChange={(event, newValue) => {
-                  setSelectedDistrict(newValue ? newValue.id : '');
-                  setSelectedCity('');
-                  setSelectedGN('');
-                }}
-                loading={allLocationsLoading}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={language === 'en' ? 'District' : language === 'si' ? 'දිස්ත්‍රික්කය' : 'மாவட்டம்'}
-                    InputProps={{
-                      ...params.InputProps,
-                      endAdornment: (
-                        <React.Fragment>
-                          {allLocationsLoading ? <CircularProgress color="inherit" size={20} /> : null}
-                          {params.InputProps.endAdornment}
-                        </React.Fragment>
-                      ),
-                    }}
-                  />
-                )}
-              />
-            </FormControl>
+                options={gnOptions}
+                getOptionLabel={(o: any) => {
+                  const name = language === 'si' ? o.nameSi : language === 'ta' ? o.nameTa : o.nameEn;
+                  const ds = language === 'si' ? o.dsSi : language === 'ta' ? o.dsTa : o.dsEn;
+                  let dis = language === 'si' ? o.disSi : language === 'ta' ? o.disTa : o.disEn;
+                  let pro = language === 'si' ? o.proSi : language === 'ta' ? o.proTa : o.proEn;
+                  
+                  if (language === 'si') {
+                    if (dis && !dis.includes('දිස්ත්‍රික්කය')) dis += ' දිස්ත්‍රික්කය';
+                    if (pro && !pro.includes('පළාත')) pro += ' පළාත';
+                  } else if (language === 'en') {
+                    if (dis && !dis.includes('District')) dis += ' District';
+                    if (pro && !pro.includes('Province')) pro += ' Province';
+                  } else if (language === 'ta') {
+                    if (dis && !dis.includes('மாவட்டம்')) dis += ' மாவட்டம்';
+                    if (pro && !pro.includes('மாகாணம்')) pro += ' மாகாணம்';
+                  }
 
-            <FormControl fullWidth disabled={!selectedDistrict}>
-              <Autocomplete
-                options={uniqueCities}
-                getOptionLabel={(option: any) => {
-                  if (!option) return '';
-                  const name = language === 'en' ? option.dsEn : language === 'si' ? option.dsSi : option.dsTa;
-                  return name || option.dsEn || option.divisionalSecretariatCode || '';
-                }}
-                value={uniqueCities.find((c: any) => c.divisionalSecretariatCode === selectedCity) || null}
-                onChange={(event, newValue) => {
-                  setSelectedCity(newValue ? newValue.divisionalSecretariatCode : '');
-                  setSelectedGN('');
-                }}
-                loading={false}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={language === 'en' ? 'City / DS Division' : language === 'si' ? 'නගරය / ප්‍රාදේශීය ලේකම් කොට්ඨාශය' : 'நகரம் / பிரதேச செயலகம்'}
-                    InputProps={{
-                      ...params.InputProps,
-                      endAdornment: (
-                        <React.Fragment>
-                          {params.InputProps.endAdornment}
-                        </React.Fragment>
-                      ),
-                    }}
-                  />
-                )}
-              />
-            </FormControl>
+                  const ccode = o.ccode || o.CCODE || o.code || '';
+                  const parts = [
+                    name ? `${name}${ccode ? ` (${ccode})` : ''}` : (o.nameEn || ''),
+                    ds, dis, pro
+                  ].filter(Boolean);
 
-            <FormControl fullWidth disabled={!selectedCity}>
-              <Autocomplete
-                options={filteredGNs}
-                getOptionLabel={(option: any) => {
-                  if (!option) return '';
-                  const name = language === 'en' ? option.nameEn : language === 'si' ? option.nameSi : option.nameTa;
-                  return name || option.nameEn || option.gnName || option.code || '';
+                  return parts.join(', ');
                 }}
-                value={districtGNs?.find((gn: any) => gn.id === selectedGN) || null}
-                onChange={(event, newValue) => {
-                  setSelectedGN(newValue ? newValue.id : '');
-                }}
-                loading={false}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={language === 'en' ? 'Grama Niladhari (GN)' : language === 'si' ? 'ග්‍රාම නිලධාරී (GN)' : 'கிராம உத்தியோகத்தர் (GN)'}
+                value={selectedGN}
+                loading={gnSearching}
+                onInputChange={(_, v) => setGnSearchInput(v)}
+                filterOptions={(x) => x} // Backend filtering
+                onChange={(_, v) => setSelectedGN(v)}
+                renderInput={(p) => (
+                  <TextField 
+                    {...p} 
+                    label={language === 'en' ? 'Location' : language === 'si' ? 'ස්ථානය' : 'இடம்'} 
+                    placeholder={language === 'en' ? 'Type GN name, District, or Province...' : language === 'si' ? 'ග්‍රාම නිලධාරී වසම, දිස්ත්‍රික්කය, හෝ පළාත සොයන්න...' : 'கிராம உத்தியோகத்தர் பிரிவு, மாவட்டம் அல்லது மாகாணத்தைத் தேடுக...'} 
                     InputProps={{
-                      ...params.InputProps,
+                      ...p.InputProps,
                       endAdornment: (
                         <React.Fragment>
-                          {params.InputProps.endAdornment}
+                          {gnSearching ? <CircularProgress color="inherit" size={20} /> : null}
+                          {p.InputProps.endAdornment}
                         </React.Fragment>
                       ),
                     }}
                   />
                 )}
+                renderOption={(props, option) => {
+                  const { key, ...optionProps } = props as any;
+                  const name = language === 'si' ? option.nameSi : language === 'ta' ? option.nameTa : option.nameEn;
+                  const ds = language === 'si' ? option.dsSi : language === 'ta' ? option.dsTa : option.dsEn;
+                  let dis = language === 'si' ? option.disSi : language === 'ta' ? option.disTa : option.disEn;
+                  let pro = language === 'si' ? option.proSi : language === 'ta' ? option.proTa : option.proEn;
+                  
+                  if (language === 'si') {
+                    if (dis && !dis.includes('දිස්ත්‍රික්කය')) dis += ' දිස්ත්‍රික්කය';
+                    if (pro && !pro.includes('පළාත')) pro += ' පළාත';
+                  } else if (language === 'en') {
+                    if (dis && !dis.includes('District')) dis += ' District';
+                    if (pro && !pro.includes('Province')) pro += ' Province';
+                  } else if (language === 'ta') {
+                    if (dis && !dis.includes('மாவட்டம்')) dis += ' மாவட்டம்';
+                    if (pro && !pro.includes('மாகாணம்')) pro += ' மாகாணம்';
+                  }
+
+                  const ccode = option.ccode || option.CCODE || option.code || '';
+                  const parts = [
+                    name ? `${name}${ccode ? ` (${ccode})` : ''}` : (option.nameEn || ''),
+                    ds, dis, pro
+                  ].filter(Boolean);
+                  
+                  return (
+                    <li key={key} {...optionProps}>
+                      <Box>
+                        <Typography variant="body1" fontWeight="500">
+                          {parts[0]}
+                        </Typography>
+                        {parts.length > 1 && (
+                          <Typography variant="caption" color="text.secondary">
+                            {parts.slice(1).join(', ')}
+                          </Typography>
+                        )}
+                      </Box>
+                    </li>
+                  );
+                }}
               />
             </FormControl>
 

@@ -285,6 +285,37 @@ const IndustrySurveyPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+  const [duplicatePromptOpen, setDuplicatePromptOpen] = useState(false);
+  const [otpRequiredAlertOpen, setOtpRequiredAlertOpen] = useState(false);
+
+  useEffect(() => {
+    const checkUserSurveys = async () => {
+      if (!token) return;
+      
+      const forceNew = localStorage.getItem('force_new_submission');
+      if (forceNew) {
+        return;
+      }
+
+      const draftStr = ccode ? localStorage.getItem(`survey_draft_${ccode}`) : null;
+      if (draftStr) return; 
+
+      try {
+        const res = await fetch('/api/my-industry-surveys', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            setDuplicatePromptOpen(true);
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    checkUserSurveys();
+  }, [token, ccode]);
   const [otpDialogOpen, setOtpDialogOpen] = useState(false);
   const [otpCode, setOtpCode] = useState('');
   const [showLoginPopup, setShowLoginPopup] = useState(false);
@@ -472,8 +503,21 @@ const IndustrySurveyPage: React.FC = () => {
       scrollToFirstError();
       return;
     }
+    if (currentStep === 0 && !isMobileVerified) {
+      setGenericAlertPopup({
+        open: true,
+        title: language === 'si' ? 'අවධානයයි' : 'Attention',
+        message: language === 'si' ? 'කරුණාකර මොබයිල් අංකය තහවුරු කරන්න (Verify Mobile Number).' : 'Please verify your mobile number (OTP) before proceeding.'
+      });
+      return;
+    }
     before?.();
     goToStep(next);
+    
+    // Auto-sync draft to backend silently on step progression
+    if (next > 0) {
+      handleSaveDraft(false, next);
+    }
   };
 
   const goPrev = (prev: number) => goToStep(prev);
@@ -541,14 +585,22 @@ const IndustrySurveyPage: React.FC = () => {
   const [gpsCoordinates, setGpsCoordinates] = useState<{ lat: number, lng: number } | null>(null);
   const [gpsChecking, setGpsChecking] = useState(false);
   const [gpsWrongLocationPopup, setGpsWrongLocationPopup] = useState<{ lat: number, lng: number } | null>(null);
+  const [genericAlertPopup, setGenericAlertPopup] = useState<{ open: boolean, title: string, message: string } | null>(null);
 
   // Universal draft key works with or without ccode
   const draftKey = ccode ? `survey_draft_${ccode}` : `survey_draft_user_${userInfo?.sub || 'anon'}`;
 
   useEffect(() => {
+    const forceNew = localStorage.getItem('force_new_submission');
+    if (forceNew) {
+      localStorage.removeItem('force_new_submission');
+      localStorage.removeItem(draftKey);
+      localStorage.removeItem(`${draftKey}_db_id`);
+    }
+
     // On route change: check for existing draft and silently resume
     const draftStr = localStorage.getItem(draftKey);
-    if (draftStr) {
+    if (draftStr && !forceNew) {
       try {
         const draft = JSON.parse(draftStr);
         if (draft.formValues && Object.keys(draft.formValues).length > 0) {
@@ -626,10 +678,11 @@ const IndustrySurveyPage: React.FC = () => {
     return res;
   };
 
-  const handleSaveDraft = async () => {
+  const handleSaveDraft = async (showPopup = true, stepOverride?: number) => {
+    const stepToSave = stepOverride !== undefined ? stepOverride : currentStep;
     const draftData = {
       formValues,
-      currentStep,
+      currentStep: stepToSave,
       surveyStartTime: surveyStartTime?.toISOString() || new Date().toISOString(),
       gpsCoordinates,
     };
@@ -669,20 +722,21 @@ const IndustrySurveyPage: React.FC = () => {
         const body = await res.json().catch(() => null);
         const reason = body?.error && typeof body.error === 'string' ? body.error : null;
         console.warn('Draft saved locally but backend sync failed:', reason || res.status);
-        alert(
-          language === 'si'
-            ? `ෆෝරමය ඔබගේ උපාංගයේ සුරැකිණි, නමුත් සර්වරයට යැවීමට අසමත් විය.${reason ? ` (${reason})` : ''}`
-            : `Saved on this device, but syncing to the server failed.${reason ? ` (${reason})` : ''}`
-        );
+        if (showPopup) {
+          alert(
+            language === 'si'
+              ? `ෆෝරමය ඔබගේ උපාංගයේ සුරැකිණි, නමුත් සර්වරයට යැවීමට අසමත් විය.${reason ? ` (${reason})` : ''}`
+              : `Saved on this device, but syncing to the server failed.${reason ? ` (${reason})` : ''}`
+          );
+        }
       }
     } catch (err) {
       console.error('Failed to sync draft to server', err);
     }
 
-    // Local save (above) always succeeds, and that's what "continue later"
-    // actually depends on — so acknowledge it regardless of whether the
-    // best-effort backend sync came through.
-    setSaveDraftDialogOpen(true);
+    if (showPopup) {
+      setSaveDraftDialogOpen(true);
+    }
   };
 
   const questions = data?.questions || [];
@@ -884,13 +938,76 @@ const IndustrySurveyPage: React.FC = () => {
       >
         {L('Save & continue later', 'සුරකින්න හා පසුව දිගටම කරන්න', 'சேமித்து பින்னர் தொடரவும்')}
       </Button>
+
+      <Dialog PaperProps={dialogPaperProps} open={duplicatePromptOpen} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <CheckCircleRoundedIcon color="primary" />
+          <Typography variant="h6" fontWeight="bold">
+            {language === 'si' ? 'ඔබට දැනටමත් ගිණුමක් ඇත' : 'You Already Have a Submission'}
+          </Typography>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Typography variant="body1">
+            {language === 'si' 
+              ? 'ඔබ දැනටමත් සමීක්ෂණයක් සම්පූර්ණ කර ඇත. ඔබට තවත් ව්‍යාපාරයක් සඳහා නව සමීක්ෂණයක් ආරම්භ කිරීමට අවශ්‍යද?'
+              : 'You have already submitted a survey or have one in progress. Do you need to add another business?'}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, py: 2 }}>
+          <Button 
+            onClick={() => {
+              setDuplicatePromptOpen(false);
+              navigate('/fill-data');
+            }}
+            variant="outlined"
+            color="inherit"
+          >
+            {language === 'si' ? 'නැත, මගේ උපකරණ පුවරුවට යන්න' : 'No, go to Dashboard'}
+          </Button>
+          <Button 
+            onClick={() => setDuplicatePromptOpen(false)} 
+            variant="contained" 
+            color="primary"
+          >
+            {language === 'si' ? 'ඔව්, නව සමීක්ෂණයක් ආරම්භ කරන්න' : 'Yes, add another one'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog PaperProps={dialogPaperProps} open={otpRequiredAlertOpen} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'warning.main' }}>
+          <ErrorOutlineRoundedIcon />
+          <Typography variant="h6" fontWeight="bold">
+            {language === 'si' ? 'අවධානයයි' : 'Attention'}
+          </Typography>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Typography variant="body1">
+            {language === 'si' 
+              ? 'ඉදිරිපත් කිරීමට පෙර ඔබගේ දුරකථන අංකය තහවුරු කරන්න.' 
+              : 'Please verify your mobile number (OTP) before submitting.'}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, py: 2 }}>
+          <Button 
+            onClick={() => {
+              setOtpRequiredAlertOpen(false);
+              setCurrentStep(0);
+            }} 
+            variant="contained" 
+            color="primary"
+          >
+            {language === 'si' ? 'හරි' : 'OK'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 
   const handleSendOtp = async () => {
     const mobile = formValues['b_mobile'];
     if (!mobile) {
-      alert(language === 'si' ? 'කරුණාකර මොබයිල් අංකය ඇතුළත් කරන්න' : 'Please enter a mobile number first.');
+      setGenericAlertPopup({ open: true, title: language === 'si' ? 'අවධානයයි' : 'Attention', message: language === 'si' ? 'කරුණාකර මොබයිල් අංකය ඇතුළත් කරන්න' : 'Please enter a mobile number first.' });
       return;
     }
     setOtpSending(true);
@@ -904,12 +1021,12 @@ const IndustrySurveyPage: React.FC = () => {
       if (res.ok && data.success) {
         setOtpDialogOpen(true);
       } else if (res.status === 429) {
-        alert(language === 'si' ? 'කරුණාකර මොහොතක් රැඳී නැවත උත්සාහ කරන්න' : 'Please wait a moment before requesting another code.');
+        setGenericAlertPopup({ open: true, title: language === 'si' ? 'අවධානයයි' : 'Attention', message: language === 'si' ? 'කරුණාකර මොහොතක් රැඳී නැවත උත්සාහ කරන්න' : 'Please wait a moment before requesting another code.' });
       } else {
-        alert(language === 'si' ? 'අසාර්ථකයි' : 'Failed');
+        setGenericAlertPopup({ open: true, title: language === 'si' ? 'දෝෂයකි' : 'Error', message: language === 'si' ? 'අසාර්ථකයි' : 'Failed' });
       }
     } catch {
-      alert(language === 'si' ? 'දෝෂයක් ඇතිවිය' : 'Error');
+      setGenericAlertPopup({ open: true, title: language === 'si' ? 'දෝෂයකි' : 'Error', message: language === 'si' ? 'දෝෂයක් ඇතිවිය' : 'Error' });
     } finally {
       setOtpSending(false);
     }
@@ -922,26 +1039,19 @@ const IndustrySurveyPage: React.FC = () => {
       const res = await fetch('/api/otp/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        // Field name must match OtpController::verify()'s validated input —
-        // this previously sent `otp`, which the backend has never accepted
-        // (it validates/reads `code`), so every verification attempt 422'd
-        // regardless of whether the code entered was correct.
         body: JSON.stringify({ mobile, code: otpCode })
       });
       const data = await res.json();
       if (res.ok && data.success) {
         setIsMobileVerified(true);
-        // The backend requires this exact token at final submission — it's
-        // what makes "Verified" mean something server-side rather than being
-        // a client-only checkmark.
         setMobileVerificationToken(data.verification_token ?? null);
         setOtpDialogOpen(false);
-        alert(language === 'si' ? 'සාර්ථකයි' : 'Success');
+        setGenericAlertPopup({ open: true, title: language === 'si' ? 'සාර්ථකයි' : 'Success', message: language === 'si' ? 'සාර්ථකයි' : 'Success' });
       } else {
-        alert(language === 'si' ? 'වැරදි කේතයකි' : 'Invalid OTP');
+        setGenericAlertPopup({ open: true, title: language === 'si' ? 'අවධානයයි' : 'Attention', message: language === 'si' ? 'වැරදි කේතයකි' : 'Invalid OTP' });
       }
     } catch {
-      alert(language === 'si' ? 'දෝෂයක් ඇතිවිය' : 'Error');
+      setGenericAlertPopup({ open: true, title: language === 'si' ? 'දෝෂයකි' : 'Error', message: language === 'si' ? 'දෝෂයක් ඇතිවිය' : 'Error' });
     } finally {
       setOtpVerifying(false);
     }
@@ -991,9 +1101,7 @@ const IndustrySurveyPage: React.FC = () => {
         const body = await response.json().catch(() => null);
         const reason = body?.error && typeof body.error === 'string' ? body.error : null;
         if (response.status === 422 && reason?.toLowerCase().includes('verif')) {
-          alert(language === 'si'
-            ? 'ඉදිරිපත් කිරීමට පෙර ඔබගේ දුරකථන අංකය තහවුරු කරන්න.'
-            : 'Please verify your mobile number (OTP) before submitting.');
+          setOtpRequiredAlertOpen(true);
         } else if (response.status === 403) {
           alert(language === 'si'
             ? 'මෙම සමීක්ෂණය සංස්කරණය කිරීමට ඔබට අවසර නැත.'
@@ -1208,6 +1316,7 @@ const IndustrySurveyPage: React.FC = () => {
                         type="tel"
                         inputProps={{ inputMode: 'tel', autoComplete: 'tel' }}
                         value={formValues['b_mobile'] || ''}
+                        disabled={isMobileVerified}
                         onChange={(e) => {
                           const next = e.target.value;
                           handleInputChange('b_mobile', next);
@@ -1475,7 +1584,7 @@ const IndustrySurveyPage: React.FC = () => {
       )}
 
       {/* Success Dialog */}
-      <Dialog PaperProps={dialogPaperProps} open={successDialogOpen} onClose={() => setSuccessDialogOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog PaperProps={dialogPaperProps} open={successDialogOpen} onClose={() => { setSuccessDialogOpen(false); navigate('/fill-data'); }} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ fontWeight: 'bold', color: 'success.main', display: 'flex', alignItems: 'center', gap: 1 }}>
           {language === 'si' ? 'සාර්ථකයි!' : language === 'ta' ? 'வெற்றி!' : 'Success!'}
         </DialogTitle>
@@ -1495,7 +1604,7 @@ const IndustrySurveyPage: React.FC = () => {
           )}
         </DialogContent>
         <DialogActions sx={{ p: 2, pt: 0 }}>
-          <Button variant="contained" color="success" onClick={() => setSuccessDialogOpen(false)}>
+          <Button variant="contained" color="success" onClick={() => { setSuccessDialogOpen(false); navigate('/fill-data'); }}>
             {language === 'si' ? 'හරි' : language === 'ta' ? 'சரி' : 'OK'}
           </Button>
         </DialogActions>
@@ -1989,6 +2098,23 @@ const IndustrySurveyPage: React.FC = () => {
         <DialogActions sx={{ p: 2, pt: 0 }}>
           <Button variant="contained" color="primary" onClick={handleLoginClick} fullWidth>
             {language === 'si' ? 'ලොග් වන්න' : language === 'ta' ? 'உள்நுழைக' : 'Login Now'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Generic Alert Popup */}
+      <Dialog PaperProps={dialogPaperProps} open={genericAlertPopup?.open || false} onClose={() => setGenericAlertPopup(null)} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ fontWeight: 'bold' }}>
+          {genericAlertPopup?.title}
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            {genericAlertPopup?.message}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, pt: 0 }}>
+          <Button variant="contained" color="primary" onClick={() => setGenericAlertPopup(null)}>
+            {language === 'si' ? 'හරි' : 'OK'}
           </Button>
         </DialogActions>
       </Dialog>

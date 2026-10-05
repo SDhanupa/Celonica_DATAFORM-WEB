@@ -15,6 +15,8 @@ import PersonIcon from '@mui/icons-material/Person';
 import PhoneIcon from '@mui/icons-material/Phone';
 import BadgeIcon from '@mui/icons-material/Badge';
 import FactoryIcon from '@mui/icons-material/Factory';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import DraftsIcon from '@mui/icons-material/Drafts';
 
 interface Survey {
   id: number;
@@ -239,63 +241,75 @@ const AdminIndustrySurveys: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3, bgcolor: '#f8fafc', minHeight: '100vh' }}>
+    <Box sx={{ p: { xs: 2, md: 4 }, bgcolor: '#F8FAFC', minHeight: '100vh', color: '#1E293B', fontFamily: "'Inter', sans-serif" }}>
       {/* Header */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-        <FactoryIcon sx={{ fontSize: 36, color: 'primary.main' }} />
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
+        <Box sx={{ display: 'inline-flex', p: 1.5, borderRadius: '12px', bgcolor: 'rgba(59, 130, 246, 0.1)' }}>
+          <FactoryIcon sx={{ fontSize: 32, color: '#3B82F6' }} />
+        </Box>
         <Box>
-          <Typography variant="h4" fontWeight={800} color="primary.main">Industry Surveys</Typography>
-          <Typography variant="body2" color="text.secondary">Super Admin — All submissions across all GN Divisions</Typography>
+          <Typography variant="h4" fontWeight={800} color="#0F172A">Industry Surveys</Typography>
+          <Typography variant="body2" color="#64748B">Super Admin — All submissions across all GN Divisions</Typography>
         </Box>
         <Box sx={{ ml: 'auto', display: 'flex', gap: 1 }}>
           <Tooltip title="Refresh">
-            <IconButton onClick={fetchSurveys} disabled={loading}>
-              <RefreshIcon />
+            <IconButton onClick={fetchSurveys} disabled={loading} sx={{ bgcolor: '#FFFFFF', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', '&:hover': { bgcolor: '#F1F5F9' } }}>
+              <RefreshIcon sx={{ color: '#475569' }} />
             </IconButton>
           </Tooltip>
         </Box>
       </Box>
 
       {/* Summary cards */}
-      <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
+      <Box sx={{ display: 'flex', gap: 3, mb: 4, flexWrap: 'wrap' }}>
         {[
-          { label: 'Total', value: surveys.length, color: '#1976d2', bg: '#e3f2fd' },
-          { label: 'Submitted', value: counts.submitted, color: '#0288d1', bg: '#e1f5fe' },
-          { label: 'Approved', value: counts.approved,  color: '#2e7d32', bg: '#e8f5e9' },
-          { label: 'Draft',    value: counts.draft,     color: '#757575', bg: '#f5f5f5' },
+          { label: 'Total Surveys', value: surveys.length, color: '#3B82F6', icon: <AssignmentIcon sx={{ color: '#3B82F6' }} /> },
+          { label: 'Submitted', value: counts.submitted, color: '#0EA5E9', icon: <CheckCircleIcon sx={{ color: '#0EA5E9' }} /> },
+          { label: 'Approved', value: counts.approved,  color: '#10B981', icon: <CheckCircleIcon sx={{ color: '#10B981' }} /> },
+          { label: 'Drafts',    value: counts.draft,     color: '#F59E0B', icon: <DraftsIcon sx={{ color: '#F59E0B' }} /> },
         ].map(c => (
-          <Paper key={c.label} sx={{ px: 3, py: 2, borderRadius: 3, bgcolor: c.bg, border: `1px solid ${c.color}30`, minWidth: 110 }}>
-            <Typography variant="h4" fontWeight={800} color={c.color}>{c.value}</Typography>
-            <Typography variant="caption" color="text.secondary" fontWeight={600}>{c.label}</Typography>
+          <Paper key={c.label} sx={{ 
+            flex: 1, minWidth: 200, p: 3, borderRadius: 4, 
+            bgcolor: '#FFFFFF', border: '1px solid rgba(0,0,0,0.05)', 
+            boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
+            display: 'flex', alignItems: 'center', gap: 2
+          }}>
+            <Box sx={{ p: 2, borderRadius: '50%', bgcolor: `${c.color}15` }}>
+              {c.icon}
+            </Box>
+            <Box>
+              <Typography variant="h4" fontWeight={800} sx={{ color: '#0F172A', lineHeight: 1 }}>{c.value}</Typography>
+              <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600, mt: 0.5, display: 'block' }}>{c.label}</Typography>
+            </Box>
           </Paper>
         ))}
       </Box>
 
       {/* Filters */}
-      <Paper sx={{ p: 2, mb: 3, display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', borderRadius: 3 }}>
-        <SearchIcon color="action" />
+      <Paper sx={{ p: 2.5, mb: 4, display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', borderRadius: 4, bgcolor: '#FFFFFF', boxShadow: '0 4px 15px rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.05)' }}>
+        <SearchIcon sx={{ color: '#94A3B8' }} />
         <TextField
           label="District" variant="outlined" size="small" value={filterDistrict}
-          onChange={e => setFilterDistrict(e.target.value)} sx={{ minWidth: 160 }}
+          onChange={e => setFilterDistrict(e.target.value)} sx={{ minWidth: 160, '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
         />
         <TextField
           label="DS Division" variant="outlined" size="small" value={filterDS}
-          onChange={e => setFilterDS(e.target.value)} sx={{ minWidth: 160 }}
+          onChange={e => setFilterDS(e.target.value)} sx={{ minWidth: 160, '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
         />
         <TextField
           label="GN Division" variant="outlined" size="small" value={filterGN}
-          onChange={e => setFilterGN(e.target.value)} sx={{ minWidth: 160 }}
+          onChange={e => setFilterGN(e.target.value)} sx={{ minWidth: 160, '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
         />
-        <Button variant="contained" onClick={fetchSurveys} startIcon={<SearchIcon />} sx={{ borderRadius: 2 }}>
+        <Button variant="contained" onClick={fetchSurveys} sx={{ borderRadius: 2, bgcolor: '#3B82F6', fontWeight: 600, px: 3, '&:hover': { bgcolor: '#2563EB' }, textTransform: 'none', boxShadow: '0 2px 8px rgba(59, 130, 246, 0.3)' }}>
           Search
         </Button>
-        <Button variant="outlined" onClick={() => { setFilterDistrict(''); setFilterDS(''); setFilterGN(''); }} sx={{ borderRadius: 2 }}>
+        <Button variant="outlined" onClick={() => { setFilterDistrict(''); setFilterDS(''); setFilterGN(''); }} sx={{ borderRadius: 2, borderColor: '#CBD5E1', color: '#475569', fontWeight: 600, px: 3, '&:hover': { borderColor: '#94A3B8', bgcolor: '#F1F5F9' }, textTransform: 'none' }}>
           Clear
         </Button>
       </Paper>
 
       {/* DataGrid */}
-      <Paper sx={{ height: 620, width: '100%', borderRadius: 3, overflow: 'hidden' }}>
+      <Paper sx={{ height: 620, width: '100%', borderRadius: 4, overflow: 'hidden', bgcolor: '#FFFFFF', boxShadow: '0 10px 30px rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.05)' }}>
         <DataGrid
           rows={surveys}
           columns={columns}
@@ -309,13 +323,15 @@ const AdminIndustrySurveys: React.FC = () => {
           }}
           sx={{
             border: 'none',
-            '& .MuiDataGrid-columnHeaders': { bgcolor: 'primary.main', color: 'white', fontWeight: 700 },
-            '& .MuiDataGrid-columnHeader': { bgcolor: 'primary.main' },
-            '& .MuiDataGrid-columnHeaderTitle': { fontWeight: 700, color: 'white' },
-            '& .MuiDataGrid-sortIcon': { color: 'white' },
-            '& .row-approved': { bgcolor: '#f1f8e9', '&:hover': { bgcolor: '#dcedc8' } },
-            '& .row-draft':    { bgcolor: '#fafafa', color: 'text.secondary', '&:hover': { bgcolor: '#f5f5f5' } },
-            '& .row-submitted':{ bgcolor: '#ffffff', '&:hover': { bgcolor: '#f3f4f6' } },
+            '& .MuiDataGrid-columnHeaders': { bgcolor: '#F8FAFC', color: '#475569', fontWeight: 700, borderBottom: '1px solid #E2E8F0' },
+            '& .MuiDataGrid-columnHeader': { bgcolor: '#F8FAFC' },
+            '& .MuiDataGrid-columnHeaderTitle': { fontWeight: 700, color: '#1E293B', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.5px' },
+            '& .MuiDataGrid-sortIcon': { color: '#64748B' },
+            '& .MuiDataGrid-row': { borderBottom: '1px solid #F1F5F9' },
+            '& .MuiDataGrid-cell': { borderBottom: 'none' },
+            '& .row-approved': { bgcolor: 'rgba(16, 185, 129, 0.04)', '&:hover': { bgcolor: 'rgba(16, 185, 129, 0.08)' } },
+            '& .row-draft':    { bgcolor: '#FFFFFF', color: '#94A3B8', '&:hover': { bgcolor: '#F8FAFC' } },
+            '& .row-submitted':{ bgcolor: '#FFFFFF', '&:hover': { bgcolor: '#F1F5F9' } },
           }}
         />
       </Paper>

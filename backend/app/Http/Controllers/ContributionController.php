@@ -32,6 +32,11 @@ class ContributionController extends Controller
         }
     }
 
+    public static function forgetMineCache(string $sub): void
+    {
+        Cache::forget("contributions_mine_{$sub}");
+    }
+
     /**
      * GET /api/contributions/mine — everything the signed-in caller has
      * contributed, newest first, with a status summary.
@@ -44,65 +49,65 @@ class ContributionController extends Controller
         }
 
         $categories = $this->categoryIndex();
-        $items = collect();
+        $cacheKey = "contributions_mine_{$sub}";
+        $items = Cache::remember($cacheKey, 60, function () use ($sub, $categories) {
+            $items = collect();
 
-        foreach (CategoryDataSchema::allTables() as $table) {
-            if (!GnRecordScope::hasColumn($table, 'contributor_sub')) {
-                continue;
+            foreach (CategoryDataSchema::allTables() as $table) {
+                if (!GnRecordScope::hasColumn($table, 'contributor_sub')) {
+                    continue;
+                }
+
+                $slug = CategoryDataSchema::slugFor($table);
+                $category = $categories->get($slug);
+                $hasStatus = GnRecordScope::hasColumn($table, 'status');
+
+                $columns = ['*'];
+
+                DB::table($table)
+                    ->where('contributor_sub', $sub)
+                    ->orderByDesc('id')
+                    ->limit(self::MINE_LIMIT)
+                    ->get($columns)
+                    ->each(function ($row) use ($items, $slug, $category, $hasStatus) {
+                        $items->push([
+                            'id' => "place:{$slug}:{$row->id}",
+                            'kind' => 'place',
+                            'title' => $row->name_en ?: ($row->name_si ?: ($row->name_ta ?: null)),
+                            'category' => $category ? $this->categoryPayload($category) : ['slug' => $slug, 'name_en' => $slug, 'root_slug' => null, 'root_name_en' => null],
+                            'village' => $row->final_gn ?? $row->raw_gn ?? null,
+                            'reg_number' => $row->reg_number,
+                            'status' => $this->placeStatus($row, $hasStatus),
+                            'is_update' => (bool) ($row->is_update_proposal ?? false),
+                            'created_at' => $row->created_at,
+                            'full_data' => $row,
+                        ]);
+                    });
             }
 
-            $slug = CategoryDataSchema::slugFor($table);
-            $category = $categories->get($slug);
-            $hasStatus = GnRecordScope::hasColumn($table, 'status');
-
-            $columns = array_values(array_filter([
-                'id', 'reg_number', 'name_en', 'name_si', 'name_ta', 'created_at', 'is_approved', 'is_update_proposal',
-                $hasStatus ? 'status' : null,
-                GnRecordScope::hasColumn($table, 'final_gn') ? 'final_gn' : null,
-                GnRecordScope::hasColumn($table, 'raw_gn') ? 'raw_gn' : null,
-            ], fn ($c) => $c && GnRecordScope::hasColumn($table, $c)));
-
-            DB::table($table)
-                ->where('contributor_sub', $sub)
-                ->orderByDesc('id')
+            DB::table('industry_surveys')
+                ->where('user_id', $sub)
+                ->orderByDesc('updated_at')
                 ->limit(self::MINE_LIMIT)
-                ->get($columns)
-                ->each(function ($row) use ($items, $slug, $category, $hasStatus) {
+                ->get(['*'])
+                ->each(function ($row) use ($items) {
                     $items->push([
-                        'id' => "place:{$slug}:{$row->id}",
-                        'kind' => 'place',
-                        'title' => $row->name_en ?: ($row->name_si ?: ($row->name_ta ?: null)),
-                        'category' => $category ? $this->categoryPayload($category) : ['slug' => $slug, 'name_en' => $slug, 'root_slug' => null, 'root_name_en' => null],
-                        'village' => $row->final_gn ?? $row->raw_gn ?? null,
+                        'id' => "survey:{$row->id}",
+                        'kind' => 'business_survey',
+                        'title' => null,
+                        'category' => null,
+                        'village' => $row->gn_name,
+                        'ccode' => $row->ccode,
                         'reg_number' => $row->reg_number,
-                        'status' => $this->placeStatus($row, $hasStatus),
-                        'is_update' => (bool) ($row->is_update_proposal ?? false),
-                        'created_at' => $row->created_at,
+                        'status' => in_array($row->status, ['draft', 'submitted', 'approved'], true) ? $row->status : 'draft',
+                        'is_update' => false,
+                        'created_at' => $row->updated_at ?? $row->created_at,
+                        'full_data' => $row,
                     ]);
                 });
-        }
 
-        DB::table('industry_surveys')
-            ->where('user_id', $sub)
-            ->orderByDesc('updated_at')
-            ->limit(self::MINE_LIMIT)
-            ->get(['id', 'reg_number', 'gn_name', 'ccode', 'status', 'created_at', 'updated_at'])
-            ->each(function ($row) use ($items) {
-                $items->push([
-                    'id' => "survey:{$row->id}",
-                    'kind' => 'business_survey',
-                    'title' => null,
-                    'category' => null,
-                    'village' => $row->gn_name,
-                    'ccode' => $row->ccode,
-                    'reg_number' => $row->reg_number,
-                    'status' => in_array($row->status, ['draft', 'submitted', 'approved'], true) ? $row->status : 'draft',
-                    'is_update' => false,
-                    'created_at' => $row->updated_at ?? $row->created_at,
-                ]);
-            });
-
-        $items = $items->sortByDesc(fn ($i) => (string) $i['created_at'])->values()->take(self::MINE_LIMIT);
+            return $items->sortByDesc(fn ($i) => (string) $i['created_at'])->values()->take(self::MINE_LIMIT);
+        });
 
         return response()->json([
             'success' => true,

@@ -866,8 +866,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             if (chosen && chosen.CCODE && chosen.nameEn) navigate(`/gnpage/${encodeURIComponent(chosen.nameEn.replace(/ /g, '-'))}/${encodeURIComponent(chosen.CCODE)}`);
           }}
           onOpenCategory={(slug) => {
-            const tGn = (displayGN || activeGn?.nameEn || gnName || 'Pahalagama').replace(/ /g, '-');
-            const tCc = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'RATPA';
+            const tGn = (displayGN || activeGn?.nameEn || gnName || 'GN-Name').replace(/ /g, '-');
+            const tCc = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'AREA-CODE';
             navigate(`/gnpage/${encodeURIComponent(tGn)}/${encodeURIComponent(tCc)}/${slug}`);
           }}
           populationData={populationData}
@@ -985,7 +985,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             <Menu anchorEl={catMenuAnchor} open={Boolean(catMenuAnchor)} onClose={() => setCatMenuAnchor(null)}
               PaperProps={{ sx: { bgcolor: isDarkMode ? '#111827' : '#ffffff', border: isDarkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e5e9f0', borderRadius: '14px', minWidth: 220, boxShadow: '0 16px 36px rgba(15,23,42,0.14)', mt: 1 } }}>
               {CATEGORIES.map((cat) => (
-                <MenuItem key={cat.slug} onClick={() => { setCatMenuAnchor(null); const tGn = (displayGN || activeGn?.nameEn || gnName || 'Pahalagama').replace(/ /g, '-'); const tCc = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'RATPA'; navigate(`/gnpage/${encodeURIComponent(tGn)}/${encodeURIComponent(tCc)}/${cat.slug}`); }} sx={{ fontWeight: 500, fontSize: '0.88rem', color: isDarkMode ? '#e2e8f0' : '#1e293b', py: 0.9, px: 2 }}>{cat.name}</MenuItem>
+                <MenuItem key={cat.slug} onClick={() => { setCatMenuAnchor(null); const tGn = (displayGN || activeGn?.nameEn || gnName || 'GN-Name').replace(/ /g, '-'); const tCc = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'AREA-CODE'; navigate(`/gnpage/${encodeURIComponent(tGn)}/${encodeURIComponent(tCc)}/${cat.slug}`); }} sx={{ fontWeight: 500, fontSize: '0.88rem', color: isDarkMode ? '#e2e8f0' : '#1e293b', py: 0.9, px: 2 }}>{cat.name}</MenuItem>
               ))}
             </Menu>
             <Button
@@ -999,6 +999,19 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             >
               Industry Survey
             </Button>
+            {isAuthenticated && !userInfo?.realm_roles?.includes('super_admin') && (
+              <Button
+                onClick={() => navigate('/user')}
+                disableRipple
+                sx={{
+                  textTransform: 'none', fontWeight: 600, fontSize: '0.88rem', borderRadius: '10px',
+                  color: isDarkMode ? '#cbd5e1' : '#334155', px: 1.5, boxShadow: 'none',
+                  '&:hover': { bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)', boxShadow: 'none', transform: 'none' },
+                }}
+              >
+                Location form
+              </Button>
+            )}
           </Box>
 
           {/* Right actions */}
@@ -1023,7 +1036,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             {isAuthenticated ? (
               <>
                 <Button
-                  onClick={() => { if (userInfo?.realm_roles?.includes('super_admin')) navigate('/admins'); else navigate('/user'); }}
+                  onClick={() => {
+                    if (userInfo?.realm_roles?.includes('super_admin')) navigate('/admins');
+                    else navigate('/mydashboard');
+                  }}
                   disableRipple
                   sx={{ textTransform: 'none', fontWeight: 600, fontSize: '0.85rem', color: isDarkMode ? '#cbd5e1' : '#334155', boxShadow: 'none', '&:hover': { bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)', boxShadow: 'none', transform: 'none' } }}
                 >
@@ -1086,8 +1102,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             isAuthenticated={isAuthenticated}
             onLoginClick={() => (isAuthenticated ? navigate('/profile') : login())}
             onSelectCategory={(slug) => {
-              const tGn = (displayGN || activeGn?.nameEn || gnName || 'Pahalagama').replace(/ /g, '-');
-              const tCc = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'RATPA';
+              const tGn = (displayGN || activeGn?.nameEn || gnName || 'GN-Name').replace(/ /g, '-');
+              const tCc = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'AREA-CODE';
               navigate(`/gnpage/${encodeURIComponent(tGn)}/${encodeURIComponent(tCc)}/${slug}`);
             }}
           />
@@ -1124,8 +1140,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                 layout="narrow"
                 showQuickStats={false}
                 onOpenCategory={(slug) => {
-                  const targetGn = (displayGN || activeGn?.nameEn || gnName || 'Pahalagama').replace(/ /g, '-');
-                  const targetCcode = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'RATPA';
+                  const targetGn = (displayGN || activeGn?.nameEn || gnName || 'GN-Name').replace(/ /g, '-');
+                  const targetCcode = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'AREA-CODE';
                   navigate(`/gnpage/${encodeURIComponent(targetGn)}/${encodeURIComponent(targetCcode)}/${slug}`);
                 }}
               />
@@ -1181,7 +1197,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                 animation: 'fadeInUp 0.45s ease 80ms both',
               }}
             >
-              {displayGN || 'Sammanthranapura'}
+              {displayGN || 'GN Name'}
             </Typography>
 
             {/* ── PROMINENT MODERN AREA CODE SHOWCASE ── */}

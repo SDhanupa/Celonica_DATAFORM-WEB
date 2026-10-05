@@ -1,0 +1,6 @@
+com\ceylonica\sms\SmsRegistrationFormActionFactory.class
+com\ceylonica\sms\SmsRegistrationFormAction.class
+com\ceylonica\sms\TextWareSmsClient.class
+com\ceylonica\sms\SmsAuthenticator.class
+com\ceylonica\sms\SmsAuthenticatorFactory.class
+com\ceylonica\sms\SmsRegistrationFormAction$1.class

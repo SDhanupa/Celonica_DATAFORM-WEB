@@ -75,14 +75,14 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
 
   const handlePrefetch = (cat: any) => {
     // 0ms Navigation Trick: Pre-fetch everything while user is hovering!
-    client.query({ query: GET_CATEGORY_BY_SLUG, variables: { slug: cat.slug }, fetchPolicy: 'cache-first' });
+    client.query({ query: GET_CATEGORY_BY_SLUG, variables: { slug: cat.slug }, fetchPolicy: 'cache-first' }).catch(() => {});
     
     if (!isAdmin) {
-      client.query({ query: GET_CATEGORY_ANSWERS, variables: { categoryId: cat.id }, fetchPolicy: 'cache-first' });
+      client.query({ query: GET_CATEGORY_ANSWERS, variables: { categoryId: cat.id }, fetchPolicy: 'cache-first' }).catch(() => {});
       
       const gnCode = selectedLocation?.CCODE || selectedLocation?.ccode || selectedLocation?.code || '';
       if (gnCode) {
-        client.query({ query: GET_APPROVED_SUBMISSIONS, variables: { categoryId: cat.id, gnCode }, fetchPolicy: 'cache-first' });
+        client.query({ query: GET_APPROVED_SUBMISSIONS, variables: { categoryId: cat.id, gnCode }, fetchPolicy: 'cache-first' }).catch(() => {});
       }
     }
   };

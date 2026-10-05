@@ -41,10 +41,14 @@ class SearchController extends Controller
             $disSi = $gn->disSi ?? $gn->dis_si ?? '';
             $disTa = $gn->disTa ?? $gn->dis_ta ?? '';
 
-            // Construct display string: District - DS - GN
-            $displayEn = trim("{$disEn} - {$dsEn} - {$nameEn} ({$ccode})", ' -()');
-            $displaySi = trim("{$disSi} - {$dsSi} - {$nameSi} ({$ccode})", ' -()');
-            $displayTa = trim("{$disTa} - {$dsTa} - {$nameTa} ({$ccode})", ' -()');
+            $proEn = $gn->proEn ?? $gn->pro_en ?? '';
+            $proSi = $gn->proSi ?? $gn->pro_si ?? '';
+            $proTa = $gn->proTa ?? $gn->pro_ta ?? '';
+
+            // Construct display string: GN, DS, District, Province
+            $displayEn = trim("{$nameEn} ({$ccode}), {$dsEn}, {$disEn}, {$proEn}", ' ,()');
+            $displaySi = trim("{$nameSi} ({$ccode}), {$dsSi}, {$disSi}, {$proSi}", ' ,()');
+            $displayTa = trim("{$nameTa} ({$ccode}), {$dsTa}, {$disTa}, {$proTa}", ' ,()');
 
             return [
                 'type' => 'gn',
@@ -59,6 +63,9 @@ class SearchController extends Controller
                 'disEn' => $disEn,
                 'disSi' => $disSi,
                 'disTa' => $disTa,
+                'proEn' => $proEn,
+                'proSi' => $proSi,
+                'proTa' => $proTa,
                 'display' => $displayEn,
                 'displaySi' => $displaySi,
                 'displayTa' => $displayTa

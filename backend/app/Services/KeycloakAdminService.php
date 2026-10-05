@@ -101,4 +101,26 @@ class KeycloakAdminService
 
         return $response->json()[0]['id'];
     }
+
+    /**
+     * Fetch a Keycloak token for a specific user using Password Grant.
+     * This acts as our "Proxy Login".
+     */
+    public function fetchUserToken(string $username, string $password)
+    {
+        $clientId = config('keycloak.client_id', 'celonica-web'); // The public client ID, not the admin client
+        
+        $response = Http::asForm()->post("{$this->baseUrl}/realms/{$this->realm}/protocol/openid-connect/token", [
+            'client_id' => $clientId,
+            'grant_type' => 'password',
+            'username' => $username,
+            'password' => $password,
+        ]);
+
+        if ($response->failed()) {
+            throw new Exception('Failed to obtain Keycloak User Token: ' . $response->body());
+        }
+
+        return $response->json(); // Returns array with access_token, refresh_token, etc.
+    }
 }

@@ -95,22 +95,17 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp, categoryName, o
   const [nameOptions, setNameOptions] = useState<any[]>([]);
   const [nameInput, setNameInput] = useState('');
 
-  const [selectedProvince, setSelectedProvince] = useState<any>(null);
-  const [selectedDistrict, setSelectedDistrict] = useState<any>(null);
-  const [selectedCity, setSelectedCity] = useState<any>(null);
   const [selectedGN, setSelectedGN] = useState<any>(null);
+  const [gnSearchInput, setGnSearchInput] = useState('');
+  const [gnOptions, setGnOptions] = useState<any[]>([]);
+  const [gnSearching, setGnSearching] = useState(false);
   const autoSelected = useRef(false);
 
   const village = readSavedVillage();
   const vName = villageName(village, language);
   const catName = categoryName || slug;
 
-  const { data: districtsData } = useQuery(GET_P_DISTRICTS, { fetchPolicy: 'cache-first' });
-  const { data: gnData, loading: gnLoading } = useQuery(GET_P_DISTRICT_WITH_GNS, {
-    variables: { id: selectedDistrict?.id },
-    skip: !selectedDistrict,
-    fetchPolicy: 'cache-first',
-  });
+
   const [getGnByCoords] = useLazyQuery(GET_GN_BY_COORDINATES);
 
   const patch = (values: Partial<ContributionForm>) => setForm((prev) => ({ ...prev, ...values }));
@@ -141,66 +136,97 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp, categoryName, o
     };
   }, [nameInput, slug, form.raw_district, form.raw_ds, form.raw_gn, existingName]);
 
-  /* ── Cascading location pickers ───────────────────────────────────────── */
-  const provinces = useMemo(() => {
-    const map = new Map();
-    (districtsData?.pDistricts || []).forEach((d: any) => d.pProvince && map.set(d.pProvince.id, d.pProvince));
-    return Array.from(map.values());
-  }, [districtsData]);
-
-  const districts = useMemo(
-    () => (selectedProvince ? (districtsData?.pDistricts || []).filter((d: any) => d.pProvince?.id === selectedProvince.id) : []),
-    [selectedProvince, districtsData],
-  );
-
-  const dsDivisions = useMemo(() => {
-    const map = new Map();
-    (gnData?.pDistrict?.gramaNiladharis || []).forEach((gn: any) => gn.divisionalSecretariatCode && map.set(gn.divisionalSecretariatCode, gn));
-    return Array.from(map.values());
-  }, [gnData]);
-
-  const gnDivisions = useMemo(
-    () => (selectedCity ? (gnData?.pDistrict?.gramaNiladharis || []).filter((gn: any) => gn.divisionalSecretariatCode === selectedCity.divisionalSecretariatCode) : []),
-    [selectedCity, gnData],
-  );
-
+  /* ── Cascading location pickers replaced by unified GN Search ────────── */
   useEffect(() => {
     patch({
-      raw_province: selectedProvince?.nameEn || selectedProvince?.admin1NameEn || '',
-      raw_district: selectedDistrict?.admin2NameEn || '',
-      raw_ds: selectedCity?.dsEn || '',
+      raw_province: selectedGN?.proEn || selectedGN?.pDistrict?.pProvince?.admin1NameEn || '',
+      raw_district: selectedGN?.disEn || selectedGN?.pDistrict?.admin2NameEn || '',
+      raw_ds: selectedGN?.dsEn || '',
       raw_gn: selectedGN?.nameEn || selectedGN?.gnName || '',
-      gn_code: selectedGN?.CCODE || selectedGN?.code || '',
+      gn_code: selectedGN?.ccode || selectedGN?.CCODE || selectedGN?.code || '',
     });
-  }, [selectedProvince, selectedDistrict, selectedCity, selectedGN]);
+  }, [selectedGN]);
 
   // Pre-fill from the contributor's chosen village, once.
   useEffect(() => {
-    if (autoSelected.current || !village || !districtsData?.pDistricts || selectedDistrict) return;
-    let district = null;
-    if ((village as any).pDistrict?.id) {
-      district = districtsData.pDistricts.find((d: any) => d.id === (village as any).pDistrict.id);
-    } else if (typeof (village as any).divisionalSecretariatCode === 'string') {
-      const prefix = (village as any).divisionalSecretariatCode.substring(0, 2);
-      district = districtsData.pDistricts.find((d: any) => String(d.admin2Pcode) === prefix);
-    }
-    if (district) {
-      setSelectedDistrict(district);
-      if (district.pProvince) setSelectedProvince(district.pProvince);
-    }
-  }, [districtsData, village, selectedDistrict]);
-
-  useEffect(() => {
-    if (autoSelected.current || !village || !gnData?.pDistrict?.gramaNiladharis) return;
-    const gns = gnData.pDistrict.gramaNiladharis;
-    const gn = gns.find((g: any) => g.id === (village as any).id || (village.CCODE && g.CCODE === village.CCODE) || (village.code && g.code === village.code));
-    if (gn) {
-      setSelectedGN(gn);
-      const ds = gns.find((g: any) => g.divisionalSecretariatCode === gn.divisionalSecretariatCode);
-      if (ds) setSelectedCity(ds);
-    }
+    if (autoSelected.current || !village) return;
     autoSelected.current = true;
-  }, [gnData, village]);
+    
+    // Construct a compatible option object from the village
+    const proEn = (village as any).pDistrict?.pProvince?.admin1NameEn || (village as any).proEn || '';
+    const proSi = (village as any).pDistrict?.pProvince?.admin1NameSi || (village as any).proSi || proEn;
+    const proTa = (village as any).pDistrict?.pProvince?.admin1NameTa || (village as any).proTa || proEn;
+    
+    const disEn = (village as any).pDistrict?.admin2NameEn || (village as any).disEn || '';
+    const disSi = (village as any).pDistrict?.admin2NameSi || (village as any).disSi || disEn;
+    const disTa = (village as any).pDistrict?.admin2NameTa || (village as any).disTa || disEn;
+    
+    const dsEn = (village as any).dsEn || '';
+    const dsSi = (village as any).dsSi || dsEn;
+    const dsTa = (village as any).dsTa || dsEn;
+    
+    const nameEn = (village as any).nameEn || '';
+    const nameSi = (village as any).nameSi || nameEn;
+    const nameTa = (village as any).nameTa || nameEn;
+    const ccode = (village as any).CCODE || (village as any).code || (village as any).ccode || '';
+
+    const displayEn = [nameEn ? `${nameEn} (${ccode})` : '', dsEn, disEn, proEn].filter(Boolean).join(', ');
+    const displaySi = [nameSi ? `${nameSi} (${ccode})` : '', dsSi, disSi, proSi].filter(Boolean).join(', ');
+    const displayTa = [nameTa ? `${nameTa} (${ccode})` : '', dsTa, disTa, proTa].filter(Boolean).join(', ');
+
+    const initialGN = {
+      ...village,
+      proEn, proSi, proTa,
+      disEn, disSi, disTa,
+      dsEn, dsSi, dsTa,
+      nameEn, nameSi, nameTa,
+      ccode,
+      display: displayEn,
+      displaySi: displaySi,
+      displayTa: displayTa
+    };
+    setSelectedGN(initialGN);
+
+    // If the cache is so old it's missing the province, fetch it dynamically.
+    if (!proEn && ccode) {
+      const controller = new AbortController();
+      fetch(`/api/search-gns?q=${encodeURIComponent(ccode)}`, { signal: controller.signal })
+        .then(res => res.json())
+        .then(json => {
+          if (json.success && json.data?.length > 0) {
+            const found = json.data.find((g: any) => g.ccode === ccode || g.CCODE === ccode);
+            if (found) setSelectedGN(found);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [village]);
+
+  // Unified GN Search Autocomplete
+  useEffect(() => {
+    if (!gnSearchInput.trim()) {
+      setGnOptions([]);
+      return;
+    }
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
+      setGnSearching(true);
+      try {
+        const query = new URLSearchParams({ q: gnSearchInput.trim() });
+        const res = await fetch(`/api/search-gns?${query}`, { signal: controller.signal, headers: { Accept: 'application/json' } });
+        const json = await res.json();
+        if (json.success) setGnOptions(json.data || []);
+      } catch {
+        // ignore
+      } finally {
+        setGnSearching(false);
+      }
+    }, 350);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [gnSearchInput]);
 
   /* ── Evidence ─────────────────────────────────────────────────────────── */
   const captureLocation = () => {
@@ -256,7 +282,7 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp, categoryName, o
   /* ── Submit ───────────────────────────────────────────────────────────── */
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    const locationMissing = !form.raw_province || !form.raw_district || !form.raw_ds || !form.raw_gn;
+    const locationMissing = !form.raw_gn;
     const nameMissing = !form.name_en.trim() && !form.name_si.trim() && !form.name_ta.trim();
     setFieldErrors({ location: locationMissing, name: nameMissing });
     if (locationMissing || nameMissing) {
@@ -368,49 +394,96 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp, categoryName, o
 
       <Stack spacing={2}>
         <FormSection index={1} title={t.stepLocation} error={fieldErrors.location}>
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr' }, gap: 2 }}>
             <Autocomplete
-              options={provinces}
-              getOptionLabel={(o: any) => o.nameEn || o.admin1NameEn || ''}
-              value={selectedProvince}
-              onChange={(_, v) => {
-                setSelectedProvince(v);
-                setSelectedDistrict(null);
-                setSelectedCity(null);
-                setSelectedGN(null);
+              options={gnOptions}
+              getOptionLabel={(o: any) => {
+                const name = language === 'si' ? o.nameSi : language === 'ta' ? o.nameTa : o.nameEn;
+                const ds = language === 'si' ? o.dsSi : language === 'ta' ? o.dsTa : o.dsEn;
+                let dis = language === 'si' ? o.disSi : language === 'ta' ? o.disTa : o.disEn;
+                let pro = language === 'si' ? o.proSi : language === 'ta' ? o.proTa : o.proEn;
+                
+                if (language === 'si') {
+                  if (dis && !dis.includes('දිස්ත්‍රික්කය')) dis += ' දිස්ත්‍රික්කය';
+                  if (pro && !pro.includes('පළාත')) pro += ' පළාත';
+                } else if (language === 'en') {
+                  if (dis && !dis.includes('District')) dis += ' District';
+                  if (pro && !pro.includes('Province')) pro += ' Province';
+                } else if (language === 'ta') {
+                  if (dis && !dis.includes('மாவட்டம்')) dis += ' மாவட்டம்';
+                  if (pro && !pro.includes('மாகாணம்')) pro += ' மாகாணம்';
+                }
+
+                const ccode = o.ccode || o.CCODE || o.code || '';
+                const parts = [
+                  name ? `${name}${ccode ? ` (${ccode})` : ''}` : (o.nameEn || ''),
+                  ds, dis, pro
+                ].filter(Boolean);
+
+                return parts.join(', ');
               }}
-              renderInput={(p) => <TextField {...p} label={t.province} required error={fieldErrors.location && !form.raw_province} />}
-            />
-            <Autocomplete
-              options={districts}
-              getOptionLabel={(o: any) => o.admin2NameEn || ''}
-              value={selectedDistrict}
-              disabled={!selectedProvince}
-              onChange={(_, v) => {
-                setSelectedDistrict(v);
-                setSelectedCity(null);
-                setSelectedGN(null);
-              }}
-              renderInput={(p) => <TextField {...p} label={t.district} required error={fieldErrors.location && !form.raw_district} />}
-            />
-            <Autocomplete
-              options={dsDivisions}
-              getOptionLabel={(o: any) => o.dsEn || ''}
-              value={selectedCity}
-              disabled={!selectedDistrict || gnLoading}
-              onChange={(_, v) => {
-                setSelectedCity(v);
-                setSelectedGN(null);
-              }}
-              renderInput={(p) => <TextField {...p} label={t.dsDivision} required error={fieldErrors.location && !form.raw_ds} />}
-            />
-            <Autocomplete
-              options={gnDivisions}
-              getOptionLabel={(o: any) => o.nameEn || o.gnName || o.code || ''}
               value={selectedGN}
-              disabled={!selectedCity || gnLoading}
+              loading={gnSearching}
+              onInputChange={(_, v) => setGnSearchInput(v)}
+              filterOptions={(x) => x} // Backend filtering
               onChange={(_, v) => setSelectedGN(v)}
-              renderInput={(p) => <TextField {...p} label={t.gnDivision} required error={fieldErrors.location && !form.raw_gn} />}
+              renderInput={(p) => (
+                <TextField 
+                  {...p} 
+                  label={t.stepLocation} 
+                  placeholder={language === 'en' ? 'Type GN name, District, or Province...' : language === 'si' ? 'ග්‍රාම නිලධාරී වසම, දිස්ත්‍රික්කය, හෝ පළාත සොයන්න...' : 'கிராம உத்தியோகத்தர் பிரிவு, மாவட்டம் அல்லது மாகாணத்தைத் தேடுக...'} 
+                  required 
+                  error={fieldErrors.location && !form.raw_gn}
+                  InputProps={{
+                    ...p.InputProps,
+                    endAdornment: (
+                      <React.Fragment>
+                        {gnSearching ? <CircularProgress color="inherit" size={20} /> : null}
+                        {p.InputProps.endAdornment}
+                      </React.Fragment>
+                    ),
+                  }}
+                />
+              )}
+              renderOption={(props, option) => {
+                const { key, ...optionProps } = props as any;
+                const name = language === 'si' ? option.nameSi : language === 'ta' ? option.nameTa : option.nameEn;
+                const ds = language === 'si' ? option.dsSi : language === 'ta' ? option.dsTa : option.dsEn;
+                let dis = language === 'si' ? option.disSi : language === 'ta' ? option.disTa : option.disEn;
+                let pro = language === 'si' ? option.proSi : language === 'ta' ? option.proTa : option.proEn;
+                
+                if (language === 'si') {
+                  if (dis && !dis.includes('දිස්ත්‍රික්කය')) dis += ' දිස්ත්‍රික්කය';
+                  if (pro && !pro.includes('පළාත')) pro += ' පළාත';
+                } else if (language === 'en') {
+                  if (dis && !dis.includes('District')) dis += ' District';
+                  if (pro && !pro.includes('Province')) pro += ' Province';
+                } else if (language === 'ta') {
+                  if (dis && !dis.includes('மாவட்டம்')) dis += ' மாவட்டம்';
+                  if (pro && !pro.includes('மாகாணம்')) pro += ' மாகாணம்';
+                }
+
+                const ccode = option.ccode || option.CCODE || option.code || '';
+                const parts = [
+                  name ? `${name}${ccode ? ` (${ccode})` : ''}` : (option.nameEn || ''),
+                  ds, dis, pro
+                ].filter(Boolean);
+                
+                return (
+                  <li key={key} {...optionProps}>
+                    <Box>
+                      <Typography variant="body1" fontWeight="500">
+                        {parts[0]}
+                      </Typography>
+                      {parts.length > 1 && (
+                        <Typography variant="caption" color="text.secondary">
+                          {parts.slice(1).join(', ')}
+                        </Typography>
+                      )}
+                    </Box>
+                  </li>
+                );
+              }}
             />
           </Box>
         </FormSection>

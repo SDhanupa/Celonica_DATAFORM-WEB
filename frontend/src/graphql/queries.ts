@@ -782,6 +782,26 @@ export const GET_GN_BY_COORDINATES = gql`
   }
 `;
 
+export const GET_GNS_BY_DISTRICT_LIGHT = gql`
+  query GetGnsByDistrictLight($id: ID!) {
+    pDistrict(id: $id) {
+      id
+      gramaNiladharis {
+        id
+        code
+        CCODE
+        nameEn
+        nameSi
+        nameTa
+        dsEn
+        dsSi
+        dsTa
+        divisionalSecretariatCode
+      }
+    }
+  }
+`;
+
 export const GET_GN_BY_CCODE = gql`
     query GetGnByCcode($CCODE: String!) {
       gnByCcode(CCODE: $CCODE) {

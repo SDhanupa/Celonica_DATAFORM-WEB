@@ -15,7 +15,7 @@ import Results from '../components/rapidFire/Results';
 import { useAnswerQueue } from '../components/rapidFire/useAnswerQueue';
 
 const RapidFirePage: React.FC = () => {
-  const { getToken } = useAuth();
+  const { getToken, isAuthenticated, login } = useAuth();
   const { t, language } = useContributeCopy();
   const navigate = useNavigate();
   const api = useMemo(() => rapidFireApi(getToken), [getToken]);
@@ -117,6 +117,26 @@ const RapidFirePage: React.FC = () => {
   const addDetails = (card: RapidFireCard) => navigate(`/user/categories/${card.path}`);
 
   /* ── Render ────────────────────────────────────────────────────────────── */
+  /* ── Not authenticated ─────────────────────────────────────────────────── */
+  if (!isAuthenticated) {
+    return (
+      <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+        <UserTopBar />
+        <Container maxWidth="sm" sx={{ py: 8 }}>
+          <Paper variant="outlined" sx={{ p: 4, borderRadius: '20px', textAlign: 'center' }}>
+            <Typography sx={{ fontWeight: 700, fontSize: '1.2rem', mb: 1 }}>Session Expired</Typography>
+            <Typography color="text.secondary" sx={{ mb: 3 }}>
+              Your session has expired. Please sign in again to play Rapid Fire.
+            </Typography>
+            <Button variant="contained" disableElevation onClick={() => login(window.location.href)}>
+              Sign In
+            </Button>
+          </Paper>
+        </Container>
+      </Box>
+    );
+  }
+
   if (!ccode) {
     return (
       <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>

@@ -1029,14 +1029,14 @@ class CategoryDataUploadController extends Controller
                 $cCode = $category ? $category->code : 'CAT';
 
                 // Find the next unique sequence number for this GN
-                $base = $gnCode . '/' . $cCode . '/';
+                $base = $gnCode . '-' . $cCode . '-';
                 $count = DB::table($tableName)->where('reg_number', 'like', $base . '%')->count() + 1;
-                $regNumber = $base . str_pad($count, 2, '0', STR_PAD_LEFT);
+                $regNumber = $base . str_pad($count, 3, '0', STR_PAD_LEFT);
 
                 // Guarantee uniqueness — keep incrementing until we find an unused code
                 while (DB::table($tableName)->where('reg_number', $regNumber)->exists()) {
                     $count++;
-                    $regNumber = $base . str_pad($count, 2, '0', STR_PAD_LEFT);
+                    $regNumber = $base . str_pad($count, 3, '0', STR_PAD_LEFT);
                 }
             }
             // else: gnCode is null → regNumber stays null, no code generated
@@ -1080,6 +1080,9 @@ class CategoryDataUploadController extends Controller
 
         $this->invalidateCategoryCache($slug);
         \App\Http\Controllers\ContributionController::forgetVillageCache($payload['gn_code'] ?? null);
+        if ($insertData['contributor_sub']) {
+            \App\Http\Controllers\ContributionController::forgetMineCache($insertData['contributor_sub']);
+        }
 
         return response()->json([
             'success' => true,

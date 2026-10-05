@@ -84,35 +84,59 @@ export interface CompleteResponse {
 
 type TokenSource = () => Promise<string | undefined>;
 
-const request = async <T>(getToken: TokenSource, path: string, init: RequestInit = {}, signal?: AbortSignal): Promise<T> => {
+const request = async <T>(getToken: TokenSource, path: string, init: RequestInit = {}, signal?: AbortSignal, timeoutMs = 8000): Promise<T> => {
   const token = await getToken();
-  if (!token) throw new ApiError('Your session has expired. Please sign in again.', 401);
-
-  const res = await fetch(`/api/rapid-fire${path}`, {
-    ...init,
-    signal,
-    headers: {
-      Accept: 'application/json',
-      Authorization: `Bearer ${token}`,
-      ...(init.body ? { 'Content-Type': 'application/json' } : {}),
-    },
-  });
-  const body = await res.json().catch(() => null);
-  if (!res.ok || !body?.success) {
-    const first = body?.errors && Object.values(body.errors)[0];
-    throw new ApiError((Array.isArray(first) && first[0]) || body?.message || `Request failed (${res.status})`, res.status);
+  if (!token) {
+    console.error('[RapidFire] request: getToken() returned undefined for', path);
+    throw new ApiError('Your session has expired. Please sign in again.', 401);
   }
-  return body.data as T;
+
+  // Safety timeout so a hung server can't hold the "saving" spinner indefinitely.
+  // Uses a plain AbortController for broad browser compatibility.
+  const timeoutCtrl = new AbortController();
+  const timeoutId = setTimeout(() => {
+    console.warn('[RapidFire] request: timeout after', timeoutMs, 'ms for', path);
+    timeoutCtrl.abort();
+  }, timeoutMs);
+
+  // Forward external abort (cleanup on unmount) to the timeout controller.
+  const onExternalAbort = () => timeoutCtrl.abort();
+  if (signal) signal.addEventListener('abort', onExternalAbort, { once: true });
+
+  try {
+    console.log('[RapidFire] fetch ->', init.method ?? 'GET', path);
+    const res = await fetch(`/api/rapid-fire${path}`, {
+      ...init,
+      signal: timeoutCtrl.signal,
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        ...(init.body ? { 'Content-Type': 'application/json' } : {}),
+      },
+    });
+    const body = await res.json().catch(() => null);
+    console.log('[RapidFire] response', res.status, path, body?.success ?? body?.message);
+    if (!res.ok || !body?.success) {
+      const first = body?.errors && Object.values(body.errors)[0];
+      throw new ApiError((Array.isArray(first) && first[0]) || body?.message || `Request failed (${res.status})`, res.status);
+    }
+    return body.data as T;
+  } finally {
+    clearTimeout(timeoutId);
+    if (signal) signal.removeEventListener('abort', onExternalAbort);
+  }
 };
 
 export const rapidFireApi = (getToken: TokenSource) => ({
   decks: (ccode: string, signal?: AbortSignal) => request<DecksResponse>(getToken, `/decks?ccode=${encodeURIComponent(ccode)}`, {}, signal),
   start: (ccode: string, deck: string) => request<StartResponse>(getToken, '/sessions', { method: 'POST', body: JSON.stringify({ ccode, deck }) }),
+  // Answers are fire-and-forget with a retry queue; 3 s is generous for a local
+  // server and keeps the "finishing" wait short if something goes wrong.
   answer: (sessionId: string, categoryId: number, answer: RapidFireAnswer, responseMs: number | null) =>
     request<AnswerResponse>(getToken, `/sessions/${sessionId}/answers`, {
       method: 'POST',
       body: JSON.stringify({ category_id: categoryId, answer, response_ms: responseMs }),
-    }),
+    }, undefined, 3000),
   complete: (sessionId: string) => request<CompleteResponse>(getToken, `/sessions/${sessionId}/complete`, { method: 'POST' }),
 });
 

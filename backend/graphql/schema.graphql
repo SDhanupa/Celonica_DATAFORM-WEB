@@ -254,6 +254,29 @@ type Category {
 }
 
 type Mutation {
+    "Initiate User Registration (Generates OTP)"
+    initiateUserRegistration(
+        firstName: String!
+        lastName: String!
+        nic: String!
+        address: String!
+        mobileNumber: String!
+        dob: String
+        gender: String
+    ): Boolean! @field(resolver: "App\\GraphQL\\Mutations\\AuthMutations@initiateUserRegistration")
+
+    "Verify Registration OTP and Create User (Returns Keycloak Token)"
+    verifyRegistrationOtp(nic: String!, otp: String!): String! @field(resolver: "App\\GraphQL\\Mutations\\AuthMutations@verifyRegistrationOtp")
+
+    "Initiate User Login (Returns masked mobile)"
+    initiateUserLogin(nic: String!): String! @field(resolver: "App\\GraphQL\\Mutations\\AuthMutations@initiateUserLogin")
+
+    "Verify Mobile Number and Send OTP"
+    verifyLoginMobile(nic: String!, mobileNumber: String!): Boolean! @field(resolver: "App\\GraphQL\\Mutations\\AuthMutations@verifyLoginMobile")
+
+    "Verify Login OTP and Return Keycloak Token"
+    verifyLoginOtp(nic: String!, otp: String!): String! @field(resolver: "App\\GraphQL\\Mutations\\AuthMutations@verifyLoginOtp")
+
     "Register a new admin linked to a Keycloak user"
     registerAdmin(
         keycloakSub: String!

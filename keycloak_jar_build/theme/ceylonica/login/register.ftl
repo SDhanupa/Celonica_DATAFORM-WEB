@@ -127,9 +127,42 @@
             </#if>
 
             <!-- Submit Button -->
+                <!-- Mobile Number -->
+                <div class="form-group <#if messagesPerField.existsError('user.attributes.mobile_number')>has-error</#if>">
+                    <label for="mobile_number" class="input-label">Mobile Number</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="mobile_number" class="pill-input" name="user.attributes.mobile_number"
+                               value="${(register.formData['user.attributes.mobile_number']!'')}"
+                               aria-invalid="<#if messagesPerField.existsError('user.attributes.mobile_number')>true</#if>"
+                               placeholder="e.g. 0712345678" />
+                    </div>
+                    <#if messagesPerField.existsError('user.attributes.mobile_number')>
+                        <span class="field-error-text" aria-live="polite">
+                            ${kcSanitize(messagesPerField.get('user.attributes.mobile_number'))?no_esc}
+                        </span>
+                    </#if>
+                </div>
+
+                <!-- OTP Verification (Only shows if required) -->
+                <#if messagesPerField.existsError('otp')>
+                    <div class="form-group has-error" style="background-color: #f0fdf4; padding: 16px; border-radius: 12px; border: 1px solid #bbf7d0; margin-top: 20px;">
+                        <label for="otp" class="input-label" style="color: #166534;">Verify Mobile Number</label>
+                        <p style="font-size: 13px; color: #15803d; margin-bottom: 8px;">An 8-digit code has been sent to your mobile number.</p>
+                        <div class="input-wrapper">
+                            <input type="text" id="otp" class="pill-input" name="otp" autofocus
+                                   style="border-color: #22c55e;"
+                                   maxlength="8"
+                                   placeholder="Enter 8-digit OTP" />
+                        </div>
+                        <span class="field-error-text" style="color: #dc2626;" aria-live="polite">
+                            ${kcSanitize(messagesPerField.get('otp'))?no_esc}
+                        </span>
+                    </div>
+                </#if>
+
             <div class="form-action">
-                <button class="btn-emerald" type="submit">
-                    <span>Create account</span>
+                <button tabindex="4" class="btn-emerald" type="submit">
+                    <span>Sign up</span>
                 </button>
             </div>
 
@@ -138,7 +171,7 @@
         <div class="auth-aux-links">
             <div class="register-prompt">
                 <span>Already have an account?</span>
-                <a href="${url.loginUrl}" class="signup-link">Log in</a>
+                <a tabindex="5" href="${url.loginUrl}" class="signup-link">Log in</a>
             </div>
         </div>
     </#if>

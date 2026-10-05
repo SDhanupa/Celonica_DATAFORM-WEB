@@ -47,16 +47,20 @@ const SYNC_USER_MUTATION = gql`
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [userInfo, setUserInfo] = useState<AuthContextType['userInfo']>(null);
   const [token, setToken] = useState<string | undefined>(undefined);
+  const [userInfo, setUserInfo] = useState<AuthContextType['userInfo']>(null);
   const isRun = React.useRef(false);
   const apolloClient = useApolloClient();
 
   const getToken = useCallback(async () => {
-    if (!keycloak.authenticated) return undefined;
+    if (!keycloak.authenticated) {
+      console.warn('[Auth] getToken: not authenticated');
+      return undefined;
+    }
     try {
       await keycloak.updateToken(30);
-    } catch {
+    } catch (e) {
+      console.error('[Auth] getToken: updateToken(30) threw:', e);
       return undefined;
     }
     setToken(keycloak.token);
@@ -86,7 +90,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             realm_roles: keycloak.tokenParsed['realm_access']?.roles || [],
           });
 
-          // Automatically sync user to local database
           apolloClient.mutate({
             mutation: SYNC_USER_MUTATION,
           }).catch((err) => console.error('Failed to sync user with DB:', err));
@@ -111,7 +114,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     keycloak.onAuthRefreshSuccess = () => setToken(keycloak.token);
     keycloak.onAuthSuccess = () => setToken(keycloak.token);
     keycloak.onAuthLogout = () => setToken(undefined);
-  }, []);
+  }, [apolloClient]);
 
   const logout = () => {
     keycloak.logout({ redirectUri: window.location.origin + '/' });

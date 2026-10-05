@@ -35,9 +35,15 @@ class KeycloakAuthGuard
             return response()->json(['error' => 'Unauthorized: Token required'], 401);
         }
 
-        if (KeycloakTokenVerifier::isGuestToken($token)) {
-            $this->publish($request, ['is_guest' => true]);
-            return $next($request);
+        try {
+            if (KeycloakTokenVerifier::isGuestToken($token)) {
+                $this->publish($request, ['is_guest' => true]);
+                return $next($request);
+            }
+        } catch (\Throwable $e) {
+            // Cache backend may be unavailable (e.g. Redis not running).
+            // Log it and fall through to normal token verification.
+            error_log('[KeycloakAuthGuard] guest-token cache check failed: ' . $e->getMessage());
         }
 
         try {

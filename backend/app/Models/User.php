@@ -46,7 +46,17 @@ class User extends Authenticatable
     ];
 
     /**
+     * Get the deterministic Keycloak proxy password for this user
+     */
+    public function getProxyPassword(): string
+    {
+        // Deterministic hash based on app key, user NIC, and mobile to ensure it's securely linked to them
+        return hash_hmac('sha256', $this->nic . '|' . $this->mobile_number, config('app.key'));
+    }
+
+    /**
      * The attributes that should be hidden for serialization.
+
      *
      * @var list<string>
      */

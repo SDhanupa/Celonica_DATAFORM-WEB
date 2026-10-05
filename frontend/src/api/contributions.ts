@@ -51,6 +51,7 @@ export interface MyContribution {
   status: ContributionStatus;
   is_update: boolean;
   created_at: string | null;
+  full_data?: any;
 }
 
 export interface MyContributions {

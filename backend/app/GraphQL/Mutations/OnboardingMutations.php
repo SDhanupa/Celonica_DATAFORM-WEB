@@ -68,7 +68,13 @@ class OnboardingMutations
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Onboarding Failed: ' . $e->getMessage());
-            throw new Exception('Failed to complete onboarding: ' . $e->getMessage());
+            if (str_contains($e->getMessage(), 'users_nic_unique')) {
+                throw new \GraphQL\Error\Error('This NIC number is already registered to another account.');
+            }
+            if (str_contains($e->getMessage(), 'users_mobile_number_unique') || str_contains($e->getMessage(), 'users_mobile_unique')) {
+                throw new \GraphQL\Error\Error('This Mobile Number is already registered to another account.');
+            }
+            throw new \GraphQL\Error\Error('Failed to complete onboarding: ' . $e->getMessage());
         }
     }
 }

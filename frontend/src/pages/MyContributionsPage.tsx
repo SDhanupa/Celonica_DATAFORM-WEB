@@ -10,6 +10,8 @@ import { ContributeCopy, useContributeCopy } from '../components/contribute/copy
 import { getCategoryVisual } from '../components/categories/categoryVisuals';
 import { ink, inkButton, semantic } from '../components/contribute/tokens';
 import { ContributionStatus, MyContribution, useMyContributions } from '../api/contributions';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Grid, IconButton } from '@mui/material';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 
 type Filter = 'all' | 'review' | 'approved' | 'drafts';
 
@@ -70,13 +72,10 @@ const MyContributionsPage: React.FC = () => {
     [language],
   );
 
+  const [viewItem, setViewItem] = useState<MyContribution | null>(null);
+
   const openItem = (item: MyContribution) => {
-    if (item.kind === 'business_survey') {
-      const gn = encodeURIComponent(String(item.village || '').replace(/ /g, '-'));
-      navigate(item.ccode ? `/industry-survey/${gn}/${encodeURIComponent(item.ccode)}` : '/industry-survey');
-    } else if (item.category) {
-      navigate(`/user/categories/${item.category.slug}`);
-    }
+    setViewItem(item);
   };
 
   const s = data?.summary;
@@ -147,6 +146,48 @@ const MyContributionsPage: React.FC = () => {
           </>
         )}
       </Container>
+      
+      {/* Submission Details Dialog */}
+      <Dialog open={Boolean(viewItem)} onClose={() => setViewItem(null)} maxWidth="md" fullWidth>
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}>
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+            {viewItem?.title || (viewItem?.kind === 'business_survey' ? t.kindBusiness : t.untitled)}
+          </Typography>
+          <IconButton onClick={() => setViewItem(null)} size="small" sx={{ color: 'text.secondary' }}>
+            <CloseRoundedIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers sx={{ bgcolor: 'background.default', p: { xs: 2, sm: 3 } }}>
+          {viewItem?.reg_number && (
+            <Alert severity="info" sx={{ mb: 3, borderRadius: '12px', '& .MuiAlert-message': { width: '100%' } }}>
+              <Typography variant="subtitle2">{t.myGeneratedCode || 'Registration Number'}</Typography>
+              <Typography variant="h6" sx={{ fontFamily: 'monospace', mt: 0.5 }}>{viewItem.reg_number}</Typography>
+            </Alert>
+          )}
+          
+          <Paper variant="outlined" sx={{ borderRadius: '12px', overflow: 'hidden' }}>
+            <Grid container>
+              {viewItem?.full_data && Object.entries(viewItem.full_data)
+                .filter(([key, val]) => val !== null && val !== '' && key !== 'id' && key !== 'contributor_sub' && key !== 'user_id' && key !== 'category_slug')
+                .map(([key, val]) => (
+                <Grid item xs={12} sm={6} key={key} sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', '&:nth-of-type(even)': { borderLeft: { sm: '1px solid' }, borderLeftColor: { sm: 'divider' } } }}>
+                  <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', fontWeight: 600 }}>
+                    {key.replace(/_/g, ' ')}
+                  </Typography>
+                  <Typography variant="body2" sx={{ mt: 0.5, wordBreak: 'break-word' }}>
+                    {typeof val === 'object' ? JSON.stringify(val) : String(val)}
+                  </Typography>
+                </Grid>
+              ))}
+            </Grid>
+          </Paper>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, pt: 1.5 }}>
+          <Button onClick={() => setViewItem(null)} sx={{ fontWeight: 600 }}>
+            {t.myFilterAll || 'Close'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
@@ -168,7 +209,7 @@ const ContributionRow: React.FC<{ item: MyContribution; dateFormat: Intl.DateTim
   const Icon = isBusiness ? StorefrontOutlinedIcon : getCategoryVisual({ slug: item.category?.root_slug || undefined, nameEn: item.category?.root_name_en || undefined }).Icon;
   const status = STATUS_STYLE[item.status] || STATUS_STYLE.pending;
   const title = isBusiness ? t.kindBusiness : item.title || t.untitled;
-  const context = isBusiness ? item.reg_number : item.category?.name_en;
+  const context = isBusiness ? item.reg_number : (item.reg_number ? `${item.reg_number} · ${item.category?.name_en}` : item.category?.name_en);
   const created = item.created_at ? new Date(item.created_at.replace(' ', 'T')) : null;
 
   return (

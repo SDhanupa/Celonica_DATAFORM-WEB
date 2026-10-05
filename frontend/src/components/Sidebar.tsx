@@ -29,6 +29,7 @@ import {
   PersonAdd as UserPlusIcon,
   Category as CategoryIcon,
   Map as MapIcon,
+  Assignment as AssignmentIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../auth/AuthProvider';
 
@@ -44,6 +45,9 @@ const navItems = [
   { label: 'Questions', icon: <QuestionsIcon />, path: '/questions', roles: ['super_admin', 'admin', 'moderator'] },
   { label: 'Industry Survey Builder', icon: <QuestionsIcon />, path: '/admin/industry-survey-questions', roles: ['super_admin', 'admin'] },
   { label: 'Industry Survey Data', icon: <ReportsIcon />, path: '/admin/industry-surveys', roles: ['super_admin', 'admin'] },
+  { label: 'Dashboard', icon: <DashboardIcon />, path: '/mydashboard', roles: ['admin', 'moderator', 'user'] },
+  { label: 'Industry Survey', icon: <ReportsIcon />, path: '/industry-survey', roles: ['admin', 'moderator', 'user'] },
+  { label: 'Location form', icon: <AssignmentIcon />, path: '/user', roles: ['admin', 'moderator', 'user'] },
   { label: 'Reports', icon: <ReportsIcon />, path: '/reports', roles: ['super_admin', 'admin', 'moderator'] },
   { label: 'Categories', icon: <CategoryIcon />, path: '/categories', roles: ['super_admin'] },
   { label: 'GM Divisions', icon: <MapIcon />, path: '/grama-niladharis', roles: ['super_admin'] },
@@ -224,13 +228,15 @@ const Sidebar: React.FC = () => {
           if (item.roles && !item.roles.includes(role)) {
             return null;
           }
-          const isActive = location.pathname.startsWith(item.path);
+          const isActive = item.path !== '#' && location.pathname.startsWith(item.path);
           return (
-            <ListItem key={item.path} disablePadding>
+            <ListItem key={item.label} disablePadding>
               <Tooltip title={collapsed ? item.label : ''} placement="right">
                 <ListItemButton
                   selected={isActive}
-                  onClick={() => handleNavigation(item.path)}
+                  onClick={() => {
+                    if (item.path !== '#') handleNavigation(item.path);
+                  }}
                   sx={{
                     justifyContent: collapsed ? 'center' : 'flex-start',
                     px: collapsed ? 2.5 : 2,

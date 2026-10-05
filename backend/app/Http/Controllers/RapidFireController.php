@@ -140,22 +140,47 @@ class RapidFireController extends Controller
                 'cards' => $cards,
             ],
         ], 201);
+
     }
 
     /** POST /api/rapid-fire/sessions/{id}/answers — play one card. */
     public function answer(Request $request, string $id): JsonResponse
     {
-        $sub = $this->sub($request);
-        $data = $request->validate([
-            'category_id' => ['required', 'integer'],
-            'answer' => ['required', 'string', 'in:' . implode(',', self::ANSWERS)],
-            'response_ms' => ['nullable', 'integer', 'min:0', 'max:600000'],
+        \Log::info('[RapidFire] answer hit', [
+            'session_id' => $id,
+            'body'       => $request->all(),
+            'sub_attr'   => $request->attributes->get('keycloak_sub'),
         ]);
+
+        try {
+            $sub = $this->sub($request);
+        } catch (\Exception $e) {
+            \Log::error('[RapidFire] sub() threw', ['msg' => $e->getMessage()]);
+            throw $e;
+        }
+
+        try {
+            $data = $request->validate([
+                'category_id' => ['required', 'integer'],
+                'answer' => ['required', 'string', 'in:' . implode(',', self::ANSWERS)],
+                'response_ms' => ['nullable', 'integer', 'min:0', 'max:600000'],
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('[RapidFire] validation failed', ['msg' => $e->getMessage(), 'input' => $request->all()]);
+            throw $e;
+        }
+
         if (!Str::isUuid($id)) {
+            \Log::warning('[RapidFire] invalid uuid', ['id' => $id]);
             return $this->fail('Round not found.', 404);
         }
 
-        return DB::transaction(function () use ($id, $sub, $data) {
+        // Capture ccode before the transaction so we can bust the cache AFTER
+        // the transaction commits.  Putting Cache::forget() inside the transaction
+        // previously caused a Redis ConnectionException to roll back every answer.
+        $ccode = DB::table('rapid_fire_sessions')->where('id', $id)->value('ccode');
+
+        $response = DB::transaction(function () use ($id, $sub, $data) {
             // Row lock: two quick taps must not both score, or both claim a card.
             $session = DB::table('rapid_fire_sessions')->where('id', $id)->lockForUpdate()->first();
 
@@ -165,8 +190,11 @@ class RapidFireController extends Controller
             if ($session->contributor_sub !== $sub) {
                 return $this->fail('This round belongs to someone else.', 403);
             }
+            // Return 410 (not 409) so the frontend treats this identically to an
+            // expired session and shows the "round expired" notice instead of
+            // silently treating every answer as "confirmed" with 0 server score.
             if ($session->completed_at !== null) {
-                return $this->fail('This round is already finished.', 409);
+                return $this->fail('This round is already finished.', 410);
             }
             if (CarbonImmutable::parse($session->expires_at)->isPast()) {
                 return $this->fail('This round has expired. Start a new one.', 410);
@@ -214,8 +242,6 @@ class RapidFireController extends Controller
                 'updated_at' => $now,
             ]);
 
-            ContributionController::forgetVillageCache($session->ccode);
-
             return response()->json([
                 'success' => true,
                 'data' => [
@@ -229,7 +255,21 @@ class RapidFireController extends Controller
                 ],
             ]);
         });
+
+        // Bust cache AFTER the transaction commits — never inside it, because a
+        // cache driver failure (e.g. Redis unavailable) must not roll back saved answers.
+        if ($response->getStatusCode() === 200 && $ccode) {
+            try {
+                ContributionController::forgetVillageCache($ccode);
+                ContributionController::forgetMineCache($sub);
+            } catch (\Exception $e) {
+                // Non-fatal: stale cache will expire on its own.
+            }
+        }
+
+        return $response;
     }
+
 
     /** POST /api/rapid-fire/sessions/{id}/complete — close the round (idempotent). */
     public function complete(Request $request, string $id): JsonResponse
