@@ -8,6 +8,7 @@ import { AuthProvider } from './auth/AuthProvider';
 import { LanguageProvider } from './context/LanguageContext';
 import ProtectedRoute from './auth/ProtectedRoute';
 import AdminLayout from './components/AdminLayout';
+import UserShell from './components/contribute/UserShell';
 import apolloClient from './api/apolloClient';
 
 import LandingPage from './pages/LandingPage';
@@ -102,9 +103,9 @@ const App: React.FC = () => {
                 path="/mydashboard"
                 element={
                   <ProtectedRoute>
-                    <AdminLayout>
+                    <UserShell>
                       <MyDashboard />
-                    </AdminLayout>
+                    </UserShell>
                   </ProtectedRoute>
                 }
               />
