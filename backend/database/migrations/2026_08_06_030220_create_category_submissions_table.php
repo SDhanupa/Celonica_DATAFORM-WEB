@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('category_submissions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
-            $table->string('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             
             // Location metadata
             $table->string('district')->nullable();

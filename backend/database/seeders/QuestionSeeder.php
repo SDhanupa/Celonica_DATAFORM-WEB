@@ -131,7 +131,7 @@ class QuestionSeeder extends Seeder
         $sortOrder = 1;
         foreach ($questions as $q) {
             Question::updateOrCreate(
-                ['question_text' => $q['question_text']],
+                ['question_text_en' => $q['question_text']],
                 [
                     'section' => $q['section'],
                     'input_type' => $q['input_type'],

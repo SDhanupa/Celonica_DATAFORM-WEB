@@ -16,13 +16,18 @@ class GnByCoordinates
         $lat = $args['lat'];
         $lng = $args['lng'];
 
-        // Fast bounding box check
-        $candidates = DB::table('gn_divisions')
-            ->where('min_lat', '<=', $lat)
-            ->where('max_lat', '>=', $lat)
-            ->where('min_lng', '<=', $lng)
-            ->where('max_lng', '>=', $lng)
-            ->get();
+        $candidates = [];
+        try {
+            // Fast bounding box check
+            $candidates = DB::table('gn_divisions')
+                ->where('min_lat', '<=', $lat)
+                ->where('max_lat', '>=', $lat)
+                ->where('min_lng', '<=', $lng)
+                ->where('max_lng', '>=', $lng)
+                ->get();
+        } catch (\Exception $e) {
+            // Table might not exist, proceed to fallback
+        }
 
         $found = null;
         foreach ($candidates as $c) {
@@ -80,7 +85,42 @@ class GnByCoordinates
                 
                 // Fallback to name search
                 $gn = GramaNiladhari::where('name_en', 'like', '%' . $found->name . '%')->first();
-                return $gn;
+                if ($gn) return $gn;
+            }
+        }
+        
+        // Fallback to Nominatim if local DB fails or returns nothing
+        $options = [
+            'http' => [
+                'header' => "User-Agent: CeylonicaApp/1.0\r\n"
+            ]
+        ];
+        $context = stream_context_create($options);
+        $response = @file_get_contents("https://nominatim.openstreetmap.org/reverse?lat={$lat}&lon={$lng}&format=json", false, $context);
+        
+        if ($response) {
+            $data = json_decode($response, true);
+            if (isset($data['address'])) {
+                $address = $data['address'];
+                $city = $address['city'] ?? $address['town'] ?? $address['village'] ?? $address['suburb'] ?? null;
+                $district = $address['state_district'] ?? $address['county'] ?? null;
+                
+                if ($city) {
+                    $query = GramaNiladhari::query();
+                    
+                    if ($district) {
+                        $cleanDistrict = str_ireplace([' District', ' ', 'Maha'], '', $district);
+                        $query->where('dis_en', 'ilike', '%' . trim($cleanDistrict) . '%');
+                    }
+                    
+                    $query->where(function($q) use ($city) {
+                        $q->where('name_en', 'ilike', '%' . $city . '%')
+                          ->orWhere('ds_en', 'ilike', '%' . $city . '%');
+                    });
+                    
+                    $gn = $query->first();
+                    if ($gn) return $gn;
+                }
             }
         }
 

@@ -79,14 +79,16 @@ const darkTheme = createTheme({
 export default function OnboardingModal({ open, onComplete }: OnboardingModalProps) {
   const { userInfo } = useAuth();
   
+  const getAttr = (val: any) => Array.isArray(val) ? val[0] : (val || '');
+
   const [formData, setFormData] = useState({
-    firstName: userInfo?.given_name || '',
-    lastName: userInfo?.family_name || '',
-    nic: '',
-    mobileNumber: '',
-    address: '',
-    dob: '',
-    gender: '',
+    firstName: getAttr(userInfo?.given_name),
+    lastName: getAttr(userInfo?.family_name),
+    nic: getAttr(userInfo?.nic),
+    mobileNumber: getAttr(userInfo?.mobile_number),
+    address: getAttr(userInfo?.address),
+    dob: getAttr(userInfo?.dob),
+    gender: getAttr(userInfo?.gender),
   });
 
   const [completeOnboarding, { loading, error }] = useMutation(COMPLETE_ONBOARDING, {

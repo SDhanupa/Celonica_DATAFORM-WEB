@@ -22,6 +22,11 @@ interface AuthContextType {
     family_name?: string;
     role?: string;
     id?: string;
+    mobile_number?: string;
+    nic?: string;
+    address?: string;
+    dob?: string;
+    gender?: string;
   } | null;
   logout: () => void;
   login: (redirectUri?: string) => void;
@@ -87,6 +92,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             email: keycloak.tokenParsed['email'],
             sub: keycloak.tokenParsed['sub'],
             preferred_username: keycloak.tokenParsed['preferred_username'],
+            given_name: keycloak.tokenParsed['given_name'],
+            family_name: keycloak.tokenParsed['family_name'],
+            mobile_number: keycloak.tokenParsed['mobile_number'],
+            nic: keycloak.tokenParsed['nic'],
+            address: keycloak.tokenParsed['address'],
+            dob: keycloak.tokenParsed['dob'],
+            gender: keycloak.tokenParsed['gender'],
             realm_roles: keycloak.tokenParsed['realm_access']?.roles || [],
           });
 

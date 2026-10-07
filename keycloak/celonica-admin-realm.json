@@ -10,6 +10,7 @@
   "resetPasswordAllowed": true,
   "editUsernameAllowed": false,
   "bruteForceProtected": true,
+  "loginTheme": "ceylonica",
   "clients": [
     {
       "clientId": "celonica-frontend",
@@ -23,10 +24,13 @@
       },
       "redirectUris": [
         "http://localhost:5173/*",
-        "http://localhost:5173"
+        "http://localhost:5173",
+        "http://localhost:5174/*",
+        "http://localhost:5174"
       ],
       "webOrigins": [
-        "http://localhost:5173"
+        "http://localhost:5173",
+        "http://localhost:5174"
       ],
       "protocol": "openid-connect"
     },

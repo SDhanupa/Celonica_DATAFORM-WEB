@@ -84,7 +84,31 @@ public class SmsRegistrationFormAction implements FormAction {
         }
 
         // ── STEP 1: Validate fields and send OTP ─────────────────────────
-        
+
+        // Reset any stale OTP state so a failed Step 1 never shows the OTP screen
+        clearNotes(s);
+
+        // 0. Reject duplicate username / email BEFORE sending any SMS
+        RealmModel realm = context.getRealm();
+        KeycloakSession session = context.getSession();
+        String email = trimToNull(formData.getFirst("email"));
+        String username = realm.isRegistrationEmailAsUsername()
+                ? email : trimToNull(formData.getFirst("username"));
+
+        if (username != null && session.users().getUserByUsername(realm, username) != null) {
+            errors.add(new FormMessage(realm.isRegistrationEmailAsUsername() ? "email" : "username",
+                    realm.isRegistrationEmailAsUsername() ? "emailExistsMessage" : "usernameExistsMessage"));
+        }
+        if (email != null && !realm.isDuplicateEmailsAllowed()
+                && session.users().getUserByEmail(realm, email) != null
+                && !realm.isRegistrationEmailAsUsername()) {
+            errors.add(new FormMessage("email", "emailExistsMessage"));
+        }
+        if (!errors.isEmpty()) {
+            context.validationError(formData, errors);
+            return;
+        }
+
         // 1. Validate Password first!
         String password = formData.getFirst("password");
         String passwordConfirm = formData.getFirst("password-confirm");
@@ -219,6 +243,12 @@ public class SmsRegistrationFormAction implements FormAction {
     }
 
     private String nvl(String v) { return v != null ? v : ""; }
+
+    private String trimToNull(String v) {
+        if (v == null) return null;
+        String t = v.trim();
+        return t.isEmpty() ? null : t;
+    }
 
     @Override public boolean requiresUser() { return false; }
     @Override public boolean configuredFor(KeycloakSession s, RealmModel r, UserModel u) { return true; }
