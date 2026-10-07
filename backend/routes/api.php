@@ -95,8 +95,14 @@ Route::middleware(['keycloak.admin'])->get('/locations', function () {
     return response()->file($file, ['Content-Type' => 'application/json', 'Cache-Control' => 'public, max-age=3600']);
 });
 
+Route::middleware(['keycloak.admin'])->group(function () {
+    Route::get('/admin/rapid-fire-approvals', [\App\Http\Controllers\AdminRapidFireApprovalsController::class, 'index']);
+    Route::post('/admin/rapid-fire-approvals/status', [\App\Http\Controllers\AdminRapidFireApprovalsController::class, 'updateStatus']);
+});
+
 // Protected API Endpoints (Super Admin Only)
 Route::middleware(['keycloak.admin', 'super_admin'])->group(function () {
+
     Route::get('/industry-surveys', [IndustrySurveyController::class, 'index']);
     Route::patch('/industry-surveys/{id}/approve', [IndustrySurveyController::class, 'approve']);
 

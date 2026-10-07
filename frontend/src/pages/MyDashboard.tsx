@@ -10,6 +10,7 @@ import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
 import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import VolunteerActivismOutlinedIcon from '@mui/icons-material/VolunteerActivismOutlined';
 import { useAuth } from '../auth/AuthProvider';
+import { useTranslation } from 'react-i18next';
 import { useMyContributions } from '../api/contributions';
 import { useContributeCopy } from '../components/contribute/copy';
 import { readSavedVillage, villageName, villagePath } from '../components/contribute/village';
@@ -28,16 +29,16 @@ interface Survey {
 }
 
 const STATUS: Record<SurveyStatus, { label: string; sx: object }> = {
-  approved: { label: 'Approved', sx: { bgcolor: ink[900], color: '#fff' } },
-  submitted: { label: 'In review', sx: { border: `1px solid ${ink[300]}`, color: ink[700] } },
-  pending: { label: 'In review', sx: { border: `1px solid ${ink[300]}`, color: ink[700] } },
-  draft: { label: 'Draft', sx: { bgcolor: ink[100], color: ink[500] } },
-  rejected: { label: 'Rejected', sx: { bgcolor: '#FEF2F2', color: '#B91C1C' } },
+  approved: { label: 'status_approved', sx: { bgcolor: ink[900], color: '#fff' } },
+  submitted: { label: 'status_review', sx: { border: `1px solid ${ink[300]}`, color: ink[700] } },
+  pending: { label: 'status_review', sx: { border: `1px solid ${ink[300]}`, color: ink[700] } },
+  draft: { label: 'status_draft', sx: { bgcolor: ink[100], color: ink[500] } },
+  rejected: { label: 'status_rejected', sx: { bgcolor: '#FEF2F2', color: '#B91C1C' } },
 };
 
-const greeting = () => {
+const greeting = (t: any) => {
   const h = new Date().getHours();
-  return h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  return h < 12 ? t('greeting_morning') : h < 17 ? t('greeting_afternoon') : t('greeting_evening');
 };
 
 const surveyTitle = (s: Survey) => s.form_data?.business_name || `Survey #${s.id}`;
@@ -52,6 +53,7 @@ const eyebrow = { fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.14em',
 
 const MyDashboard: React.FC = () => {
   const { token, userInfo } = useAuth();
+  const { t } = useTranslation();
   const { language } = useContributeCopy();
   const navigate = useNavigate();
   const mounted = useMounted();
@@ -83,9 +85,9 @@ const MyDashboard: React.FC = () => {
   const approvedPct = total > 0 ? ((s?.approved ?? 0) / total) * 100 : 0;
 
   const shortcuts = [
-    { label: 'My contributions', desc: 'Track every record you have added', icon: VolunteerActivismOutlinedIcon, path: '/user/contributions' },
-    { label: 'Register a business', desc: 'Add an industry survey for your area', icon: StorefrontOutlinedIcon, path: '/user' },
-    { label: 'Explore data', desc: 'Browse GN division statistics', icon: ExploreOutlinedIcon, path: '/gnpage' },
+    { label: t('my_contributions_label'), desc: t('my_contributions_desc'), icon: VolunteerActivismOutlinedIcon, path: '/user/contributions' },
+    { label: t('register_business'), desc: t('register_business_desc'), icon: StorefrontOutlinedIcon, path: '/user' },
+    { label: t('explore_data_label'), desc: t('explore_data_desc'), icon: ExploreOutlinedIcon, path: '/gnpage' },
   ];
 
   return (
@@ -108,7 +110,7 @@ const MyDashboard: React.FC = () => {
         }}
       >
         <Ambient />
-        <Typography sx={{ ...eyebrow, color: 'rgba(255,255,255,.5)', mb: 1.5 }}>{greeting()}</Typography>
+        <Typography sx={{ ...eyebrow, color: 'rgba(255,255,255,.5)', mb: 1.5 }}>{greeting(t)}</Typography>
         <Typography
           component="h1"
           sx={{
@@ -123,10 +125,10 @@ const MyDashboard: React.FC = () => {
             pb: 0.5,
           }}
         >
-          {firstName || 'Welcome back'}
+          {firstName || t('welcome_back')}
         </Typography>
         <Typography sx={{ color: 'rgba(255,255,255,.6)', mt: 1.5, maxWidth: 440, lineHeight: 1.6 }}>
-          Every record you add makes your village's data more complete. Pick up where you left off.
+          {t('hero_subtitle')}
         </Typography>
         <Box sx={{ flex: 1, minHeight: 24 }} />
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25}>
@@ -145,14 +147,14 @@ const MyDashboard: React.FC = () => {
               '&:hover': { bgcolor: ink[100], transform: 'none', '& .MuiButton-endIcon': { transform: 'translateX(3px)' } },
             }}
           >
-            Contribute
+            {t('contribute')}
           </Button>
           <Button
             startIcon={<BoltRoundedIcon />}
             onClick={() => navigate('/user/rapid-fire')}
             sx={{ px: 2.5, py: 1.3, borderRadius: 999, fontWeight: 600, color: '#fff', border: '1px solid rgba(255,255,255,.2)', bgcolor: 'rgba(255,255,255,.04)', backdropFilter: 'blur(6px)', '&:hover': { bgcolor: 'rgba(255,255,255,.1)', borderColor: 'rgba(255,255,255,.4)', transform: 'none' } }}
           >
-            Rapid Fire
+            {t('rapid_fire')}
           </Button>
         </Stack>
       </Box>
@@ -163,7 +165,7 @@ const MyDashboard: React.FC = () => {
         onPointerMove={spotlightMove}
         sx={{ ...card, ...spotlight(), ...enter(1), gridColumn: { md: 'span 4' }, p: { xs: 2.5, sm: 3 }, display: 'flex', flexDirection: 'column' }}
       >
-        <Typography sx={eyebrow}>Your contributions</Typography>
+        <Typography sx={eyebrow}>{t('your_contributions')}</Typography>
         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', py: 2 }}>
           {contribLoading ? (
             <Skeleton width={120} height={80} />
@@ -172,12 +174,12 @@ const MyDashboard: React.FC = () => {
               <CountUp value={total} />
             </Typography>
           )}
-          <Typography sx={{ color: ink[500], mt: 1 }}>records added across {s?.villages ?? 0} {s?.villages === 1 ? 'village' : 'villages'}</Typography>
+          <Typography sx={{ color: ink[500], mt: 1 }}>{t('records_added_across')} {s?.villages ?? 0} {s?.villages === 1 ? t('village_singular') : t('village_plural')}</Typography>
         </Box>
         <Box>
           <Stack direction="row" sx={{ justifyContent: 'space-between', mb: 0.75 }}>
             <Typography variant="caption" sx={{ color: ink[500], fontWeight: 600 }}>
-              Approval rate
+              {t('approval_rate')}
             </Typography>
             <Typography variant="caption" sx={{ color: ink[900], fontWeight: 700 }}>
               {Math.round(approvedPct)}%
@@ -191,20 +193,20 @@ const MyDashboard: React.FC = () => {
 
       {/* Stats */}
       <Box sx={{ gridColumn: { md: 'span 12' }, display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)' }, gap: { xs: 1.5, md: 2 } }}>
-        <StatTile i={2} label="Approved" value={s?.approved} loading={contribLoading} />
-        <StatTile i={3} label="In review" value={s?.in_review} loading={contribLoading} />
-        <StatTile i={4} label="Drafts" value={s?.drafts} loading={contribLoading} />
-        <StatTile i={5} label="Surveys" value={surveysLoading ? undefined : surveys.length} loading={surveysLoading} />
+        <StatTile i={2} label={t('approved')} value={s?.approved} loading={contribLoading} />
+        <StatTile i={3} label={t('pending_approval')} value={s?.in_review} loading={contribLoading} />
+        <StatTile i={4} label={t('drafts')} value={s?.drafts} loading={contribLoading} />
+        <StatTile i={5} label={t('surveys')} value={surveysLoading ? undefined : surveys.length} loading={surveysLoading} />
       </Box>
 
       {/* Surveys */}
       <Paper elevation={0} sx={{ ...card, ...enter(6), gridColumn: { md: 'span 8' }, p: { xs: 2, sm: 3 } }}>
         <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
           <Box>
-            <Typography sx={eyebrow}>Industry surveys</Typography>
-            <Typography sx={{ fontWeight: 700, fontSize: '1.15rem', color: ink[900], letterSpacing: '-0.02em' }}>Your businesses</Typography>
+            <Typography sx={eyebrow}>{t('industry_surveys')}</Typography>
+            <Typography sx={{ fontWeight: 700, fontSize: '1.15rem', color: ink[900], letterSpacing: '-0.02em' }}>{t('your_businesses')}</Typography>
           </Box>
-          <PillLink label="New survey" onClick={() => navigate('/user')} />
+          <PillLink label={t('new_survey')} onClick={() => navigate('/user')} />
         </Stack>
 
         {surveysLoading ? (
@@ -219,12 +221,12 @@ const MyDashboard: React.FC = () => {
             <Box sx={{ width: 56, height: 56, mx: 'auto', mb: 2, borderRadius: '18px', display: 'grid', placeItems: 'center', bgcolor: '#fff', border: `1px solid ${ink[100]}`, boxShadow: '0 12px 24px -12px rgba(10,12,15,.25)', animation: `${floatY} 3.6s ease-in-out infinite` }}>
               <StorefrontOutlinedIcon sx={{ color: ink[700] }} />
             </Box>
-            <Typography sx={{ fontWeight: 700, color: ink[900], mb: 0.5 }}>No business surveys yet</Typography>
+            <Typography sx={{ fontWeight: 700, color: ink[900], mb: 0.5 }}>{t('no_surveys_yet')}</Typography>
             <Typography variant="body2" sx={{ color: ink[500], mb: 2.5 }}>
-              Register a business in your GN division to see it here.
+              {t('register_business_prompt')}
             </Typography>
             <Button onClick={() => navigate('/user')} sx={{ borderRadius: 999, px: 2.5, py: 1, fontWeight: 700, bgcolor: ink[900], color: '#fff', '&:hover': { bgcolor: ink[700], transform: 'none' } }}>
-              Register a business
+              {t('register_business')}
             </Button>
           </Box>
         ) : (
@@ -255,7 +257,7 @@ const MyDashboard: React.FC = () => {
                         {[survey.village, survey.reg_number].filter(Boolean).join(' · ') || '—'}
                       </Typography>
                     </Box>
-                    <Box sx={{ ...st.sx, px: 1.25, py: 0.4, borderRadius: 999, fontSize: '0.72rem', fontWeight: 700, flexShrink: 0 }}>{st.label}</Box>
+                    <Box sx={{ ...st.sx, px: 1.25, py: 0.4, borderRadius: 999, fontSize: '0.72rem', fontWeight: 700, flexShrink: 0 }}>{t(st.label)}</Box>
                   </Box>
                 </Reveal>
               );
@@ -279,7 +281,7 @@ const MyDashboard: React.FC = () => {
                 {displayName}
               </Typography>
               <Typography variant="caption" sx={{ color: ink[400], display: 'block' }} noWrap>
-                {userInfo?.email || 'Contributor'}
+                {userInfo?.email || t('contributor')}
               </Typography>
             </Box>
           </Stack>
@@ -315,8 +317,8 @@ const MyDashboard: React.FC = () => {
             </Box>
           </Stack>
           <Box sx={{ position: 'relative', zIndex: 2, mt: 3 }}>
-            <Typography sx={{ ...eyebrow, color: 'rgba(255,255,255,.45)' }}>Your village</Typography>
-            <Typography sx={{ fontWeight: 700, fontSize: '1.25rem', letterSpacing: '-0.02em', mt: 0.25 }}>{vName || 'Choose your village'}</Typography>
+            <Typography sx={{ ...eyebrow, color: 'rgba(255,255,255,.45)' }}>{t('your_village')}</Typography>
+            <Typography sx={{ fontWeight: 700, fontSize: '1.25rem', letterSpacing: '-0.02em', mt: 0.25, color: '#fff' }}>{vName || t('choose_your_village')}</Typography>
           </Box>
         </ButtonBase>
       </Stack>

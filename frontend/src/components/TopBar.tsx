@@ -21,6 +21,7 @@ import {
   KeyboardArrowDown,
   Menu as MenuIcon,
 } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 
@@ -33,6 +34,7 @@ import { GET_ME } from '../graphql/queries';
 
 const TopBar: React.FC = () => {
   const { userInfo, logout } = useAuth();
+  const { i18n } = useTranslation();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [notifAnchorEl, setNotifAnchorEl] = useState<null | HTMLElement>(null);
@@ -209,6 +211,26 @@ const TopBar: React.FC = () => {
             </MenuItem>
             <MenuItem onClick={handleClose}>
               <SettingsIcon sx={{ mr: 1.5, fontSize: 18, color: 'text.secondary' }} /> Settings
+            </MenuItem>
+            <Divider />
+            <Typography variant="caption" sx={{ px: 2, py: 1, display: 'block', color: 'text.secondary', fontWeight: 600 }}>Language / භාෂාව / மொழி</Typography>
+            <MenuItem 
+              selected={i18n.language === 'en'} 
+              onClick={() => { i18n.changeLanguage('en'); handleClose(); }}
+            >
+              <Typography variant="body2" sx={{ ml: 4 }}>English</Typography>
+            </MenuItem>
+            <MenuItem 
+              selected={i18n.language === 'si'} 
+              onClick={() => { i18n.changeLanguage('si'); handleClose(); }}
+            >
+              <Typography variant="body2" sx={{ ml: 4 }}>සිංහල</Typography>
+            </MenuItem>
+            <MenuItem 
+              selected={i18n.language === 'ta'} 
+              onClick={() => { i18n.changeLanguage('ta'); handleClose(); }}
+            >
+              <Typography variant="body2" sx={{ ml: 4 }}>தமிழ்</Typography>
             </MenuItem>
             <Divider />
             <MenuItem onClick={() => { logout(); handleClose(); }} sx={{ color: 'error.main' }}>

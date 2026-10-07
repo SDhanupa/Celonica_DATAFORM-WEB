@@ -39,7 +39,7 @@ import ApprovalsPage from './pages/ApprovalsPage';
 import IndustrySurveyPage from './pages/IndustrySurveyPage';
 import AdminIndustrySurveys from './pages/AdminIndustrySurveys';
 import AdminIndustrySurveysQuestions from './pages/AdminIndustrySurveysQuestions';
-
+import AdminRapidFireApprovals from './pages/AdminRapidFireApprovals';
 
 const App: React.FC = () => {
   return (
@@ -309,6 +309,17 @@ const App: React.FC = () => {
 
               {/* Default redirects */}
               <Route path="/dashboard" element={<Navigate to="/gnpage" replace />} />
+              
+              <Route
+                path="/admin/rapid-fire-approvals"
+                element={
+                  <ProtectedRoute allowedRoles={['super_admin', 'admin', 'moderator']}>
+                    <AdminLayout>
+                      <AdminRapidFireApprovals />
+                    </AdminLayout>
+                  </ProtectedRoute>
+                }
+              />
               
               <Route
                 path="/admin/industry-surveys"

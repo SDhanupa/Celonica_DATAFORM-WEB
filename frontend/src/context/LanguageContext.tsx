@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import i18n from '../i18n';
 
 type Language = 'en' | 'si' | 'ta';
 
@@ -18,12 +19,16 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
     localStorage.setItem('app_language', lang);
+    i18n.changeLanguage(lang);
   };
 
   useEffect(() => {
+    i18n.changeLanguage(language);
+    
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'app_language' && e.newValue) {
         setLanguageState(e.newValue as Language);
+        i18n.changeLanguage(e.newValue as Language);
       }
     };
     window.addEventListener('storage', handleStorageChange);

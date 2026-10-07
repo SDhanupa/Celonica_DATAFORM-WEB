@@ -94,15 +94,15 @@ export default function OnboardingModal({ open, onComplete }: OnboardingModalPro
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [step, setStep] = useState(0);
-  const [form, setForm] = useState<Form>({
-    firstName: '',
-    lastName: '',
-    dob: '',
-    gender: '',
-    nic: '',
-    mobileNumber: '',
-    address: '',
-  });
+  const [form, setForm] = useState<Form>(() => ({
+    firstName: 'Test',
+    lastName: 'User',
+    dob: '1990-01-01',
+    gender: 'Male',
+    nic: `${Math.floor(100000000 + Math.random() * 900000000)}V`,
+    mobileNumber: `07${Math.floor(10000000 + Math.random() * 90000000)}`,
+    address: '123 Test Street, Colombo',
+  }));
   const [touched, setTouched] = useState<Partial<Record<Field, true>>>({});
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<Field, string>>>({});
   const [serverError, setServerError] = useState<string | null>(null);

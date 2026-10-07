@@ -62,6 +62,7 @@ class KeycloakAuthGuard
 
         try {
             $admin = Admin::findByKeycloakSub($sub);
+            \Log::info('[KeycloakAuthGuard] Checked admin for sub:', ['sub' => $sub, 'admin_found' => !!$admin, 'email' => $decoded->email ?? 'no-email']);
             if ($admin) {
                 if (!$admin->is_active) {
                     return response()->json(['error' => 'Forbidden: Admin account is deactivated'], 403);

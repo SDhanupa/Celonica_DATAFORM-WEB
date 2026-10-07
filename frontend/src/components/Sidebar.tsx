@@ -45,6 +45,7 @@ const navItems = [
   { label: 'Questions', icon: <QuestionsIcon />, path: '/questions', roles: ['super_admin', 'admin', 'moderator'] },
   { label: 'Industry Survey Builder', icon: <QuestionsIcon />, path: '/admin/industry-survey-questions', roles: ['super_admin', 'admin'] },
   { label: 'Industry Survey Data', icon: <ReportsIcon />, path: '/admin/industry-surveys', roles: ['super_admin', 'admin'] },
+  { label: 'GN Location Approvals', icon: <ReportsIcon />, path: '/admin/rapid-fire-approvals', roles: ['super_admin', 'admin', 'moderator'] },
   { label: 'Dashboard', icon: <DashboardIcon />, path: '/mydashboard', roles: ['admin', 'moderator', 'user'] },
   { label: 'Industry Survey', icon: <ReportsIcon />, path: '/industry-survey', roles: ['admin', 'moderator', 'user'] },
   { label: 'Location form', icon: <AssignmentIcon />, path: '/user', roles: ['admin', 'moderator', 'user'] },
