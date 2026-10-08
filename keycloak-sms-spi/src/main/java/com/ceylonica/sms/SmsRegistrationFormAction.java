@@ -1,19 +1,23 @@
 package com.ceylonica.sms;
 
-import org.jboss.logging.Logger;
 import org.keycloak.authentication.FormAction;
 import org.keycloak.authentication.FormContext;
 import org.keycloak.authentication.ValidationContext;
 import org.keycloak.forms.login.LoginFormsProvider;
+import org.keycloak.models.AuthenticationExecutionModel;
 import org.keycloak.models.AuthenticatorConfigModel;
-import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.FormMessage;
+import org.keycloak.sessions.AuthenticationSessionModel;
+import org.jboss.logging.Logger;
 import org.keycloak.policy.PasswordPolicyManagerProvider;
 import org.keycloak.policy.PolicyError;
-import org.keycloak.sessions.AuthenticationSessionModel;
+import org.keycloak.userprofile.UserProfile;
+import org.keycloak.userprofile.UserProfileContext;
+import org.keycloak.userprofile.UserProfileProvider;
+import org.keycloak.userprofile.ValidationException;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -25,10 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SmsRegistrationFormAction implements FormAction {
-
     private static final Logger logger = Logger.getLogger(SmsRegistrationFormAction.class);
 
-    // AuthNote keys — all stored server-side, never lost between steps
+    // AuthNote keys
     private static final String NOTE_OTP         = "sms-reg-otp";
     private static final String NOTE_PENDING      = "sms-reg-otp-pending";
     private static final String NOTE_PASSWORD     = "sms-reg-password";
@@ -44,7 +47,6 @@ public class SmsRegistrationFormAction implements FormAction {
         AuthenticationSessionModel s = context.getAuthenticationSession();
         if (!"true".equals(s.getAuthNote(NOTE_PENDING))) return;
 
-        // Inject ALL saved Step-1 data as FTL attributes for the OTP page
         form.setAttribute("otpPending",   "true");
         setAttribute(form, "savedFirstName", s.getAuthNote(NOTE_FIRST));
         setAttribute(form, "savedLastName",  s.getAuthNote(NOTE_LAST));
@@ -67,13 +69,10 @@ public class SmsRegistrationFormAction implements FormAction {
 
         String enteredOtp = formData.getFirst("otp");
 
-        // ── STEP 2: OTP verification ──────────────────────────────────────
+        // STEP 2: OTP verification
         if (enteredOtp != null && !enteredOtp.trim().isEmpty()) {
             String expected = s.getAuthNote(NOTE_OTP);
-            logger.infof("OTP Step 2 - entered: '%s', expected: '%s'", enteredOtp.trim(), expected);
-
             if (expected != null && expected.equals(enteredOtp.trim())) {
-                // Clear all our notes
                 clearNotes(s);
                 context.success();
             } else {
@@ -83,36 +82,12 @@ public class SmsRegistrationFormAction implements FormAction {
             return;
         }
 
-        // ── STEP 1: Validate fields and send OTP ─────────────────────────
-
-        // Reset any stale OTP state so a failed Step 1 never shows the OTP screen
+        // STEP 1: Validate fields and send OTP
         clearNotes(s);
 
-        // 0. Reject duplicate username / email BEFORE sending any SMS
-        RealmModel realm = context.getRealm();
-        KeycloakSession session = context.getSession();
-        String email = trimToNull(formData.getFirst("email"));
-        String username = realm.isRegistrationEmailAsUsername()
-                ? email : trimToNull(formData.getFirst("username"));
-
-        if (username != null && session.users().getUserByUsername(realm, username) != null) {
-            errors.add(new FormMessage(realm.isRegistrationEmailAsUsername() ? "email" : "username",
-                    realm.isRegistrationEmailAsUsername() ? "emailExistsMessage" : "usernameExistsMessage"));
-        }
-        if (email != null && !realm.isDuplicateEmailsAllowed()
-                && session.users().getUserByEmail(realm, email) != null
-                && !realm.isRegistrationEmailAsUsername()) {
-            errors.add(new FormMessage("email", "emailExistsMessage"));
-        }
-        if (!errors.isEmpty()) {
-            context.validationError(formData, errors);
-            return;
-        }
-
-        // 1. Validate Password first!
         String password = formData.getFirst("password");
         String passwordConfirm = formData.getFirst("password-confirm");
-        
+
         if (password == null || password.trim().isEmpty()) {
             errors.add(new FormMessage("password", "missingPasswordMessage"));
             context.validationError(formData, errors);
@@ -124,19 +99,14 @@ public class SmsRegistrationFormAction implements FormAction {
             return;
         }
         
-        // Create a dummy UserModel proxy to prevent NullPointerException in Password Policy evaluation
         UserModel dummyUser = (UserModel) Proxy.newProxyInstance(
             UserModel.class.getClassLoader(),
             new Class[] { UserModel.class },
             new InvocationHandler() {
                 @Override
                 public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                    if (method.getName().equals("getUsername")) {
-                        return formData.getFirst("username");
-                    }
-                    if (method.getReturnType().equals(boolean.class)) {
-                        return false;
-                    }
+                    if (method.getName().equals("getUsername")) return formData.getFirst("username");
+                    if (method.getReturnType().equals(boolean.class)) return false;
                     return null;
                 }
             }
@@ -159,27 +129,43 @@ public class SmsRegistrationFormAction implements FormAction {
 
         String nic = formData.getFirst("nic");
         if (nic == null || !nic.matches("^(\\d{9}[vVxX]|\\d{12})$")) {
-            errors.add(new FormMessage("nic",
-                    "Invalid NIC. Must be 12 digits or 9 digits followed by V or X."));
+            errors.add(new FormMessage("nic", "Invalid NIC. Must be 12 digits or 9 digits followed by V or X."));
             context.validationError(formData, errors);
             return;
         }
 
-        // Get SMS config from realm
+        // ---- EXPLICIT PROFILE VALIDATION DEBUGGING ----
+        try {
+            UserProfileProvider provider = context.getSession().getProvider(UserProfileProvider.class);
+            UserProfile profile = provider.create(UserProfileContext.REGISTRATION, formData);
+            profile.validate();
+        } catch (ValidationException e) {
+            logger.warn("Profile validation failed before SMS!");
+            // We just add ALL errors so the user can see EXACTLY which field failed
+            for (org.keycloak.userprofile.ValidationException.Error err : e.getErrors()) {
+                logger.warn("Field: " + err.getAttribute() + " Error: " + err.getMessage());
+                // We map the error to the field so the user sees it in the UI!
+                errors.add(new FormMessage(err.getAttribute(), err.getMessage(), err.getMessageParameters()));
+            }
+            context.validationError(formData, errors);
+            return; // STOP AND DO NOT SEND SMS
+        } catch (Exception e) {
+            logger.warn("Unknown error during profile validation: " + e.getMessage());
+        }
+        // -----------------------------------------------
+
         AuthenticatorConfigModel config = context.getRealm().getAuthenticatorConfigsStream()
-                .filter(c -> c.getConfig() != null
-                        && c.getConfig().containsKey(SmsAuthenticatorFactory.CONF_USERNAME))
+                .filter(c -> c.getConfig() != null && c.getConfig().containsKey(SmsAuthenticatorFactory.CONF_USERNAME))
                 .findFirst().orElse(null);
 
         if (config == null) {
-            logger.error("TextWare SMS configuration not found in realm.");
             errors.add(new FormMessage(null, "System error: SMS not configured."));
             context.validationError(formData, errors);
             return;
         }
 
-        // Generate OTP and send SMS
         String otp = String.format("%08d", new SecureRandom().nextInt(100000000));
+        
         String smsUser  = config.getConfig().get(SmsAuthenticatorFactory.CONF_USERNAME);
         String smsPw    = config.getConfig().get(SmsAuthenticatorFactory.CONF_PASSWORD);
         String smsSrc   = config.getConfig().get(SmsAuthenticatorFactory.CONF_SENDER_ID);
@@ -193,7 +179,6 @@ public class SmsRegistrationFormAction implements FormAction {
             return;
         }
 
-        // Save ALL Step-1 data in AuthNotes so they survive the round-trip
         s.setAuthNote(NOTE_OTP,      otp);
         s.setAuthNote(NOTE_PENDING,  "true");
         s.setAuthNote(NOTE_FIRST,    nvl(formData.getFirst("firstName")));
@@ -204,23 +189,21 @@ public class SmsRegistrationFormAction implements FormAction {
         s.setAuthNote(NOTE_MOBILE,   nvl(mobile.trim()));
         s.setAuthNote(NOTE_PASSWORD, nvl(formData.getFirst("password")));
 
-        // Show the OTP form (validationError re-renders the page)
         errors.add(new FormMessage("otp", "An 8-digit code has been sent to your mobile."));
         context.validationError(formData, errors);
     }
 
     @Override
     public void success(FormContext context) {
-        // Send welcome SMS
         AuthenticationSessionModel s = context.getAuthenticationSession();
-        String mobile    = context.getHttpRequest().getDecodedFormParameters()
-                                   .getFirst("mobile_number");
-        String firstName = context.getHttpRequest().getDecodedFormParameters().getFirst("firstName");
-        String lastName  = context.getHttpRequest().getDecodedFormParameters().getFirst("lastName");
+        String mobile = s.getAuthNote(NOTE_MOBILE);
+        String firstName = s.getAuthNote(NOTE_FIRST);
+        String lastName = s.getAuthNote(NOTE_LAST);
+
+        clearNotes(s);
 
         AuthenticatorConfigModel config = context.getRealm().getAuthenticatorConfigsStream()
-                .filter(c -> c.getConfig() != null
-                        && c.getConfig().containsKey(SmsAuthenticatorFactory.CONF_USERNAME))
+                .filter(c -> c.getConfig() != null && c.getConfig().containsKey(SmsAuthenticatorFactory.CONF_USERNAME))
                 .findFirst().orElse(null);
 
         if (config != null && mobile != null && !mobile.isEmpty()) {
@@ -244,15 +227,9 @@ public class SmsRegistrationFormAction implements FormAction {
 
     private String nvl(String v) { return v != null ? v : ""; }
 
-    private String trimToNull(String v) {
-        if (v == null) return null;
-        String t = v.trim();
-        return t.isEmpty() ? null : t;
-    }
-
     @Override public boolean requiresUser() { return false; }
     @Override public boolean configuredFor(KeycloakSession s, RealmModel r, UserModel u) { return true; }
-    @Override public void setRequiredActions(KeycloakSession s, RealmModel r, UserModel u) {}
-    @Override public void close() {}
+    @Override public void setRequiredActions(KeycloakSession s, RealmModel r, UserModel u) { }
+    @Override public void close() { }
 }
 
