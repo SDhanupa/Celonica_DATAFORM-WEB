@@ -1,6 +1,5 @@
 <#import "template.ftl" as layout>
-
-<@layout.registrationLayout displayMessage=!messagesPerField.existsError('firstName','lastName','email','username','password','password-confirm','mobile_number','nic'); section>
+<@layout.registrationLayout displayMessage=!messagesPerField.existsError('firstName','lastName','email','username','password','password-confirm','user.attributes.mobile_number','user.attributes.nic'); section>
     <#if section = "header">
         Sign up
     <#elseif section = "form">
@@ -13,12 +12,26 @@
             <#if otpPending?? && otpPending == "true">
 
                 <#-- Re-submit all registration data transparently as hidden fields -->
+                <#if messagesPerField.existsError('firstName','lastName','email','username','password','password-confirm','user.attributes.mobile_number','user.attributes.nic')>
+                    <div style="background:red; color:white; padding:10px; margin-bottom:10px;">
+                        <strong>DEBUG ERRORS:</strong><br/>
+                        <#if messagesPerField.existsError('firstName')>firstName: ${messagesPerField.get('firstName')}<br/></#if>
+                        <#if messagesPerField.existsError('lastName')>lastName: ${messagesPerField.get('lastName')}<br/></#if>
+                        <#if messagesPerField.existsError('email')>email: ${messagesPerField.get('email')}<br/></#if>
+                        <#if messagesPerField.existsError('username')>username: ${messagesPerField.get('username')}<br/></#if>
+                        <#if messagesPerField.existsError('password')>password: ${messagesPerField.get('password')}<br/></#if>
+                        <#if messagesPerField.existsError('password-confirm')>password-confirm: ${messagesPerField.get('password-confirm')}<br/></#if>
+                        <#if messagesPerField.existsError('user.attributes.mobile_number')>mobile: ${messagesPerField.get('user.attributes.mobile_number')}<br/></#if>
+                        <#if messagesPerField.existsError('user.attributes.nic')>nic: ${messagesPerField.get('user.attributes.nic')}<br/></#if>
+                    </div>
+                </#if>
+                
                 <input type="hidden" name="firstName"                        value="${(savedFirstName!'')}"/>
                 <input type="hidden" name="lastName"                         value="${(savedLastName!'')}"/>
                 <input type="hidden" name="email"                            value="${(savedEmail!'')}"/>
                 <input type="hidden" name="username"                         value="${(savedUsername!'')}"/>
-                <input type="hidden" name="nic"              value="${(savedNic!'')}"/>
-                <input type="hidden" name="mobile_number"    value="${(savedMobile!'')}"/>
+                <input type="hidden" name="user.attributes.nic"              value="${(savedNic!'')}"/>
+                <input type="hidden" name="user.attributes.mobile_number"    value="${(savedMobile!'')}"/>
                 <#-- Password is injected from the server-side AuthNote -->
                 <#if savedPassword??>
                     <input type="hidden" name="password"         value="${savedPassword}"/>
@@ -184,33 +197,33 @@
                 </#if>
 
                 <!-- NIC Number -->
-                <div class="form-group <#if messagesPerField.existsError('nic')>has-error</#if>">
+                <div class="form-group <#if messagesPerField.existsError('user.attributes.nic')>has-error</#if>">
                     <label for="nic" class="input-label">NIC Number</label>
                     <div class="input-wrapper">
-                        <input type="text" id="nic" class="pill-input" name="nic"
-                               value="${(register.formData['nic']!'')}"
-                               aria-invalid="<#if messagesPerField.existsError('nic')>true</#if>"
+                        <input type="text" id="nic" class="pill-input" name="user.attributes.nic"
+                               value="${(register.formData['user.attributes.nic']!'')}"
+                               aria-invalid="<#if messagesPerField.existsError('user.attributes.nic')>true</#if>"
                                placeholder="e.g. 199012345678 or 901234567V"/>
                     </div>
-                    <#if messagesPerField.existsError('nic')>
+                    <#if messagesPerField.existsError('user.attributes.nic')>
                         <span class="field-error-text" aria-live="polite">
-                            ${kcSanitize(messagesPerField.get('nic'))?no_esc}
+                            ${kcSanitize(messagesPerField.get('user.attributes.nic'))?no_esc}
                         </span>
                     </#if>
                 </div>
 
                 <!-- Mobile Number -->
-                <div class="form-group <#if messagesPerField.existsError('mobile_number')>has-error</#if>">
+                <div class="form-group <#if messagesPerField.existsError('user.attributes.mobile_number')>has-error</#if>">
                     <label for="mobile_number" class="input-label">Mobile Number</label>
                     <div class="input-wrapper">
-                        <input type="text" id="mobile_number" class="pill-input" name="mobile_number"
-                               value="${(register.formData['mobile_number']!'')}"
-                               aria-invalid="<#if messagesPerField.existsError('mobile_number')>true</#if>"
+                        <input type="text" id="mobile_number" class="pill-input" name="user.attributes.mobile_number"
+                               value="${(register.formData['user.attributes.mobile_number']!'')}"
+                               aria-invalid="<#if messagesPerField.existsError('user.attributes.mobile_number')>true</#if>"
                                placeholder="e.g. 0712345678"/>
                     </div>
-                    <#if messagesPerField.existsError('mobile_number')>
+                    <#if messagesPerField.existsError('user.attributes.mobile_number')>
                         <span class="field-error-text" aria-live="polite">
-                            ${kcSanitize(messagesPerField.get('mobile_number'))?no_esc}
+                            ${kcSanitize(messagesPerField.get('user.attributes.mobile_number'))?no_esc}
                         </span>
                     </#if>
                 </div>
@@ -233,10 +246,3 @@
         </div>
     </#if>
 </@layout.registrationLayout>
-
-
-
-
-
-
-

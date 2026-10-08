@@ -150,16 +150,16 @@ public class SmsRegistrationFormAction implements FormAction {
             return;
         }
 
-        String mobile = formData.getFirst("mobile_number");
+        String mobile = formData.getFirst("user.attributes.mobile_number");
         if (mobile == null || mobile.trim().isEmpty()) {
-            errors.add(new FormMessage("mobile_number", "Mobile number is required."));
+            errors.add(new FormMessage("user.attributes.mobile_number", "Mobile number is required."));
             context.validationError(formData, errors);
             return;
         }
 
-        String nic = formData.getFirst("nic");
+        String nic = formData.getFirst("user.attributes.nic");
         if (nic == null || !nic.matches("^(\\d{9}[vVxX]|\\d{12})$")) {
-            errors.add(new FormMessage("nic",
+            errors.add(new FormMessage("user.attributes.nic",
                     "Invalid NIC. Must be 12 digits or 9 digits followed by V or X."));
             context.validationError(formData, errors);
             return;
@@ -188,7 +188,7 @@ public class SmsRegistrationFormAction implements FormAction {
         boolean sent = TextWareSmsClient.sendSms(smsUser, smsPw, smsSrc, mobile.trim(), msg);
 
         if (!sent) {
-            errors.add(new FormMessage("mobile_number", "SMS send failed. Please try again."));
+            errors.add(new FormMessage("user.attributes.mobile_number", "SMS send failed. Please try again."));
             context.validationError(formData, errors);
             return;
         }
@@ -214,7 +214,7 @@ public class SmsRegistrationFormAction implements FormAction {
         // Send welcome SMS
         AuthenticationSessionModel s = context.getAuthenticationSession();
         String mobile    = context.getHttpRequest().getDecodedFormParameters()
-                                   .getFirst("mobile_number");
+                                   .getFirst("user.attributes.mobile_number");
         String firstName = context.getHttpRequest().getDecodedFormParameters().getFirst("firstName");
         String lastName  = context.getHttpRequest().getDecodedFormParameters().getFirst("lastName");
 
@@ -255,4 +255,3 @@ public class SmsRegistrationFormAction implements FormAction {
     @Override public void setRequiredActions(KeycloakSession s, RealmModel r, UserModel u) {}
     @Override public void close() {}
 }
-
