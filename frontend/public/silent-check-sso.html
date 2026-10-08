@@ -2,8 +2,7 @@
 <html>
   <head><title></title></head>
   <body>
-    <script>
-      parent.postMessage(location.href, location.origin);
-    </script>
+    <!-- External script (not inline) so it is allowed by CSP script-src 'self' -->
+    <script src="/silent-check-sso.js"></script>
   </body>
 </html>
