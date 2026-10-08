@@ -3,6 +3,13 @@
     <#if section = "header">
         Sign up
     <#elseif section = "form">
+                    <!-- DEBUG_PROFILE_START
+            <#if profile?? && profile.attributesByName??>
+                <#list profile.attributesByName?keys as attrName>
+                    ATTR:  - ERROR: <#if messagesPerField.existsError(attrName)>YES<#else>NO</#if>
+                </#list>
+            </#if>
+            DEBUG_PROFILE_END -->
         <form id="kc-register-form" action="${url.registrationAction}" method="post" class="auth-form">
 
             <#-- ════════════════════════════════════════════
@@ -246,5 +253,6 @@
         </div>
     </#if>
 </@layout.registrationLayout>
+
 
 
