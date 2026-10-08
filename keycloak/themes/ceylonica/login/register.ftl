@@ -3,13 +3,17 @@
     <#if section = "header">
         Sign up
     <#elseif section = "form">
-                    <!-- DEBUG_PROFILE_START
-            <#if profile?? && profile.attributesByName??>
-                <#list profile.attributesByName?keys as attrName>
-                    ATTR:  - ERROR: <#if messagesPerField.existsError(attrName)>YES<#else>NO</#if>
-                </#list>
-            </#if>
-            DEBUG_PROFILE_END -->
+                                <!-- DEBUG_EXPLICIT_START
+            username: <#if messagesPerField.existsError('username')>YES<#else>NO</#if>
+            email: <#if messagesPerField.existsError('email')>YES<#else>NO</#if>
+            firstName: <#if messagesPerField.existsError('firstName')>YES<#else>NO</#if>
+            lastName: <#if messagesPerField.existsError('lastName')>YES<#else>NO</#if>
+            mobile_number: <#if messagesPerField.existsError('mobile_number')>YES<#else>NO</#if>
+            nic: <#if messagesPerField.existsError('nic')>YES<#else>NO</#if>
+            password: <#if messagesPerField.existsError('password')>YES<#else>NO</#if>
+            user.attributes.mobile_number: <#if messagesPerField.existsError('user.attributes.mobile_number')>YES<#else>NO</#if>
+            user.attributes.nic: <#if messagesPerField.existsError('user.attributes.nic')>YES<#else>NO</#if>
+            DEBUG_EXPLICIT_END -->
         <form id="kc-register-form" action="${url.registrationAction}" method="post" class="auth-form">
 
             <#-- ════════════════════════════════════════════
@@ -253,6 +257,7 @@
         </div>
     </#if>
 </@layout.registrationLayout>
+
 
 
 
