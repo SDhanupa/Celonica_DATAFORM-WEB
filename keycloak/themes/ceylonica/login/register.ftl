@@ -3,11 +3,12 @@
     <#if section = "header">
         Sign up
     <#elseif section = "form">
-                                            <!-- DEBUG_LOOP_START
+                                                        <!-- DEBUG_LOOP_START
             <#if profile?? && profile.attributes??>
                 <#list profile.attributes as attr>
-                    ATTR_NAME: 
-                    ERROR: <#if messagesPerField.existsError(attr.name)>YES<#else>NO</#if>
+                    ATTR_CLASS: 
+                    ATTR_KEYS: <#list attr?keys as k>,</#list>
+                    ERROR: <#if messagesPerField.existsError(attr.name!"")>YES<#else>NO</#if>
                 </#list>
             </#if>
             DEBUG_LOOP_END -->
@@ -254,6 +255,7 @@
         </div>
     </#if>
 </@layout.registrationLayout>
+
 
 
 
