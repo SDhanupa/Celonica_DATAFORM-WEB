@@ -39,8 +39,8 @@
                 <input type="hidden" name="lastName"                         value="${(savedLastName!'')}"/>
                 <input type="hidden" name="email"                            value="${(savedEmail!'')}"/>
                 <input type="hidden" name="username"                         value="${(savedUsername!'')}"/>
-                <input type="hidden" name="user.attributes.nic"              value="${(savedNic!'')}"/>
-                <input type="hidden" name="user.attributes.mobile_number"    value="${(savedMobile!'')}"/>
+                <input type="hidden" name="nic"              value="${(savedNic!'')}"/>
+                <input type="hidden" name="mobile_number"    value="${(savedMobile!'')}"/>
                 <#-- Password is injected from the server-side AuthNote -->
                 <#if savedPassword??>
                     <input type="hidden" name="password"         value="${savedPassword}"/>
@@ -209,7 +209,7 @@
                 <div class="form-group <#if messagesPerField.existsError('nic')>has-error</#if>">
                     <label for="nic" class="input-label">NIC Number</label>
                     <div class="input-wrapper">
-                        <input type="text" id="nic" class="pill-input" name="user.attributes.nic"
+                        <input type="text" id="nic" class="pill-input" name="nic"
                                value="${(register.formData['nic']!'')}"
                                aria-invalid="<#if messagesPerField.existsError('nic')>true</#if>"
                                placeholder="e.g. 199012345678 or 901234567V"/>
@@ -225,7 +225,7 @@
                 <div class="form-group <#if messagesPerField.existsError('mobile_number')>has-error</#if>">
                     <label for="mobile_number" class="input-label">Mobile Number</label>
                     <div class="input-wrapper">
-                        <input type="text" id="mobile_number" class="pill-input" name="user.attributes.mobile_number"
+                        <input type="text" id="mobile_number" class="pill-input" name="mobile_number"
                                value="${(register.formData['mobile_number']!'')}"
                                aria-invalid="<#if messagesPerField.existsError('mobile_number')>true</#if>"
                                placeholder="e.g. 0712345678"/>
@@ -255,6 +255,7 @@
         </div>
     </#if>
 </@layout.registrationLayout>
+
 
 
 
