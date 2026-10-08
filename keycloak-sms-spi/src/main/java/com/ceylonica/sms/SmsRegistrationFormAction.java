@@ -197,7 +197,9 @@ public class SmsRegistrationFormAction implements FormAction {
 
     @Override public boolean requiresUser() { return false; }
     @Override public boolean configuredFor(KeycloakSession s, RealmModel r, UserModel u) { return true; }
-    @Override public void setRequiredActions(KeycloakSession s, RealmModel r, UserModel u) {}
+        @Override public void setRequiredActions(KeycloakSession s, RealmModel r, UserModel u) {}
     @Override public void close() {}
+    @Override public void success(org.keycloak.authentication.FormContext context) {}
 }
+
 
