@@ -154,12 +154,12 @@ public class SmsRegistrationFormAction implements FormAction {
         String nic       = context.getHttpRequest().getDecodedFormParameters().getFirst("nic");
         String firstName = context.getHttpRequest().getDecodedFormParameters().getFirst("firstName");
         String lastName  = context.getHttpRequest().getDecodedFormParameters().getFirst("lastName");
-        String email     = context.getHttpRequest().getDecodedFormParameters().getFirst("email");
-        String username  = context.getHttpRequest().getDecodedFormParameters().getFirst("username");
-        String password  = context.getHttpRequest().getDecodedFormParameters().getFirst("password");
-
+        
         // PREVENT PREMATURE SMS: If any required field is empty, another validator will fail. Do not send SMS yet.
-        if (isBlank(mobile) || isBlank(nic) || isBlank(firstName) || isBlank(lastName) || isBlank(email) || isBlank(username) || isBlank(password)) {
+        if (mobile == null || mobile.trim().isEmpty() || 
+            nic == null || nic.trim().isEmpty() || 
+            firstName == null || firstName.trim().isEmpty() || 
+            lastName == null || lastName.trim().isEmpty()) {
             return;
         }
 
