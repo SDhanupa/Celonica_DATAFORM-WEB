@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         if (DB::getDriverName() === 'pgsql') {
-            DB::statement("ALTER TABLE gn_economies ALTER COLUMN gn_number TYPE bigint USING NULLIF(TRIM(gn_number), '')::bigint");
+            DB::statement("ALTER TABLE gn_economies ALTER COLUMN gn_number TYPE bigint USING NULLIF(TRIM(gn_number::text), '')::bigint");
         } else {
             DB::statement('ALTER TABLE gn_economies MODIFY gn_number BIGINT UNSIGNED NULL');
         }
