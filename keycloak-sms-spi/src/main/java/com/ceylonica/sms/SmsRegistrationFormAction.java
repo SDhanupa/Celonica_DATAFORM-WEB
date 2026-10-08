@@ -150,18 +150,73 @@ public class SmsRegistrationFormAction implements FormAction {
             return;
         }
 
-                String mobile    = context.getHttpRequest().getDecodedFormParameters().getFirst("mobile_number");
-        String nic       = context.getHttpRequest().getDecodedFormParameters().getFirst("nic");
-        String firstName = context.getHttpRequest().getDecodedFormParameters().getFirst("firstName");
-        String lastName  = context.getHttpRequest().getDecodedFormParameters().getFirst("lastName");
-        
-        // PREVENT PREMATURE SMS: If any required field is empty, another validator will fail. Do not send SMS yet.
-        if (mobile == null || mobile.trim().isEmpty() || 
-            nic == null || nic.trim().isEmpty() || 
-            firstName == null || firstName.trim().isEmpty() || 
-            lastName == null || lastName.trim().isEmpty()) {
+        String mobile = formData.getFirst("user.attributes.mobile_number");
+        if (mobile == null || mobile.trim().isEmpty()) {
+            errors.add(new FormMessage("user.attributes.mobile_number", "Mobile number is required."));
+            context.validationError(formData, errors);
             return;
         }
+
+        String nic = formData.getFirst("user.attributes.nic");
+        if (nic == null || !nic.matches("^(\\d{9}[vVxX]|\\d{12})$")) {
+            errors.add(new FormMessage("user.attributes.nic",
+                    "Invalid NIC. Must be 12 digits or 9 digits followed by V or X."));
+            context.validationError(formData, errors);
+            return;
+        }
+
+        // Get SMS config from realm
+        AuthenticatorConfigModel config = context.getRealm().getAuthenticatorConfigsStream()
+                .filter(c -> c.getConfig() != null
+                        && c.getConfig().containsKey(SmsAuthenticatorFactory.CONF_USERNAME))
+                .findFirst().orElse(null);
+
+        if (config == null) {
+            logger.error("TextWare SMS configuration not found in realm.");
+            errors.add(new FormMessage(null, "System error: SMS not configured."));
+            context.validationError(formData, errors);
+            return;
+        }
+
+        // Generate OTP and send SMS
+        String otp = String.format("%08d", new SecureRandom().nextInt(100000000));
+        String smsUser  = config.getConfig().get(SmsAuthenticatorFactory.CONF_USERNAME);
+        String smsPw    = config.getConfig().get(SmsAuthenticatorFactory.CONF_PASSWORD);
+        String smsSrc   = config.getConfig().get(SmsAuthenticatorFactory.CONF_SENDER_ID);
+        String msg      = "Ceylonica verification code: " + otp + ". Valid for one use only.";
+
+        boolean sent = TextWareSmsClient.sendSms(smsUser, smsPw, smsSrc, mobile.trim(), msg);
+
+        if (!sent) {
+            errors.add(new FormMessage("user.attributes.mobile_number", "SMS send failed. Please try again."));
+            context.validationError(formData, errors);
+            return;
+        }
+
+        // Save ALL Step-1 data in AuthNotes so they survive the round-trip
+        s.setAuthNote(NOTE_OTP,      otp);
+        s.setAuthNote(NOTE_PENDING,  "true");
+        s.setAuthNote(NOTE_FIRST,    nvl(formData.getFirst("firstName")));
+        s.setAuthNote(NOTE_LAST,     nvl(formData.getFirst("lastName")));
+        s.setAuthNote(NOTE_EMAIL,    nvl(formData.getFirst("email")));
+        s.setAuthNote(NOTE_USERNAME, nvl(formData.getFirst("username")));
+        s.setAuthNote(NOTE_NIC,      nvl(nic));
+        s.setAuthNote(NOTE_MOBILE,   nvl(mobile.trim()));
+        s.setAuthNote(NOTE_PASSWORD, nvl(formData.getFirst("password")));
+
+        // Show the OTP form (validationError re-renders the page)
+        errors.add(new FormMessage("otp", "An 8-digit code has been sent to your mobile."));
+        context.validationError(formData, errors);
+    }
+
+    @Override
+    public void success(FormContext context) {
+        // Send welcome SMS
+        AuthenticationSessionModel s = context.getAuthenticationSession();
+        String mobile    = context.getHttpRequest().getDecodedFormParameters()
+                                   .getFirst("user.attributes.mobile_number");
+        String firstName = context.getHttpRequest().getDecodedFormParameters().getFirst("firstName");
+        String lastName  = context.getHttpRequest().getDecodedFormParameters().getFirst("lastName");
 
         AuthenticatorConfigModel config = context.getRealm().getAuthenticatorConfigsStream()
                 .filter(c -> c.getConfig() != null
@@ -197,9 +252,6 @@ public class SmsRegistrationFormAction implements FormAction {
 
     @Override public boolean requiresUser() { return false; }
     @Override public boolean configuredFor(KeycloakSession s, RealmModel r, UserModel u) { return true; }
-        @Override public void setRequiredActions(KeycloakSession s, RealmModel r, UserModel u) {}
+    @Override public void setRequiredActions(KeycloakSession s, RealmModel r, UserModel u) {}
     @Override public void close() {}
-    @Override public void success(org.keycloak.authentication.FormContext context) {}
 }
-
-
