@@ -3,6 +3,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { Box, Typography, Button, FormControl, CircularProgress, Alert, Dialog, DialogContent, DialogActions, Autocomplete, TextField, Divider, useTheme } from '@mui/material';
 import { useQuery } from '@apollo/client';
 import { GET_GN_BY_COORDINATES } from '../graphql/queries';
+import { cleanMojibake } from '../utils/mojibake';
 
 interface LocationSelectorModalProps {
   open: boolean;
@@ -179,23 +180,23 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
                   <Box sx={{ mt: 1 }}>
                     <Typography variant="body1" fontWeight="bold">
                       {language === 'en' ? 'District' : language === 'si' ? 'දිස්ත්‍රික්කය' : 'மாவட்டம்'}: {
-                        language === 'en' ? activeGn.pDistrict?.admin2NameEn :
+                        cleanMojibake(language === 'en' ? activeGn.pDistrict?.admin2NameEn :
                           language === 'si' ? activeGn.pDistrict?.admin2NameSi :
-                            activeGn.pDistrict?.admin2NameTa
+                            activeGn.pDistrict?.admin2NameTa)
                       }
                     </Typography>
                     <Typography variant="body1" fontWeight="bold">
                       {language === 'en' ? 'City / DS Division' : language === 'si' ? 'නගරය / ප්‍රාදේශීය ලේකම් කොට්ඨාශය' : 'நகரம் / பிரதேச செயலகம்'}: {
-                        language === 'en' ? activeGn.dsEn :
+                        cleanMojibake(language === 'en' ? activeGn.dsEn :
                           language === 'si' ? activeGn.dsSi :
-                            activeGn.dsTa
+                            activeGn.dsTa)
                       }
                     </Typography>
                     <Typography variant="body1" fontWeight="bold">
                       {language === 'en' ? 'GN Division' : language === 'si' ? 'ග්‍රාම නිලධාරී වසම' : 'கிராம உத்தியோகத்தர் பிரிவு'}: {
-                        language === 'en' ? activeGn.nameEn :
+                        cleanMojibake(language === 'en' ? activeGn.nameEn :
                           language === 'si' ? activeGn.nameSi :
-                            activeGn.nameTa
+                            activeGn.nameTa)
                       }
                     </Typography>
                   </Box>

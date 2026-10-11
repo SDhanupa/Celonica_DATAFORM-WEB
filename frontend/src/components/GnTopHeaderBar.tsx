@@ -18,6 +18,7 @@ import GlobalSearchBar from './GlobalSearchBar';
 import { useLanguage } from '../context/LanguageContext';
 import { MOBILE_CATEGORIES } from './mobile/mobileCategories';
 import { useEdgeFadeMask } from './survey/SurveyKit';
+import { cleanMojibake } from '../utils/mojibake';
 
 interface GnTopHeaderBarProps {
   districts?: any[];
@@ -95,21 +96,21 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
   const activeCcode = activeGnObj?.CCODE || activeGnObj?.code || activeGnObj?.ccode || selectedGN || '';
 
   /* Localized display names, used by the read-only location summary. */
-  const districtName = language === 'si'
+  const districtName = cleanMojibake(language === 'si'
     ? (activeDistrictObj?.admin2NameSi || activeDistrictObj?.nameSi || activeDistrictObj?.nameEn)
     : language === 'ta'
       ? (activeDistrictObj?.admin2NameTa || activeDistrictObj?.nameTa || activeDistrictObj?.nameEn)
-      : (activeDistrictObj?.admin2NameEn || activeDistrictObj?.nameEn);
-  const dsName = language === 'si'
+      : (activeDistrictObj?.admin2NameEn || activeDistrictObj?.nameEn));
+  const dsName = cleanMojibake(language === 'si'
     ? (activeCityObj?.dsSi || activeCityObj?.dsEn)
     : language === 'ta'
       ? (activeCityObj?.dsTa || activeCityObj?.dsEn)
-      : activeCityObj?.dsEn;
-  const gnName = language === 'si'
+      : activeCityObj?.dsEn);
+  const gnName = cleanMojibake(language === 'si'
     ? (activeGnObj?.nameSi || activeGnObj?.nameEn)
     : language === 'ta'
       ? (activeGnObj?.nameTa || activeGnObj?.nameEn)
-      : activeGnObj?.nameEn;
+      : activeGnObj?.nameEn);
 
   const surface = isDarkMode ? '#111827' : '#ffffff';
   const border = isDarkMode ? '1px solid rgba(255,255,255,0.12)' : '1px solid #e5e9f0';
@@ -151,12 +152,12 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
       renderValue={(v) => {
         if (!v) return <Box component="span" sx={{ color: textMuted, fontWeight: 500 }}>{t.district}</Box>;
         const d = activeDistrictObj;
-        const name = language === 'si' ? (d?.admin2NameSi || d?.nameSi || d?.nameEn) : language === 'ta' ? (d?.admin2NameTa || d?.nameTa || d?.nameEn) : (d?.admin2NameEn || d?.nameEn);
+        const name = cleanMojibake(language === 'si' ? (d?.admin2NameSi || d?.nameSi || d?.nameEn) : language === 'ta' ? (d?.admin2NameTa || d?.nameTa || d?.nameEn) : (d?.admin2NameEn || d?.nameEn));
         return name || v;
       }}
     >
       {districts.map((d: any) => {
-        const name = language === 'si' ? (d.admin2NameSi || d.nameSi || d.nameEn) : language === 'ta' ? (d.admin2NameTa || d.nameTa || d.nameEn) : (d.admin2NameEn || d.nameEn);
+        const name = cleanMojibake(language === 'si' ? (d.admin2NameSi || d.nameSi || d.nameEn) : language === 'ta' ? (d.admin2NameTa || d.nameTa || d.nameEn) : (d.admin2NameEn || d.nameEn));
         return <MenuItem key={d.id || d.admin2Pcode} value={d.id || d.admin2Pcode}>{name}</MenuItem>;
       })}
     </Select>
@@ -173,12 +174,12 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
       renderValue={(v) => {
         if (!v) return <Box component="span" sx={{ color: textMuted, fontWeight: 500 }}>{t.dsDivision}</Box>;
         const c = activeCityObj;
-        const name = language === 'si' ? (c?.dsSi || c?.dsEn) : language === 'ta' ? (c?.dsTa || c?.dsEn) : (c?.dsEn || v);
+        const name = cleanMojibake(language === 'si' ? (c?.dsSi || c?.dsEn) : language === 'ta' ? (c?.dsTa || c?.dsEn) : (c?.dsEn || v));
         return name || v;
       }}
     >
       {dsDivisions.map((city: any) => {
-        const name = language === 'si' ? (city.dsSi || city.dsEn) : language === 'ta' ? (city.dsTa || city.dsEn) : (city.dsEn || city.divisionalSecretariatCode || city.dsCode);
+        const name = cleanMojibake(language === 'si' ? (city.dsSi || city.dsEn) : language === 'ta' ? (city.dsTa || city.dsEn) : (city.dsEn || city.divisionalSecretariatCode || city.dsCode));
         return <MenuItem key={city.divisionalSecretariatCode || city.dsCode} value={city.divisionalSecretariatCode || city.dsCode}>{name}</MenuItem>;
       })}
     </Select>
@@ -195,7 +196,7 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
       renderValue={(v) => {
         if (!v) return <Box component="span" sx={{ color: textMuted, fontWeight: 500 }}>{t.village}</Box>;
         const g = activeGnObj;
-        const name = language === 'si' ? (g?.nameSi || g?.nameEn) : language === 'ta' ? (g?.nameTa || g?.nameEn) : g?.nameEn;
+        const name = cleanMojibake(language === 'si' ? (g?.nameSi || g?.nameEn) : language === 'ta' ? (g?.nameTa || g?.nameEn) : g?.nameEn);
         const code = g?.CCODE || g?.code || g?.ccode;
         return (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, minWidth: 0 }}>
@@ -210,7 +211,7 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
       }}
     >
       {gramaNiladharis.map((gn: any) => {
-        const name = language === 'si' ? (gn.nameSi || gn.nameEn) : language === 'ta' ? (gn.nameTa || gn.nameEn) : gn.nameEn;
+        const name = cleanMojibake(language === 'si' ? (gn.nameSi || gn.nameEn) : language === 'ta' ? (gn.nameTa || gn.nameEn) : gn.nameEn);
         const code = gn.CCODE || gn.code || gn.ccode;
         return (
           <MenuItem key={gn.id || gn.CCODE || gn.ccode} value={String(gn.id) || gn.CCODE || gn.ccode} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2, py: 0.8 }}>

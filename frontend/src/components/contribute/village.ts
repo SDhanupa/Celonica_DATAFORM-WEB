@@ -16,13 +16,23 @@ export interface SavedVillage {
   [key: string]: unknown;
 }
 
+import { cleanMojibake, sanitizeObject } from '../../utils/mojibake';
+
 /** A corrupted or hand-edited entry must not take a page down. */
 export const readSavedVillage = (): SavedVillage | null => {
   const raw = sessionStorage.getItem(VILLAGE_STORAGE_KEY) || localStorage.getItem(VILLAGE_STORAGE_KEY);
   if (!raw) return null;
   try {
     const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === 'object' ? parsed : null;
+    if (parsed && typeof parsed === 'object') {
+      const sanitized = sanitizeObject(parsed) as SavedVillage;
+      // If the raw data contained corrupted mojibake, write back the cleaned version
+      if (raw.includes('α') || raw.includes('Γ') || raw.includes('«')) {
+        saveVillage(sanitized);
+      }
+      return sanitized;
+    }
+    return null;
   } catch {
     clearSavedVillage();
     return null;
@@ -30,7 +40,8 @@ export const readSavedVillage = (): SavedVillage | null => {
 };
 
 export const saveVillage = (village: SavedVillage): void => {
-  const serialised = JSON.stringify(village);
+  const sanitized = sanitizeObject(village);
+  const serialised = JSON.stringify(sanitized);
   sessionStorage.setItem(VILLAGE_STORAGE_KEY, serialised);
   localStorage.setItem(VILLAGE_STORAGE_KEY, serialised);
 };
@@ -45,9 +56,9 @@ export const villageCode = (village: SavedVillage | null | undefined): string | 
 
 export const villageName = (village: SavedVillage | null | undefined, language: 'en' | 'si' | 'ta'): string => {
   if (!village) return '';
-  if (language === 'si' && village.nameSi) return village.nameSi;
-  if (language === 'ta' && village.nameTa) return village.nameTa;
-  return village.nameEn || village.nameSi || village.nameTa || '';
+  if (language === 'si' && village.nameSi) return cleanMojibake(village.nameSi);
+  if (language === 'ta' && village.nameTa) return cleanMojibake(village.nameTa);
+  return cleanMojibake(village.nameEn || village.nameSi || village.nameTa || '');
 };
 
 export const villagePath = (village: SavedVillage): string =>

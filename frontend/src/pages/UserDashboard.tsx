@@ -29,6 +29,7 @@ import MobileDashboard from '../components/mobile/MobileDashboard';
 import ContributeBanner from '../components/contribute/ContributeBanner';
 import { useContributeCopy } from '../components/contribute/copy';
 import { saveVillage } from '../components/contribute/village';
+import { cleanMojibake } from '../utils/mojibake';
 
 
 const tChart = {
@@ -367,10 +368,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
 
   if (!showManualForm && activeGn) {
     const d = activeGn.pDistrict;
-    displayDistrict = language === 'en' ? d?.admin2NameEn : language === 'si' ? d?.admin2NameSi : d?.admin2NameTa;
+    displayDistrict = cleanMojibake(language === 'en' ? d?.admin2NameEn : language === 'si' ? d?.admin2NameSi : d?.admin2NameTa);
     const g = activeGn;
-    displayCity = language === 'en' ? g?.dsEn : language === 'si' ? g?.dsSi : g?.dsTa;
-    displayGN = language === 'en' ? g?.nameEn : language === 'si' ? g?.nameSi : g?.nameTa;
+    displayCity = cleanMojibake(language === 'en' ? g?.dsEn : language === 'si' ? g?.dsSi : g?.dsTa);
+    displayGN = cleanMojibake(language === 'en' ? g?.nameEn : language === 'si' ? g?.nameSi : g?.nameTa);
     displayCCODE = g?.CCODE || g?.code || ccode || '';
     if (g?.pGn) {
       populationData = {
@@ -419,7 +420,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   } else if (showManualForm && selectedDistrict) {
     const d = districtsData?.pDistricts?.find((x: any) => x.id === selectedDistrict);
     if (d) {
-      displayDistrict = language === 'en' ? d.admin2NameEn : language === 'si' ? d.admin2NameSi : d.admin2NameTa;
+      displayDistrict = cleanMojibake(language === 'en' ? d.admin2NameEn : language === 'si' ? d.admin2NameSi : d.admin2NameTa);
       // Fallback to District population
       populationData = {
         both: d.populationBoth || 0,
@@ -431,7 +432,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
     if (selectedCity) {
       const c = uniqueCities.find((x: any) => x.divisionalSecretariatCode === selectedCity);
       if (c) {
-        displayCity = language === 'en' ? c.dsEn : language === 'si' ? c.dsSi : c.dsTa;
+        displayCity = cleanMojibake(language === 'en' ? c.dsEn : language === 'si' ? c.dsSi : c.dsTa);
 
         // Sum population for all GNs in this DS Division
         if (gnData?.pDistrict?.gramaNiladharis) {

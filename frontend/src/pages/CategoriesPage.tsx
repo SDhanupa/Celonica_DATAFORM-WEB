@@ -26,13 +26,15 @@ import BulkUploadDialog from '../components/BulkUploadDialog';
 import { useAuth } from '../auth/AuthProvider';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import { cleanMojibake } from '../utils/mojibake';
+import { readSavedVillage } from '../components/contribute/village';
 
 const CategoriesPage: React.FC = () => {
   const [lang, setLang] = useState<'en' | 'si' | 'ta'>('en');
   const navigate = useNavigate();
   const { userInfo } = useAuth();
   const client = useApolloClient();
-  const selectedLocation = JSON.parse(localStorage.getItem('user_selected_location') || sessionStorage.getItem('user_selected_location') || 'null');
+  const selectedLocation = readSavedVillage();
   
   const isSuperAdmin = userInfo?.realm_roles?.includes('super_admin');
 
@@ -223,7 +225,7 @@ const CategoriesPage: React.FC = () => {
                 )}
                 <CardContent sx={{ flexGrow: 1, textAlign: 'center', p: '12px !important', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Typography variant="subtitle1" component="div" sx={{ fontWeight: 600, lineHeight: 1.2 }}>
-                    {lang === 'en' ? cat.nameEn : lang === 'si' ? (cat.nameSi || cat.nameEn) : (cat.nameTa || cat.nameEn)}
+                    {cleanMojibake(lang === 'en' ? cat.nameEn : lang === 'si' ? (cat.nameSi || cat.nameEn) : (cat.nameTa || cat.nameEn))}
                   </Typography>
                 </CardContent>
                 {!isSuperAdmin && cat.progress !== undefined && (

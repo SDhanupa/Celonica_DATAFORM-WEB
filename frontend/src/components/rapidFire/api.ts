@@ -138,6 +138,8 @@ export const rapidFireApi = (getToken: TokenSource) => ({
       body: JSON.stringify({ category_id: categoryId, answer, response_ms: responseMs }),
     }, undefined, 3000),
   complete: (sessionId: string) => request<CompleteResponse>(getToken, `/sessions/${sessionId}/complete`, { method: 'POST' }),
+  counts: (sessionId: string, counts: { category_id: number; count: number }[]) =>
+    request<{ saved: number }>(getToken, `/sessions/${sessionId}/counts`, { method: 'POST', body: JSON.stringify({ counts }) }),
 });
 
 export type RapidFireApi = ReturnType<typeof rapidFireApi>;

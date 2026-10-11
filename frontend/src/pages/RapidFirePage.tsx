@@ -9,6 +9,7 @@ import { useContributeCopy } from '../components/contribute/copy';
 import { readSavedVillage, villageCode, villageName } from '../components/contribute/village';
 import { DecksResponse, RapidFireAnswer, RapidFireCard, rapidFireApi } from '../components/rapidFire/api';
 import { displayScore, gameReducer, initialGameState } from '../components/rapidFire/gameReducer';
+import CountSurvey from '../components/rapidFire/CountSurvey';
 import Lobby from '../components/rapidFire/Lobby';
 import PlayStage from '../components/rapidFire/PlayStage';
 import Results from '../components/rapidFire/Results';
@@ -31,6 +32,8 @@ const RapidFirePage: React.FC = () => {
   const [decksNonce, setDecksNonce] = useState(0);
   const [notice, setNotice] = useState<string | null>(null);
   const finishing = useRef(false);
+  const [countsOpen, setCountsOpen] = useState(false);
+  const [countsSaved, setCountsSaved] = useState(false);
 
   /* ── Decks ─────────────────────────────────────────────────────────────── */
   useEffect(() => {
@@ -70,6 +73,8 @@ const RapidFirePage: React.FC = () => {
       setNotice(null);
       resetQueue();
       finishing.current = false;
+      setCountsOpen(false);
+      setCountsSaved(false);
       dispatch({ type: 'START_REQUEST', deck });
       try {
         dispatch({ type: 'START_SUCCESS', response: await api.start(ccode, deck) });
@@ -177,6 +182,24 @@ const RapidFirePage: React.FC = () => {
     );
   }
 
+  if (state.phase === 'results' && countsOpen && state.sessionId && state.summary?.yes_topics.length) {
+    const sessionId = state.sessionId;
+    return (
+      <CountSurvey
+        cards={state.summary.yes_topics}
+        villageName={vName}
+        onSubmit={async (counts) => {
+          await api.counts(sessionId, counts);
+          setCountsSaved(true);
+        }}
+        onClose={() => {
+          setCountsOpen(false);
+          window.scrollTo({ top: 0 });
+        }}
+      />
+    );
+  }
+
   if (state.phase === 'results' && state.rules) {
     return (
       <Results
@@ -188,9 +211,17 @@ const RapidFirePage: React.FC = () => {
         villageName={vName}
         error={state.error || (failed > 0 ? t.rfSaveError : null)}
         onPlayAgain={() => state.deck && start(state.deck)}
-        onOtherDeck={() => dispatch({ type: 'RESET' })}
+        onOtherDeck={() => {
+          setCountsSaved(false);
+          dispatch({ type: 'RESET' });
+        }}
         onBack={() => navigate('/user')}
         onAddDetails={addDetails}
+        onCount={() => {
+          setCountsOpen(true);
+          window.scrollTo({ top: 0 });
+        }}
+        countsSaved={countsSaved}
       />
     );
   }

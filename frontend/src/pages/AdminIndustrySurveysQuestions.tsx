@@ -57,6 +57,7 @@ import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined
 import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import { useAuth } from '../auth/AuthProvider';
 import { MAX_STEP_INDEX, SURVEY_STEPS, getStepMeta } from '../components/survey/surveySteps';
+import { sanitizeObject } from '../utils/mojibake';
 
 /* ── Domain types ─────────────────────────────────────────────────────────── */
 
@@ -381,7 +382,7 @@ const AdminIndustrySurveysQuestions: React.FC = () => {
         const res = await authedFetch('/api/business-survey-questions/all');
         const payload = await res.json().catch(() => null);
         if (!res.ok || !payload?.success) throw new Error(extractApiError(payload, res.status));
-        setQuestions(payload.data || []);
+        setQuestions(sanitizeObject(payload.data || []));
         setLoadError('');
       } catch (err: any) {
         setLoadError(err.message || 'Could not load the survey questions.');
