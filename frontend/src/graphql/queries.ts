@@ -460,6 +460,20 @@ export const GET_ALL_LOCATIONS = gql`
   }
 `;
 
+// Lightweight location selector: detailed GN statistics are loaded only for
+// the selected GN by GET_GN_BY_CCODE.
+export const GET_DISTRICT_GN_OPTIONS = gql`
+  query GetDistrictGnOptions($id: ID!) {
+    pDistrict(id: $id) {
+      id
+      gramaNiladharis {
+        id code CCODE nameEn nameSi nameTa dsEn dsSi dsTa divisionalSecretariatCode
+        pGn { populationBoth populationMale populationFemale age_0_14 age_15_59 age_60_64 age_65_above }
+      }
+    }
+  }
+`;
+
 export const GET_P_DISTRICT_WITH_GNS = gql`
   query GetPDistrictWithGns($id: ID!) {
     pDistrict(id: $id) {

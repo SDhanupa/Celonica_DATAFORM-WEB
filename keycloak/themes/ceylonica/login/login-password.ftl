@@ -1,5 +1,5 @@
 <#import "template.ftl" as layout>
-<@layout.registrationLayout displayMessage=!messagesPerField.existsError('password') displayInfo=(realm.password && realm.registrationAllowed && !registrationDisabled??); section>
+<@layout.registrationLayout bodyClass="password-page" displayMessage=!messagesPerField.existsError('password') displayInfo=(realm.password && realm.registrationAllowed && !registrationDisabled??); section>
     <#if section = "header">
         <#assign showSelector = (auth?has_content && auth.showTryAnotherWayLink() && !messagesPerField.existsError('password'))>
         <span id="dynamic-page-title">
@@ -19,6 +19,7 @@
                     <#if showSelector>
                         <!-- Method Selector UI -->
                         <div id="method-selector-container">
+                            <p id="sms-choice-error" role="alert" tabindex="-1" hidden style="color:#a12d2d; text-align:center; margin-bottom:16px;">Could not start SMS verification. Please try again.</p>
                             <p style="color: #6C757D; text-align: center; margin-bottom: 25px; font-size: 14px;">
                                 Please choose how you would like to sign in to your account.
                             </p>
@@ -39,7 +40,7 @@
                                 </button>
                                 
                                 <!-- SMS Option -->
-                                <form action="${url.loginAction}" method="post" style="margin: 0; padding: 0;">
+                                <form id="sms-choice-form" action="${url.loginAction}" method="post" style="margin: 0; padding: 0;">
                                     <input type="hidden" name="tryAnotherWay" value="on"/>
                                     <button type="submit" class="authenticator-card">
                                         <div class="auth-icon-container">
@@ -56,6 +57,44 @@
                                 </form>
                             </div>
                         </div>
+
+                        <script>
+                            (function () {
+                                const form = document.getElementById('sms-choice-form');
+                                form.addEventListener('submit', async function (event) {
+                                    event.preventDefault();
+                                    document.documentElement.classList.add('sms-selection-pending');
+                                    try {
+                                        // Resolve Keycloak's alternative execution in the background,
+                                        // without displaying its second selection screen.
+                                        const response = await fetch(form.action, {
+                                            method: 'POST', credentials: 'same-origin',
+                                            body: new URLSearchParams(new FormData(form))
+                                        });
+                                        if (!response.ok) throw new Error('Unable to select SMS');
+                                        const page = new DOMParser().parseFromString(await response.text(), 'text/html');
+                                        const selector = page.getElementById('kc-select-credential-form');
+                                        const sms = selector && selector.querySelector('[data-auth-method="sms"]');
+                                        if (!selector || !sms) throw new Error('SMS option unavailable');
+                                        const next = document.createElement('form');
+                                        next.method = 'post';
+                                        next.action = new URL(selector.getAttribute('action'), response.url).href;
+                                        const execution = document.createElement('input');
+                                        execution.type = 'hidden';
+                                        execution.name = 'authenticationExecution';
+                                        execution.value = sms.value;
+                                        next.appendChild(execution);
+                                        document.body.appendChild(next);
+                                        next.submit();
+                                    } catch (error) {
+                                        document.documentElement.classList.remove('sms-selection-pending');
+                                        const notice = document.getElementById('sms-choice-error');
+                                        notice.hidden = false;
+                                        notice.focus();
+                                    }
+                                });
+                            })();
+                        </script>
 
                         <style>
                             .authenticator-card {
@@ -165,6 +204,18 @@
                             </#if>
                         </form>
                     </div>
+                    <#if showSelector>
+                        <script>
+                            try {
+                                if (sessionStorage.getItem('ceylonica-open-password') === '1') {
+                                    sessionStorage.removeItem('ceylonica-open-password');
+                                    document.getElementById('method-selector-container').style.display = 'none';
+                                    document.getElementById('password-form-container').style.display = 'block';
+                                    document.getElementById('dynamic-page-title').innerText = 'Enter Password';
+                                }
+                            } catch (e) {}
+                        </script>
+                    </#if>
                 </#if>
             </div>
         </div>

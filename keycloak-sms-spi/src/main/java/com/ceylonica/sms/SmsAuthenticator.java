@@ -21,6 +21,8 @@ public class SmsAuthenticator implements Authenticator {
     private static final String AUTH_NOTE_OTP = "sms-otp-code";
     private static final String AUTH_NOTE_TIMESTAMP = "sms-otp-timestamp";
     private static final String AUTH_NOTE_ATTEMPTS = "sms-otp-attempts";
+    private static final String AUTH_NOTE_FAILURES = "sms-otp-failures";
+    private static final long OTP_VALIDITY_MS = 5 * 60 * 1000L;
 
     @Override
     public void authenticate(AuthenticationFlowContext context) {
@@ -103,19 +105,35 @@ public class SmsAuthenticator implements Authenticator {
         String enteredCode = formData.getFirst("otp");
         
         AuthenticationSessionModel authSession = context.getAuthenticationSession();
+        if (formData.containsKey("resendCode")) {
+            authenticate(context);
+            return;
+        }
         String expectedCode = authSession.getAuthNote(AUTH_NOTE_OTP);
+        String timestamp = authSession.getAuthNote(AUTH_NOTE_TIMESTAMP);
         
-        if (expectedCode == null) {
+        if (expectedCode == null || timestamp == null || System.currentTimeMillis() - Long.parseLong(timestamp) > OTP_VALIDITY_MS) {
+            authSession.removeAuthNote(AUTH_NOTE_OTP);
             context.failureChallenge(org.keycloak.authentication.AuthenticationFlowError.INTERNAL_ERROR,
-                    context.form().setError("Login session expired. Please restart.").createForm(TPL_CODE));
+                    context.form().setError("The code has expired. Request a new code or restart login.").createForm(TPL_CODE));
             return;
         }
         
         if (expectedCode.equals(enteredCode)) {
             // Success!
             authSession.removeAuthNote(AUTH_NOTE_OTP);
+            authSession.removeAuthNote(AUTH_NOTE_FAILURES);
             context.success();
         } else {
+            String failuresNote = authSession.getAuthNote(AUTH_NOTE_FAILURES);
+            int failures = failuresNote == null ? 1 : Integer.parseInt(failuresNote) + 1;
+            authSession.setAuthNote(AUTH_NOTE_FAILURES, Integer.toString(failures));
+            if (failures >= 5) {
+                authSession.removeAuthNote(AUTH_NOTE_OTP);
+                context.failureChallenge(org.keycloak.authentication.AuthenticationFlowError.ACCESS_DENIED,
+                        context.form().setError("Too many incorrect codes. Please restart login.").createErrorPage(Response.Status.TOO_MANY_REQUESTS));
+                return;
+            }
             // Failure
             context.getEvent().error(org.keycloak.events.Errors.INVALID_USER_CREDENTIALS);
             Response challenge = context.form()

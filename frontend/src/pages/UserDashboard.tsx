@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, Container, Grid, FormControl, useTheme, useMediaQuery, CircularProgress, Alert, Dialog, DialogContent, DialogActions, Autocomplete, TextField, IconButton, Divider, Menu, MenuItem, Fab, Fade, useScrollTrigger } from '@mui/material';
 import { useQuery } from '@apollo/client';
-import { GET_P_DISTRICTS, GET_P_DISTRICT_WITH_GNS, GET_GN_BY_COORDINATES, GET_GN_BY_CCODE } from '../graphql/queries';
+import { GET_P_DISTRICTS, GET_DISTRICT_GN_OPTIONS, GET_GN_BY_COORDINATES, GET_GN_BY_CCODE } from '../graphql/queries';
 import { useAuth } from '../auth/AuthProvider';
 import { useLanguage } from '../context/LanguageContext';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -174,9 +174,6 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const [showLocationModal, setShowLocationModal] = useState<boolean>(!ccode);
   const t = tChart[language] || tChart.en;
   const [showManualForm, setShowManualForm] = useState(!ccode && !window.matchMedia('(max-width: 600px)').matches);
-  const canContinue = !showManualForm
-    ? (location !== null || locationError !== null)
-    : (selectedDistrict !== '' && selectedCity !== '' && selectedGN !== '');
 
   const cycleLanguage = () => {
     if (language === 'en') setLanguage('si');
@@ -214,7 +211,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   });
 
 
-  const { data: gnData, loading: gnLoading, error: gnError } = useQuery(GET_P_DISTRICT_WITH_GNS, {
+  const { data: gnData, loading: gnLoading, error: gnError } = useQuery(GET_DISTRICT_GN_OPTIONS, {
     variables: { id: selectedDistrict },
     skip: !selectedDistrict,
     fetchPolicy: 'cache-first',
@@ -259,6 +256,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   });
 
   const activeGn = urlGnData?.gnByCcode || autoGnData?.gnByCoordinates;
+  const canContinue = !showManualForm
+    ? !!activeGn
+    : (selectedDistrict !== '' && selectedCity !== '' && selectedGN !== '');
   const { t: contributeCopy } = useContributeCopy();
 
   /** Contributing from a village page means contributing to *that* village. */
@@ -278,11 +278,22 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
 
   // Geolocation Effect
   useEffect(() => {
-    if (!ccode && !location && !locationError) {
+    if (!ccode && !showManualForm && !location && !locationError) {
       setLocating(true);
       if (navigator.geolocation) {
+        let finished = false;
+        const timer = window.setTimeout(() => {
+          if (!finished) {
+            finished = true;
+            setLocationError('Location is taking too long. Check location permission or select manually.');
+            setLocating(false);
+          }
+        }, 12000);
         navigator.geolocation.getCurrentPosition(
           (position) => {
+            if (finished) return;
+            finished = true;
+            window.clearTimeout(timer);
             setLocation({
               lat: position.coords.latitude,
               lng: position.coords.longitude,
@@ -290,16 +301,21 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             setLocating(false);
           },
           (error) => {
+            if (finished) return;
+            finished = true;
+            window.clearTimeout(timer);
             setLocationError(error.message || 'Unable to retrieve your location');
             setLocating(false);
-          }
+          },
+          { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
         );
+        return () => { finished = true; window.clearTimeout(timer); };
       } else {
         setLocationError('Geolocation is not supported by your browser');
         setLocating(false);
       }
     }
-  }, [ccode, location, locationError]);
+  }, [ccode, showManualForm, location, locationError]);
 
   // Sync active GN with District, DS, and Village dropdown selectors
   useEffect(() => {
@@ -783,7 +799,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
 
               <Button
                 variant="outlined"
-                onClick={() => setShowManualForm(false)}
+                onClick={() => { setLocationError(null); setShowManualForm(false); }}
                 sx={{
                   color: themeColors.primary,
                   borderColor: themeColors.primary,
@@ -809,7 +825,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
               if (!showManualForm && activeGn) {
                 loadedGn = activeGn;
               } else if (showManualForm && selectedGN && gnData?.pDistrict?.gramaNiladharis) {
-                loadedGn = gnData.pDistrict.gramaNiladharis.find((x: any) => x.id === selectedGN);
+                loadedGn = gnData.pDistrict.gramaNiladharis.find((x: any) => String(x.id) === String(selectedGN) || x.CCODE === selectedGN);
               }
               setShowLocationModal(false);
               if (loadedGn && loadedGn.CCODE && loadedGn.nameEn) {

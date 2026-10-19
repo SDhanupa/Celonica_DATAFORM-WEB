@@ -1,5 +1,5 @@
 <#import "template.ftl" as layout>
-<@layout.registrationLayout displayInfo=false; section>
+<@layout.registrationLayout bodyClass="authenticator-selection" displayInfo=false; section>
     <#if section = "header">
         Select login method
     <#elseif section = "form">
@@ -12,7 +12,7 @@
 
             <div class="authenticator-list" style="display: flex; flex-direction: column; gap: 15px;">
                 <#list auth.authenticationSelections as selection>
-                    <button class="authenticator-card" type="submit" name="authenticationExecution" value="${selection.authExecId}">
+                    <button class="authenticator-card" type="submit" name="authenticationExecution" value="${selection.authExecId}" <#if selection.displayName == 'sms-otp-authenticator-display-name'>data-auth-method="sms"<#elseif selection.displayName?contains('password')>data-auth-method="password"</#if>>
                         <div class="auth-icon-container">
                             <#if selection.authExecId?contains("password")>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="auth-icon"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>

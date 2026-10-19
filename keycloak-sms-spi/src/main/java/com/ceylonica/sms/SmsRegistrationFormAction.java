@@ -35,6 +35,9 @@ public class SmsRegistrationFormAction implements FormAction {
     private static final String NOTE_USERNAME     = "sms-reg-username";
     private static final String NOTE_NIC          = "sms-reg-nic";
     private static final String NOTE_MOBILE       = "sms-reg-mobile";
+    private static final String NOTE_SENT_AT      = "sms-reg-sent-at";
+    private static final String NOTE_FAILURES     = "sms-reg-failures";
+    private static final long OTP_VALIDITY_MS = 5 * 60 * 1000L;
 
     @Override
     public void buildPage(FormContext context, LoginFormsProvider form) {
@@ -64,13 +67,20 @@ public class SmsRegistrationFormAction implements FormAction {
         String enteredOtp = formData.getFirst("otp");
 
         // STEP 2: OTP verification
-        if (enteredOtp != null && !enteredOtp.trim().isEmpty()) {
+        if ("true".equals(s.getAuthNote(NOTE_PENDING))) {
             String expected = s.getAuthNote(NOTE_OTP);
-            if (expected != null && expected.equals(enteredOtp.trim())) {
-                clearNotes(s);
+            String sentAt = s.getAuthNote(NOTE_SENT_AT);
+            boolean validTime = sentAt != null && System.currentTimeMillis() - Long.parseLong(sentAt) <= OTP_VALIDITY_MS;
+            int failures = Integer.parseInt(nvl(s.getAuthNote(NOTE_FAILURES)).isEmpty() ? "0" : s.getAuthNote(NOTE_FAILURES));
+            if (failures >= 5) {
+                errors.add(new FormMessage("otp", "Too many incorrect codes. Please restart registration."));
+                context.validationError(formData, errors);
+            } else if (validTime && expected != null && enteredOtp != null && expected.equals(enteredOtp.trim())) {
+                s.removeAuthNote(NOTE_OTP);
                 context.success();
             } else {
-                errors.add(new FormMessage("otp", "Invalid OTP. Please try again."));
+                if (validTime) s.setAuthNote(NOTE_FAILURES, Integer.toString(++failures));
+                errors.add(new FormMessage("otp", !validTime ? "The code has expired. Please restart registration." : failures >= 5 ? "Too many incorrect codes. Please restart registration." : "Invalid OTP. Please try again."));
                 context.validationError(formData, errors);
             }
             return;
@@ -117,9 +127,16 @@ public class SmsRegistrationFormAction implements FormAction {
         String mobile = formData.getFirst("mobile_number");
         String nic = formData.getFirst("nic");
 
-        // BYPASS CUSTOM VALIDATION
-        // if (mobile == null || mobile.trim().isEmpty()) { ... }
-        // if (nic == null || !nic.matches(...)) { ... }
+        if (mobile == null || !mobile.trim().matches("^(?:0[0-9]{9}|\\+?94[0-9]{9})$")) {
+            errors.add(new FormMessage("mobile_number", "Enter a valid Sri Lankan mobile number."));
+        }
+        if (nic == null || !nic.trim().matches("^(?:[0-9]{9}[vVxX]|[0-9]{12})$")) {
+            errors.add(new FormMessage("nic", "Enter a valid NIC number."));
+        }
+        if (!errors.isEmpty()) {
+            context.validationError(formData, errors);
+            return;
+        }
 
         AuthenticatorConfigModel config = context.getRealm().getAuthenticatorConfigsStream()
                 .filter(c -> c.getConfig() != null && c.getConfig().containsKey(SmsAuthenticatorFactory.CONF_USERNAME))
@@ -138,17 +155,15 @@ public class SmsRegistrationFormAction implements FormAction {
         String smsSrc   = config.getConfig().get(SmsAuthenticatorFactory.CONF_SENDER_ID);
         String msg      = "Ceylonica verification code: " + otp + ". Valid for one use only.";
 
-        // BYPASS ACTUAL SMS SENDING IF MOBILE IS EMPTY (so we don't crash)
-        if (mobile != null && !mobile.trim().isEmpty()) {
-            boolean sent = TextWareSmsClient.sendSms(smsUser, smsPw, smsSrc, mobile.trim(), msg);
-            if (!sent) {
-                errors.add(new FormMessage("mobile_number", "SMS send failed. Please try again."));
-                context.validationError(formData, errors);
-                return;
-            }
+        boolean sent = TextWareSmsClient.sendSms(smsUser, smsPw, smsSrc, mobile.trim(), msg);
+        if (!sent) {
+            errors.add(new FormMessage("mobile_number", "SMS send failed. Please try again."));
+            context.validationError(formData, errors);
+            return;
         }
 
         s.setAuthNote(NOTE_OTP,      otp);
+        s.setAuthNote(NOTE_SENT_AT,  Long.toString(System.currentTimeMillis()));
         s.setAuthNote(NOTE_PENDING,  "true");
         s.setAuthNote(NOTE_FIRST,    nvl(formData.getFirst("firstName")));
         s.setAuthNote(NOTE_LAST,     nvl(formData.getFirst("lastName")));
@@ -166,14 +181,19 @@ public class SmsRegistrationFormAction implements FormAction {
     public void success(FormContext context) {
         AuthenticationSessionModel s = context.getAuthenticationSession();
         String mobile = s.getAuthNote(NOTE_MOBILE);
-        String firstName = s.getAuthNote(NOTE_FIRST);
-        String lastName = s.getAuthNote(NOTE_LAST);
+        String nic = s.getAuthNote(NOTE_NIC);
+        UserModel user = context.getUser();
+        if (user == null || mobile == null || mobile.isBlank()) {
+            throw new IllegalStateException("Verified registration is missing its user or mobile number");
+        }
+        user.setSingleAttribute("mobile_number", mobile);
+        if (nic != null && !nic.isBlank()) user.setSingleAttribute("nic", nic.trim());
         clearNotes(s);
     }
 
     private void clearNotes(AuthenticationSessionModel s) {
         for (String k : new String[]{NOTE_OTP, NOTE_PENDING, NOTE_PASSWORD,
-                NOTE_FIRST, NOTE_LAST, NOTE_EMAIL, NOTE_USERNAME, NOTE_NIC, NOTE_MOBILE}) {
+                NOTE_FIRST, NOTE_LAST, NOTE_EMAIL, NOTE_USERNAME, NOTE_NIC, NOTE_MOBILE, NOTE_SENT_AT, NOTE_FAILURES}) {
             s.removeAuthNote(k);
         }
     }

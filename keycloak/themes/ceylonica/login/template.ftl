@@ -6,6 +6,22 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <#if bodyClass == 'password-page'>
+        <style>
+            .sms-pending-content { display: none; }
+            .sms-selection-pending .form-pane > .page-title-area,
+            .sms-selection-pending .form-pane > .form-content,
+            .sms-selection-pending .form-pane > .social-section,
+            .sms-selection-pending .form-pane > .form-footer { display: none; }
+            .sms-selection-pending .sms-pending-content { display: block; }
+            .sms-wait-overlay { display: none; }
+            .sms-selection-pending .sms-wait-overlay { display: flex; position: fixed; inset: 0; z-index: 100; align-items: center; justify-content: center; padding: 20px; background: rgba(12, 35, 24, .45); }
+            .sms-wait-dialog { width: min(100%, 320px); padding: 28px; border-radius: 18px; background: #fff; text-align: center; box-shadow: 0 16px 48px rgba(0,0,0,.2); color: #1a2e26; }
+            .sms-wait-spinner { width: 32px; height: 32px; margin: 0 auto 16px; border: 3px solid #dcebe2; border-top-color: #2d5a27; border-radius: 50%; animation: sms-spin .8s linear infinite; }
+            @keyframes sms-spin { to { transform: rotate(360deg); } }
+            @media (prefers-reduced-motion: reduce) { .sms-wait-spinner { animation: none; } }
+        </style>
+    </#if>
     <title><#if realm?? && realm.displayName??>${realm.displayName}<#else>Ceylonica</#if> - Sign In</title>
     <link rel="icon" href="${url.resourcesPath}/img/logo.png" />
     
@@ -41,6 +57,18 @@
                         <img src="${url.resourcesPath}/img/logo.png" alt="Ceylonica" class="brand-logo" />
                     </div>
                 </div>
+
+                <#if bodyClass == 'password-page'>
+                    <div class="sms-pending-content" aria-hidden="true">
+                        <div class="page-title-area"><h1 class="page-title">Verify Mobile Number</h1></div>
+                        <p style="color:#315647; font-size:14px; line-height:1.6; text-align:center; margin:24px 0;">A verification code will be sent to your mobile number.</p>
+                        <div class="form-group">
+                            <label class="input-label" for="sms-pending-otp">Enter 8-digit OTP</label>
+                            <div class="input-wrapper"><input id="sms-pending-otp" class="pill-input" type="text" placeholder="00000000" disabled /></div>
+                        </div>
+                        <div class="form-action" style="margin-top:32px;"><button class="btn-emerald" type="button" disabled>Verify &amp; Sign In</button></div>
+                    </div>
+                </#if>
 
                 <!-- Alert Messages (Errors / Warnings / Success) -->
                 <#if displayMessage && message?has_content && (message.type != 'warning' || !isAppInitiatedAction??)>
@@ -121,7 +149,7 @@
                                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
                                 </svg>
                             </button>
-                            <a href="http://localhost:5173/login" class="social-btn social-user" title="User Login">
+                            <a href="${url.loginRestartFlowUrl}" class="social-btn social-user" title="User Login">
                                 <svg class="social-svg" viewBox="0 0 24 24" fill="#0f2a1e">
                                     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                                 </svg>
@@ -172,6 +200,16 @@
         </div>
 
     </div>
+
+    <#if bodyClass == 'password-page'>
+        <div class="sms-wait-overlay" role="status" aria-live="polite">
+            <div class="sms-wait-dialog">
+                <div class="sms-wait-spinner" aria-hidden="true"></div>
+                <strong>Please wait</strong>
+                <p style="margin-top:8px; font-size:14px; line-height:1.5; color:#60746a;">Sending your verification code...</p>
+            </div>
+        </div>
+    </#if>
 
     <#if properties.scripts?has_content>
         <#list properties.scripts?split(' ') as script>
