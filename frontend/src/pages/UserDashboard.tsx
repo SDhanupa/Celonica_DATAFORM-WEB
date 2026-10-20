@@ -1,5 +1,6 @@
 // Forced reload for Vite (Fixed pie chart background and translations)
 // Forced reload for Vite (Added title glassmorphism panels back)
+import MyLocationIcon from '@mui/icons-material/MyLocation';
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, Container, Grid, FormControl, useTheme, useMediaQuery, CircularProgress, Alert, Dialog, DialogContent, DialogActions, Autocomplete, TextField, IconButton, Divider, Menu, MenuItem, Fab, Fade, useScrollTrigger } from '@mui/material';
 import { useQuery } from '@apollo/client';
@@ -19,6 +20,7 @@ import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import TagRoundedIcon from '@mui/icons-material/TagRounded';
 import Tooltip from '@mui/material/Tooltip';
+import { locationHeaderSx, locationContinueSx, locationBodySx, locationPaperSx } from '../components/locationModalStyles';
 import { CATEGORIES } from './CategoryDetailPage';
 import GnPageFooter from '../components/GnPageFooter';
 import { VillageMap } from '../components/VillageMap';
@@ -527,58 +529,51 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             borderRadius: '24px',
             minWidth: { xs: '90%', sm: 420 },
             position: 'relative',
-            overflow: 'hidden',
+            overflow: 'visible',
             background: isDarkMode
               ? 'linear-gradient(160deg, #1a1c2e 0%, #2a2c40 100%)'
               : 'linear-gradient(160deg, #ffffff 0%, #f0f4ff 100%)',
-            boxShadow: '0 32px 80px rgba(0,0,0,0.35)',
+            ...locationPaperSx,
           }
         }}
         slotProps={{ backdrop: { sx: { backdropFilter: 'blur(14px)', bgcolor: 'rgba(0,0,0,0.6)' } } }}
       >
         {/* Modal Hero Header */}
         <Box
-          sx={{
-            background: 'linear-gradient(135deg, #00A8FF 0%, #0070CC 100%)',
-            p: 3,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 1.5,
-            position: 'relative',
-          }}
+          sx={locationHeaderSx(isDarkMode)}
         >
           {/* Language Toggle */}
           <Box
             onClick={cycleLanguage}
             sx={{
               position: 'absolute',
-              top: 14,
-              right: 14,
+              top: 22,
+              right: 24,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: 38,
-              height: 38,
-              borderRadius: '50%',
-              bgcolor: 'rgba(255,255,255,0.2)',
+              width: 48,
+              height: 36,
+              borderRadius: '8px',
+              zIndex: 3,
+              bgcolor: 'rgba(255,255,255,0.14)',
               backdropFilter: 'blur(8px)',
-              border: '1px solid rgba(255,255,255,0.4)',
+              border: '1px solid rgba(255,255,255,0.45)',
               fontFamily: "'Inter', sans-serif",
               fontWeight: 700,
               fontSize: '0.8rem',
               color: '#ffffff',
               textTransform: 'uppercase',
               transition: 'all 0.2s',
-              '&:hover': { bgcolor: 'rgba(255,255,255,0.35)' }
+              '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' }
             }}
           >
             {language}
           </Box>
 
           {/* Plain Transparent PNG Logos */}
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3, my: 0.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 3, mb: 1 }}>
             <img
               src="/logo.png"
               alt="Ceylonica Logo"
@@ -588,7 +583,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
 
           <Typography
             variant="h6"
-            sx={{ color: '#ffffff', fontWeight: 700, fontFamily: "'Inter', sans-serif", textAlign: 'center', textShadow: '0 1px 4px rgba(0,0,0,0.2)' }}
+            sx={{ color: '#ffffff', fontWeight: 700, fontFamily: "'Inter', sans-serif", textAlign: 'left', letterSpacing: '-0.01em', lineHeight: 1.25 }}
           >
             {!showManualForm
               ? (language === 'en' ? 'Your Location' : language === 'si' ? 'ඔබගේ ස්ථානය' : 'உங்கள் இடம்')
@@ -599,7 +594,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             {language === 'en' ? 'Census Data Explorer · Sri Lanka' : language === 'si' ? 'ජනලේඛන දත්ත · ශ්‍රී ලංකා' : 'மக்கள்தொகை கணக்கெடுப்பு · இலங்கை'}
           </Typography>
         </Box>
-        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 3, px: 3 }}>
+        <DialogContent sx={locationBodySx}>
           {!showManualForm ? (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {locating ? (
@@ -775,14 +770,14 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                   fontWeight: 600,
                   '&:hover': { bgcolor: 'rgba(0,168,255,0.08)', borderColor: themeColors.primary }
                 }}
-                startIcon={<span style={{ fontSize: '1.1em' }}>📍</span>}
+                startIcon={<MyLocationIcon fontSize="small" />}
               >
                 Use GPS Auto-Location
               </Button>
             </Box>
           )}
         </DialogContent>
-        <DialogActions sx={{ p: 3, pt: 1, justifyContent: 'center' }}>
+        <DialogActions sx={{ px: 3.5, pb: 3.5, pt: 1 }}>
           <Button
             variant="contained"
             onClick={() => {
@@ -798,19 +793,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
               }
             }}
             disabled={!canContinue}
-            sx={{
-              background: canContinue ? 'linear-gradient(135deg, #00A8FF 0%, #0070CC 100%)' : undefined,
-              color: 'white',
-              px: 5,
-              py: 1.2,
-              borderRadius: '12px',
-              fontWeight: 700,
-              fontFamily: "'Inter', sans-serif",
-              fontSize: '1rem',
-              boxShadow: canContinue ? '0 4px 20px rgba(0,168,255,0.4)' : undefined,
-              '&:hover': { background: 'linear-gradient(135deg, #0090E0 0%, #005AB0 100%)', boxShadow: '0 6px 24px rgba(0,168,255,0.5)' },
-              transition: 'all 0.25s',
-            }}
+            sx={locationContinueSx(canContinue)}
           >
             {language === 'en' ? 'Continue' : language === 'si' ? 'ඉදිරියට' : 'தொடரவும்'}
           </Button>
