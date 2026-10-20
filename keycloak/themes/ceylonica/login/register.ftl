@@ -1,17 +1,9 @@
 <#import "template.ftl" as layout>
-<@layout.registrationLayout displayMessage=!messagesPerField.existsError('firstName','lastName','email','username','password','password-confirm','mobile_number','nic'); section>
+<#assign nicFieldName = nicFieldName!"nic">
+<@layout.registrationLayout displayMessage=!messagesPerField.existsError('firstName','lastName','email','username','password','password-confirm','mobile_number',nicFieldName); section>
     <#if section = "header">
         Sign up
     <#elseif section = "form">
-                                                        <!-- DEBUG_LOOP_START
-            <#if profile?? && profile.attributes??>
-                <#list profile.attributes as attr>
-                    ATTR_CLASS: 
-                    ATTR_KEYS: <#list attr?keys as k>,</#list>
-                    ERROR: <#if messagesPerField.existsError(attr.name!"")>YES<#else>NO</#if>
-                </#list>
-            </#if>
-            DEBUG_LOOP_END -->
         <form id="kc-register-form" action="${url.registrationAction}" method="post" class="auth-form">
 
             <#-- ════════════════════════════════════════════
@@ -21,25 +13,13 @@
             <#if otpPending?? && otpPending == "true">
 
                 <#-- Re-submit all registration data transparently as hidden fields -->
-                <#if messagesPerField.existsError('firstName','lastName','email','username','password','password-confirm','mobile_number','nic')>
-                    <div style="background:red; color:white; padding:10px; margin-bottom:10px;">
-                        <strong>DEBUG ERRORS:</strong><br/>
-                        <#if messagesPerField.existsError('firstName')>firstName: ${messagesPerField.get('firstName')}<br/></#if>
-                        <#if messagesPerField.existsError('lastName')>lastName: ${messagesPerField.get('lastName')}<br/></#if>
-                        <#if messagesPerField.existsError('email')>email: ${messagesPerField.get('email')}<br/></#if>
-                        <#if messagesPerField.existsError('username')>username: ${messagesPerField.get('username')}<br/></#if>
-                        <#if messagesPerField.existsError('password')>password: ${messagesPerField.get('password')}<br/></#if>
-                        <#if messagesPerField.existsError('password-confirm')>password-confirm: ${messagesPerField.get('password-confirm')}<br/></#if>
-                        <#if messagesPerField.existsError('mobile_number')>mobile: ${messagesPerField.get('mobile_number')}<br/></#if>
-                        <#if messagesPerField.existsError('nic')>nic: ${messagesPerField.get('nic')}<br/></#if>
-                    </div>
-                </#if>
+
                 
                 <input type="hidden" name="firstName"                        value="${(savedFirstName!'')}"/>
                 <input type="hidden" name="lastName"                         value="${(savedLastName!'')}"/>
                 <input type="hidden" name="email"                            value="${(savedEmail!'')}"/>
                 <input type="hidden" name="username"                         value="${(savedUsername!'')}"/>
-                <input type="hidden" name="nic"              value="${(savedNic!'')}"/>
+                <input type="hidden" name="${nicFieldName}"              value="${(savedNic!'')}"/>
                 <input type="hidden" name="mobile_number"    value="${(savedMobile!'')}"/>
                 <#-- Password is injected from the server-side AuthNote -->
                 <#if savedPassword??>
@@ -206,17 +186,17 @@
                 </#if>
 
                 <!-- NIC Number -->
-                <div class="form-group <#if messagesPerField.existsError('nic')>has-error</#if>">
+                <div class="form-group <#if messagesPerField.existsError(nicFieldName)>has-error</#if>">
                     <label for="nic" class="input-label">NIC Number</label>
                     <div class="input-wrapper">
-                        <input type="text" id="nic" class="pill-input" name="nic"
-                               value="${(register.formData['nic']!'')}"
-                               aria-invalid="<#if messagesPerField.existsError('nic')>true</#if>"
+                        <input type="text" id="nic" class="pill-input" name="${nicFieldName}"
+                               value="${(register.formData[nicFieldName]!'')}"
+                               aria-invalid="<#if messagesPerField.existsError(nicFieldName)>true</#if>"
                                placeholder="e.g. 199012345678 or 901234567V"/>
                     </div>
-                    <#if messagesPerField.existsError('nic')>
+                    <#if messagesPerField.existsError(nicFieldName)>
                         <span class="field-error-text" aria-live="polite">
-                            ${kcSanitize(messagesPerField.get('nic'))?no_esc}
+                            ${kcSanitize(messagesPerField.get(nicFieldName))?no_esc}
                         </span>
                     </#if>
                 </div>

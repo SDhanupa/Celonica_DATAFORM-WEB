@@ -13,6 +13,10 @@ import org.keycloak.sessions.AuthenticationSessionModel;
 import org.jboss.logging.Logger;
 import org.keycloak.policy.PasswordPolicyManagerProvider;
 import org.keycloak.policy.PolicyError;
+import org.keycloak.authentication.forms.RegistrationUserCreation;
+import org.keycloak.userprofile.UserProfileProvider;
+import org.keycloak.userprofile.ValidationException;
+import org.keycloak.services.validation.Validation;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -41,6 +45,7 @@ public class SmsRegistrationFormAction implements FormAction {
 
     @Override
     public void buildPage(FormContext context, LoginFormsProvider form) {
+        form.setAttribute("nicFieldName", nicFieldName(context));
         AuthenticationSessionModel s = context.getAuthenticationSession();
         if (!"true".equals(s.getAuthNote(NOTE_PENDING))) return;
 
@@ -58,6 +63,11 @@ public class SmsRegistrationFormAction implements FormAction {
         if (value != null) form.setAttribute(key, value);
     }
 
+    private String nicFieldName(FormContext context) {
+        var config = context.getSession().getProvider(UserProfileProvider.class).getConfiguration();
+        return config != null && config.getAttribute("NIC") != null ? "NIC" : "nic";
+    }
+
     @Override
     public void validate(ValidationContext context) {
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
@@ -68,6 +78,18 @@ public class SmsRegistrationFormAction implements FormAction {
 
         // STEP 2: OTP verification
         if ("true".equals(s.getAuthNote(NOTE_PENDING))) {
+            // The verified phone and identity must be the ones originally submitted.
+            String[][] fields = {{"firstName", NOTE_FIRST}, {"lastName", NOTE_LAST},
+                    {"email", NOTE_EMAIL}, {"username", NOTE_USERNAME},
+                    {nicFieldName(context), NOTE_NIC}, {"mobile_number", NOTE_MOBILE},
+                    {"password", NOTE_PASSWORD}, {"password-confirm", NOTE_PASSWORD}};
+            for (String[] field : fields) {
+                if (!nvl(formData.getFirst(field[0])).equals(nvl(s.getAuthNote(field[1])))) {
+                    errors.add(new FormMessage("otp", "Registration details changed. Please restart registration."));
+                    context.validationError(formData, errors);
+                    return;
+                }
+            }
             String expected = s.getAuthNote(NOTE_OTP);
             String sentAt = s.getAuthNote(NOTE_SENT_AT);
             boolean validTime = sentAt != null && System.currentTimeMillis() - Long.parseLong(sentAt) <= OTP_VALIDITY_MS;
@@ -76,7 +98,6 @@ public class SmsRegistrationFormAction implements FormAction {
                 errors.add(new FormMessage("otp", "Too many incorrect codes. Please restart registration."));
                 context.validationError(formData, errors);
             } else if (validTime && expected != null && enteredOtp != null && expected.equals(enteredOtp.trim())) {
-                s.removeAuthNote(NOTE_OTP);
                 context.success();
             } else {
                 if (validTime) s.setAuthNote(NOTE_FAILURES, Integer.toString(++failures));
@@ -88,6 +109,15 @@ public class SmsRegistrationFormAction implements FormAction {
 
         // STEP 1: Validate fields and send OTP
         clearNotes(s);
+
+        // Keycloak runs every form action's validation. Do not send an SMS
+        // when an earlier profile action rejected a required or duplicate field.
+        try {
+            new RegistrationUserCreation().getOrCreateUserProfile(context, formData).validate();
+        } catch (ValidationException e) {
+            context.validationError(formData, Validation.getFormErrorsFromValidation(e.getErrors()));
+            return;
+        }
 
         String password = formData.getFirst("password");
         String passwordConfirm = formData.getFirst("password-confirm");
@@ -125,13 +155,13 @@ public class SmsRegistrationFormAction implements FormAction {
         }
 
         String mobile = formData.getFirst("mobile_number");
-        String nic = formData.getFirst("nic");
+        String nic = formData.getFirst(nicFieldName(context));
 
         if (mobile == null || !mobile.trim().matches("^(?:0[0-9]{9}|\\+?94[0-9]{9})$")) {
             errors.add(new FormMessage("mobile_number", "Enter a valid Sri Lankan mobile number."));
         }
         if (nic == null || !nic.trim().matches("^(?:[0-9]{9}[vVxX]|[0-9]{12})$")) {
-            errors.add(new FormMessage("nic", "Enter a valid NIC number."));
+            errors.add(new FormMessage(nicFieldName(context), "Enter a valid NIC number."));
         }
         if (!errors.isEmpty()) {
             context.validationError(formData, errors);
@@ -170,7 +200,7 @@ public class SmsRegistrationFormAction implements FormAction {
         s.setAuthNote(NOTE_EMAIL,    nvl(formData.getFirst("email")));
         s.setAuthNote(NOTE_USERNAME, nvl(formData.getFirst("username")));
         s.setAuthNote(NOTE_NIC,      nvl(nic));
-        s.setAuthNote(NOTE_MOBILE,   nvl(mobile != null ? mobile.trim() : ""));
+        s.setAuthNote(NOTE_MOBILE,   nvl(mobile));
         s.setAuthNote(NOTE_PASSWORD, nvl(formData.getFirst("password")));
 
         errors.add(new FormMessage("otp", "An 8-digit code has been sent to your mobile."));
@@ -186,8 +216,8 @@ public class SmsRegistrationFormAction implements FormAction {
         if (user == null || mobile == null || mobile.isBlank()) {
             throw new IllegalStateException("Verified registration is missing its user or mobile number");
         }
-        user.setSingleAttribute("mobile_number", mobile);
-        if (nic != null && !nic.isBlank()) user.setSingleAttribute("nic", nic.trim());
+        user.setSingleAttribute("mobile_number", mobile.trim());
+        if (nic != null && !nic.isBlank()) user.setSingleAttribute(nicFieldName(context), nic.trim());
         clearNotes(s);
     }
 
