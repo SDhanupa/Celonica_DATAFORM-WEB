@@ -102,8 +102,9 @@ class RapidFireController extends Controller
             ->where('ccode', $ccode)
             ->where('is_hasty', false)
             ->whereIn('category_id', $remaining)
+            ->selectRaw('category_id, count(*) as answer_count')
             ->groupBy('category_id')
-            ->pluck(DB::raw('count(*)'), 'category_id')
+            ->pluck('answer_count', 'category_id')
             ->mapWithKeys(fn ($count, $id) => [(int) $id => (int) $count]);
 
         shuffle($remaining);
