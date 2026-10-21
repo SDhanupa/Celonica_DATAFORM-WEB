@@ -131,6 +131,7 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
   return (
     <Dialog
       open={open}
+      scroll="body"
       onClose={(event, reason) => {
         if (reason === 'backdropClick' || reason === 'escapeKeyDown') {
           return;
@@ -358,7 +359,7 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
           </Box>
         )}
       </DialogContent>
-      <DialogActions sx={{ px: 3.5, pb: 3.5, pt: 1 }}>
+      <DialogActions sx={{ px: { xs: 2.1, sm: 2.8 }, pb: { xs: 2.1, sm: 2.8 }, pt: 1 }}>
         <Button
           variant="contained"
           onClick={handleContinue}

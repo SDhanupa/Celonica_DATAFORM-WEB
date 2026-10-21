@@ -523,6 +523,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
       {/* Location Modal */}
       <Dialog
         open={showLocationModal}
+        scroll="body"
         disableEscapeKeyDown
         PaperProps={{
           sx: {
@@ -777,7 +778,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             </Box>
           )}
         </DialogContent>
-        <DialogActions sx={{ px: 3.5, pb: 3.5, pt: 1 }}>
+        <DialogActions sx={{ px: { xs: 2.1, sm: 2.8 }, pb: { xs: 2.1, sm: 2.8 }, pt: 1 }}>
           <Button
             variant="contained"
             onClick={() => {
