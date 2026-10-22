@@ -6,6 +6,7 @@ import { useVillageProgress } from '../../api/contributions';
 import { fill, useContributeCopy } from './copy';
 import { formatPercent } from './VillageProgressCard';
 import { ink } from './tokens';
+import { glassSx } from '../glass';
 
 interface ContributeBannerProps {
   ccode: string | null | undefined;
@@ -15,13 +16,15 @@ interface ContributeBannerProps {
   onContribute: () => void;
   onJoin: () => void;
   compact?: boolean;
+  /** Liquid-glass surface for use over the live map background. */
+  glass?: boolean;
 }
 
 /**
  * The invitation to contribute, on the public village page. Monochrome, and
  * adapts to the village page's own light/dark theme.
  */
-const ContributeBanner: React.FC<ContributeBannerProps> = ({ ccode, villageName, isAuthenticated, isDarkMode = false, onContribute, onJoin, compact = false }) => {
+const ContributeBanner: React.FC<ContributeBannerProps> = ({ ccode, villageName, isAuthenticated, isDarkMode = false, onContribute, onJoin, compact = false, glass = false }) => {
   const { t } = useContributeCopy();
   const { data, loading } = useVillageProgress(ccode);
 
@@ -39,7 +42,12 @@ const ContributeBanner: React.FC<ContributeBannerProps> = ({ ccode, villageName,
     <Box
       component="section"
       aria-label={t.bannerTitle}
-      sx={{ position: 'relative', borderRadius: compact ? '14px' : '16px', border: '1px solid', borderColor: c.border, bgcolor: c.bg, p: compact ? 2.25 : { xs: 2.5, md: 3 } }}
+      sx={{
+        position: 'relative',
+        borderRadius: compact ? '14px' : '16px',
+        p: compact ? 2.25 : { xs: 2.5, md: 3 },
+        ...(glass ? { ...glassSx(isDarkMode), borderRadius: '20px', p: { xs: 2, md: 2.25 } } : { border: '1px solid', borderColor: c.border, bgcolor: c.bg }),
+      }}
     >
       <Stack direction={{ xs: 'column', md: compact ? 'column' : 'row' }} spacing={compact ? 2 : { xs: 2.5, md: 4 }} sx={{ alignItems: { md: compact ? 'stretch' : 'center' } }}>
         <Stack direction="row" spacing={1.75} sx={{ alignItems: 'flex-start', flex: 1, minWidth: 0 }}>
@@ -52,7 +60,7 @@ const ContributeBanner: React.FC<ContributeBannerProps> = ({ ccode, villageName,
           </Box>
         </Stack>
 
-        <Stack spacing={1.25} sx={{ width: { xs: '100%', md: compact ? '100%' : 280 }, flexShrink: 0 }}>
+        <Stack spacing={1.25} sx={{ width: { xs: '100%', md: compact ? '100%' : glass ? 230 : 280 }, flexShrink: 0 }}>
           <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'baseline' }}>
             <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: c.muted, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.progressTitle}</Typography>
             <Typography sx={{ fontWeight: 700, color: c.fg }}>{loading ? '…' : `${formatPercent(pct)}%`}</Typography>

@@ -76,6 +76,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (isRun.current) return;
     isRun.current = true;
 
+    // check-sso waits on a hidden iframe with no timeout of its own. If that iframe is blocked
+    // (third-party cookies off, Keycloak's frame-ancestors, a different auth origin) init never
+    // settles and the UI would hide Login/Join forever. Fall back to "signed out" after 8s;
+    // the explicit login() redirect does not depend on the iframe.
+    const giveUp = window.setTimeout(() => setIsLoading(false), 8000);
+
     keycloak
       .init({
         onLoad: 'check-sso',
@@ -84,6 +90,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         checkLoginIframe: false,
       })
       .then((authenticated) => {
+        window.clearTimeout(giveUp);
         setIsAuthenticated(authenticated);
         setToken(keycloak.token);
         if (authenticated && keycloak.tokenParsed) {
@@ -109,6 +116,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setIsLoading(false);
       })
       .catch(() => {
+        window.clearTimeout(giveUp);
         setIsLoading(false);
       });
 

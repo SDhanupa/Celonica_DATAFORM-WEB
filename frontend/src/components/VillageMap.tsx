@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { glassSx } from './glass';
 import { useLanguage } from '../context/LanguageContext';
 import { Box, Typography, IconButton, Tooltip, Divider, useTheme } from '@mui/material';
 import { MapContainer, TileLayer, Polygon, Marker, Popup, useMap } from 'react-leaflet';
@@ -33,24 +34,47 @@ const customPinIcon = L.icon({
 });
 
 // Custom map controls helper
+export type MapInsets = { top: number; right: number; bottom: number; left: number };
+
+const NO_INSETS: MapInsets = { top: 0, right: 0, bottom: 0, left: 0 };
+
+/** Leaflet fit options that keep the village inside the part of the map not covered by overlay panels. */
+export const fitOptions = (insets: MapInsets) => ({
+  paddingTopLeft: [insets.left + 40, insets.top + 40] as [number, number],
+  paddingBottomRight: [insets.right + 40, insets.bottom + 40] as [number, number],
+});
+
 function MapCustomControls({
   bounds,
   zoomIn,
   zoomOut,
   resetView,
+  insets,
 }: {
   bounds: [[number, number], [number, number]] | null;
   zoomIn: number;
   zoomOut: number;
   resetView: number;
+  insets: MapInsets;
 }) {
   const map = useMap();
+  const panned = useRef<[number, number]>([0, 0]);
+
+  // Insets change on window resize; refit only when they actually move, not on every render.
+  const insetsKey = `${insets.top},${insets.right},${insets.bottom},${insets.left}`;
 
   useEffect(() => {
+    map.invalidateSize();
     if (bounds) {
-      map.flyToBounds(bounds, { padding: [40, 40], maxZoom: 16, duration: 1.5 });
+      map.flyToBounds(bounds, { ...fitOptions(insets), maxZoom: 16, duration: 1.5 });
+      return;
     }
-  }, [bounds, map]);
+    // No boundary to fit: shift the centre into the visible lane, panning only by the change since last time.
+    const target: [number, number] = [-(insets.left - insets.right) / 2, -(insets.top - insets.bottom) / 2];
+    map.panBy([target[0] - panned.current[0], target[1] - panned.current[1]], { animate: false });
+    panned.current = target;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bounds, map, insetsKey]);
 
   useEffect(() => {
     if (zoomIn > 0) map.zoomIn();
@@ -62,8 +86,9 @@ function MapCustomControls({
 
   useEffect(() => {
     if (resetView > 0 && bounds) {
-      map.flyToBounds(bounds, { padding: [40, 40], duration: 1 });
+      map.flyToBounds(bounds, { ...fitOptions(insets), duration: 1 });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetView, bounds, map]);
 
   return null;
@@ -80,6 +105,9 @@ export interface VillageMapProps {
    *  and the "VILLAGE MAP" header pill, and lowers the floating controls so a
    *  separate app bar can sit above them. Used by the mobile map-background view. */
   immersive?: boolean;
+  /** Pixels of the map hidden under overlay panels. Controls sit just inside these edges and
+   *  the village is framed in the remaining visible area. Omit for the normal card layout. */
+  insets?: MapInsets;
 }
 
 export const VillageMap: React.FC<VillageMapProps> = ({
@@ -90,7 +118,9 @@ export const VillageMap: React.FC<VillageMapProps> = ({
   boundary,
   height = 520,
   immersive = false,
+  insets,
 }) => {
+  const edge = insets ?? { ...NO_INSETS, top: immersive ? 80 : 54 };
   const { language } = useLanguage();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
@@ -227,13 +257,10 @@ export const VillageMap: React.FC<VillageMapProps> = ({
         <Box
           sx={{
             pointerEvents: 'auto',
-            bgcolor: isDark ? 'rgba(15, 23, 42, 0.88)' : 'rgba(255, 255, 255, 0.92)',
-            backdropFilter: 'blur(16px)',
-            border: isDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(0,0,0,0.08)',
+            ...glassSx(isDark),
             borderRadius: '20px',
             px: 3,
             py: 0.8,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
           }}
         >
           <Typography
@@ -255,8 +282,8 @@ export const VillageMap: React.FC<VillageMapProps> = ({
       <Box
         sx={{
           position: 'absolute',
-          top: immersive ? 96 : 70,
-          left: 16,
+          top: edge.top + 16,
+          left: edge.left + 16,
           zIndex: 1000,
           display: 'flex',
           flexDirection: 'column',
@@ -267,11 +294,8 @@ export const VillageMap: React.FC<VillageMapProps> = ({
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            bgcolor: isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(12px)',
+            ...glassSx(isDark),
             borderRadius: '12px',
-            border: isDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(0,0,0,0.1)',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
             overflow: 'hidden',
           }}
         >
@@ -292,11 +316,8 @@ export const VillageMap: React.FC<VillageMapProps> = ({
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            bgcolor: isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(12px)',
+            ...glassSx(isDark),
             borderRadius: '12px',
-            border: isDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(0,0,0,0.1)',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
             overflow: 'hidden',
           }}
         >
@@ -318,18 +339,15 @@ export const VillageMap: React.FC<VillageMapProps> = ({
       <Box
         sx={{
           position: 'absolute',
-          top: immersive ? 96 : 70,
-          right: 16,
+          top: edge.top + 16,
+          right: edge.right + 16,
           zIndex: 1000,
           display: 'flex',
           flexDirection: 'column',
           gap: 1,
-          bgcolor: isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(12px)',
+          ...glassSx(isDark),
           borderRadius: '14px',
           p: 0.5,
-          border: isDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(0,0,0,0.1)',
-          boxShadow: '0 6px 20px rgba(0,0,0,0.15)',
         }}
       >
         <Tooltip title="Toggle Satellite / OSM Layer" placement="left">
@@ -416,6 +434,7 @@ export const VillageMap: React.FC<VillageMapProps> = ({
           zoomIn={zoomInTrigger}
           zoomOut={zoomOutTrigger}
           resetView={resetViewTrigger}
+          insets={insets ?? NO_INSETS}
         />
 
         {/* Highlighted Boundary Polygon */}

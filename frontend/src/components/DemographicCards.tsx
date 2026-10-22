@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { glassSx, glassEdge } from './glass';
 import { useLanguage } from '../context/LanguageContext';
 import VillageQuickStats from './VillageQuickStats';
 import {
@@ -721,9 +722,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
         sx={{
           borderRadius: '20px',
           p: { xs: 2, md: 2.5 },
-          bgcolor: isDarkMode ? '#111827' : '#ffffff',
-          border: isDarkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e5e9f0',
-          boxShadow: isDarkMode ? 'none' : '0 1px 2px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.04)',
+          ...glassSx(isDarkMode),
           display: 'flex',
           flexDirection: isNarrow ? 'column' : { xs: 'column', md: 'row' },
           height: isNarrow ? '100%' : { md: 400 },
@@ -933,7 +932,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
                         borderRadius: '11px',
                         cursor: 'pointer',
                         userSelect: 'none',
-                        bgcolor: isSelected ? '#2563eb' : isDarkMode ? 'rgba(255,255,255,0.05)' : '#f8fafc',
+                        bgcolor: isSelected ? '#2563eb' : isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.5)',
                         border: `1px solid ${isSelected ? '#2563eb' : isDarkMode ? 'rgba(255,255,255,0.08)' : '#e5e9f0'}`,
                         color: isSelected ? '#ffffff' : isDarkMode ? '#cbd5e1' : '#475569',
                         boxShadow: isSelected ? '0 4px 12px rgba(37,99,235,0.24)' : 'none',
@@ -947,7 +946,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
                         '&:hover': {
                           transform: 'translateY(-1px)',
                           borderColor: '#2563eb',
-                          bgcolor: isSelected ? '#1d4ed8' : isDarkMode ? 'rgba(255,255,255,0.09)' : '#eff6ff',
+                          bgcolor: isSelected ? '#1d4ed8' : isDarkMode ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.75)',
                         },
                       }}
                     >
@@ -1015,7 +1014,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
                   bottom: 0,
                   height: 20,
                   pointerEvents: 'none',
-                  background: `linear-gradient(180deg, transparent 0%, ${isDarkMode ? '#111827' : '#ffffff'} 90%)`,
+                  background: `linear-gradient(180deg, transparent 0%, ${glassEdge(isDarkMode)} 90%)`,
                 }}
               />
             )}

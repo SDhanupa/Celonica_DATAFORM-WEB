@@ -3,6 +3,8 @@ import { useLanguage } from '../context/LanguageContext';
 import { Box, Typography, Button, FormControl, CircularProgress, Alert, Dialog, DialogContent, DialogActions, Autocomplete, TextField, Divider, useTheme } from '@mui/material';
 import { useQuery } from '@apollo/client';
 import { GET_GN_BY_COORDINATES } from '../graphql/queries';
+import MyLocationIcon from '@mui/icons-material/MyLocation';
+import { locationHeaderSx, locationContinueSx, locationBodySx, locationPaperSx } from './locationModalStyles';
 
 interface LocationSelectorModalProps {
   open: boolean;
@@ -100,6 +102,7 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
   return (
     <Dialog
       open={open}
+      scroll="body"
       onClose={(event, reason) => {
         if (reason === 'backdropClick' || reason === 'escapeKeyDown') {
           return;
@@ -112,28 +115,20 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
           borderRadius: '24px',
           minWidth: { xs: '90%', sm: 420 },
           position: 'relative',
-          overflow: 'hidden',
+          overflow: 'visible',
           background: isDarkMode
             ? 'linear-gradient(160deg, #1a1c2e 0%, #2a2c40 100%)'
             : 'linear-gradient(160deg, #ffffff 0%, #f0f4ff 100%)',
-          boxShadow: '0 32px 80px rgba(0,0,0,0.35)',
+          ...locationPaperSx,
         }
       }}
       slotProps={{ backdrop: { sx: { backdropFilter: 'blur(14px)', bgcolor: 'rgba(0,0,0,0.6)' } } }}
     >
       <Box
-        sx={{
-          background: 'linear-gradient(135deg, #00A8FF 0%, #0070CC 100%)',
-          p: 3,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 1.5,
-          position: 'relative',
-        }}
+        sx={locationHeaderSx(isDarkMode)}
       >
         {/* Plain Transparent PNG Logos (No border, No box) */}
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3, my: 0.5 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 3, mb: 1 }}>
           <img
             src="/logo.png"
             alt="Ceylonica Logo"
@@ -143,7 +138,7 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
 
         <Typography
           variant="h6"
-          sx={{ color: '#ffffff', fontWeight: 700, fontFamily: "'Inter', sans-serif", textAlign: 'center', textShadow: '0 1px 4px rgba(0,0,0,0.2)' }}
+          sx={{ color: '#ffffff', fontWeight: 700, fontFamily: "'Inter', sans-serif", textAlign: 'left', letterSpacing: '-0.01em', lineHeight: 1.25 }}
         >
           {!showManualForm
             ? (language === 'en' ? 'Your Location' : language === 'si' ? 'ඔබගේ ස්ථානය' : 'உங்கள் இடம்')
@@ -154,7 +149,7 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
           {language === 'en' ? 'Census Data Explorer · Sri Lanka' : language === 'si' ? 'ජනලේඛන දත්ත · ශ්‍රී ලංකා' : 'மக்கள்தொகை கணக்கெடுப்பு · இலங்கை'}
         </Typography>
       </Box>
-      <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 3, px: 3 }}>
+      <DialogContent sx={locationBodySx}>
         {!showManualForm ? (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {locating ? (
@@ -325,31 +320,19 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
                 fontWeight: 600,
                 '&:hover': { bgcolor: 'rgba(0,168,255,0.08)', borderColor: themeColors.primary }
               }}
-              startIcon={<span style={{ fontSize: '1.1em' }}>📍</span>}
+              startIcon={<MyLocationIcon fontSize="small" />}
             >
               Use GPS Auto-Location
             </Button>
           </Box>
         )}
       </DialogContent>
-      <DialogActions sx={{ p: 3, pt: 1, justifyContent: 'center' }}>
+      <DialogActions sx={{ px: { xs: 2.1, sm: 2.8 }, pb: { xs: 2.1, sm: 2.8 }, pt: 1 }}>
         <Button
           variant="contained"
           onClick={handleContinue}
           disabled={!canContinue}
-          sx={{
-            background: canContinue ? 'linear-gradient(135deg, #00A8FF 0%, #0070CC 100%)' : undefined,
-            color: 'white',
-            px: 5,
-            py: 1.2,
-            borderRadius: '12px',
-            fontWeight: 700,
-            fontFamily: "'Inter', sans-serif",
-            fontSize: '1rem',
-            boxShadow: canContinue ? '0 4px 20px rgba(0,168,255,0.4)' : undefined,
-            '&:hover': { background: 'linear-gradient(135deg, #0090E0 0%, #005AB0 100%)', boxShadow: '0 6px 24px rgba(0,168,255,0.5)' },
-            transition: 'all 0.25s',
-          }}
+          sx={locationContinueSx(canContinue)}
         >
           {language === 'en' ? 'Continue' : language === 'si' ? 'ඉදිරියට' : 'தொடரவும்'}
         </Button>

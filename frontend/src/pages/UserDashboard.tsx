@@ -1,7 +1,8 @@
 // Forced reload for Vite (Fixed pie chart background and translations)
 // Forced reload for Vite (Added title glassmorphism panels back)
-import React, { useState, useEffect } from 'react';
-import { Box, Typography, Button, Container, Grid, FormControl, useTheme, useMediaQuery, CircularProgress, Alert, Dialog, DialogContent, DialogActions, Autocomplete, TextField, IconButton, Divider, Menu, MenuItem, Fab, Fade, useScrollTrigger } from '@mui/material';
+import MyLocationIcon from '@mui/icons-material/MyLocation';
+import React, { useState, useEffect, useRef } from 'react';
+import { Box, Typography, Button, Grid, FormControl, useTheme, useMediaQuery, CircularProgress, Alert, Dialog, DialogContent, DialogActions, Autocomplete, TextField, IconButton, Divider, Menu, MenuItem, Fab, Fade, useScrollTrigger } from '@mui/material';
 import { useQuery } from '@apollo/client';
 import { GET_P_DISTRICTS, GET_DISTRICT_GN_OPTIONS, GET_GN_BY_COORDINATES, GET_GN_BY_CCODE } from '../graphql/queries';
 import { useAuth } from '../auth/AuthProvider';
@@ -19,9 +20,12 @@ import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import TagRoundedIcon from '@mui/icons-material/TagRounded';
 import Tooltip from '@mui/material/Tooltip';
+import { locationHeaderSx, locationContinueSx, locationBodySx, locationPaperSx } from '../components/locationModalStyles';
 import { CATEGORIES } from './CategoryDetailPage';
 import GnPageFooter from '../components/GnPageFooter';
 import { VillageMap } from '../components/VillageMap';
+import { useOverlayInsets } from '../components/useOverlayInsets';
+import { glassSx, glassTileSx } from '../components/glass';
 import { GnTopHeaderBar } from '../components/GnTopHeaderBar';
 import { DemographicCards } from '../components/DemographicCards';
 import VillageQuickStats from '../components/VillageQuickStats';
@@ -550,70 +554,134 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
 
   // Chart UI variables removed - hero-only mode
 
+  // ── Desktop map-background layout ──────────────────────────────────────
+  const isLg = useMediaQuery(theme.breakpoints.up('lg'), { noSsr: true });
+  const sectionRef = useRef<HTMLElement>(null);
+  const topStackRef = useRef<HTMLDivElement>(null);
+  const leftPanelRef = useRef<HTMLDivElement>(null);
+  const rightPanelRef = useRef<HTMLDivElement>(null);
+  const bottomPanelRef = useRef<HTMLDivElement>(null);
+  // Panels mount/unmount with the breakpoint and the mobile switch, so both re-key the measurement.
+  const mapInsets = useOverlayInsets(sectionRef, { top: topStackRef, left: leftPanelRef, right: rightPanelRef, bottom: bottomPanelRef }, `${isMobile}-${isLg}`);
+
+  // Desktop panels render at 80% via CSS zoom. The map is not zoomed (zoom breaks Leaflet's pointer maths),
+  // so anything that must line up with the map's own controls is converted between the two scales.
+  const UI_SCALE = 0.8;
+  const LANE_PAD_LEFT = 64 / UI_SCALE;   // clears the map's zoom stack (unscaled px)
+  const LANE_PAD_RIGHT = 72 / UI_SCALE;  // clears the map's toolbox
+  // Width, in the panels' own (zoomed) CSS px, that the contribute card gets in the open lane.
+  const laneCardWidth = Math.min(680, (mapInsets.width - mapInsets.left - mapInsets.right) / UI_SCALE - LANE_PAD_LEFT - LANE_PAD_RIGHT);
+
+  const ink = isDarkMode ? '#f8fafc' : '#0f172a';
+  const inkSoft = isDarkMode ? '#cbd5e1' : '#334155';
+  const inkMuted = isDarkMode ? '#94a3b8' : '#64748b';
+  const navPillSx = {
+    textTransform: 'none', fontWeight: 600, fontSize: '0.86rem', borderRadius: '999px', px: 1.8, minHeight: 38,
+    fontFamily: 'inherit', boxShadow: 'none', transition: 'background-color 0.2s ease, color 0.2s ease',
+    '&:hover': { bgcolor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.06)', boxShadow: 'none', transform: 'none' },
+    '&:focus-visible': { outline: '2px solid #2d5e41', outlineOffset: 2 },
+  } as const;
+  const roundBtnSx = {
+    width: 40, height: 40, minWidth: 40, borderRadius: '999px', color: inkSoft, fontFamily: 'inherit',
+    bgcolor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.7)',
+    border: isDarkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(15,23,42,0.08)',
+    '&:hover': { bgcolor: isDarkMode ? 'rgba(255,255,255,0.16)' : '#ffffff' },
+    '&:focus-visible': { outline: '2px solid #2d5e41', outlineOffset: 2 },
+  } as const;
+
+  const openCategory = (slug: string) => {
+    const tGn = (displayGN || activeGn?.nameEn || gnName || 'GN-Name').replace(/ /g, '-');
+    const tCc = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'AREA-CODE';
+    navigate(`/gnpage/${encodeURIComponent(tGn)}/${encodeURIComponent(tCc)}/${slug}`);
+  };
+
+  const copyAreaCode = () => {
+    // Clipboard API is missing on insecure origins (plain http on a LAN IP); fail quietly rather than throw.
+    navigator.clipboard?.writeText(displayCCODE).then(() => {
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 2200);
+    }).catch(() => {});
+  };
+
+  const charts = (
+    <DemographicCards
+      populationData={populationData}
+      gnEconomyData={gnEconomyData}
+      housingOwnershipData={housingOwnershipData}
+      housingWallData={housingWallData}
+      housingUnitData={housingUnitData}
+      toiletFacilityData={toiletFacilityData}
+      drinkingWaterData={drinkingWaterData}
+      solidWasteData={solidWasteData}
+      roomsData={roomsData}
+      roofData={roofData}
+      religionData={religionData}
+      householdHeadData={householdHeadData}
+      isDarkMode={isDarkMode}
+      layout="narrow"
+      showQuickStats={false}
+      onOpenCategory={openCategory}
+    />
+  );
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>
 
       {/* Location Modal */}
       <Dialog
         open={showLocationModal}
+        scroll="body"
         disableEscapeKeyDown
         PaperProps={{
           sx: {
             borderRadius: '24px',
             minWidth: { xs: '90%', sm: 420 },
             position: 'relative',
-            overflow: 'hidden',
+            overflow: 'visible',
             background: isDarkMode
               ? 'linear-gradient(160deg, #1a1c2e 0%, #2a2c40 100%)'
               : 'linear-gradient(160deg, #ffffff 0%, #f0f4ff 100%)',
-            boxShadow: '0 32px 80px rgba(0,0,0,0.35)',
+            ...locationPaperSx,
           }
         }}
         slotProps={{ backdrop: { sx: { backdropFilter: 'blur(14px)', bgcolor: 'rgba(0,0,0,0.6)' } } }}
       >
         {/* Modal Hero Header */}
         <Box
-          sx={{
-            background: 'linear-gradient(135deg, #00A8FF 0%, #0070CC 100%)',
-            p: 3,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 1.5,
-            position: 'relative',
-          }}
+          sx={locationHeaderSx(isDarkMode)}
         >
           {/* Language Toggle */}
           <Box
             onClick={cycleLanguage}
             sx={{
               position: 'absolute',
-              top: 14,
-              right: 14,
+              top: 22,
+              right: 24,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: 38,
-              height: 38,
-              borderRadius: '50%',
-              bgcolor: 'rgba(255,255,255,0.2)',
+              width: 48,
+              height: 36,
+              borderRadius: '8px',
+              zIndex: 3,
+              bgcolor: 'rgba(255,255,255,0.14)',
               backdropFilter: 'blur(8px)',
-              border: '1px solid rgba(255,255,255,0.4)',
+              border: '1px solid rgba(255,255,255,0.45)',
               fontFamily: "'Inter', sans-serif",
               fontWeight: 700,
               fontSize: '0.8rem',
               color: '#ffffff',
               textTransform: 'uppercase',
               transition: 'all 0.2s',
-              '&:hover': { bgcolor: 'rgba(255,255,255,0.35)' }
+              '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' }
             }}
           >
             {language}
           </Box>
 
           {/* Plain Transparent PNG Logos */}
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3, my: 0.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 3, mb: 1 }}>
             <img
               src="/logo.png"
               alt="Ceylonica Logo"
@@ -623,7 +691,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
 
           <Typography
             variant="h6"
-            sx={{ color: '#ffffff', fontWeight: 700, fontFamily: "'Inter', sans-serif", textAlign: 'center', textShadow: '0 1px 4px rgba(0,0,0,0.2)' }}
+            sx={{ color: '#ffffff', fontWeight: 700, fontFamily: "'Inter', sans-serif", textAlign: 'left', letterSpacing: '-0.01em', lineHeight: 1.25 }}
           >
             {!showManualForm
               ? (language === 'en' ? 'Your Location' : language === 'si' ? 'ඔබගේ ස්ථානය' : 'உங்கள் இடம்')
@@ -634,7 +702,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             {language === 'en' ? 'Census Data Explorer · Sri Lanka' : language === 'si' ? 'ජනලේඛන දත්ත · ශ්‍රී ලංකා' : 'மக்கள்தொகை கணக்கெடுப்பு · இலங்கை'}
           </Typography>
         </Box>
-        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 3, px: 3 }}>
+        <DialogContent sx={locationBodySx}>
           {!showManualForm ? (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {locating ? (
@@ -810,14 +878,14 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                   fontWeight: 600,
                   '&:hover': { bgcolor: 'rgba(0,168,255,0.08)', borderColor: themeColors.primary }
                 }}
-                startIcon={<span style={{ fontSize: '1.1em' }}>📍</span>}
+                startIcon={<MyLocationIcon fontSize="small" />}
               >
                 Use GPS Auto-Location
               </Button>
             </Box>
           )}
         </DialogContent>
-        <DialogActions sx={{ p: 3, pt: 1, justifyContent: 'center' }}>
+        <DialogActions sx={{ px: { xs: 2.1, sm: 2.8 }, pb: { xs: 2.1, sm: 2.8 }, pt: 1 }}>
           <Button
             variant="contained"
             onClick={() => {
@@ -833,19 +901,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
               }
             }}
             disabled={!canContinue}
-            sx={{
-              background: canContinue ? 'linear-gradient(135deg, #00A8FF 0%, #0070CC 100%)' : undefined,
-              color: 'white',
-              px: 5,
-              py: 1.2,
-              borderRadius: '12px',
-              fontWeight: 700,
-              fontFamily: "'Inter', sans-serif",
-              fontSize: '1rem',
-              boxShadow: canContinue ? '0 4px 20px rgba(0,168,255,0.4)' : undefined,
-              '&:hover': { background: 'linear-gradient(135deg, #0090E0 0%, #005AB0 100%)', boxShadow: '0 6px 24px rgba(0,168,255,0.5)' },
-              transition: 'all 0.25s',
-            }}
+            sx={locationContinueSx(canContinue)}
           >
             {language === 'en' ? 'Continue' : language === 'si' ? 'ඉදිරියට' : 'தொடரவும்'}
           </Button>
@@ -912,543 +968,347 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         />
       ) : (
       <>
-      {/* ── MAIN DASHBOARD VIEW ────────────────────────────────────────── */}
+      {/* ── MAIN DASHBOARD VIEW: live village map full-bleed, glass panels floating over it ── */}
       <Box
+        component="main"
+        ref={sectionRef}
         sx={{
-          flexGrow: 1,
-          bgcolor: isDarkMode ? '#0f172a' : '#ffffff',
-          color: themeColors.textLight,
           position: 'relative',
+          height: '100dvh',
+          minHeight: 640,
           overflow: 'hidden',
+          bgcolor: isDarkMode ? '#0b1120' : '#e8eef4',
+          color: themeColors.textLight,
+          // Keep the OSM attribution (licence requirement) visible beside the right panel.
+          '& .leaflet-bottom.leaflet-right': { right: `${mapInsets.right}px` },
         }}
       >
-        {/* Flat background wash — no stock photography */}
+        <Box sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+          <VillageMap
+            immersive
+            insets={mapInsets}
+            gnName={displayGN}
+            district={displayDistrict}
+            dsDivision={displayCity}
+            ccode={displayCCODE}
+            boundary={activeGn?.boundary}
+            height="100%"
+          />
+        </Box>
+
+        {/* Soft edge vignette so glass panels read cleanly over busy map tiles. */}
         <Box
+          aria-hidden
           sx={{
             position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 420,
-            background: isDarkMode
-              ? 'radial-gradient(90% 60% at 50% -10%, rgba(37,99,235,0.16) 0%, rgba(15,23,42,0) 65%)'
-              : 'radial-gradient(90% 60% at 50% -10%, rgba(37,99,235,0.08) 0%, rgba(255,255,255,0) 65%)',
-            zIndex: 0,
+            inset: 0,
+            zIndex: 1,
             pointerEvents: 'none',
+            background: isDarkMode
+              ? 'linear-gradient(90deg, rgba(11,17,32,0.55) 0%, rgba(11,17,32,0) 32%, rgba(11,17,32,0) 68%, rgba(11,17,32,0.55) 100%)'
+              : 'linear-gradient(90deg, rgba(232,238,244,0.55) 0%, rgba(232,238,244,0) 32%, rgba(232,238,244,0) 68%, rgba(232,238,244,0.55) 100%)',
           }}
         />
 
-        {/* ── STICKY TOP NAVBAR (flat, no dark bar / no stock imagery) ── */}
+        {/* Overlay: only the panels take pointer events, so the map stays draggable in the open lane. */}
         <Box
-          component="header"
           sx={{
-            position: 'sticky',
-            top: 0,
-            zIndex: 20,
+            position: 'absolute',
+            inset: 0,
+            zIndex: 2,
+            pointerEvents: 'none',
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 2,
-            bgcolor: isDarkMode ? 'rgba(15,23,42,0.85)' : 'rgba(255,255,255,0.85)',
-            backdropFilter: 'blur(14px)',
-            borderBottom: isDarkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(15,23,42,0.07)',
-            px: { md: 4, lg: 6, xl: 8 },
-            py: 1.3,
-            animation: 'fadeInDown 0.4s ease both',
+            flexDirection: 'column',
+            gap: { md: 1.5, lg: 2 },
+            p: { md: 2, lg: 2.5 },
+            zoom: UI_SCALE,
+            fontFamily: "'Poppins', 'Noto Sans Sinhala', 'Noto Sans Tamil', sans-serif",
           }}
         >
-          {/* Wordmark */}
-          <Box
-            onClick={() => navigate(gnName && ccode ? `/gnpage/${gnName}/${ccode}` : '/gnpage')}
-            sx={{ display: 'flex', alignItems: 'center', gap: 1.1, cursor: 'pointer', flexShrink: 0 }}
-          >
-            <Box component="img" src="/logo.png" alt="Ceylonica" sx={{ height: 30, width: 30, objectFit: 'contain' }} />
-            <Typography sx={{ fontFamily: "'Playfair Display', serif", fontWeight: 800, fontSize: '1.15rem', color: isDarkMode ? '#f8fafc' : '#0f172a', letterSpacing: '-0.01em' }}>
-              Ceylonica
-            </Typography>
-          </Box>
-
-          {/* Center nav links — flat text buttons, no dividers */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            {[
-              { label: 'Home', onClick: () => navigate(gnName && ccode ? `/gnpage/${gnName}/${ccode}` : '/gnpage') },
-            ].map((item) => (
-              <Button
-                key={item.label}
-                onClick={item.onClick}
-                disableRipple
-                sx={{
-                  textTransform: 'none', fontWeight: 600, fontSize: '0.88rem', borderRadius: '10px',
-                  color: isDarkMode ? '#cbd5e1' : '#334155', px: 1.5, boxShadow: 'none',
-                  '&:hover': { bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)', boxShadow: 'none', transform: 'none' },
-                }}
-              >
-                {item.label}
-              </Button>
-            ))}
-            <Button
-              onClick={(e) => setCatMenuAnchor(e.currentTarget as HTMLElement)}
-              disableRipple
-              endIcon={<KeyboardArrowDownIcon sx={{ fontSize: '1.1rem !important' }} />}
-              sx={{
-                textTransform: 'none', fontWeight: 600, fontSize: '0.88rem', borderRadius: '10px',
-                color: isDarkMode ? '#cbd5e1' : '#334155', px: 1.5, boxShadow: 'none',
-                '&:hover': { bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)', boxShadow: 'none', transform: 'none' },
-              }}
-            >
-              Categories
-            </Button>
-            <Menu anchorEl={catMenuAnchor} open={Boolean(catMenuAnchor)} onClose={() => setCatMenuAnchor(null)}
-              PaperProps={{ sx: { bgcolor: isDarkMode ? '#111827' : '#ffffff', border: isDarkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e5e9f0', borderRadius: '14px', minWidth: 220, boxShadow: '0 16px 36px rgba(15,23,42,0.14)', mt: 1 } }}>
-              {CATEGORIES.map((cat) => (
-                <MenuItem key={cat.slug} onClick={() => { setCatMenuAnchor(null); const tGn = (displayGN || activeGn?.nameEn || gnName || 'GN-Name').replace(/ /g, '-'); const tCc = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'AREA-CODE'; navigate(`/gnpage/${encodeURIComponent(tGn)}/${encodeURIComponent(tCc)}/${cat.slug}`); }} sx={{ fontWeight: 500, fontSize: '0.88rem', color: isDarkMode ? '#e2e8f0' : '#1e293b', py: 0.9, px: 2 }}>{cat.name}</MenuItem>
-              ))}
-            </Menu>
-            <Button
-              onClick={() => navigate(gnName && ccode ? `/industry-survey/${gnName}/${ccode}` : '/industry-survey')}
-              disableRipple
-              sx={{
-                textTransform: 'none', fontWeight: 600, fontSize: '0.88rem', borderRadius: '10px',
-                color: isDarkMode ? '#cbd5e1' : '#334155', px: 1.5, boxShadow: 'none',
-                '&:hover': { bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)', boxShadow: 'none', transform: 'none' },
-              }}
-            >
-              Industry Survey
-            </Button>
-            {isAuthenticated && !userInfo?.realm_roles?.includes('super_admin') && (
-              <Button
-                onClick={() => navigate('/user')}
-                disableRipple
-                sx={{
-                  textTransform: 'none', fontWeight: 600, fontSize: '0.88rem', borderRadius: '10px',
-                  color: isDarkMode ? '#cbd5e1' : '#334155', px: 1.5, boxShadow: 'none',
-                  '&:hover': { bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)', boxShadow: 'none', transform: 'none' },
-                }}
-              >
-                Location form
-              </Button>
-            )}
-          </Box>
-
-          {/* Right actions */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, flexShrink: 0 }}>
+          <Box ref={topStackRef} sx={{ display: 'flex', flexDirection: 'column', gap: { md: 1.5, lg: 2 }, '& > *': { pointerEvents: 'auto' } }}>
+            {/* ── FLOATING GLASS NAVBAR ── */}
             <Box
-              onClick={cycleLanguage}
-              role="button"
-              aria-label="Change language"
+              component="header"
               sx={{
-                display: 'flex', alignItems: 'center', gap: 0.4, cursor: 'pointer',
-                px: 1.1, height: 34, borderRadius: '9px',
-                bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)',
-                color: isDarkMode ? '#e2e8f0' : '#334155', fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase',
-              }}
-            >
-              {language}
-            </Box>
-            <IconButton onClick={() => setIsDarkMode(!isDarkMode)} size="small" sx={{ width: 34, height: 34, color: isDarkMode ? '#e2e8f0' : '#334155' }}>
-              {isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
-            </IconButton>
-            <Box sx={{ width: '1px', height: 20, bgcolor: isDarkMode ? 'rgba(255,255,255,0.12)' : 'rgba(15,23,42,0.1)', mx: 0.3 }} />
-            {isAuthenticated ? (
-              <>
-                <Button
-                  onClick={() => {
-                    if (userInfo?.realm_roles?.includes('super_admin')) navigate('/admins');
-                    else navigate('/mydashboard');
-                  }}
-                  disableRipple
-                  sx={{ textTransform: 'none', fontWeight: 600, fontSize: '0.85rem', color: isDarkMode ? '#cbd5e1' : '#334155', boxShadow: 'none', '&:hover': { bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)', boxShadow: 'none', transform: 'none' } }}
-                >
-                  {userInfo?.realm_roles?.includes('super_admin') ? 'Dashboard' : contributeCopy.navContribute}
-                </Button>
-                <Button
-                  onClick={() => logout()}
-                  disableRipple
-                  sx={{ textTransform: 'none', fontWeight: 600, fontSize: '0.85rem', color: '#dc2626', boxShadow: 'none', '&:hover': { bgcolor: 'rgba(220,38,38,0.08)', boxShadow: 'none', transform: 'none' } }}
-                >
-                  Logout
-                </Button>
-              </>
-            ) : !isLoading ? (
-              <>
-                <Button
-                  onClick={() => login(window.location.href)}
-                  disableRipple
-                  sx={{ textTransform: 'none', fontWeight: 600, fontSize: '0.85rem', color: isDarkMode ? '#cbd5e1' : '#334155', boxShadow: 'none', '&:hover': { bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)', boxShadow: 'none', transform: 'none' } }}
-                >
-                  Login
-                </Button>
-                <Button
-                  variant="contained"
-                  disableElevation
-                  onClick={joinToContribute}
-                  sx={{
-                    textTransform: 'none', fontWeight: 700, fontSize: '0.85rem', borderRadius: '9px',
-                    bgcolor: '#2563eb', color: '#fff', px: 2, boxShadow: 'none',
-                    '&:hover': { bgcolor: '#1d4ed8', boxShadow: 'none', transform: 'none' },
-                  }}
-                >
-                  {contributeCopy.bannerCtaGuest}
-                </Button>
-              </>
-            ) : null}
-          </Box>
-        </Box>
-        <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1, pt: { md: 4 }, pb: 4, px: { xs: 2, md: 4, lg: 6, xl: 8 } }}>
-
-          {/* ── TOP HEADER GLASS BAR (Location Selectors & Categories Ribbon) ── */}
-          <GnTopHeaderBar
-            districts={districtsData?.pDistricts || []}
-            selectedDistrict={selectedDistrict}
-            onDistrictChange={(d) => { setSelectedDistrict(d); setSelectedCity(''); setSelectedGN(''); }}
-            dsDivisions={uniqueCities}
-            selectedCity={selectedCity}
-            onCityChange={(c) => { setSelectedCity(c); setSelectedGN(''); }}
-            gramaNiladharis={filteredGNs}
-            selectedGN={selectedGN}
-            onGNChange={(g) => {
-              setSelectedGN(g);
-              const chosen = gnData?.pDistrict?.gramaNiladharis?.find((x: any) => x.id === g || x.CCODE === g);
-              if (chosen && chosen.CCODE && chosen.nameEn) navigate(`/gnpage/${encodeURIComponent(chosen.nameEn.replace(/ /g, '-'))}/${encodeURIComponent(chosen.CCODE)}`);
-            }}
-
-            onCycleLanguage={cycleLanguage}
-            isDarkMode={isDarkMode}
-            onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-            isAuthenticated={isAuthenticated}
-            onLoginClick={() => (isAuthenticated ? navigate('/profile') : login())}
-            onSelectCategory={(slug) => {
-              const tGn = (displayGN || activeGn?.nameEn || gnName || 'GN-Name').replace(/ /g, '-');
-              const tCc = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'AREA-CODE';
-              navigate(`/gnpage/${encodeURIComponent(tGn)}/${encodeURIComponent(tCc)}/${slug}`);
-            }}
-          />
-
-          {/* ── SINGLE INLINE ROW: CHARTS · VILLAGE IDENTITY + KPIs · MAP ──
-              All three panels share one viewport row so nothing needs scrolling. */}
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: '1fr 0.85fr 1fr', lg: '1.05fr 0.92fr 1.05fr' },
-              gap: { xs: 2.5, lg: 3 },
-              alignItems: 'stretch',
-              mt: 0.5,
-              mb: 6,
-              minHeight: { md: 420, lg: 440 },
-            }}
-          >
-            {/* ── 1 · SURVEY & CENSUS CHARTS ── */}
-            <Box sx={{ display: 'flex', minWidth: 0, animation: 'fadeInUp 0.5s ease 160ms both' }}>
-              <DemographicCards
-                populationData={populationData}
-                gnEconomyData={gnEconomyData}
-                housingOwnershipData={housingOwnershipData}
-                housingWallData={housingWallData}
-                housingUnitData={housingUnitData}
-                toiletFacilityData={toiletFacilityData}
-                drinkingWaterData={drinkingWaterData}
-                solidWasteData={solidWasteData}
-                roomsData={roomsData}
-                roofData={roofData}
-                religionData={religionData}
-                householdHeadData={householdHeadData}
-                isDarkMode={isDarkMode}
-                layout="narrow"
-                showQuickStats={false}
-                onOpenCategory={(slug) => {
-                  const targetGn = (displayGN || activeGn?.nameEn || gnName || 'GN-Name').replace(/ /g, '-');
-                  const targetCcode = displayCCODE || activeGn?.CCODE || ccode || selectedGN || 'AREA-CODE';
-                  navigate(`/gnpage/${encodeURIComponent(targetGn)}/${encodeURIComponent(targetCcode)}/${slug}`);
-                }}
-              />
-            </Box>
-
-            {/* ── 2 · VILLAGE IDENTITY + KPIs ── */}
-          <Box
-            key={displayGN || 'default'}
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              minWidth: 0,
-              width: '100%',
-              textAlign: 'center',
-            }}
-          >
-            {/* Plain Transparent Branding PNGs (No box, No borders) */}
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: { xs: 2.5, md: 3 }, mb: 1.6, animation: 'fadeInUp 0.35s ease both' }}>
-              <Box
-                component="img"
-                src="/logo.png"
-                alt="Ceylonica Logo"
-                sx={{
-                  height: { xs: 36, md: 40, lg: 44 },
-                  width: 'auto',
-                  objectFit: 'contain',
-                  filter: 'drop-shadow(0 3px 10px rgba(0,0,0,0.1))',
-                  transition: 'transform 0.25s ease',
-                  '&:hover': { transform: 'scale(1.05)' },
-                }}
-              />
-            </Box>
-
-            {(displayDistrict || displayCity) && (
-              <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: isDarkMode ? '#94a3b8' : '#64748b', textTransform: 'uppercase', letterSpacing: '0.8px', mb: 1, animation: 'fadeInUp 0.4s ease 40ms both' }}>
-                {[displayDistrict, displayCity].filter(Boolean).join('  ›  ')}
-              </Typography>
-            )}
-
-            <Typography
-              variant="h1"
-              sx={{
-                fontFamily: '"Playfair Display", "Merriweather", "Georgia", serif',
-                fontWeight: 800,
-                fontSize: { xs: '2rem', sm: '2.2rem', md: '2rem', lg: '2.4rem' },
-                color: isDarkMode ? '#f8fafc' : '#0f172a',
-                lineHeight: 1.05,
-                letterSpacing: '-0.02em',
-                wordBreak: 'break-word',
-                textAlign: 'inherit',
-                mb: 0,
-                animation: 'fadeInUp 0.45s ease 80ms both',
-              }}
-            >
-              {displayGN || 'GN Name'}
-            </Typography>
-
-            {/* ── PROMINENT MODERN AREA CODE SHOWCASE ── */}
-            <Box
-              sx={{
+                ...glassSx(isDarkMode),
+                borderRadius: '20px',
                 display: 'flex',
-                flexWrap: 'wrap',
                 alignItems: 'center',
-                gap: 1,
-                justifyContent: 'center',
-                mt: 1.2,
-                animation: 'fadeInUp 0.45s ease 90ms both',
+                justifyContent: 'space-between',
+                gap: 2,
+                px: { md: 2, lg: 2.5 },
+                py: 1,
+                animation: 'fadeInDown 0.4s ease both',
               }}
             >
-              {displayCCODE && (
-                <Box
-                  sx={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 1.1,
-                    px: { xs: 1.5, md: 1.8 },
-                    py: { xs: 0.65, md: 0.7 },
-                    borderRadius: '14px',
-                    background: isDarkMode
-                      ? 'linear-gradient(135deg, rgba(37,99,235,0.22) 0%, rgba(30,58,138,0.35) 100%)'
-                      : 'linear-gradient(135deg, rgba(239,246,255,0.95) 0%, rgba(219,234,254,0.8) 100%)',
-                    border: isDarkMode
-                      ? '1.5px solid rgba(96,165,250,0.5)'
-                      : '1.5px solid rgba(37,99,235,0.35)',
-                    boxShadow: isDarkMode
-                      ? '0 6px 24px rgba(37,99,235,0.28), inset 0 1px 1px rgba(255,255,255,0.15)'
-                      : '0 6px 20px rgba(37,99,235,0.12), inset 0 1px 1px rgba(255,255,255,0.9)',
-                    backdropFilter: 'blur(12px)',
-                    transition: 'all 0.25s ease',
-                    '&:hover': {
-                      transform: 'translateY(-2px)',
-                      boxShadow: isDarkMode
-                        ? '0 8px 30px rgba(37,99,235,0.45)'
-                        : '0 8px 24px rgba(37,99,235,0.2)',
-                    }
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      width: 30,
-                      height: 30,
-                      borderRadius: '9px',
-                      bgcolor: isDarkMode ? 'rgba(59,130,246,0.35)' : '#2563eb',
-                      color: '#ffffff',
-                      boxShadow: '0 2px 8px rgba(37,99,235,0.3)',
-                    }}
-                  >
-                    <PinDropRoundedIcon sx={{ fontSize: '1.15rem' }} />
-                  </Box>
-
-                  <Box sx={{ textAlign: 'left' }}>
-                    <Typography
-                      sx={{
-                        fontSize: '0.68rem',
-                        fontWeight: 800,
-                        textTransform: 'uppercase',
-                        letterSpacing: '1.2px',
-                        color: isDarkMode ? '#93c5fd' : '#1d4ed8',
-                        lineHeight: 1.1,
-                      }}
-                    >
-                      {language === 'si' ? 'ග්‍රාම නිලධාරී වසම් කේතය (AREA CODE)' : language === 'ta' ? 'கிராம அலுவலர் பிரிவு குறியீடு (AREA CODE)' : 'GN DIVISION AREA CODE'}
-                    </Typography>
-                    <Typography
-                      component="div"
-                      sx={{
-                        fontFamily: "'JetBrains Mono', 'Roboto Mono', 'Plus Jakarta Sans', monospace",
-                        fontWeight: 900,
-                        fontSize: { xs: '1.1rem', md: '1.3rem' },
-                        color: isDarkMode ? '#ffffff' : '#0f172a',
-                        letterSpacing: '2px',
-                        lineHeight: 1.2,
-                        mt: 0.1,
-                      }}
-                    >
-                      {displayCCODE}
-                    </Typography>
-                  </Box>
-
-                  {/* Quick Copy Button */}
-                  <Tooltip title={copiedCode ? (language === 'si' ? 'පිටපත් විය!' : language === 'ta' ? 'நகலெடுக்கப்பட்டது!' : 'Copied to Clipboard!') : (language === 'si' ? 'කේතය පිටපත් කරන්න' : language === 'ta' ? 'குறியீட்டை நகலெடு' : 'Copy Area Code')}>
-                    <IconButton
-                      size="small"
-                      onClick={() => {
-                        navigator.clipboard.writeText(displayCCODE);
-                        setCopiedCode(true);
-                        setTimeout(() => setCopiedCode(false), 2200);
-                      }}
-                      sx={{
-                        ml: 0.5,
-                        p: 0.75,
-                        color: copiedCode ? '#10b981' : (isDarkMode ? '#93c5fd' : '#2563eb'),
-                        bgcolor: copiedCode
-                          ? (isDarkMode ? 'rgba(16,185,129,0.2)' : 'rgba(16,185,129,0.12)')
-                          : (isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(37,99,235,0.08)'),
-                        borderRadius: '9px',
-                        transition: 'all 0.2s ease',
-                        '&:hover': {
-                          bgcolor: isDarkMode ? 'rgba(255,255,255,0.16)' : 'rgba(37,99,235,0.18)',
-                          transform: 'scale(1.08)',
-                        }
-                      }}
-                    >
-                      {copiedCode ? <CheckRoundedIcon sx={{ fontSize: '1.2rem', color: '#10b981' }} /> : <ContentCopyRoundedIcon sx={{ fontSize: '1.2rem' }} />}
-                    </IconButton>
-                  </Tooltip>
-                </Box>
-              )}
-
-              <Button
-                size="small"
-                onClick={() => setIsAboutModalOpen(true)}
-                startIcon={<InfoOutlinedIcon sx={{ fontSize: '1rem !important' }} />}
-                disableRipple
-                sx={{
-                  px: 1.6,
-                  py: 0.4,
-                  fontSize: '0.78rem',
-                  borderRadius: '9px',
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  color: isDarkMode ? '#cbd5e1' : '#475569',
-                  bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)',
-                  boxShadow: 'none',
-                  transition: 'background-color 0.2s ease',
-                  '&:hover': {
-                    bgcolor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(15,23,42,0.08)',
-                    boxShadow: 'none',
-                    transform: 'none',
-                  }
-                }}
+              <Box
+                component="button"
+                type="button"
+                onClick={() => navigate(gnName && ccode ? `/gnpage/${gnName}/${ccode}` : '/gnpage')}
+                aria-label="Ceylonica home"
+                sx={{ all: 'unset', display: 'flex', alignItems: 'center', gap: 1.1, cursor: 'pointer', flexShrink: 0, borderRadius: '10px', '&:focus-visible': { outline: '2px solid #2d5e41', outlineOffset: 3 } }}
               >
-                {language === 'si' ? 'ගම පිළිබඳව' : language === 'ta' ? 'கிராමத்தைப் பற்றி' : 'About Village'}
-              </Button>
+                <Box component="img" src="/logo.png" alt="" sx={{ height: 34, width: 34, objectFit: 'contain' }} />
+                <Typography sx={{ fontFamily: 'inherit', fontWeight: 800, fontSize: '1.1rem', color: ink, letterSpacing: '-0.02em' }}>
+                  Ceylonica
+                </Typography>
+              </Box>
+
+              {/* Segmented nav: the current page is the dark pill. */}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, p: 0.5, borderRadius: '999px', bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)' }}>
+                <Button
+                  onClick={() => navigate(gnName && ccode ? `/gnpage/${gnName}/${ccode}` : '/gnpage')}
+                  disableRipple
+                  aria-current="page"
+                  sx={{ ...navPillSx, bgcolor: isDarkMode ? '#f8fafc' : '#0f172a', color: isDarkMode ? '#0f172a' : '#ffffff', '&:hover': { bgcolor: isDarkMode ? '#e2e8f0' : '#1e293b', boxShadow: 'none', transform: 'none' } }}
+                >
+                  Home
+                </Button>
+                <Button
+                  onClick={(e) => setCatMenuAnchor(e.currentTarget as HTMLElement)}
+                  disableRipple
+                  aria-haspopup="menu"
+                  aria-expanded={Boolean(catMenuAnchor)}
+                  endIcon={<KeyboardArrowDownIcon sx={{ fontSize: '1.1rem !important' }} />}
+                  sx={{ ...navPillSx, color: inkSoft }}
+                >
+                  Categories
+                </Button>
+                <Menu anchorEl={catMenuAnchor} open={Boolean(catMenuAnchor)} onClose={() => setCatMenuAnchor(null)}
+                  PaperProps={{ sx: { ...glassSx(isDarkMode), borderRadius: '16px', minWidth: 220, mt: 1 } }}>
+                  {CATEGORIES.map((cat) => (
+                    <MenuItem key={cat.slug} onClick={() => { setCatMenuAnchor(null); openCategory(cat.slug); }} sx={{ fontWeight: 500, fontSize: '0.88rem', color: ink, py: 0.9, px: 2 }}>{cat.name}</MenuItem>
+                  ))}
+                </Menu>
+                <Button
+                  onClick={() => navigate(gnName && ccode ? `/industry-survey/${gnName}/${ccode}` : '/industry-survey')}
+                  disableRipple
+                  sx={{ ...navPillSx, color: inkSoft }}
+                >
+                  Industry Survey
+                </Button>
+                {isAuthenticated && !userInfo?.realm_roles?.includes('super_admin') && (
+                  <Button onClick={() => navigate('/user')} disableRipple sx={{ ...navPillSx, color: inkSoft }}>
+                    Location form
+                  </Button>
+                )}
+              </Box>
+
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, flexShrink: 0 }}>
+                <Button onClick={cycleLanguage} aria-label="Change language" disableRipple sx={{ ...roundBtnSx, width: 'auto', px: 1.4, fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>
+                  {language}
+                </Button>
+                <IconButton onClick={() => setIsDarkMode(!isDarkMode)} aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'} sx={roundBtnSx}>
+                  {isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
+                </IconButton>
+                {isAuthenticated ? (
+                  <>
+                    <Button
+                      onClick={() => {
+                        if (userInfo?.realm_roles?.includes('super_admin')) navigate('/admins');
+                        else navigate('/mydashboard');
+                      }}
+                      disableRipple
+                      sx={{ ...navPillSx, color: inkSoft }}
+                    >
+                      {userInfo?.realm_roles?.includes('super_admin') ? 'Dashboard' : contributeCopy.navContribute}
+                    </Button>
+                    <Button onClick={() => logout()} disableRipple sx={{ ...navPillSx, color: '#dc2626', '&:hover': { bgcolor: 'rgba(220,38,38,0.08)', boxShadow: 'none', transform: 'none' } }}>
+                      Logout
+                    </Button>
+                  </>
+                ) : !isLoading ? (
+                  <>
+                    <Button onClick={() => login(window.location.href)} disableRipple sx={{ ...navPillSx, color: inkSoft }}>
+                      Login
+                    </Button>
+                    <Button
+                      variant="contained"
+                      disableElevation
+                      onClick={joinToContribute}
+                      sx={{ ...navPillSx, bgcolor: '#2d5e41', color: '#fff', px: 2.2, '&:hover': { bgcolor: '#23503a', boxShadow: 'none', transform: 'none' } }}
+                    >
+                      {contributeCopy.bannerCtaGuest}
+                    </Button>
+                  </>
+                ) : null}
+              </Box>
             </Box>
 
-            {/* ── AT-A-GLANCE KPIs (lifted into the hero so they sit above the fold) ── */}
-            <Box sx={{ mt: { xs: 1.8, md: 2 }, animation: 'fadeInUp 0.5s ease 140ms both' }}>
-              <VillageQuickStats
-                populationData={populationData}
-                gnEconomyData={gnEconomyData}
-                housingOwnershipData={housingOwnershipData}
-                roomsData={roomsData}
+            {/* ── LOCATION SELECTORS & CATEGORY RIBBON (glass) ── */}
+            <Box sx={{ '& > .MuiBox-root': { mb: '0 !important' } }}>
+              <GnTopHeaderBar
+                districts={districtsData?.pDistricts || []}
+                selectedDistrict={selectedDistrict}
+                onDistrictChange={(d) => { setSelectedDistrict(d); setSelectedCity(''); setSelectedGN(''); }}
+                dsDivisions={uniqueCities}
+                selectedCity={selectedCity}
+                onCityChange={(c) => { setSelectedCity(c); setSelectedGN(''); }}
+                gramaNiladharis={filteredGNs}
+                selectedGN={selectedGN}
+                onGNChange={(g) => {
+                  setSelectedGN(g);
+                  const chosen = gnData?.pDistrict?.gramaNiladharis?.find((x: any) => x.id === g || x.CCODE === g);
+                  if (chosen && chosen.CCODE && chosen.nameEn) navigate(`/gnpage/${encodeURIComponent(chosen.nameEn.replace(/ /g, '-'))}/${encodeURIComponent(chosen.CCODE)}`);
+                }}
+                onCycleLanguage={cycleLanguage}
                 isDarkMode={isDarkMode}
-                variant="compact"
-                orientation="column"
+                onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
+                isAuthenticated={isAuthenticated}
+                onLoginClick={() => (isAuthenticated ? navigate('/profile') : login())}
+                onSelectCategory={openCategory}
               />
             </Box>
-
-            <Dialog
-              open={isAboutModalOpen} 
-              onClose={() => setIsAboutModalOpen(false)}
-              maxWidth="sm"
-              fullWidth
-              PaperProps={{
-                sx: {
-                  borderRadius: '16px',
-                  bgcolor: isDarkMode ? '#1e293b' : '#ffffff',
-                  color: isDarkMode ? '#f8fafc' : '#0f172a',
-                }
-              }}
-            >
-              <DialogContent sx={{ p: 4, textAlign: 'center' }}>
-                <Typography sx={{ 
-                  fontFamily: '"Times New Roman", Times, serif',
-                  fontSize: '1.1rem',
-                  lineHeight: 1.6,
-                  color: isDarkMode ? '#e2e8f0' : '#1e293b'
-                }}>
-                  {language === 'si' 
-                    ? 'ප්‍රජා තොරතුරු සම්පාදනය තුළින් ගම සංවර්ධනයේ පදනම සකස් වේ. ඒ සඳහා ලංකාවේ ඕනෑම පුද්ගලයෙකුට සාමාජිකත්වය, ප්‍රතිලාභ, නායකත්වය ලබාගත හැකි වේදිකාවකි. මෙය මුළුමනින්ම ගමේ සාමාජිකයින් එකතු වී ගම සංවිධානය කරගන්නා නව ප්‍රවේශයකි. දශක කිහිපයක පර්යේෂණයකින් ගොඩනැගුණු මහජන මෙවලමකි. ඔබ ඔබේ ගම ගොඩනගන්න, ගමේ වෙබ් අඩවිය නිර්මානය කරගනිමින් එකතු වෙන්න. Login වන්න. පද්ධතිය සඳහා ඔබේ ගමේ පළමු සාමාජිකයා, නියමුවා බවට පත්වන්න.'
-                    : language === 'ta'
-                    ? 'சமூக தகவல் தொகுப்பின் மூலம் கிராம வளர்ச்சியின் அடிப்படை அமைக்கப்படுகிறது. இது இலங்கையில் உள்ள எவரும் உறுப்புரிமை, நன்மைகள் மற்றும் தலைமையை பெறக்கூடிய ஒரு தளமாகும். இது கிராம உறுப்பினர்கள் ஒன்றிணைந்து கிராமத்தை ஒழுங்கமைக்கும் ஒரு புதிய அணுகுமுறையாகும். இது பல தசாப்த கால ஆராய்ச்சியின் மூலம் உருவாக்கப்பட்ட ஒரு பொது கருவியாகும். உங்கள் கிராமத்தை உருவாக்குங்கள், கிராம வலைத்தளத்தை உருவாக்குவதன் மூலம் இணையுங்கள். உள்நுழையவும். உங்கள் கிராமத்திற்கான அமைப்பின் முதல் உறுப்பினர் மற்றும் வழிகாட்டியாக மாறுங்கள்.'
-                    : 'Community information compilation lays the foundation for village development. It is a platform where any individual in Sri Lanka can obtain membership, benefits, and leadership. This is a completely new approach where village members come together to organize their own village. It is a public tool built on decades of research. Build your village, and join by creating your village website. Login now. Become the first member and the pioneer of your village system.'}
-                </Typography>
-              </DialogContent>
-              <DialogActions sx={{ p: 2, pb: 3, justifyContent: 'center' }}>
-                <Button 
-                  onClick={() => setIsAboutModalOpen(false)}
-                  variant="contained"
-                  disableElevation
-                  sx={{ 
-                    fontWeight: 600, 
-                    textTransform: 'none',
-                    borderRadius: '8px',
-                    bgcolor: isDarkMode ? '#3b82f6' : '#2563eb',
-                    '&:hover': {
-                      bgcolor: isDarkMode ? '#2563eb' : '#1d4ed8',
-                    }
-                  }}
-                >
-                  {language === 'si' ? 'වහන්න' : language === 'ta' ? 'மூடு' : 'Close'}
-                </Button>
-              </DialogActions>
-            </Dialog>
           </Box>
 
-            {/* ── 3 · VILLAGE MAP ── */}
-            <Box sx={{ display: 'flex', minWidth: 0, animation: 'fadeInUp 0.5s ease 240ms both' }}>
-              <Box sx={{ width: '100%', height: { xs: 300, sm: 360, md: '100%' }, minHeight: { md: 420, lg: 440 } }}>
-                <VillageMap
-                  gnName={displayGN}
-                  district={displayDistrict}
-                  dsDivision={displayCity}
-                  ccode={displayCCODE}
-                  boundary={activeGn?.boundary}
-                  height="100%"
+          {/* ── PANELS: identity left · open map lane · charts right (charts join the left column below lg) ── */}
+          <Box
+            sx={{
+              flex: 1,
+              minHeight: 0,
+              display: 'grid',
+              gridTemplateColumns: { md: 'minmax(320px, 380px) 1fr', lg: 'minmax(330px, 380px) 1fr minmax(360px, 430px)' },
+              gap: { md: 1.5, lg: 2 },
+            }}
+          >
+            <Box
+              ref={leftPanelRef}
+              sx={{
+                pointerEvents: 'auto',
+                minHeight: 0,
+                overflowY: 'auto',
+                overscrollBehavior: 'contain',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 1.5,
+                scrollbarWidth: 'thin',
+                animation: 'fadeInUp 0.5s ease 120ms both',
+              }}
+            >
+              {/* Village identity card */}
+              <Box key={displayGN || 'default'} sx={{ ...glassSx(isDarkMode), borderRadius: '22px', p: { md: 2.2, lg: 2.5 }, display: 'flex', flexDirection: 'column', gap: 1.4 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                  <Box component="img" src="/logo.png" alt="Ceylonica logo" sx={{ height: 46, width: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 3px 10px rgba(0,0,0,0.12))' }} />
+                  {(displayDistrict || displayCity) && (
+                    <Typography sx={{ fontFamily: 'inherit', fontSize: '0.74rem', fontWeight: 600, color: inkMuted, textTransform: 'uppercase', letterSpacing: '0.08em', lineHeight: 1.4 }}>
+                      {[displayDistrict, displayCity].filter(Boolean).join('  ›  ')}
+                    </Typography>
+                  )}
+                </Box>
+
+                <Typography
+                  variant="h1"
+                  sx={{ fontFamily: 'inherit', fontWeight: 800, fontSize: { md: '1.9rem', lg: '2.2rem' }, color: ink, lineHeight: 1.1, letterSpacing: '-0.02em', wordBreak: 'break-word' }}
+                >
+                  {displayGN || 'GN Name'}
+                </Typography>
+
+                {displayCCODE && (
+                  <Box sx={{ ...glassTileSx(isDarkMode), display: 'flex', alignItems: 'center', gap: 1.2, px: 1.4, py: 1, borderRadius: '14px' }}>
+                    <Box sx={{ display: 'grid', placeItems: 'center', width: 34, height: 34, borderRadius: '10px', bgcolor: '#2d5e41', color: '#fff', flexShrink: 0 }}>
+                      <PinDropRoundedIcon sx={{ fontSize: '1.15rem' }} />
+                    </Box>
+                    <Box sx={{ minWidth: 0, flex: 1 }}>
+                      <Typography sx={{ fontFamily: 'inherit', fontSize: '0.66rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: inkMuted, lineHeight: 1.3 }}>
+                        {language === 'si' ? 'ග්‍රාම නිලධාරී වසම් කේතය' : language === 'ta' ? 'கிராம அலுவலர் பிரிவு குறியீடு' : 'GN Division Area Code'}
+                      </Typography>
+                      <Typography component="div" sx={{ fontFamily: "'JetBrains Mono', 'Roboto Mono', monospace", fontWeight: 800, fontSize: '1.2rem', color: ink, letterSpacing: '0.12em', lineHeight: 1.2 }}>
+                        {displayCCODE}
+                      </Typography>
+                    </Box>
+                    <Tooltip title={copiedCode ? (language === 'si' ? 'පිටපත් විය!' : language === 'ta' ? 'நகலெடுக்கப்பட்டது!' : 'Copied!') : (language === 'si' ? 'කේතය පිටපත් කරන්න' : language === 'ta' ? 'குறியீட்டை நகலெடு' : 'Copy area code')}>
+                      <IconButton
+                        onClick={copyAreaCode}
+                        aria-label="Copy area code"
+                        sx={{ width: 40, height: 40, borderRadius: '12px', color: copiedCode ? '#059669' : ink, bgcolor: copiedCode ? 'rgba(5,150,105,0.12)' : (isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.05)'), transition: 'background-color 0.2s ease', '&:hover': { bgcolor: isDarkMode ? 'rgba(255,255,255,0.16)' : 'rgba(15,23,42,0.1)' } }}
+                      >
+                        {copiedCode ? <CheckRoundedIcon fontSize="small" /> : <ContentCopyRoundedIcon fontSize="small" />}
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                )}
+
+                <Button
+                  onClick={() => setIsAboutModalOpen(true)}
+                  startIcon={<InfoOutlinedIcon sx={{ fontSize: '1.05rem !important' }} />}
+                  disableRipple
+                  sx={{ ...navPillSx, alignSelf: 'flex-start', color: inkSoft, bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)' }}
+                >
+                  {language === 'si' ? 'ගම පිළිබඳව' : language === 'ta' ? 'கிராமத்தைப் பற்றி' : 'About Village'}
+                </Button>
+
+                <VillageQuickStats
+                  populationData={populationData}
+                  gnEconomyData={gnEconomyData}
+                  housingOwnershipData={housingOwnershipData}
+                  roomsData={roomsData}
+                  isDarkMode={isDarkMode}
+                  variant="compact"
+                  orientation="column"
+                />
+              </Box>
+
+              {!isLg && <Box sx={{ minHeight: 420, display: 'flex' }}>{charts}</Box>}
+            </Box>
+
+            {/* Open map lane. The contribute card docks at its bottom so it is on screen at landing, at any size. */}
+            {/* Side padding keeps the card clear of the map's own control stacks on both edges of the lane. */}
+            <Box sx={{ minWidth: 0, minHeight: 0, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', pl: `${LANE_PAD_LEFT}px`, pr: `${LANE_PAD_RIGHT}px` }}>
+              <Box ref={bottomPanelRef} sx={{ pointerEvents: 'auto', width: '100%', maxWidth: 680, animation: 'fadeInUp 0.5s ease 280ms both' }}>
+                <ContributeBanner
+                  glass
+                  compact={laneCardWidth < 640}
+                  ccode={displayCCODE || activeGn?.CCODE}
+                  villageName={displayGN || activeGn?.nameEn || ''}
+                  isAuthenticated={isAuthenticated}
+                  isDarkMode={isDarkMode}
+                  onContribute={startContributing}
+                  onJoin={joinToContribute}
                 />
               </Box>
             </Box>
-          </Box>
 
-          <Box sx={{ mt: -2, mb: 2, animation: 'fadeInUp 0.5s ease 320ms both' }}>
-            <ContributeBanner
-              ccode={displayCCODE || activeGn?.CCODE}
-              villageName={displayGN || activeGn?.nameEn || ''}
-              isAuthenticated={isAuthenticated}
-              isDarkMode={isDarkMode}
-              onContribute={startContributing}
-              onJoin={joinToContribute}
-            />
+            {isLg && (
+              <Box ref={rightPanelRef} sx={{ pointerEvents: 'auto', minHeight: 0, display: 'flex', animation: 'fadeInUp 0.5s ease 200ms both' }}>
+                {charts}
+              </Box>
+            )}
           </Box>
-        </Container>
+        </Box>
+
+        <Dialog
+          open={isAboutModalOpen}
+          onClose={() => setIsAboutModalOpen(false)}
+          maxWidth="sm"
+          fullWidth
+          PaperProps={{ sx: { ...glassSx(isDarkMode), borderRadius: '22px', color: ink } }}
+        >
+          <DialogContent sx={{ p: 4, textAlign: 'center' }}>
+            <Typography sx={{ fontSize: '1.05rem', lineHeight: 1.7, color: isDarkMode ? '#e2e8f0' : '#1e293b' }}>
+              {language === 'si'
+                ? 'ප්‍රජා තොරතුරු සම්පාදනය තුළින් ගම සංවර්ධනයේ පදනම සකස් වේ. ඒ සඳහා ලංකාවේ ඕනෑම පුද්ගලයෙකුට සාමාජිකත්වය, ප්‍රතිලාභ, නායකත්වය ලබාගත හැකි වේදිකාවකි. මෙය මුළුමනින්ම ගමේ සාමාජිකයින් එකතු වී ගම සංවිධානය කරගන්නා නව ප්‍රවේශයකි. දශක කිහිපයක පර්යේෂණයකින් ගොඩනැගුණු මහජන මෙවලමකි. ඔබ ඔබේ ගම ගොඩනගන්න, ගමේ වෙබ් අඩවිය නිර්මානය කරගනිමින් එකතු වෙන්න. Login වන්න. පද්ධතිය සඳහා ඔබේ ගමේ පළමු සාමාජිකයා, නියමුවා බවට පත්වන්න.'
+                : language === 'ta'
+                ? 'சமூக தகவல் தொகுப்பின் மூலம் கிராம வளர்ச்சியின் அடிப்படை அமைக்கப்படுகிறது. இது இலங்கையில் உள்ள எவரும் உறுப்புரிமை, நன்மைகள் மற்றும் தலைமையை பெறக்கூடிய ஒரு தளமாகும். இது கிராம உறுப்பினர்கள் ஒன்றிணைந்து கிராமத்தை ஒழுங்கமைக்கும் ஒரு புதிய அணுகுமுறையாகும். இது பல தசாப்த கால ஆராய்ச்சியின் மூலம் உருவாக்கப்பட்ட ஒரு பொது கருவியாகும். உங்கள் கிராமத்தை உருவாக்குங்கள், கிராம வலைத்தளத்தை உருவாக்குவதன் மூலம் இணையுங்கள். உள்நுழையவும். உங்கள் கிராமத்திற்கான அமைப்பின் முதல் உறுப்பினர் மற்றும் வழிகாட்டியாக மாறுங்கள்.'
+                : 'Community information compilation lays the foundation for village development. It is a platform where any individual in Sri Lanka can obtain membership, benefits, and leadership. This is a completely new approach where village members come together to organize their own village. It is a public tool built on decades of research. Build your village, and join by creating your village website. Login now. Become the first member and the pioneer of your village system.'}
+            </Typography>
+          </DialogContent>
+          <DialogActions sx={{ p: 2, pb: 3, justifyContent: 'center' }}>
+            <Button
+              onClick={() => setIsAboutModalOpen(false)}
+              variant="contained"
+              disableElevation
+              sx={{ fontWeight: 600, textTransform: 'none', borderRadius: '999px', px: 3, bgcolor: '#2d5e41', '&:hover': { bgcolor: '#23503a' } }}
+            >
+              {language === 'si' ? 'වහන්න' : language === 'ta' ? 'மூடு' : 'Close'}
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
 
       {/* ── Footer ─────────────────────────────────────────────────────── */}
-      <GnPageFooter isDarkMode={isDarkMode} />
+      <Box sx={{ zoom: 0.8 }}>
+        <GnPageFooter isDarkMode={isDarkMode} />
+      </Box>
 
       <Fade in={trigger}>
         <Box
