@@ -66,7 +66,8 @@ function MapCustomControls({
   useEffect(() => {
     map.invalidateSize();
     if (bounds) {
-      map.flyToBounds(bounds, { ...fitOptions(insets), maxZoom: 16, duration: 1.5 });
+      // Instant fit: an animated fly downloads tiles for every zoom level it passes through.
+      map.fitBounds(bounds, { ...fitOptions(insets), maxZoom: 16, animate: false });
       return;
     }
     // No boundary to fit: shift the centre into the visible lane, panning only by the change since last time.
@@ -92,6 +93,67 @@ function MapCustomControls({
   }, [resetView, bounds, map]);
 
   return null;
+}
+
+/**
+ * Outer ring of a stored GN boundary, as GeoJSON [lng, lat] pairs. `polygons` is a JSON string holding a bare
+ * ring, a polygon (list of rings) or a multipolygon; only the first outer ring is used. [] when missing or invalid.
+ */
+export function boundaryRing(polygons: unknown): [number, number][] {
+  if (typeof polygons !== 'string' || !polygons) return [];
+  try {
+    const raw = JSON.parse(polygons);
+    if (!Array.isArray(raw)) return [];
+    const ring =
+      Array.isArray(raw[0]?.[0]) && typeof raw[0][0][0] === 'number'
+        ? raw[0]
+        : Array.isArray(raw[0]?.[0]?.[0])
+        ? raw[0][0]
+        : raw;
+    return (ring as [number, number][]).filter(
+      (p) => Array.isArray(p) && Number.isFinite(p[0]) && Number.isFinite(p[1]),
+    );
+  } catch (e) {
+    console.error('Error parsing GN polygon:', e);
+    return [];
+  }
+}
+
+/**
+ * Six illustrative parcel boxes laid out inside the village's bounding box, as [lat, lng] rings with a fill
+ * colour. Not survey data: a visual placeholder until real cadastral parcels exist.
+ */
+export function simulatedParcels(boundary: any): { coords: [number, number][]; color: string }[] {
+  if (!boundary?.minLat || !boundary?.minLng || !boundary?.maxLat || !boundary?.maxLng) return [];
+  const minLat = boundary.minLat;
+  const maxLat = boundary.maxLat;
+  const minLng = boundary.minLng;
+  const maxLng = boundary.maxLng;
+
+  const latSpan = maxLat - minLat;
+  const lngSpan = maxLng - minLng;
+
+  const parcels = [];
+  const colors = ['#fef08a', '#fed7aa', '#bbf7d0', '#e2e8f0', '#fbcfe8', '#fed7aa'];
+
+  for (let i = 0; i < 6; i++) {
+    const pMinLat = minLat + latSpan * (0.25 + (i % 3) * 0.18);
+    const pMaxLat = pMinLat + latSpan * 0.12;
+    const pMinLng = minLng + lngSpan * (0.3 + Math.floor(i / 3) * 0.22);
+    const pMaxLng = pMinLng + lngSpan * 0.16;
+
+    parcels.push({
+      coords: [
+        [pMinLat, pMinLng],
+        [pMaxLat, pMinLng],
+        [pMaxLat, pMaxLng],
+        [pMinLat, pMaxLng],
+      ] as [number, number][],
+      color: colors[i % colors.length],
+    });
+  }
+
+  return parcels;
 }
 
 export interface VillageMapProps {
@@ -132,62 +194,13 @@ export const VillageMap: React.FC<VillageMapProps> = ({
   const [activeLayer, setActiveLayer] = useState<'osm' | 'satellite' | 'terrain'>('osm');
   const [showCadastre, setShowCadastre] = useState(true);
 
-  // Parse polygons from GeoJSON [lng, lat] to Leaflet [lat, lng] format
-  const parsedPositions = useMemo(() => {
-    if (!boundary?.polygons) return [];
-    try {
-      const raw = JSON.parse(boundary.polygons);
-      if (Array.isArray(raw)) {
-        const ring =
-          Array.isArray(raw[0]?.[0]) && typeof raw[0][0][0] === 'number'
-            ? raw[0]
-            : Array.isArray(raw[0]?.[0]?.[0])
-            ? raw[0][0]
-            : raw;
+  // Leaflet wants [lat, lng]; the stored ring is GeoJSON order [lng, lat].
+  const parsedPositions = useMemo(
+    () => boundaryRing(boundary?.polygons).map(([lng, lat]) => [lat, lng] as [number, number]),
+    [boundary?.polygons],
+  );
 
-        return ring
-          .map((pt: [number, number]) => [pt[1], pt[0]] as [number, number])
-          .filter((p: [number, number]) => Number.isFinite(p[0]) && Number.isFinite(p[1]));
-      }
-    } catch (e) {
-      console.error('Error parsing GN polygon:', e);
-    }
-    return [];
-  }, [boundary?.polygons]);
-
-  // Generate simulated cadastral parcels inside the village boundary for realistic mapping visual
-  const cadastralParcels = useMemo(() => {
-    if (!boundary?.minLat || !boundary?.minLng || !boundary?.maxLat || !boundary?.maxLng) return [];
-    const minLat = boundary.minLat;
-    const maxLat = boundary.maxLat;
-    const minLng = boundary.minLng;
-    const maxLng = boundary.maxLng;
-
-    const latSpan = maxLat - minLat;
-    const lngSpan = maxLng - minLng;
-
-    const parcels = [];
-    const colors = ['#fef08a', '#fed7aa', '#bbf7d0', '#e2e8f0', '#fbcfe8', '#fed7aa'];
-
-    for (let i = 0; i < 6; i++) {
-      const pMinLat = minLat + latSpan * (0.25 + (i % 3) * 0.18);
-      const pMaxLat = pMinLat + latSpan * 0.12;
-      const pMinLng = minLng + lngSpan * (0.3 + Math.floor(i / 3) * 0.22);
-      const pMaxLng = pMinLng + lngSpan * 0.16;
-
-      parcels.push({
-        coords: [
-          [pMinLat, pMinLng],
-          [pMaxLat, pMinLng],
-          [pMaxLat, pMaxLng],
-          [pMinLat, pMaxLng],
-        ] as [number, number][],
-        color: colors[i % colors.length],
-      });
-    }
-
-    return parcels;
-  }, [boundary]);
+  const cadastralParcels = useMemo(() => simulatedParcels(boundary), [boundary]);
 
   // Compute center & bounding box.
   // `?? fallback` does NOT catch NaN (NaN is a number), and a single NaN in the

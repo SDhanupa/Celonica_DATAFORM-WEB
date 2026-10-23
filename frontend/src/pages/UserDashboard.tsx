@@ -24,6 +24,8 @@ import { locationHeaderSx, locationContinueSx, locationBodySx, locationPaperSx }
 import { CATEGORIES } from './CategoryDetailPage';
 import GnPageFooter from '../components/GnPageFooter';
 import { VillageMap } from '../components/VillageMap';
+// Loaded on demand: MapLibre is ~800 KB and only the desktop gnpage needs it.
+const VillageMap3D = React.lazy(() => import('../components/VillageMap3D'));
 import { useOverlayInsets } from '../components/useOverlayInsets';
 import { glassSx, glassTileSx } from '../components/glass';
 import { GnTopHeaderBar } from '../components/GnTopHeaderBar';
@@ -256,7 +258,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const { data: urlGnData, loading: urlGnLoading } = useQuery(GET_GN_BY_CCODE, {
     variables: { CCODE: ccode },
     skip: !ccode,
-    fetchPolicy: 'network-only',
+    // Census data and boundaries for a village don't change between visits; reuse the cache.
+    fetchPolicy: 'cache-first',
   });
 
   const activeGn = urlGnData?.gnByCcode || autoGnData?.gnByCoordinates;
@@ -984,16 +987,18 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         }}
       >
         <Box sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-          <VillageMap
-            immersive
-            insets={mapInsets}
-            gnName={displayGN}
-            district={displayDistrict}
-            dsDivision={displayCity}
-            ccode={displayCCODE}
-            boundary={activeGn?.boundary}
-            height="100%"
-          />
+          <React.Suspense fallback={null}>
+            <VillageMap3D
+              immersive
+              insets={mapInsets}
+              gnName={displayGN}
+              district={displayDistrict}
+              dsDivision={displayCity}
+              ccode={displayCCODE}
+              boundary={activeGn?.boundary}
+              height="100%"
+            />
+          </React.Suspense>
         </Box>
 
         {/* Soft edge vignette so glass panels read cleanly over busy map tiles. */}
