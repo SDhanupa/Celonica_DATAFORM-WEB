@@ -266,10 +266,11 @@ class CategoryDataUploadController extends Controller
 
     public function getData(Request $request, $slug)
     {
+        $staff = \App\Support\PublicDirectoryData::staff($request);
         $version = Cache::get('category_data_version_' . $slug, '1');
-        $cacheKey = 'category_data_' . $slug . '_v' . $version . '_' . md5(json_encode($request->all()));
+        $cacheKey = 'category_data_private_v2_' . ($staff ? 'staff_' : 'public_') . $slug . '_v' . $version . '_' . md5(json_encode($request->all()));
 
-        $data = Cache::remember($cacheKey, 3600, function() use ($request, $slug) {
+        $data = Cache::remember($cacheKey, 3600, function() use ($request, $slug, $staff) {
             $tableName = 'category_data_' . str_replace('-', '_', $slug);
             $tableExists = Schema::hasTable($tableName);
             $data = collect();
@@ -288,8 +289,12 @@ class CategoryDataUploadController extends Controller
         $query = DB::table($tableName);
 
         // Only show approved bulk records on the public GN page, admins see everything
-        if (Schema::hasColumn($tableName, 'is_approved') && !$request->has('is_admin')) {
-            $query->where($tableName . '.is_approved', true);
+        if (!$staff) {
+            if (Schema::hasColumn($tableName, 'is_approved')) {
+                $query->where($tableName . '.is_approved', true);
+            } else {
+                $query->whereRaw('1 = 0');
+            }
         }
 
         // Optional filtering by specific GN/DS/District (mapped)
@@ -325,53 +330,35 @@ class CategoryDataUploadController extends Controller
             $query->whereNotNull($tableName . '.gn_id');
         }
 
-        // Ensure the table has the raw columns before querying to prevent SQL errors on older tables
-        if (!Schema::hasColumn($tableName, 'raw_province')) {
-            Schema::table($tableName, function (Blueprint $table) {
-                $table->string('raw_province')->nullable();
-                $table->string('raw_district')->nullable();
-                $table->string('raw_ds')->nullable();
-                $table->string('raw_gn')->nullable();
-            });
-        }
-        
-        if (!Schema::hasColumn($tableName, 'image_path')) {
-            Schema::table($tableName, function (Blueprint $table) {
-                $table->string('image_path')->nullable();
-            });
-        }
-
-        if (!Schema::hasColumn($tableName, 'final_province')) {
-            Schema::table($tableName, function (Blueprint $table) {
-                $table->string('final_province')->nullable();
-                $table->string('final_district')->nullable();
-                $table->string('final_ds')->nullable();
-                $table->string('final_gn')->nullable();
-            });
-        }
+        // Reads must never alter the database. Older tables can omit enrichment columns.
+        $columns = Schema::getColumnListing($tableName);
 
         // Search functionality
         if ($request->has('search') && $request->input('search')) {
             $search = strtolower(trim($request->input('search')));
-            $query->where(function($q) use ($tableName, $search) {
+            $query->where(function($q) use ($tableName, $search, $staff) {
                 $q->where($tableName . '.name_en', 'ilike', '%' . $search . '%')
                   ->orWhere($tableName . '.name_si', 'ilike', '%' . $search . '%')
                   ->orWhere($tableName . '.name_ta', 'ilike', '%' . $search . '%')
-                  ->orWhere($tableName . '.reg_number', 'ilike', '%' . $search . '%')
-                  ->orWhere($tableName . '.mobile', 'ilike', '%' . $search . '%')
+                  ->orWhere($tableName . '.reg_number', 'ilike', '%' . $search . '%');
+                if ($staff) {
+                    $q->orWhere($tableName . '.mobile', 'ilike', '%' . $search . '%')
                   ->orWhere($tableName . '.description', 'ilike', '%' . $search . '%')
                   ->orWhere($tableName . '.contact_person_name', 'ilike', '%' . $search . '%');
+                }
             });
         }
 
 
         // Simply select the final columns (or fallback to raw) and return instantly
-        $query->select($tableName . '.*',
-            DB::raw("COALESCE($tableName.final_province, $tableName.raw_province) as province_name"),
-            DB::raw("COALESCE($tableName.final_district, $tableName.raw_district) as district_name"),
-            DB::raw("COALESCE($tableName.final_ds, $tableName.raw_ds) as ds_name"),
-            DB::raw("COALESCE($tableName.final_gn, $tableName.raw_gn) as gn_name")
-        );
+        $query->select($tableName . '.*');
+        foreach (['province', 'district', 'ds', 'gn'] as $part) {
+            $available = array_values(array_intersect(['final_' . $part, 'raw_' . $part], $columns));
+            $grammar = DB::connection()->getQueryGrammar();
+            $expressions = array_map(fn($column) => $grammar->wrap($tableName . '.' . $column), $available);
+            $expression = count($expressions) > 1 ? 'COALESCE(' . implode(',', $expressions) . ')' : ($expressions[0] ?? 'NULL');
+            $query->addSelect(DB::raw($expression . ' as ' . $part . '_name'));
+        }
 
         $totalCount += $query->count();
 
@@ -390,7 +377,7 @@ class CategoryDataUploadController extends Controller
 
             $submissionsQuery = \App\Models\CategorySubmission::whereIn('category_id', $categoryIds);
             
-            if (!$request->has('is_admin')) {
+            if (!$staff) {
                 $submissionsQuery->where('status', 'approved');
             }
 
@@ -400,9 +387,11 @@ class CategoryDataUploadController extends Controller
 
             if ($request->has('search') && $request->input('search')) {
                 $search = strtolower(trim($request->input('search')));
-                $submissionsQuery->where(function($q) use ($search) {
-                    $q->where('generated_code', 'ilike', '%' . $search . '%')
-                      ->orWhere('answers_data', 'ilike', '%' . $search . '%');
+                $submissionsQuery->where(function($q) use ($search, $staff) {
+                    $q->where('generated_code', 'ilike', '%' . $search . '%');
+                    if ($staff) {
+                        $q->orWhere('answers_data', 'ilike', '%' . $search . '%');
+                    }
                 });
             }
 
@@ -448,7 +437,7 @@ class CategoryDataUploadController extends Controller
 
 
             return [
-                'data' => $data,
+                'data' => $staff ? $data : $data->map(fn($row) => \App\Support\PublicDirectoryData::record($row)),
                 'total' => $totalCount
             ];
         });
@@ -844,7 +833,7 @@ class CategoryDataUploadController extends Controller
         }
 
         try {
-            $results = $dbQuery->limit(50)->get();
+            $results = $dbQuery->limit(50)->get()->map(fn($row) => \App\Support\PublicDirectoryData::record($row));
             return response()->json(['success' => true, 'data' => $results]);
         } catch (\Throwable $e) {
             error_log('[searchCategoryData] Query error slug=' . $slug . ': ' . $e->getMessage());

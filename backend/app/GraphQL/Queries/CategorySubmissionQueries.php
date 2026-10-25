@@ -88,6 +88,10 @@ class CategorySubmissionQueries
                 if (isset($filters['status']) && $filters['status'] !== 'all') {
                     if (\Illuminate\Support\Facades\Schema::hasColumn($tableName, 'status')) {
                         $query->where('status', $filters['status']);
+                    } elseif (\Illuminate\Support\Facades\Schema::hasColumn($tableName, 'is_approved')) {
+                        $query->where('is_approved', $filters['status'] === 'approved');
+                    } else {
+                        $query->whereRaw('1 = 0');
                     }
                 }
                 
@@ -207,10 +211,27 @@ class CategorySubmissionQueries
 
     public function approved($_, array $args)
     {
-        return $this->fetchFromDynamicTables($args['category_id'], [
+        $submissions = $this->fetchFromDynamicTables($args['category_id'], [
             'status' => 'approved',
             'gn_code' => $args['gn_code']
         ]);
+        if (\App\Support\PublicDirectoryData::staff(request())) {
+            return $submissions;
+        }
+        return $submissions->map(function ($submission) {
+            // In-memory projection only; never save these changes to the record.
+            $safe = clone $submission;
+            $safe->user_id = null;
+            $safe->setRelation('user', null);
+            $safe->latitude = null;
+            $safe->longitude = null;
+            $answers = json_decode($safe->answers_data, true) ?: [];
+            $safe->answers_data = json_encode(array_intersect_key($answers, array_flip([
+                'National', 'Province', 'District', 'DS Division', 'GN Name',
+                'Name (EN)', 'Name (SI)', 'Name (TA)',
+            ])));
+            return $safe;
+        });
     }
 
     public function all($_, array $args)

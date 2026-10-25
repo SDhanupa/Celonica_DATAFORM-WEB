@@ -13,9 +13,8 @@ class PublicBusinessController extends Controller
     /**
      * Sensitive fields that must NEVER appear on the public profile.
      */
-    private const SENSITIVE_KEYS = [
-        'b_nic', 'q_nic', 'q_dob_age', 'q_email', 'q_address',
-        'q_whatsapp', 'q_mobile', 'b_mobile',
+    private const PUBLIC_KEYS = [
+        'b_name', 'b_type', 'b_type_name', 'b_reg_no', 'q_main_products',
     ];
 
     /**
@@ -25,7 +24,7 @@ class PublicBusinessController extends Controller
     public function show(string $regNumber)
     {
         $survey = IndustrySurvey::where('reg_number', $regNumber)
-            ->whereIn('status', ['submitted', 'approved'])
+            ->where('status', 'approved')
             ->first();
 
         if (!$survey) {
@@ -35,9 +34,9 @@ class PublicBusinessController extends Controller
         $formData = $survey->form_data ?? [];
         $formValues = $formData['formValues'] ?? $formData;
 
-        // Strip sensitive data
+        // Publish only reviewed listing fields; unknown survey fields stay private.
         $safeValues = collect($formValues)
-            ->reject(fn($v, $k) => in_array($k, self::SENSITIVE_KEYS))
+            ->only(self::PUBLIC_KEYS)
             ->all();
 
         return response()->json([
@@ -59,7 +58,7 @@ class PublicBusinessController extends Controller
     public function byCcode(string $ccode)
     {
         $surveys = IndustrySurvey::where('ccode', strtoupper($ccode))
-            ->whereIn('status', ['submitted', 'approved'])
+            ->where('status', 'approved')
             ->whereNotNull('reg_number')
             ->orderBy('created_at', 'desc')
             ->get()
@@ -72,9 +71,6 @@ class PublicBusinessController extends Controller
                     'status'      => $s->status,
                     'b_name'      => $fv['b_name'] ?? null,
                     'b_type_name' => $fv['b_type_name'] ?? null,
-                    'b_address'   => $fv['b_address'] ?? null,
-                    'b_owner_name'=> $fv['b_owner_name'] ?? null,
-                    'b_photo'     => $fv['b_photo'] ?? null,
                     'created_at'  => $s->created_at,
                 ];
             });

@@ -32,7 +32,7 @@ Route::middleware('throttle:120,1')->group(function () {
     Route::get('/category-data-tables', [\App\Http\Controllers\CategoryDataUploadController::class, 'getBulkDataCategories']);
     Route::get('/all-categories', [\App\Http\Controllers\CategoryDataUploadController::class, 'getAllCategories']);
     Route::get('/search-all-data', [\App\Http\Controllers\CategoryDataUploadController::class, 'searchAllData']);
-    Route::get('/category-data/{slug}', [\App\Http\Controllers\CategoryDataUploadController::class, 'getData']);
+    Route::get('/category-data/{slug}', [\App\Http\Controllers\CategoryDataUploadController::class, 'getData'])->middleware('keycloak.optional');
     Route::get('/category-tables/{slug}', [\App\Http\Controllers\CategoryTablesController::class, 'getTablesForCategory']);
     Route::post('/upload-survey-image', [\App\Http\Controllers\CategoryDataUploadController::class, 'uploadSurveyImage']);
     Route::get('/search-category-data/{slug}', [\App\Http\Controllers\CategoryDataUploadController::class, 'searchCategoryData']);

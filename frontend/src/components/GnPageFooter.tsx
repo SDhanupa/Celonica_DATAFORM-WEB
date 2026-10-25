@@ -179,22 +179,26 @@ const GnPageFooter: React.FC<GnPageFooterProps> = () => {
                 <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#ffffff', mb: 3, textTransform: 'uppercase', letterSpacing: 1.5 }}>
                   {t.platform}
                 </Typography>
-                {[t.about, t.methodology, t.privacy].map((item) => (
+                {[t.about, t.methodology].map((item) => (
                   <Typography key={item} variant="body2" sx={{ color: '#94a3b8', mb: 1.5, cursor: 'pointer', transition: 'color 0.2s', '&:hover': { color: '#38bdf8' } }}>
                     {item}
                   </Typography>
                 ))}
+                <Typography component="a" href="/privacy-policy/" variant="body2" sx={{ display: 'block', color: '#94a3b8', mb: 1.5 }}>{t.privacy}</Typography>
+                <Typography component="a" href="/terms-of-service/" variant="body2" sx={{ display: 'block', color: '#94a3b8', mb: 1.5 }}>
+                  {language === 'si' ? 'සේවා කොන්දේසි' : language === 'ta' ? 'சேவை விதிமுறைகள்' : 'Terms of service'}
+                </Typography>
                 
                 <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#ffffff', mt: 4, mb: 2, textTransform: 'uppercase', letterSpacing: 1.5 }}>
                   {t.contact}
                 </Typography>
                 <Typography 
                   component="a" 
-                  href="mailto:cdicceylon@gmail.com"
+                  href="mailto:greenceylonica@gmail.com"
                   variant="body2" 
                   sx={{ display: 'block', color: '#94a3b8', mb: 1.5, textDecoration: 'none', cursor: 'pointer', transition: 'color 0.2s', '&:hover': { color: '#38bdf8' } }}
                 >
-                  cdicceylon@gmail.com
+                  greenceylonica@gmail.com
                 </Typography>
               </Grid>
               

@@ -325,6 +325,7 @@ const FastBigCardList = ({ slug, categoryName, gnId, parentQuestions, searchQuer
   slug: string; categoryName: string; gnId: string; parentQuestions: any[];
   searchQuery?: string; autoOpenId?: string | null; isDarkMode: boolean; isSuperAdmin?: boolean; onLoaded?: (slug: string, count: number) => void;
 }) => {
+  const { token } = useAuth();
   const [data, setData] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
   const tc = getThemeColors(isDarkMode);
@@ -333,7 +334,7 @@ const FastBigCardList = ({ slug, categoryName, gnId, parentQuestions, searchQuer
     const controller = new AbortController();
     setLoading(true);
     const url = `/api/category-data/${slug}?gn_id=${gnId}${isSuperAdmin ? '&is_admin=true' : ''}`;
-    fetch(url, { signal: controller.signal })
+    fetch(url, { signal: controller.signal, headers: token ? { Authorization: `Bearer ${token}` } : {} })
       .then(res => res.json())
       .then(res => {
         const rows = res.success ? res.data : [];
@@ -349,7 +350,7 @@ const FastBigCardList = ({ slug, categoryName, gnId, parentQuestions, searchQuer
       });
     return () => controller.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slug, gnId]);
+  }, [slug, gnId, token, isSuperAdmin]);
 
   if (loading) {
     return (

@@ -60,9 +60,7 @@ const CategoryDataList: React.FC<CategoryDataListProps> = ({
         const queryString = params.toString() ? `?${params.toString()}` : '';
 
         const response = await fetch(`/api/category-data/${slug}${queryString}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
         });
         const result = await response.json();
         

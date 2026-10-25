@@ -43,6 +43,13 @@ class OptionalKeycloakAuth
 
         $request->attributes->set('keycloak_sub', $decoded->sub);
 
+        // Read-only staff resolution for public directory endpoints. A query
+        // parameter can never grant access to private survey fields.
+        $admin = \App\Models\Admin::findByKeycloakSub($decoded->sub);
+        if ($admin && $admin->is_active) {
+            $request->attributes->set('current_admin', $admin);
+        }
+
         return $next($request);
     }
 }

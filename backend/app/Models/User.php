@@ -7,11 +7,32 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    // Hosted accounts use UUID strings; never cast an existing ID to an integer.
+    protected $keyType = 'string';
+
+    protected static function booted(): void
+    {
+        static::creating(function (User $user): void {
+            // Preserve numeric auto-increment databases while supplying IDs for
+            // the hosted string-key schema. This requires no data migration.
+            $type = $user->getConnection()->getSchemaBuilder()
+                ->getColumnType($user->getTable(), $user->getKeyName());
+
+            if (in_array($type, ['uuid', 'varchar', 'character varying', 'char', 'bpchar', 'text', 'string'], true)) {
+                $user->setIncrementing(false);
+                if ($user->getKey() === null) {
+                    $user->setAttribute($user->getKeyName(), (string) Str::uuid());
+                }
+            }
+        });
+    }
 
     public function getFirstNameAttribute()
     {
