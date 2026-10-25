@@ -1,0 +1,24 @@
+# Local development only. start.ps1 supplies this file explicitly; hosting does not.
+services:
+  backend:
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:5174
+      FRONTEND_URL: http://localhost:5174
+      KEYCLOAK_PUBLIC_URL: http://localhost:8081
+      KEYCLOAK_REALM: celonica-admin
+      KEYCLOAK_CLIENT_ID: celonica-frontend
+    command: ["sh", "/usr/local/bin/entrypoint-local.sh"]
+    volumes:
+      - ./backend/app:/var/www/app
+      - ./backend/config:/var/www/config
+      - ./backend/routes:/var/www/routes
+      - ./backend/graphql:/var/www/graphql
+      - ./backend/resources:/var/www/resources
+      - ./backend/database:/var/www/database
+      - ./backend/bootstrap/app.php:/var/www/bootstrap/app.php:ro
+      - ./backend/docker/opcache.local.ini:/usr/local/etc/php/conf.d/zzz-local.ini:ro
+      - ./backend/docker/entrypoint.local.sh:/usr/local/bin/entrypoint-local.sh:ro
+  keycloak:
+    command: ["start-dev", "--spi-theme-cache-themes=false", "--spi-theme-cache-templates=false", "--spi-theme-static-max-age=-1"]
