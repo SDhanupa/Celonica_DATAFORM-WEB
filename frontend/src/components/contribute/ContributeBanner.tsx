@@ -35,8 +35,8 @@ const ContributeBanner: React.FC<ContributeBannerProps> = ({ ccode, villageName,
   const body = hasData ? fill(t.bannerBody, { village: villageName, pct: formatPercent(pct) }) : fill(t.bannerBodyNoData, { village: villageName });
 
   const c = isDarkMode
-    ? { bg: 'rgba(255,255,255,0.04)', border: 'rgba(255,255,255,0.1)', fg: '#F5F6F8', muted: 'rgba(245,246,248,0.62)', tile: 'rgba(255,255,255,0.1)', track: 'rgba(255,255,255,0.12)', bar: '#F5F6F8', btnBg: '#F5F6F8', btnFg: ink[900] }
-    : { bg: '#fff', border: ink[200], fg: ink[900], muted: ink[500], tile: ink[100], track: ink[100], bar: ink[900], btnBg: ink[900], btnFg: '#fff' };
+    ? { bg: 'rgba(255,255,255,0.04)', border: 'rgba(255,255,255,0.1)', fg: '#F5F6F8', muted: 'rgba(245,246,248,0.62)', tile: 'rgba(255,255,255,0.1)', track: 'rgba(255,255,255,0.12)', bar: '#7dd3b0', btnBg: '#7dd3b0', btnFg: '#102c24' }
+    : { bg: '#fff', border: ink[200], fg: ink[900], muted: ink[500], tile: ink[100], track: ink[100], bar: '#28715b', btnBg: '#205e4b', btnFg: '#fff' };
 
   return (
     <Box
@@ -46,7 +46,7 @@ const ContributeBanner: React.FC<ContributeBannerProps> = ({ ccode, villageName,
         position: 'relative',
         borderRadius: compact ? '14px' : '16px',
         p: compact ? 2.25 : { xs: 2.5, md: 3 },
-        ...(glass ? { ...glassSx(isDarkMode), borderRadius: '20px', p: { xs: 2, md: 2.25 } } : { border: '1px solid', borderColor: c.border, bgcolor: c.bg }),
+        ...(glass ? { ...glassSx(isDarkMode), borderRadius: '18px', p: { xs: 2, md: 2.25 } } : { border: '1px solid', borderColor: c.border, bgcolor: c.bg }),
       }}
     >
       <Stack direction={{ xs: 'column', md: compact ? 'column' : 'row' }} spacing={compact ? 2 : { xs: 2.5, md: 4 }} sx={{ alignItems: { md: compact ? 'stretch' : 'center' } }}>
@@ -62,7 +62,7 @@ const ContributeBanner: React.FC<ContributeBannerProps> = ({ ccode, villageName,
 
         <Stack spacing={1.25} sx={{ width: { xs: '100%', md: compact ? '100%' : glass ? 230 : 280 }, flexShrink: 0 }}>
           <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'baseline' }}>
-            <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: c.muted, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.progressTitle}</Typography>
+            <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: c.muted, letterSpacing: '0' }}>{t.progressTitle}</Typography>
             <Typography sx={{ fontWeight: 700, color: c.fg }}>{loading ? '…' : `${formatPercent(pct)}%`}</Typography>
           </Stack>
           <LinearProgress

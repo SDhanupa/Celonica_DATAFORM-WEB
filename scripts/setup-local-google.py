@@ -94,7 +94,10 @@ for role in ('admin', 'super_admin'):
 
 profile = api('/users/profile')
 for attribute in profile['attributes']:
-    if attribute['name'] in ('nic', 'mobile_number'):
+    if attribute['name'] in ('firstName', 'lastName'):
+        attribute['required'] = {'roles': ['user']}
+        attribute['permissions'] = {'view': ['admin', 'user'], 'edit': ['admin', 'user']}
+    elif attribute['name'] in ('nic', 'mobile_number'):
         attribute['required'] = {'roles': ['user']}
         attribute['permissions'] = {'view': ['admin', 'user'], 'edit': ['admin', 'user']}
         attribute['displayName'] = 'National Identity Card (NIC)' if attribute['name'] == 'nic' else 'Mobile Number'

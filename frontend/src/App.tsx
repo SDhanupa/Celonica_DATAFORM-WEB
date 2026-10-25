@@ -309,6 +309,7 @@ const App: React.FC = () => {
 
               {/* Default redirects */}
               <Route path="/dashboard" element={<Navigate to="/gnpage" replace />} />
+              <Route path="/fill-data" element={<Navigate to="/mydashboard" replace />} />
               
               <Route
                 path="/admin/rapid-fire-approvals"

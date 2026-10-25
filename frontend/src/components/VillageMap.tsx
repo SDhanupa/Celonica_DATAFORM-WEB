@@ -8,15 +8,12 @@ import 'leaflet/dist/leaflet.css';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
-import ExploreIcon from '@mui/icons-material/Explore';
 import LayersIcon from '@mui/icons-material/Layers';
 import AltRouteIcon from '@mui/icons-material/AltRoute';
 import GridViewIcon from '@mui/icons-material/GridView';
-import ApartmentIcon from '@mui/icons-material/Apartment';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import MapIcon from '@mui/icons-material/Map';
 import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary';
-import CameraAltIcon from '@mui/icons-material/CameraAlt';
 
 // Fix Leaflet's default marker icons in Vite/React bundling
 import iconMarker from 'leaflet/dist/images/marker-icon.png';
@@ -192,7 +189,9 @@ export const VillageMap: React.FC<VillageMapProps> = ({
   const [zoomOutTrigger, setZoomOutTrigger] = useState(0);
   const [resetViewTrigger, setResetViewTrigger] = useState(0);
   const [activeLayer, setActiveLayer] = useState<'osm' | 'satellite' | 'terrain'>('osm');
-  const [showCadastre, setShowCadastre] = useState(true);
+  const [showCadastre, setShowCadastre] = useState(false);
+  const [showRoads, setShowRoads] = useState(true);
+  const [showBoundary, setShowBoundary] = useState(true);
 
   // Leaflet wants [lat, lng]; the stored ring is GeoJSON order [lng, lat].
   const parsedPositions = useMemo(
@@ -339,12 +338,6 @@ export const VillageMap: React.FC<VillageMapProps> = ({
               <FullscreenIcon sx={{ fontSize: '1.2rem', color: isDark ? '#ffffff' : '#1e293b' }} />
             </IconButton>
           </Tooltip>
-          <Divider />
-          <Tooltip title="North Compass" placement="right">
-            <IconButton size="small" sx={{ p: 1 }}>
-              <ExploreIcon sx={{ fontSize: '1.2rem', color: '#ef4444' }} />
-            </IconButton>
-          </Tooltip>
         </Box>
       </Box>
 
@@ -373,10 +366,10 @@ export const VillageMap: React.FC<VillageMapProps> = ({
           </IconButton>
         </Tooltip>
 
-        <Tooltip title="Roads & Transport Lines" placement="left">
-          <IconButton size="small" sx={{ p: 0.8, color: isDark ? '#ffffff' : '#334155' }}>
+        <Tooltip title={activeLayer === 'osm' ? 'Roads are included in the street map; switch to satellite to toggle the overlay' : 'Roads & Transport Lines'} placement="left">
+          <span><IconButton aria-label="Roads & Transport Lines" aria-pressed={showRoads} disabled={activeLayer === 'osm'} size="small" onClick={() => setShowRoads(v => !v)} sx={{ p: 0.8, color: showRoads ? '#3b82f6' : isDark ? '#ffffff' : '#334155' }}>
             <AltRouteIcon sx={{ fontSize: '1.15rem' }} />
-          </IconButton>
+          </IconButton></span>
         </Tooltip>
 
         <Tooltip title="Cadastral Parcels / Lands" placement="left">
@@ -389,12 +382,6 @@ export const VillageMap: React.FC<VillageMapProps> = ({
           </IconButton>
         </Tooltip>
 
-        <Tooltip title="Buildings & Infrastructure" placement="left">
-          <IconButton size="small" sx={{ p: 0.8, color: isDark ? '#ffffff' : '#334155' }}>
-            <ApartmentIcon sx={{ fontSize: '1.15rem' }} />
-          </IconButton>
-        </Tooltip>
-
         <Tooltip title="Center Village Pin" placement="left">
           <IconButton size="small" onClick={() => setResetViewTrigger((v) => v + 1)} sx={{ p: 0.8, color: '#3b82f6' }}>
             <LocationOnIcon sx={{ fontSize: '1.15rem' }} />
@@ -402,22 +389,17 @@ export const VillageMap: React.FC<VillageMapProps> = ({
         </Tooltip>
 
         <Tooltip title="Village Boundaries" placement="left">
-          <IconButton size="small" sx={{ p: 0.8, color: isDark ? '#ffffff' : '#334155' }}>
+          <IconButton aria-pressed={showBoundary} size="small" onClick={() => setShowBoundary(v => !v)} sx={{ p: 0.8, color: showBoundary ? '#3b82f6' : isDark ? '#ffffff' : '#334155' }}>
             <MapIcon sx={{ fontSize: '1.15rem' }} />
           </IconButton>
         </Tooltip>
 
         <Tooltip title="Aerial Photos" placement="left">
-          <IconButton size="small" sx={{ p: 0.8, color: isDark ? '#ffffff' : '#334155' }}>
+          <IconButton aria-pressed={activeLayer === 'satellite'} size="small" onClick={() => setActiveLayer('satellite')} sx={{ p: 0.8, color: activeLayer === 'satellite' ? '#3b82f6' : isDark ? '#ffffff' : '#334155' }}>
             <PhotoLibraryIcon sx={{ fontSize: '1.15rem' }} />
           </IconButton>
         </Tooltip>
 
-        <Tooltip title="Snapshot / Export Map" placement="left">
-          <IconButton size="small" sx={{ p: 0.8, color: isDark ? '#ffffff' : '#334155' }}>
-            <CameraAltIcon sx={{ fontSize: '1.15rem' }} />
-          </IconButton>
-        </Tooltip>
       </Box>
 
       {/* ── LEAFLET MAP CONTAINER ─────────────────────────────────── */}
@@ -442,6 +424,11 @@ export const VillageMap: React.FC<VillageMapProps> = ({
           />
         )}
 
+        {activeLayer === 'satellite' && showRoads && <TileLayer
+          url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}"
+          attribution="&copy; Esri" maxZoom={19} zIndex={2}
+        />}
+
         <MapCustomControls
           bounds={bounds}
           zoomIn={zoomInTrigger}
@@ -451,7 +438,7 @@ export const VillageMap: React.FC<VillageMapProps> = ({
         />
 
         {/* Highlighted Boundary Polygon */}
-        {parsedPositions.length > 0 && (
+        {showBoundary && parsedPositions.length > 0 && (
           <Polygon
             positions={parsedPositions}
             pathOptions={{

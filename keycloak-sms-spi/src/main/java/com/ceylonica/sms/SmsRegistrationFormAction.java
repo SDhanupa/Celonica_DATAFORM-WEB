@@ -216,6 +216,11 @@ public class SmsRegistrationFormAction implements FormAction {
         if (user == null || mobile == null || mobile.isBlank()) {
             throw new IllegalStateException("Verified registration is missing its user or mobile number");
         }
+        // Registration is a two-request flow. Persist the original validated
+        // names explicitly, just like NIC/mobile, before discarding the notes.
+        // This action runs only for the newly created registration account.
+        user.setFirstName(nvl(s.getAuthNote(NOTE_FIRST)).trim());
+        user.setLastName(nvl(s.getAuthNote(NOTE_LAST)).trim());
         user.setSingleAttribute("mobile_number", mobile.trim());
         if (nic != null && !nic.isBlank()) user.setSingleAttribute(nicFieldName(context), nic.trim());
         clearNotes(s);

@@ -1,7 +1,15 @@
 # Local feature integration — 2026-10-25
 
 Branch: `codex/local-feature-integration-20261025`, based on `main` at `60257f0`.
-This work is local only. Do not push or deploy without a new user instruction.
+The initial integration was local only. On 2026-10-25 the user authorized
+publishing the reviewed changes to `Dev`/`main` and hosting, with no production
+database or other-project changes.
+
+Production compatibility: rapid-fire count entry is enabled only when the
+existing database has its nullable `quantity` column. Hosting currently lacks
+that column, so the regular rapid-fire flow remains available and the optional
+count offer is hidden. No production migration or seeder is part of deployment.
+Local databases with the column retain the count survey.
 
 Merged branches:
 
@@ -58,7 +66,7 @@ container configured for PostgreSQL. From the repository root:
 
 ```powershell
 docker cp backend/tests/integration/feature-branches.php celonicaquecionweb-backend-1:/tmp/feature-branches.php
-docker exec -e CEYLONICA_APP_ROOT=/var/www celonicaquecionweb-backend-1 php /tmp/feature-branches.php
+docker exec --user www-data -e CEYLONICA_APP_ROOT=/var/www celonicaquecionweb-backend-1 php /tmp/feature-branches.php
 ```
 
 It checks migration preservation, count ownership/validation/persistence,
@@ -68,3 +76,15 @@ Open `http://localhost:5174/gnpage/Ottappuwa/RAYOT` for the integrated dashboard
 Use `./start.ps1` to start local services if needed; it does not run seeders or migrations.
 The pre-existing working edits are also saved in a Git stash and
 `.local/integration-20261025/local-edits.patch` before restoration.
+
+## Local logging and location requests
+
+PHP-FPM runs as `www-data`. Run PHP diagnostic scripts in the containers with
+`docker exec --user www-data` so they do not create root-owned runtime files.
+A root-owned `storage/logs/laravel.log` previously caused signed-in GraphQL
+requests to fail with HTTP 500 when the authentication guard wrote its log;
+guest requests skipped that log and appeared healthy.
+
+The local entrypoint repairs ownership of this project's log directory/files
+and defaults container logging to stderr (visible through `docker logs`). It
+respects an explicit `LOG_CHANNEL` override. The hosted entrypoint is unchanged.

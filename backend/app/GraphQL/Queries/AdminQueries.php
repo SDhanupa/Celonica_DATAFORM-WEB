@@ -3,6 +3,7 @@
 namespace App\GraphQL\Queries;
 
 use App\Models\Admin;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 
 final class AdminQueries
@@ -26,10 +27,11 @@ final class AdminQueries
     /**
      * Return all admins
      */
-    public function admins(mixed $root, array $args): array
+    public function admins(mixed $root, array $args): Collection
     {
         $this->ensureSuperAdmin();
-        return Admin::orderBy('created_at', 'desc')->get()->toArray();
+        // Preserve Carbon date values for Lighthouse's DateTime scalar.
+        return Admin::orderBy('created_at', 'desc')->get();
     }
 
     /**

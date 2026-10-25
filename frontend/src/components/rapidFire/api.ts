@@ -3,6 +3,7 @@ import { ApiError } from '../../api/contributions';
 /* Mirrors RapidFireController responses. */
 
 export interface RapidFireRules {
+  counts_enabled?: boolean;
   session_size: number;
   seconds_per_question: number;
   hasty_threshold_ms: number;

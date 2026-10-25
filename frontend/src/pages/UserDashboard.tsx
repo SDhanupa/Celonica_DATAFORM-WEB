@@ -36,6 +36,7 @@ import ContributeBanner from '../components/contribute/ContributeBanner';
 import { useContributeCopy } from '../components/contribute/copy';
 import { saveVillage } from '../components/contribute/village';
 import { cleanMojibake } from '../utils/mojibake';
+import { filterLocationOptions } from '../utils/locationOptions';
 
 
 const tChart = {
@@ -182,6 +183,12 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const t = tChart[language] || tChart.en;
   const [showManualForm, setShowManualForm] = useState(!ccode && !window.matchMedia('(max-width: 600px)').matches);
 
+  const locationCopy = {
+    en: { loading: 'Loading locations…', failed: 'Could not load locations. Please try again.', retry: 'Try again', noMatch: 'No matching locations. Search in English, Sinhala or Tamil.', noDivisions: 'No DS divisions found for this district.', selectDistrict: 'Select a district first.', selectCity: 'Select a DS division first.' },
+    si: { loading: 'ස්ථාන පූරණය වෙමින්…', failed: 'ස්ථාන පූරණය කළ නොහැකි විය. නැවත උත්සාහ කරන්න.', retry: 'නැවත උත්සාහ කරන්න', noMatch: 'ගැළපෙන ස්ථාන නැත. සිංහල, දෙමළ හෝ ඉංග්‍රීසියෙන් සොයන්න.', noDivisions: 'මෙම දිස්ත්‍රික්කයට ප්‍රාදේශීය ලේකම් කොට්ඨාශ හමු නොවීය.', selectDistrict: 'පළමුව දිස්ත්‍රික්කයක් තෝරන්න.', selectCity: 'පළමුව ප්‍රාදේශීය ලේකම් කොට්ඨාශයක් තෝරන්න.' },
+    ta: { loading: 'இடங்கள் ஏற்றப்படுகின்றன…', failed: 'இடங்களை ஏற்ற முடியவில்லை. மீண்டும் முயலவும்.', retry: 'மீண்டும் முயலவும்', noMatch: 'பொருந்தும் இடங்கள் இல்லை. தமிழ், சிங்களம் அல்லது ஆங்கிலத்தில் தேடவும்.', noDivisions: 'இந்த மாவட்டத்தில் பிரதேச செயலகப் பிரிவுகள் கிடைக்கவில்லை.', selectDistrict: 'முதலில் மாவட்டத்தைத் தேர்ந்தெடுக்கவும்.', selectCity: 'முதலில் பிரதேச செயலகப் பிரிவைத் தேர்ந்தெடுக்கவும்.' },
+  }[language];
+
   const cycleLanguage = () => {
     if (language === 'en') setLanguage('si');
     else if (language === 'si') setLanguage('ta');
@@ -213,19 +220,22 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   const [copiedCode, setCopiedCode] = useState<boolean>(false);
 
   // Search Logic Queries (Always active so dropdowns are always populated)
-  const { data: districtsData, loading: districtsLoading, error: districtsError } = useQuery(GET_P_DISTRICTS, {
+  const { data: districtsData, loading: districtsLoading, error: districtsError, refetch: retryDistricts } = useQuery(GET_P_DISTRICTS, {
+    notifyOnNetworkStatusChange: true,
     fetchPolicy: 'cache-first',
   });
 
 
-  const { data: gnData, loading: gnLoading, error: gnError } = useQuery(GET_DISTRICT_GN_OPTIONS, {
+  const { data: gnData, loading: gnLoading, error: gnError, refetch: retryGnOptions } = useQuery(GET_DISTRICT_GN_OPTIONS, {
     variables: { id: selectedDistrict },
+    notifyOnNetworkStatusChange: true,
     skip: !selectedDistrict,
     fetchPolicy: 'cache-first',
   });
 
 
   const uniqueCities = React.useMemo(() => {
+    if (!selectedDistrict || String(gnData?.pDistrict?.id) !== String(selectedDistrict)) return [];
     if (!gnData?.pDistrict?.gramaNiladharis) return [];
     const citiesMap = new Map();
     gnData.pDistrict.gramaNiladharis.forEach((gn: any) => {
@@ -240,15 +250,16 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
       }
     });
     return Array.from(citiesMap.values());
-  }, [gnData]);
+  }, [gnData, selectedDistrict]);
 
   const filteredGNs = React.useMemo(() => {
+    if (!selectedDistrict || String(gnData?.pDistrict?.id) !== String(selectedDistrict)) return [];
     if (!gnData?.pDistrict?.gramaNiladharis) return [];
     if (!selectedCity) return gnData.pDistrict.gramaNiladharis;
     return gnData.pDistrict.gramaNiladharis.filter(
       (gn: any) => gn.divisionalSecretariatCode === selectedCity || gn.dsEn === selectedCity
     );
-  }, [gnData, selectedCity]);
+  }, [gnData, selectedCity, selectedDistrict]);
 
   const { data: autoGnData, loading: autoGnLoading } = useQuery(GET_GN_BY_COORDINATES, {
     variables: { lat: location?.lat, lng: location?.lng },
@@ -570,7 +581,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
 
   // Desktop panels render at 80% via CSS zoom. The map is not zoomed (zoom breaks Leaflet's pointer maths),
   // so anything that must line up with the map's own controls is converted between the two scales.
-  const UI_SCALE = 0.8;
+  const UI_SCALE = 0.9;
   const LANE_PAD_LEFT = 64 / UI_SCALE;   // clears the map's zoom stack (unscaled px)
   const LANE_PAD_RIGHT = 72 / UI_SCALE;  // clears the map's toolbox
   // Width, in the panels' own (zoomed) CSS px, that the contribute card gets in the open lane.
@@ -769,9 +780,21 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             </Box>
           ) : (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
+              {(districtsError || (selectedDistrict && gnError)) && (
+                <Alert severity="error" action={<Button color="inherit" size="small" onClick={() => {
+                  if (districtsError) void retryDistricts().catch(() => undefined);
+                  if (selectedDistrict && gnError) void retryGnOptions().catch(() => undefined);
+                }}>{locationCopy.retry}</Button>}>
+                  {locationCopy.failed}
+                </Alert>
+              )}
+              {selectedDistrict && gnLoading && <Typography role="status">{locationCopy.loading}</Typography>}
               <FormControl fullWidth>
                 <Autocomplete
                   options={districtsData?.pDistricts || []}
+                  filterOptions={filterLocationOptions}
+                  loadingText={locationCopy.loading}
+                  noOptionsText={locationCopy.noMatch}
                   getOptionLabel={(option: any) => {
                     if (!option) return '';
                     const name = language === 'en' ? option.admin2NameEn : language === 'si' ? option.admin2NameSi : option.admin2NameTa;
@@ -804,7 +827,13 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
 
               <FormControl fullWidth disabled={!selectedDistrict || gnLoading}>
                 <Autocomplete
-                  options={uniqueCities}
+                  key={`ds-${selectedDistrict}`}
+                  options={gnLoading ? [] : uniqueCities}
+                  disabled={!selectedDistrict || gnLoading || !!gnError}
+                  filterOptions={filterLocationOptions}
+                  loadingText={locationCopy.loading}
+                  noOptionsText={uniqueCities.length ? locationCopy.noMatch : locationCopy.noDivisions}
+                  isOptionEqualToValue={(option, value) => option.divisionalSecretariatCode === value.divisionalSecretariatCode}
                   getOptionLabel={(option: any) => {
                     if (!option) return '';
                     const name = language === 'en' ? option.dsEn : language === 'si' ? option.dsSi : option.dsTa;
@@ -820,6 +849,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                     <TextField
                       {...params}
                       label={language === 'en' ? 'City / DS Division' : language === 'si' ? 'නගරය / ප්‍රාදේශීය ලේකම් කොට්ඨාශය' : 'நகரம் / பிரதேச செயலகம்'}
+                      helperText={!selectedDistrict ? locationCopy.selectDistrict : undefined}
                       InputProps={{
                         ...params.InputProps,
                         endAdornment: (
@@ -836,7 +866,13 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
 
               <FormControl fullWidth disabled={!selectedCity || gnLoading}>
                 <Autocomplete
-                  options={filteredGNs}
+                  key={`gn-${selectedDistrict}-${selectedCity}`}
+                  options={gnLoading ? [] : filteredGNs}
+                  disabled={!selectedCity || gnLoading || !!gnError}
+                  filterOptions={filterLocationOptions}
+                  loadingText={locationCopy.loading}
+                  noOptionsText={locationCopy.noMatch}
+                  isOptionEqualToValue={(option, value) => String(option.id || option.CCODE) === String(value.id || value.CCODE)}
                   getOptionLabel={(option: any) => {
                     if (!option) return '';
                     const name = language === 'en' ? option.nameEn : language === 'si' ? option.nameSi : option.nameTa;
@@ -851,6 +887,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                     <TextField
                       {...params}
                       label={language === 'en' ? 'Grama Niladhari (GN)' : language === 'si' ? 'ග්‍රාම නිලධාරී (GN)' : 'கிராம உத்தியோகத்தர் (GN)'}
+                      helperText={!selectedCity ? locationCopy.selectCity : undefined}
                       InputProps={{
                         ...params.InputProps,
                         endAdornment: (
@@ -990,6 +1027,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         <Box sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
           <React.Suspense fallback={null}>
             <VillageMap3D
+              isDarkMode={isDarkMode}
               immersive
               insets={mapInsets}
               gnName={displayGN}
@@ -1028,7 +1066,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
             gap: { md: 1.5, lg: 2 },
             p: { md: 2, lg: 2.5 },
             zoom: UI_SCALE,
-            fontFamily: "'Poppins', 'Noto Sans Sinhala', 'Noto Sans Tamil', sans-serif",
+            fontFamily: "'DM Sans', 'Noto Sans Sinhala', 'Noto Sans Tamil', sans-serif",
           }}
         >
           <Box ref={topStackRef} sx={{ display: 'flex', flexDirection: 'column', gap: { md: 1.5, lg: 2 }, '& > *': { pointerEvents: 'auto' } }}>
@@ -1054,7 +1092,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                 aria-label="Ceylonica home"
                 sx={{ all: 'unset', display: 'flex', alignItems: 'center', gap: 1.1, cursor: 'pointer', flexShrink: 0, borderRadius: '10px', '&:focus-visible': { outline: '2px solid #2d5e41', outlineOffset: 3 } }}
               >
-                <Box component="img" src="/logo.png" alt="" sx={{ height: 34, width: 34, objectFit: 'contain' }} />
+                <Box component="img" src="/logo.png" alt="" sx={{ height: 34, width: 34, objectFit: 'contain', bgcolor: '#fff', borderRadius: '50%' }} />
                 <Typography sx={{ fontFamily: 'inherit', fontWeight: 800, fontSize: '1.1rem', color: ink, letterSpacing: '-0.02em' }}>
                   Ceylonica
                 </Typography>
@@ -1173,7 +1211,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
               flex: 1,
               minHeight: 0,
               display: 'grid',
-              gridTemplateColumns: { md: 'minmax(320px, 380px) 1fr', lg: 'minmax(330px, 380px) 1fr minmax(360px, 430px)' },
+              gridTemplateColumns: { md: '310px minmax(0, 1fr)', lg: '330px minmax(0, 1fr) 370px' },
               gap: { md: 1.5, lg: 2 },
             }}
           >
@@ -1192,11 +1230,11 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
               }}
             >
               {/* Village identity card */}
-              <Box key={displayGN || 'default'} sx={{ ...glassSx(isDarkMode), borderRadius: '22px', p: { md: 2.2, lg: 2.5 }, display: 'flex', flexDirection: 'column', gap: 1.4 }}>
+              <Box key={displayGN || 'default'} sx={{ ...glassSx(isDarkMode), borderRadius: '18px', p: { md: 2.2, lg: 2.5 }, borderTop: '4px solid #28715b', display: 'flex', flexDirection: 'column', gap: 1.4 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                  <Box component="img" src="/logo.png" alt="Ceylonica logo" sx={{ height: 46, width: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 3px 10px rgba(0,0,0,0.12))' }} />
+
                   {(displayDistrict || displayCity) && (
-                    <Typography sx={{ fontFamily: 'inherit', fontSize: '0.74rem', fontWeight: 600, color: inkMuted, textTransform: 'uppercase', letterSpacing: '0.08em', lineHeight: 1.4 }}>
+                    <Typography sx={{ fontFamily: 'inherit', fontSize: '0.82rem', fontWeight: 500, color: inkMuted, letterSpacing: '0', lineHeight: 1.4 }}>
                       {[displayDistrict, displayCity].filter(Boolean).join('  ›  ')}
                     </Typography>
                   )}
@@ -1215,7 +1253,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                       <PinDropRoundedIcon sx={{ fontSize: '1.15rem' }} />
                     </Box>
                     <Box sx={{ minWidth: 0, flex: 1 }}>
-                      <Typography sx={{ fontFamily: 'inherit', fontSize: '0.66rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: inkMuted, lineHeight: 1.3 }}>
+                      <Typography sx={{ fontFamily: 'inherit', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0', color: inkMuted, lineHeight: 1.3 }}>
                         {language === 'si' ? 'ග්‍රාම නිලධාරී වසම් කේතය' : language === 'ta' ? 'கிராம அலுவலர் பிரிவு குறியீடு' : 'GN Division Area Code'}
                       </Typography>
                       <Typography component="div" sx={{ fontFamily: "'JetBrains Mono', 'Roboto Mono', monospace", fontWeight: 800, fontSize: '1.2rem', color: ink, letterSpacing: '0.12em', lineHeight: 1.2 }}>

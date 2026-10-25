@@ -58,9 +58,13 @@ class SignupProfileSync
                 // Email alone must never link or overwrite another account.
                 throw new RuntimeException('Unable to link this signup profile. Contact support.');
             }
+            $name = trim(($profile['firstName'] ?? '') . ' ' . ($profile['lastName'] ?? ''));
+            if ($name === '') {
+                throw new RuntimeException('Signup names are unavailable. Check the identity provider profile permissions.');
+            }
 
             return User::create($signup + [
-                'name' => trim(($profile['firstName'] ?? '') . ' ' . ($profile['lastName'] ?? '')),
+                'name' => $name,
                 'email' => $email,
                 'password' => bcrypt(Str::random(32)),
                 'keycloak_sub' => $subject,

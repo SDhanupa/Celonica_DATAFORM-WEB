@@ -9,6 +9,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 /**
@@ -323,6 +324,9 @@ class RapidFireController extends Controller
     public function counts(Request $request, string $id): JsonResponse
     {
         $sub = $this->sub($request);
+        if (!Schema::hasColumn('village_topic_answers', 'quantity')) {
+            return $this->fail('Count surveys are not available yet.', 503);
+        }
         if (!Str::isUuid($id)) {
             return $this->fail('Round not found.', 404);
         }
@@ -396,6 +400,7 @@ class RapidFireController extends Controller
     private function rules(): array
     {
         return [
+            'counts_enabled' => Schema::hasColumn('village_topic_answers', 'quantity'),
             'session_size' => (int) config('rapid_fire.session_size'),
             'seconds_per_question' => (int) config('rapid_fire.seconds_per_question'),
             'hasty_threshold_ms' => (int) config('rapid_fire.hasty_threshold_ms'),

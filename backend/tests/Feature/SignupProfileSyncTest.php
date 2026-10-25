@@ -67,6 +67,17 @@ class SignupProfileSyncTest extends TestCase
         catch (\RuntimeException $e) { $this->assertSame(0,User::count()); }
     }
 
+    public function test_hidden_signup_names_never_create_a_blank_profile(): void
+    {
+        $api = \Mockery::mock(KeycloakAdminService::class);
+        $api->shouldReceive('getUserProfile')->with('signup-sub')->andReturn([
+            'id'=>'signup-sub', 'email'=>'signup@example.test',
+            'attributes'=>['nic'=>['198812345679'], 'mobile_number'=>['0700000000']],
+        ]);
+        try { (new SignupProfileSync($api))->sync('signup-sub'); $this->fail('Expected missing names rejection'); }
+        catch (\RuntimeException $e) { $this->assertSame(0, User::count()); }
+    }
+
     public function test_sync_fills_only_missing_values_on_the_same_account(): void
     {
         $user=User::create(['name'=>'Existing Name','email'=>'signup@example.test','keycloak_sub'=>'signup-sub','nic'=>'880000000V','address'=>'Existing address']);

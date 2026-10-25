@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { lazy, Suspense, useState } from 'react';
 import {
   Box, Typography, IconButton, Chip, Menu, MenuItem, Divider,
   Dialog, DialogContent, DialogActions, Button, SwipeableDrawer, useScrollTrigger,
@@ -18,7 +18,7 @@ import GroupsIcon from '@mui/icons-material/Groups';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import GlobalSearchBar from '../GlobalSearchBar';
-import { VillageMap } from '../VillageMap';
+const InteractiveVillageMap = lazy(() => import('../VillageMap3D'));
 import GnPageFooter from '../GnPageFooter';
 import MobileSurveyCarousel from './MobileSurveyCarousel';
 import MobileLocationSheet from './MobileLocationSheet';
@@ -116,11 +116,16 @@ const MobileDashboard: React.FC<MobileDashboardProps> = (props) => {
       {/* ── IMMERSIVE MAP BACKGROUND (fixed, interactive) ─────────────── */}
       <Box sx={{
         position: 'fixed', top: 0, left: 0, right: 0,
-        height: '60dvh', zIndex: 0,
+        height: 'max(60dvh, 510px)', zIndex: 0,
         bgcolor: isDarkMode ? '#0b1120' : '#e8eef7',
       }}>
-        <VillageMap
+        <Suspense fallback={<Box role="status" sx={{ pt: 12, textAlign: 'center' }}>Loading map…</Box>}>
+        <InteractiveVillageMap
           immersive
+          compact
+          initial3D={false}
+          isDarkMode={isDarkMode}
+          insets={{ top: 80, right: 0, bottom: 150, left: 0 }}
           height="100%"
           gnName={displayGN || ''}
           district={displayDistrict}
@@ -128,6 +133,7 @@ const MobileDashboard: React.FC<MobileDashboardProps> = (props) => {
           ccode={displayCCODE}
           boundary={activeGn?.boundary}
         />
+        </Suspense>
         {/* Top scrim so the app bar stays legible over the map */}
         <Box sx={{
           position: 'absolute', top: 0, left: 0, right: 0, height: 130, pointerEvents: 'none',
@@ -214,14 +220,14 @@ const MobileDashboard: React.FC<MobileDashboardProps> = (props) => {
 
         {/* Transparent spacer reveals the map; taps pass through to keep the map
             pannable. The floating pill re-enables pointer events for itself. */}
-        <Box sx={{ height: '42dvh', pointerEvents: 'none', position: 'relative' }}>
+        <Box sx={{ height: 'max(42dvh, 360px)', pointerEvents: 'none', position: 'relative' }}>
           <Box
             onClick={() => setLocationOpen(true)}
             role="button"
             aria-label={L('Change location', 'ස්ථානය වෙනස් කරන්න', 'இடத்தை மாற்று')}
             sx={{
               pointerEvents: 'auto',
-              position: 'absolute', left: '50%', bottom: 22, transform: 'translateX(-50%)',
+              position: 'absolute', left: '50%', bottom: 38, transform: 'translateX(-50%)',
               display: 'inline-flex', alignItems: 'center', gap: 1, cursor: 'pointer',
               maxWidth: 'calc(100vw - 48px)',
               px: 1.6, py: 0.9, borderRadius: '999px',
@@ -268,7 +274,7 @@ const MobileDashboard: React.FC<MobileDashboardProps> = (props) => {
               </Typography>
             )}
             <Typography sx={{
-              fontFamily: "'Playfair Display', serif", fontWeight: 900,
+              fontFamily: "'DM Sans', 'Noto Sans Sinhala', 'Noto Sans Tamil', sans-serif", fontWeight: 800,
               fontSize: 'clamp(1.9rem, 8vw, 2.7rem)', lineHeight: 1.05, color: textMain,
               letterSpacing: '-0.02em', wordBreak: 'break-word',
             }}>
@@ -357,7 +363,7 @@ const MobileDashboard: React.FC<MobileDashboardProps> = (props) => {
                   }}>
                     {cat.icon}
                   </Box>
-                  <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: textMain, textAlign: 'center', lineHeight: 1.15 }}>
+                  <Typography sx={{ fontSize: '0.78rem', fontWeight: 600, color: textMain, textAlign: 'center', lineHeight: 1.15 }}>
                     {catLabel(cat, language)}
                   </Typography>
                 </Box>
@@ -368,8 +374,8 @@ const MobileDashboard: React.FC<MobileDashboardProps> = (props) => {
           {/* Population highlight card */}
           <Box sx={{
             mb: 2.5, borderRadius: '24px', p: 2.5, position: 'relative', overflow: 'hidden',
-            background: 'linear-gradient(135deg,#2563eb 0%,#1d4ed8 55%,#1e40af 100%)',
-            boxShadow: '0 18px 44px rgba(37,99,235,0.4)',
+            background: '#205e4b',
+            boxShadow: '0 8px 24px rgba(17,43,36,0.12)',
           }}>
             <Box sx={{ position: 'absolute', top: -30, right: -30, width: 140, height: 140, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.12)', filter: 'blur(6px)' }} />
             <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>

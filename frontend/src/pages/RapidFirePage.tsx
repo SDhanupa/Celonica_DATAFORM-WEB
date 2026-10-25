@@ -182,7 +182,7 @@ const RapidFirePage: React.FC = () => {
     );
   }
 
-  if (state.phase === 'results' && countsOpen && state.sessionId && state.summary?.yes_topics.length) {
+  if (state.phase === 'results' && state.rules?.counts_enabled && countsOpen && state.sessionId && state.summary?.yes_topics.length) {
     const sessionId = state.sessionId;
     return (
       <CountSurvey

@@ -140,7 +140,7 @@ const GnPageFooter: React.FC<GnPageFooterProps> = () => {
                 <Typography component={Link} to={targetUrl} variant="body2" sx={{ display: 'block', color: '#38bdf8', mb: 1.5, textDecoration: 'none', cursor: 'pointer', fontWeight: 'bold' }}>
                   {t.industrySurvey}
                 </Typography>
-                <Typography component={Link} to="/fill-data" variant="body2" sx={{ display: 'block', color: '#38bdf8', mb: 1.5, textDecoration: 'none', cursor: 'pointer', fontWeight: 'bold' }}>
+                <Typography component={Link} to="/mydashboard" variant="body2" sx={{ display: 'block', color: '#38bdf8', mb: 1.5, textDecoration: 'none', cursor: 'pointer', fontWeight: 'bold' }}>
                   {t.dataGather}
                 </Typography>
                 {[t.boundaries, t.land, t.roads, t.naturalLocation, t.flora].map((item) => (

@@ -142,7 +142,7 @@ const Results: React.FC<ResultsProps> = ({ summary, score, bestStreak, cardsCoun
           )}
         </Paper>
 
-        {summary && summary.yes_topics.length > 0 && (
+        {rules.counts_enabled && summary && summary.yes_topics.length > 0 && (
           <Button
             onClick={onCount}
             fullWidth

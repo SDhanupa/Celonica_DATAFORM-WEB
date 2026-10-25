@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import maplibregl, { type LngLatBoundsLike, type Map as MlMap, type StyleSpecification } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { Box, Divider, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
@@ -107,8 +107,8 @@ const style: StyleSpecification = {
       },
     },
     { id: 'mask', type: 'fill', source: 'mask', paint: { 'fill-color': '#0b1a14', 'fill-opacity': 0.55 } },
-    { id: 'parcels', type: 'fill', source: 'parcels', paint: { 'fill-color': ['get', 'color'], 'fill-opacity': 0.45 } },
-    { id: 'parcels-line', type: 'line', source: 'parcels', paint: { 'line-color': '#334155', 'line-width': 1.5 } },
+    { id: 'parcels', type: 'fill', source: 'parcels', layout: { visibility: 'none' }, paint: { 'fill-color': ['get', 'color'], 'fill-opacity': 0.45 } },
+    { id: 'parcels-line', type: 'line', source: 'parcels', layout: { visibility: 'none' }, paint: { 'line-color': '#334155', 'line-width': 1.5 } },
     { id: 'village-glow', type: 'line', source: 'village', paint: { 'line-color': '#ffffff', 'line-width': 9, 'line-blur': 7, 'line-opacity': 0.6 } },
     { id: 'village-outline', type: 'line', source: 'village', paint: { 'line-color': '#facc15', 'line-width': 3 } },
   ],
@@ -196,21 +196,31 @@ function frame(map: MlMap, bounds: LngLatBoundsLike | null, insets: MapInsets, i
   else map.jumpTo(target);
 }
 
-const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
+type InteractiveMapProps = VillageMapProps & { isDarkMode?: boolean; compact?: boolean; initial3D?: boolean };
+
+const VillageMap3DInner: React.FC<InteractiveMapProps> = (props) => {
   const { boundary, height = 520, insets, gnName, ccode } = props;
   const edge = insets ?? NO_INSETS;
-  const isDark = useTheme().palette.mode === 'dark';
+  const theme = useTheme();
+  const isDark = props.isDarkMode ?? (theme.palette.mode === 'dark');
 
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MlMap | null>(null);
+  // React can preserve loaded state during hot reload while replacing the map.
+  const styleReadyRef = useRef(false);
   const markerRef = useRef<maplibregl.Marker | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [styleVersion, setStyleVersion] = useState(0);
+  const [exportPreview, setExportPreview] = useState<{url: string; name: string} | null>(null);
+  useEffect(() => {
+    return () => { if (exportPreview) URL.revokeObjectURL(exportPreview.url); };
+  }, [exportPreview]);
   const [failed, setFailed] = useState(false);
-  const [is3D, setIs3D] = useState(true);
+  const [is3D, setIs3D] = useState(props.initial3D ?? true);
   const [base, setBase] = useState<Base>('satellite');
-  // Off by default: two extra imagery layers re-fetch every tile the satellite base already loads.
-  const [showRoads, setShowRoads] = useState(false);
-  const [showParcels, setShowParcels] = useState(true);
+  // Roads are visible on arrival; parcel overlays are opt-in.
+  const [showRoads, setShowRoads] = useState(true);
+  const [showParcels, setShowParcels] = useState(false);
   // Off by default: MapLibre 4 can't clip extrusions to the village, so buildings outside the focus area
   // render as bright specks over the dimmed surroundings.
   const [showBuildings, setShowBuildings] = useState(false);
@@ -243,14 +253,15 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
   // A WebGL context that fails at runtime (driver, lost GPU) falls back to the 2D map.
   useEffect(() => {
     if (!containerRef.current || !villageKnown || mapRef.current) return;
+    styleReadyRef.current = false;
     let map: MlMap;
     try {
       map = new maplibregl.Map({
         container: containerRef.current,
         style,
         ...(bounds ? { bounds, fitBoundsOptions: { maxZoom: 16 } } : { center: COLOMBO, zoom: 12 }),
-        pitch: PITCH_3D,
-        bearing: BEARING_3D,
+        pitch: is3D ? PITCH_3D : 0,
+        bearing: is3D ? BEARING_3D : 0,
         maxPitch: 65,
         maxZoom: 18,
         attributionControl: { compact: true },
@@ -270,7 +281,9 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
     // outline, pin and controls need none of them, so they appear while imagery streams in underneath.
     // (isStyleLoaded() can't be used for this: in MapLibre 4 it also waits for all tiles.)
     map.once('style.load', () => {
-      map.setTerrain({ source: 'dem', exaggeration: EXAGGERATION });
+      if (is3D) map.setTerrain({ source: 'dem', exaggeration: EXAGGERATION });
+      styleReadyRef.current = true;
+      setStyleVersion(v => v + 1);
       setLoaded(true);
     });
     // Missing tiles (offline, rate-limited) are not fatal; MapLibre keeps rendering what it has.
@@ -279,6 +292,7 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
     return () => {
       markerRef.current?.remove();
       markerRef.current = null;
+      styleReadyRef.current = false;
       map.remove();
       mapRef.current = null;
       setLoaded(false);
@@ -290,7 +304,7 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
   // Village shape, mask and pin follow the selected village.
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !loaded) return;
+    if (!map || !loaded || !styleReadyRef.current) return;
     const { village, mask } = shapes(ring);
     (map.getSource('village') as maplibregl.GeoJSONSource).setData(village);
     (map.getSource('mask') as maplibregl.GeoJSONSource).setData(mask);
@@ -341,12 +355,12 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
       map.off('sourcedata', onData);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loaded, ring, bounds]);
+  }, [loaded, ring, bounds, styleVersion]);
 
   // Panels resize with the window; keep the village in the open lane without animating every step.
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !loaded) return;
+    if (!map || !loaded || !styleReadyRef.current) return;
     map.resize();
     // A jump here would cut the landing animation short; panels settle long before it ends.
     if (map.isMoving()) return;
@@ -366,7 +380,7 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
   // Layer visibility follows the toolbox toggles.
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !loaded) return;
+    if (!map || !loaded || !styleReadyRef.current) return;
     const show = (id: string, on: boolean) => map.setLayoutProperty(id, 'visibility', on ? 'visible' : 'none');
     // Road and place labels sit on imagery; the street and topographic maps already draw their own.
     show('roads', showRoads && base === 'satellite');
@@ -377,14 +391,14 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
     show('mask', showBoundary);
     show('village-glow', showBoundary);
     show('village-outline', showBoundary);
-  }, [loaded, base, showRoads, showParcels, showBuildings, showBoundary]);
+  }, [loaded, base, showRoads, showParcels, showBuildings, showBoundary, styleVersion]);
 
   // Seamless base-map swap: the new base is turned on underneath/over the old one, and the old one is only
   // hidden once the map is idle again (new tiles for this view loaded), so there is never a blank or half-drawn
   // frame. A slow network still swaps after SWAP_TIMEOUT_MS rather than leaving two bases drawing forever.
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !loaded) return;
+    if (!map || !loaded || !styleReadyRef.current) return;
     shownBase.current = base;
     map.setPaintProperty(base, 'raster-opacity', 1); // a preloaded base sits at opacity 0
     map.setLayoutProperty(base, 'visibility', 'visible');
@@ -397,19 +411,34 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
       window.clearTimeout(timer);
       map.off('idle', hideOthers);
     };
-  }, [loaded, base]);
+  }, [loaded, base, styleVersion]);
 
   const snapshot = () => {
     const map = mapRef.current;
     if (!map) return;
     // The WebGL buffer is cleared after each frame, so read it inside the next render.
     map.once('render', () => {
-      const a = document.createElement('a');
-      a.href = map.getCanvas().toDataURL('image/png');
+      const source = map.getCanvas();
+      const output = document.createElement('canvas');
+      output.width = source.width;
+      output.height = source.height + 60;
+      const ctx = output.getContext('2d');
+      if (!ctx) return;
+      ctx.drawImage(source, 0, 0);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, source.height, output.width, 60);
+      ctx.fillStyle = '#18372d';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText([gnName, ccode].filter(Boolean).join(' · '), 12, source.height + 22, output.width - 24);
+      // Attribution is a DOM control, so it must be included separately in a canvas export.
+      ctx.font = '11px sans-serif';
+      const attribution = map.getContainer().querySelector('.maplibregl-ctrl-attrib-inner')?.textContent ?? '';
+      ctx.fillText(attribution, 12, source.height + 44, output.width - 24);
       // Only strip characters filesystems reject: village names are often Sinhala or Tamil.
       const name = [gnName, ccode].filter(Boolean).map((v) => String(v).replace(/[\\/:*?"<>|\s]+/g, '-')).join('-');
-      a.download = `${name || 'village'}-map.png`;
-      a.click();
+      output.toBlob((blob) => {
+        if (blob) setExportPreview({url: URL.createObjectURL(blob), name: `${name || 'village'}-map.png`});
+      }, 'image/png');
     });
     map.triggerRepaint();
   };
@@ -431,7 +460,7 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
         aria-pressed={active}
         onClick={onClick}
         disabled={!loaded}
-        sx={{ p: 0.8, color: active ? '#3b82f6' : iconColor, '& .MuiSvgIcon-root': { fontSize: '1.15rem' } }}
+        sx={{ p: 0.8, ...(props.compact ? { width: 44, height: 44 } : {}), color: active ? '#3b82f6' : iconColor, '& .MuiSvgIcon-root': { fontSize: '1.15rem' } }}
       >
         {icon}
       </IconButton>
@@ -455,7 +484,7 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
       <Box ref={containerRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
 
       {/* ── LEFT FLOATING CONTROLS (+, -, Reset view, Compass) ── */}
-      <Box sx={{ position: 'absolute', top: edge.top + 16, left: edge.left + 16, zIndex: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+      <Box sx={{ position: 'absolute', top: edge.top + (props.compact ? 0 : 16), left: edge.left + 16, zIndex: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
         <Box sx={group}>
           {tool('Zoom In', () => mapRef.current?.zoomIn(), <AddIcon />, 'right')}
           <Divider />
@@ -479,9 +508,9 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
       )}
 
       {/* ── RIGHT FLOATING TOOLBOX (same options as the original map) ── */}
-      <Box sx={{ position: 'absolute', top: edge.top + 16, right: edge.right + 16, zIndex: 2, ...glassSx(isDark), borderRadius: '14px', p: 0.5, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+      <Box sx={{ position: 'absolute', top: edge.top + 16, right: edge.right + 16, zIndex: 2, ...glassSx(isDark), borderRadius: '14px', p: 0.5, display: props.compact ? 'grid' : 'flex', gridTemplateColumns: 'repeat(3, 44px)', flexDirection: 'column', gap: 0.5 }}>
         {tool(is3D ? 'Switch to 2D' : 'Switch to 3D', toggle3D,
-          <Typography component="span" sx={{ fontWeight: 800, fontSize: '0.75rem', width: 18, lineHeight: '18px' }}>{is3D ? '2D' : '3D'}</Typography>, 'left')}
+          <Typography component="span" sx={{ fontWeight: 800, fontSize: '0.75rem', color: 'inherit', width: 18, lineHeight: '18px' }}>{is3D ? '2D' : '3D'}</Typography>, 'left')}
         {tool(`Map Layer: ${BASE_LABEL[base]} (next: ${BASE_LABEL[nextBase]})`, () => setBase(nextBase), <LayersIcon />, 'left', base !== 'satellite')}
         {tool('Roads & Transport Lines', () => setShowRoads((v) => !v), <AltRouteIcon />, 'left', showRoads)}
         {tool('Cadastral Parcels / Lands', () => setShowParcels((v) => !v), <GridViewIcon />, 'left', showParcels)}
@@ -491,12 +520,22 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
         {tool('Aerial Photos', () => setBase('satellite'), <PhotoLibraryIcon />, 'left', base === 'satellite')}
         {tool('Snapshot / Export Map', snapshot, <CameraAltIcon />, 'left')}
       </Box>
+      <Dialog open={Boolean(exportPreview)} onClose={() => setExportPreview(null)} maxWidth="sm" fullWidth>
+        <DialogTitle>Export village map</DialogTitle>
+        <DialogContent>
+          {exportPreview && <Box component="img" src={exportPreview.url} alt="Village map export preview" sx={{ width: '100%', display: 'block' }} />}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setExportPreview(null)}>Close</Button>
+          {exportPreview && <Button component="a" href={exportPreview.url} download={exportPreview.name} variant="contained">Download PNG</Button>}
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
 
 /** 3D village map; uses the 2D Leaflet map where WebGL is unavailable. */
-const VillageMap3D: React.FC<VillageMapProps> = (props) =>
+const VillageMap3D: React.FC<InteractiveMapProps> = (props) =>
   webglSupported ? <VillageMap3DInner {...props} /> : <VillageMap {...props} />;
 
 export default VillageMap3D;

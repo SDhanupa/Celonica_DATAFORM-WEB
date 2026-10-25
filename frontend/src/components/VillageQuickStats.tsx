@@ -45,7 +45,7 @@ export const VillageQuickStats: React.FC<VillageQuickStatsProps> = ({
 
   const stats = [
     {
-      label: { en: 'VILLAGE POPULATION', si: 'ග්‍රාමීය ජනගහනය', ta: 'கிராம மக்கள்தொகை' }[language] || 'VILLAGE POPULATION',
+      label: { en: 'Population', si: 'ග්‍රාමීය ජනගහනය', ta: 'கிராம மக்கள்தொகை' }[language] || 'Population',
       value: totalPopulation,
       icon: <GroupsIcon />,
       color: '#2563eb',
@@ -71,11 +71,11 @@ export const VillageQuickStats: React.FC<VillageQuickStatsProps> = ({
       sx={{
         display: 'grid',
         gridTemplateColumns: isColumn ? '1fr' : 'repeat(3, 1fr)',
-        gap: isColumn ? 1 : (compact ? 1.25 : 1.5),
+        gap: isColumn ? 0 : (compact ? 1.25 : 1.5),
         width: '100%',
       }}
     >
-      {stats.map((stat, idx) => (
+      {stats.map((stat) => (
         <Box
           key={stat.label}
           sx={{
@@ -83,18 +83,14 @@ export const VillageQuickStats: React.FC<VillageQuickStatsProps> = ({
             px: compact ? 1.5 : 1.8,
             py: isColumn ? 1 : (compact ? 1.5 : 1.8),
             ...glassTileSx(isDarkMode),
+            ...(isColumn ? { background: 'transparent', border: 'none', borderBottom: `1px solid ${isDarkMode ? '#34444d' : '#e1e9e5'}`, borderRadius: 0, px: 0.25, py: 1.8, '&:last-child': { borderBottom: 0 } } : {}),
             display: 'flex',
             flexDirection: isColumn ? 'row' : 'column',
             alignItems: isColumn ? 'center' : 'stretch',
             justifyContent: isColumn ? 'space-between' : 'flex-start',
             gap: isColumn ? 1.25 : 0.6,
             minWidth: 0,
-            animation: `fadeInUp 0.4s ease ${idx * 80}ms both`,
-            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-            '&:hover': {
-              transform: 'translateY(-2px)',
-              boxShadow: isDarkMode ? 'none' : '0 8px 20px rgba(15,23,42,0.08)',
-            },
+
           }}
         >
           <Box
@@ -110,10 +106,10 @@ export const VillageQuickStats: React.FC<VillageQuickStatsProps> = ({
             {stat.icon}
             <Typography
               sx={{
-                fontSize: compact ? '0.63rem' : '0.68rem',
+                fontSize: compact ? '0.84rem' : '0.8rem',
                 fontWeight: 700,
                 color: isDarkMode ? '#94a3b8' : '#64748b',
-                textTransform: 'uppercase',
+                textTransform: 'none',
                 letterSpacing: '0.3px',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
@@ -125,7 +121,7 @@ export const VillageQuickStats: React.FC<VillageQuickStatsProps> = ({
           </Box>
           <Typography
             sx={{
-              fontSize: compact ? '1.35rem' : '1.5rem',
+              fontSize: compact ? '1.6rem' : '1.5rem',
               fontWeight: 800,
               color: isDarkMode ? '#f8fafc' : '#0f172a',
               fontVariantNumeric: 'tabular-nums',

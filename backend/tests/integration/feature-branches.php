@@ -27,7 +27,16 @@ foreach ([[1,'tester','yes'],[2,'tester','no'],[3,'another-user','yes']] as [$id
     DB::table('village_topic_answers')->insert(['session_id'=>$session,'category_id'=>$id,'contributor_sub'=>$sub,'answer'=>$answer]);
 }
 $migration=require $root.'/database/migrations/2026_10_11_000001_add_quantity_to_village_topic_answers.php';
+$controller=$app->make(RapidFireController::class);
+$legacyRequest=Request::create('/counts','POST',['counts'=>[['category_id'=>1,'count'=>7]]]);
+$legacyRequest->attributes->set('keycloak_sub','tester');
+$before=DB::table('village_topic_answers')->get()->toJson();
+check($controller->counts($legacyRequest,$session)->getStatusCode()===503,'Unmigrated schema must reject count writes cleanly');
+check(DB::table('village_topic_answers')->get()->toJson()===$before,'Unavailable counts must not change answers');
+$rules=new ReflectionMethod(RapidFireController::class,'rules');
+check($rules->invoke($controller)['counts_enabled']===false,'Unmigrated schema must hide count offer');
 $migration->up();
+check($rules->invoke($controller)['counts_enabled']===true,'Migrated local schema must enable counts');
 check(DB::table('village_topic_answers')->count()===3 && DB::table('village_topic_answers')->whereNotNull('quantity')->count()===0, 'Migration must preserve existing answers');
 $controller=$app->make(RapidFireController::class);
 $request=Request::create('/counts','POST',['counts'=>[['category_id'=>1,'count'=>7],['category_id'=>2,'count'=>8],['category_id'=>3,'count'=>9]]]);

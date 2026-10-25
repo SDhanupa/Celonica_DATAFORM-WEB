@@ -961,7 +961,7 @@ const IndustrySurveyPage: React.FC = () => {
           <Button 
             onClick={() => {
               setDuplicatePromptOpen(false);
-              navigate('/fill-data');
+              navigate('/mydashboard');
             }}
             variant="outlined"
             color="inherit"
@@ -1588,7 +1588,7 @@ const IndustrySurveyPage: React.FC = () => {
       )}
 
       {/* Success Dialog */}
-      <Dialog PaperProps={dialogPaperProps} open={successDialogOpen} onClose={() => { setSuccessDialogOpen(false); navigate('/fill-data'); }} maxWidth="sm" fullWidth>
+      <Dialog PaperProps={dialogPaperProps} open={successDialogOpen} onClose={() => { setSuccessDialogOpen(false); navigate('/mydashboard'); }} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ fontWeight: 'bold', color: 'success.main', display: 'flex', alignItems: 'center', gap: 1 }}>
           {language === 'si' ? 'සාර්ථකයි!' : language === 'ta' ? 'வெற்றி!' : 'Success!'}
         </DialogTitle>
@@ -1608,7 +1608,7 @@ const IndustrySurveyPage: React.FC = () => {
           )}
         </DialogContent>
         <DialogActions sx={{ p: 2, pt: 0 }}>
-          <Button variant="contained" color="success" onClick={() => { setSuccessDialogOpen(false); navigate('/fill-data'); }}>
+          <Button variant="contained" color="success" onClick={() => { setSuccessDialogOpen(false); navigate('/mydashboard'); }}>
             {language === 'si' ? 'හරි' : language === 'ta' ? 'சரி' : 'OK'}
           </Button>
         </DialogActions>

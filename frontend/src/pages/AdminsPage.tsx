@@ -39,13 +39,6 @@ import { useQuery, useMutation } from '@apollo/client';
 import { GET_ADMINS } from '../graphql/queries';
 import { REGISTER_ADMIN, UPDATE_ADMIN_ROLE, DEACTIVATE_ADMIN, ACTIVATE_ADMIN } from '../graphql/mutations';
 
-// Fallback mock data in case backend is not connected yet
-const MOCK_ADMINS = [
-  { id: '1', name: 'Super Admin', email: 'superadmin@ceylonica.com', role: 'SUPER_ADMIN', isActive: true, keycloakSub: 'kc-001', lastLoginAt: new Date().toISOString(), createdAt: new Date().toISOString() },
-  { id: '2', name: 'John Doe', email: 'john@ceylonica.com', role: 'ADMIN', isActive: true, keycloakSub: 'kc-002', lastLoginAt: null, createdAt: new Date().toISOString() },
-  { id: '3', name: 'Jane Smith', email: 'jane@ceylonica.com', role: 'MODERATOR', isActive: false, keycloakSub: 'kc-003', lastLoginAt: null, createdAt: new Date().toISOString() },
-];
-
 const roleConfig: Record<string, { label: string; color: 'primary' | 'success' | 'warning' }> = {
   SUPER_ADMIN: { label: 'Super Admin', color: 'primary' },
   ADMIN: { label: 'Admin', color: 'success' },
@@ -60,8 +53,7 @@ const AdminsPage: React.FC = () => {
   const [newAdmin, setNewAdmin] = useState({ keycloakSub: '', email: '', name: '', role: 'ADMIN' });
   const [successMsg, setSuccessMsg] = useState('');
 
-  const { data, loading, refetch } = useQuery(GET_ADMINS, { 
-    errorPolicy: 'ignore',
+  const { data, loading, error, refetch } = useQuery(GET_ADMINS, {
     fetchPolicy: 'cache-first'
   });
   const [registerAdmin] = useMutation(REGISTER_ADMIN);
@@ -69,7 +61,7 @@ const AdminsPage: React.FC = () => {
   const [deactivateAdmin] = useMutation(DEACTIVATE_ADMIN);
   const [activateAdmin] = useMutation(ACTIVATE_ADMIN);
 
-  const admins = data?.admins || MOCK_ADMINS;
+  const admins = data?.admins ?? [];
 
   const filtered = admins.filter(
     (a: any) =>
@@ -145,6 +137,7 @@ const AdminsPage: React.FC = () => {
           {successMsg}
         </Alert>
       )}
+      {error && <Alert severity="error" sx={{ mb: 3 }} action={<Button color="inherit" onClick={() => refetch()}>Retry</Button>}>Unable to load administrator accounts.</Alert>}
 
       {/* Search */}
       <Box sx={{ mb: 3 }}>

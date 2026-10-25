@@ -1,0 +1,155 @@
+FOLLOW-UP: MOBILE MAP / AUTH / ADMIN REVIEW - 2026-10-25
+This section supersedes the corresponding gaps in the earlier review below.
+All changes remain uncommitted on codex/local-feature-integration-20261025.
+No push to main/Dev, hosting deployment, existing-user edit, migration,
+seeding, or other-project change was performed.
+
+FIXES
+- Mobile uses the interactive MapLibre map, starts in 2D, and has 44px touch
+  targets with a compact 3x3 toolbar. Short-screen spacing keeps the location
+  chip clear of controls and attribution. Roads start on; parcels start off.
+  Roads, buildings, boundaries, base map, 3D, zoom, reset and centering were
+  exercised. A style-load version retriggers layers/markers after HMR.
+- Export presents a PNG preview and uses a Blob download link. A real PNG
+  downloaded and was visually inspected: satellite, boundary, name and
+  attribution are present. The earlier data-URL download failed in IAB.
+- Short-phone browser check at 320x568 passed: document and scroll width both
+  305px (scrollbar excluded), 44px controls visible, location chip and map
+  attribution separated. Responsive viewport override restored afterward.
+- Leaflet compatibility fallback now toggles roads and boundaries, selects
+  satellite imagery and omits controls it cannot implement.
+- SMS registration now persists the names captured before OTP verification.
+  Local Keycloak firstName/lastName permissions were missing and prevented
+  service-account profile reads. Restored only those two profile definitions,
+  with a backup under .local; no existing user records were edited.
+  scripts/repair-local-signup-names.py is the narrow repair; local Google
+  setup now retains these permissions. Only local Keycloak was restarted.
+- New app profiles reject missing names instead of creating blank profiles.
+- Admin directory API now preserves model date objects for GraphQL. Converting
+  them to arrays produced an invalid DateTime error. Removed fake-account UI
+  fallback and added an explicit retryable load error.
+
+VALIDATION
+- Final frontend TypeScript/Vite build passed. Existing large-chunk warning:
+  main 1.86 MB and map 989 KB uncompressed.
+- Isolated SQLite PHPUnit suite: 21 tests, 78 assertions passed. Includes
+  signup profile reuse, hidden-name rejection, admin dates and access control.
+- Java SPI package/tests passed: 15 tests (13 SMS notification tests plus two
+  registration-name tests); installed the provider only in local Keycloak.
+- Temporary 1730 account: password signup + OTP, browser password login,
+  separate SMS-only login + OTP completed. Deleted only this account and its
+  matching app row after explicit approval.
+- Temporary 1731 signup after SPI fix: OTP completed, Keycloak names confirmed.
+  Its app row was created before the profile-permissions repair, so only that
+  fixture's blank name was repaired after verifying Keycloak names. Live
+  GraphQL then returned correct signup names/NIC/mobile, optional fields empty.
+  This is not a claim of a third full signup after both fixes.
+- Normal user: three personal API reads returned 200, four admin API reads
+  returned 403. Dashboard reused signup data without duplicate onboarding.
+- Temporary 1731 promoted only for testing: browser required password then
+  SMS OTP before sign-in. OTP completed and admin pages became accessible.
+- Read-only admin smoke checks: /admins, /users, /registration, /questions,
+  /admin/industry-survey-questions, /bulk-data, /reports, /user-submissions,
+  /approvals, /categories, /grama-niladharis, /police-connections,
+  /post-office-connections, /phi-connections, /trs-connections,
+  /district-province-connections, /admin/rapid-fire-approvals,
+  /admin/industry-surveys. Actual test admin row verified after date fix.
+- Industry survey opened with Local Regression as surveyor; declining GPS
+  continued to step 1. Empty Next showed five required-field errors.
+- No existing surveys, approvals, uploaded files or mapping records changed.
+
+REMAINING / LIMITATIONS
+- Google chooser reaches the correct localhost broker with openid/email/profile.
+  User confirmed return to local Ceylonica. Connected browser still showed the
+  chooser, so callback is user-confirmed, not independently observed. Local
+  event query returned no events and could not independently confirm it.
+- After explicit approval, removed only account 1731's one app user, one admin
+  and Keycloak user. Exact-username Keycloak query confirmed deletion.
+- OTP delivery was confirmed by user-supplied codes. Receipt of welcome/login
+  notification texts has not been separately confirmed during this audit.
+- Users and Reports are existing Coming Soon placeholders. Questions and
+  industry builder have no configured records in this local DB; no seeding.
+- Live destructive CRUD, full survey submission/uploads, real device GPS and
+  every possible admin role/data combination are not certified by smoke tests.
+- Parcel shapes remain illustrative, not cadastral survey data.
+- Existing extra blank EOF line in AdminRapidFireApprovals.tsx remains.
+
+EARLIER REVIEW (historical results and gaps below)
+Local regression review - 2026-10-25
+Branch: codex/local-feature-integration-20261025 (base HEAD cb1acb0)
+Scope: local working tree only. No Git push, deployment, database migration,
+seeding, existing-user edits, or changes to other projects were performed.
+
+FIXED DURING THIS REVIEW
+1. Missing storage/framework/views caused Laravel's root page test to return
+   HTTP 500: "Please provide a valid cache path." Created the missing runtime
+   directories in the shared local storage volume as www-data. The local
+   entrypoint now creates writable views, sessions and cache/data directories
+   on startup without clearing their contents.
+2. The village footer and industry survey success/cancel buttons linked to
+   /fill-data, an absent route that fell back to the village page. Updated
+   these links to /mydashboard and retained /fill-data as a redirect for old
+   bookmarks. This does not bypass the dashboard authentication guard.
+
+PASSED
+- Frontend TypeScript and production Vite build after the fixes.
+- Frontend feature integration checks: 16 survey steps and multilingual text.
+- Location-option filtering checks: English, Sinhala, Tamil and location codes.
+- PHPUnit: 18 tests / 73 assertions. Includes signup profile reuse, optional
+  profile fields, account identity preservation, conflict handling, public
+  directory privacy, approval filtering, ID generation and root rendering.
+  All mutation tests used a disposable SQLite in-memory database. PHPUnit,
+  Mockery and Faker were installed separately in the backend container's /tmp,
+  without modifying application vendor dependencies.
+- Standalone feature-branch integration test: quantity migration, rapid-fire
+  count persistence, ownership and validation, unchanged scoring, survey
+  steps 14 and 15, all against SQLite in memory.
+- Syntax lint of 108 PHP files in app/config/routes; local entrypoint shell
+  syntax check. All existing local migrations are already marked Ran.
+- 43 local HTTP checks: health, guest token, full frontend GraphQL district/GN
+  queries, coordinate lookup, GN search, category metadata, all 10 location
+  category data endpoints, survey questions, village progress, public survey
+  directory, protected endpoint rejection, frontend page and static assets.
+  Detailed statuses/timings: .local/regression-http-results.json.
+- District list: 25. Anuradhapura: 694 GNs / 22 DS divisions. Colombo:
+  557 GNs / 13 DS divisions. Full Ottappuwa RAYOT statistics query succeeded.
+- Sample API timing on this machine: district options 612-681 ms, detailed
+  GN query 340 ms, coordinate lookup 736 ms. These are single warm local
+  measurements, not full page loading benchmarks or real GPS acquisition.
+- Anonymous/guest access was rejected for contributions, rapid-fire,
+  personal surveys, admin approvals, industry surveys, submissions and the
+  admin survey-question list. Two initial personal-survey probes encountered
+  HTTP 429 during the rapid burst; both returned expected HTTP 401 after the
+  existing rate-limit window cleared. No limiter was disabled or changed.
+- Browser: village data and chart loaded; desktop 3D/2D map mode switch;
+  roads default on and parcels default off on the desktop map; roads-category
+  empty-state page; footer destination; login redirect; signup fields;
+  Google account chooser with the localhost callback and basic identity scopes.
+- Mobile at 390 px: correct village and population loaded, no horizontal
+  overflow (document width 375 px). Viewport override restored afterward.
+- No browser console errors recorded during those page checks.
+
+KNOWN GAPS / NOT CERTIFIED
+- Several existing Leaflet/mobile map toolbar buttons are placeholders with
+  no handlers: Roads & Transport Lines, Buildings & Infrastructure, Village
+  Boundaries, Aerial Photos, Snapshot / Export Map, and North Compass. OSM
+  already draws roads, but the mobile Roads button does not toggle a layer.
+  Desktop MapLibre controls are a separate implementation.
+- Parcel boxes are illustrative generated shapes, not actual cadastral data.
+- Vite still reports large bundles (main approximately 2.04 MB, map 813 KB,
+  uncompressed). Build succeeds; download/performance work remains possible.
+- User confirmed local sign-in in their browser, but the connected test
+  browser remained on Google's account chooser. Authenticated user/admin
+  screens, complete Google callback, real SMS delivery and OTP completion
+  were not independently exercised in this review. No new accounts or SMS
+  messages were created. Signup/identity logic was covered by isolated tests.
+- Real survey uploads, submissions, approval/deletion workflows and all
+  populated admin screens were not exercised against existing records.
+- Real device GPS permission/acquisition was not requested; coordinate lookup
+  was tested using a public village bounding-box centre.
+- git diff --check reports an existing extra blank line at EOF in
+  AdminRapidFireApprovals.tsx; it was left untouched with the user's changes.
+
+Conclusion: the tested build, backend rules, public read paths and location
+selection data pass. Two local defects were fixed. This is not a claim that
+every interactive or authenticated workflow has passed end-to-end testing.

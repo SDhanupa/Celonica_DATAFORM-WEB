@@ -124,8 +124,8 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
   const selectSx = {
     minWidth: isMobile ? '100%' : 128,
     width: isMobile ? '100%' : undefined,
-    height: isMobile ? 48 : 36,
-    fontSize: isMobile ? '0.95rem' : '0.82rem',
+    height: isMobile ? 48 : 40,
+    fontSize: isMobile ? '0.95rem' : '0.88rem',
     fontWeight: 600,
     bgcolor: fieldBg,
     borderRadius: isMobile ? '12px' : '9px',
