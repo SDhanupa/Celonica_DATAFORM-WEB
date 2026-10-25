@@ -31,7 +31,9 @@ for (let i = 0; i < cp437Chars.length; i++) {
 }
 
 const textEncoder = new TextEncoder();
-const textDecoder = new TextDecoder('utf-8', { fatal: false });
+// A genuine Greek letter or punctuation must not become replacement characters.
+// Only accept the conversion when the recovered bytes are valid UTF-8.
+const textDecoder = new TextDecoder('utf-8', { fatal: true });
 
 export function cleanMojibake(str: string | null | undefined): string {
   if (!str || typeof str !== 'string') return '';

@@ -17,7 +17,7 @@ class BusinessSurveyQuestionController extends Controller
      * is unreachable for respondents and invisible in the builder, so it is
      * rejected here rather than silently stored.
      */
-    private const MAX_STEP_INDEX = 13;
+    private const MAX_STEP_INDEX = 15;
 
     /**
      * Types DynamicQuestionRenderer can actually draw. Anything else renders as

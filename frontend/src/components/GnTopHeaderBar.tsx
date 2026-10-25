@@ -146,7 +146,7 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
   const districtSelect = (
     <Select
       size="small"
-      value={selectedDistrict || ''}
+      value={districts.some((d: any) => String(d.id || d.admin2Pcode) === String(selectedDistrict)) ? selectedDistrict : ''}
       onChange={(e) => onDistrictChange?.(e.target.value)}
       displayEmpty
       sx={selectSx}
@@ -167,7 +167,7 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
   const dsSelect = (
     <Select
       size="small"
-      value={selectedCity || ''}
+      value={dsDivisions.some((c: any) => String(c.divisionalSecretariatCode || c.dsCode) === String(selectedCity)) ? selectedCity : ''}
       onChange={(e) => onCityChange?.(e.target.value)}
       displayEmpty
       disabled={!selectedDistrict || dsDivisions.length === 0}
@@ -189,7 +189,7 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
   const gnSelect = (
     <Select
       size="small"
-      value={selectedGN || ''}
+      value={activeGnObj ? String(activeGnObj.id || activeGnObj.CCODE || activeGnObj.ccode) : ''}
       onChange={(e) => onGNChange?.(e.target.value)}
       displayEmpty
       disabled={!selectedCity || gramaNiladharis.length === 0}
@@ -215,7 +215,7 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
         const name = cleanMojibake(language === 'si' ? (gn.nameSi || gn.nameEn) : language === 'ta' ? (gn.nameTa || gn.nameEn) : gn.nameEn);
         const code = gn.CCODE || gn.code || gn.ccode;
         return (
-          <MenuItem key={gn.id || gn.CCODE || gn.ccode} value={String(gn.id) || gn.CCODE || gn.ccode} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2, py: 0.8 }}>
+          <MenuItem key={gn.id || gn.CCODE || gn.ccode} value={String(gn.id || gn.CCODE || gn.ccode)} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2, py: 0.8 }}>
             <Typography sx={{ fontWeight: 600, fontSize: '0.85rem' }}>{name}</Typography>
             {code && (
               <Typography sx={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 800, fontSize: '0.75rem', bgcolor: isDarkMode ? 'rgba(59,130,246,0.2)' : 'rgba(37,99,235,0.09)', color: '#2563eb', px: 0.8, py: 0.25, borderRadius: '6px' }}>

@@ -2,12 +2,13 @@
    Industry survey — validation & verification logic
    Pure, framework-agnostic. `L(en, si, ta?)` supplies localized messages.
 
-   Step layout (14 sections, 0..13):
+   Step layout (16 steps, 0..15):
      0  Basic Information            (hardcoded — b_* fields, OTP verified)
      1  Business Owner Information   (hardcoded — q_owner_name … q_prev_occupation)
      2..13 Legal / Location / Infrastructure / Capital / Workforce / Production /
            Finance / Market & Marketing / Innovation & Technology / Business
            Environment & Government / Environmental & Social / Future Needs
+     14 Transport & Logistics; 15 Additional Information
                                      (DB-driven — business_survey_questions)
 
    Steps 9-13 moved from hardcoded JSX to the database on 2026-09-10, matching
@@ -18,7 +19,7 @@
 
    Option-value encoding differs between the two families of steps:
      • the still-hardcoded steps (0, 1) store the full label — "1. ඔව්"
-     • DB-driven steps (2-13) store only the numeric prefix — "1"
+     • DB-driven steps (2-15) store only the numeric prefix — "1"
    Every comparison below goes through `is()` / `hasOpt()`, which normalise to
    the numeric prefix, so a rule is correct under either encoding.
    ────────────────────────────────────────────────────────────────────────── */

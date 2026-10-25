@@ -424,6 +424,7 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
   const tool = (title: string, onClick: () => void, icon: React.ReactNode, placement: 'left' | 'right', active = false) => (
     // describeChild keeps the label on the button only; otherwise screen readers announce each control twice.
     <Tooltip title={title} placement={placement} describeChild>
+      <span>
       <IconButton
         size="small"
         aria-label={title}
@@ -434,6 +435,7 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
       >
         {icon}
       </IconButton>
+      </span>
     </Tooltip>
   );
   const group = { ...glassSx(isDark), borderRadius: '12px', display: 'flex', flexDirection: 'column' as const, overflow: 'hidden' };
@@ -449,7 +451,8 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
         '& .maplibregl-ctrl-bottom-right': { right: `${edge.right}px`, bottom: `${edge.bottom}px` },
       }}
     >
-      <Box ref={containerRef} sx={{ position: 'absolute', inset: 0 }} />
+      {/* Inline positioning wins over MapLibre's asynchronously loaded position:relative rule. */}
+      <Box ref={containerRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
 
       {/* ── LEFT FLOATING CONTROLS (+, -, Reset view, Compass) ── */}
       <Box sx={{ position: 'absolute', top: edge.top + 16, left: edge.left + 16, zIndex: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>

@@ -46,9 +46,10 @@ const CountSurvey: React.FC<CountSurveyProps> = ({ cards, villageName, onSubmit,
     setCounts((prev) => ({ ...prev, [card.id]: clamped === 0 ? null : clamped }));
   };
 
-  const submit = async () => {
+  const submit = async (snapshot = counts) => {
+    if (saving) return;
     const payload = cards
-      .map((c) => ({ category_id: c.id, count: counts[c.id] ?? 0 }))
+      .map((c) => ({ category_id: c.id, count: snapshot[c.id] ?? 0 }))
       .filter((row) => row.count > 0);
     if (payload.length === 0) {
       setSavedCount(0);
@@ -76,8 +77,11 @@ const CountSurvey: React.FC<CountSurveyProps> = ({ cards, villageName, onSubmit,
   };
 
   const skip = () => {
-    if (card) setCounts((prev) => ({ ...prev, [card.id]: null }));
-    go(1);
+    if (!card || saving) return;
+    const nextCounts = { ...counts, [card.id]: null };
+    setCounts(nextCounts);
+    if (isLast) void submit(nextCounts);
+    else go(1);
   };
 
   return (
