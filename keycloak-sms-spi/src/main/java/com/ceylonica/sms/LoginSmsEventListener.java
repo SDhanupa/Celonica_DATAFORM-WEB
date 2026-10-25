@@ -13,6 +13,8 @@ import org.keycloak.models.UserModel;
 import org.keycloak.services.managers.AuthenticationManager;
 import org.keycloak.sessions.AuthenticationSessionModel;
 
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -93,7 +95,7 @@ public final class LoginSmsEventListener implements EventListenerProvider {
         }
 
         pending.put((registration ? "register:" : "login:") + key,
-                new Notification(gatewayUser, password, sender, mobile.trim(), message(user.getUsername(), registration)));
+                new Notification(gatewayUser, password, sender, mobile.trim(), message(user.getUsername(), registration, event.getTime())));
         if (registration) {
             pending.remove("login:" + key);
             if (auth != null) auth.setAuthNote(REGISTERED, event.getUserId());
@@ -117,12 +119,14 @@ public final class LoginSmsEventListener implements EventListenerProvider {
         }
     }
 
-    static String message(String username, boolean registration) {
+    static String message(String username, boolean registration, long eventTime) {
+        if (registration) {
+            String date = Instant.ofEpochMilli(eventTime).atZone(ZoneId.of("Asia/Colombo")).toLocalDate().toString();
+            return "Welcome to ceystem.com! Your registration is complete.\nDate: " + date;
+        }
         String name = blank(username) ? "user" : username.replaceAll("[\\p{Cntrl}\\s]+", " ").trim();
         if (name.length() > 40) name = name.substring(0, 40);
-        return registration
-                ? "Welcome to ceystem.com, " + name + "! Your registration is complete."
-                : "Welcome to ceystem.com, " + name + ". You have logged in successfully.";
+        return "Welcome to ceystem.com, " + name + ". You have logged in successfully.";
     }
 
     private static boolean blank(String value) { return value == null || value.isBlank(); }

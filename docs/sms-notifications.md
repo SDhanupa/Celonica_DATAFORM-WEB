@@ -1,7 +1,15 @@
 # Registration and login SMS
 
-The `ceylonica-login-sms` Keycloak event listener sends a username greeting after
-successful registration or a fresh successful login. It handles form and Google
+The `ceylonica-login-sms` Keycloak event listener sends a welcome after
+successful registration or a fresh successful login. Registration messages use
+the event date in Sri Lanka time (Asia/Colombo), without a username:
+
+```text
+Welcome to ceystem.com! Your registration is complete.
+Date: 2026-10-25
+```
+
+Login messages retain the username greeting. It handles form and Google
 registration, and password, SMS and Google login. The signup's automatic first
 login is suppressed so it produces one welcome message. Silent SSO, refreshes,
 failed attempts, admin-console clients and service accounts are excluded.

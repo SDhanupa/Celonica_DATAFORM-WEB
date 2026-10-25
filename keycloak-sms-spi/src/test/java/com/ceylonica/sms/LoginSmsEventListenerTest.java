@@ -58,18 +58,19 @@ class LoginSmsEventListenerTest {
     Event event(EventType type) {
         Event event = new Event();
         event.setType(type);
+        event.setTime(java.time.Instant.parse("2026-10-24T20:00:00Z").toEpochMilli());
         event.setRealmId("local-realm");
         event.setUserId("user-1");
         event.setClientId("celonica-frontend");
         return event;
     }
 
-    @Test void registrationWaitsForCommitAndSendsWelcomeWithUsername() {
+    @Test void registrationWaitsForCommitAndUsesSriLankanDateWithoutUsername() {
         listener.onEvent(event(EventType.REGISTER));
         assertTrue(delivered.isEmpty());
         transaction.get().commit();
         assertEquals(1, delivered.size());
-        assertEquals("Welcome to ceystem.com, sample-user! Your registration is complete.", delivered.get(0).message());
+        assertEquals("Welcome to ceystem.com! Your registration is complete.\nDate: 2026-10-25", delivered.get(0).message());
         verify(user, never()).setSingleAttribute(any(), any());
     }
 
@@ -163,17 +164,17 @@ class LoginSmsEventListenerTest {
     }
 
     @Test void eventAndUserChangesCannotAlterQueuedPrivateSnapshot() {
-        Event mutable = event(EventType.REGISTER);
+        Event mutable = event(EventType.LOGIN);
         listener.onEvent(mutable);
         mutable.setType(EventType.LOGIN_ERROR);
         when(user.getUsername()).thenReturn("changed");
         transaction.get().commit();
-        assertTrue(delivered.get(0).message().contains("sample-user!"));
+        assertTrue(delivered.get(0).message().contains("sample-user."));
         assertFalse(delivered.get(0).toString().contains("not-a-real-secret"));
     }
 
     @Test void messagesAreShortAndDoNotIncludeControlCharacters() {
-        String message = LoginSmsEventListener.message("long\nname".repeat(40), false);
+        String message = LoginSmsEventListener.message("long\nname".repeat(40), false, 0);
         assertTrue(message.length() <= 160);
         assertFalse(message.contains("\n"));
     }
