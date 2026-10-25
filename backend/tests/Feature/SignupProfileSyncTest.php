@@ -94,6 +94,29 @@ class SignupProfileSyncTest extends TestCase
         catch (\Illuminate\Database\QueryException $e) { $this->assertEquals($before,DB::table('users')->get()->toArray()); }
     }
 
+    public function test_existing_account_can_sign_in_when_signup_phone_conflicts(): void
+    {
+        User::create(['name'=>'Other','email'=>'other@example.test','mobile_number'=>'0700000000']);
+        $user=User::create(['name'=>'Existing','email'=>'signup@example.test','keycloak_sub'=>'signup-sub']);
+        $before=DB::table('users')->orderBy('id')->get()->toArray();
+        $result=$this->service(['NIC'=>['199012345678'],'mobile_number'=>['0700000000']])->sync('signup-sub');
+        $this->assertSame($user->id,$result->id);
+        $this->assertNull($result->nic);
+        $this->assertNull($result->mobile_number);
+        $this->assertEquals($before,DB::table('users')->orderBy('id')->get()->toArray());
+    }
+
+    public function test_existing_account_can_sign_in_when_profile_read_is_unavailable(): void
+    {
+        $user=User::create(['name'=>'Existing','email'=>'signup@example.test','keycloak_sub'=>'signup-sub']);
+        $before=$user->fresh()->getAttributes();
+        $api=\Mockery::mock(KeycloakAdminService::class);
+        $api->shouldReceive('getUserProfile')->with('signup-sub')->andThrow(new \RuntimeException('Unavailable'));
+        $result=(new SignupProfileSync($api))->sync('signup-sub');
+        $this->assertSame($user->id,$result->id);
+        $this->assertSame($before,$user->fresh()->getAttributes());
+    }
+
     public function test_optional_profile_fields_can_be_cleared_without_touching_identity(): void
     {
         $user=User::create(['name'=>'Existing','email'=>'existing@example.test','nic'=>'199012345678','mobile_number'=>'0700000000','dob'=>'1990-01-01','gender'=>'Male','address'=>'Address']);

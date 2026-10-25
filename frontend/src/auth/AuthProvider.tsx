@@ -107,7 +107,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           try {
             const result = await apolloClient.mutate({ mutation: SYNC_USER_MUTATION });
             if (!result.data?.syncUser?.id) throw new Error('Signup profile could not be loaded');
-            await apolloClient.refetchQueries({ include: ['GetMe'] });
+            // A background profile-query error must not invalidate a successful
+            // account sync or replace the authenticated user's dashboard.
+            void apolloClient.refetchQueries({ include: ['GetMe'] }).catch(() => {});
           } catch {
             setProfileSyncFailed(true);
           }

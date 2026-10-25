@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use RuntimeException;
 
@@ -18,6 +19,21 @@ class SignupProfileSync
             return $existing;
         }
 
+        try {
+            return $this->syncProfile($subject);
+        } catch (\Throwable $error) {
+            if (!$existing) throw $error;
+
+            // An established account must not lose access because optional
+            // enrichment is unavailable or conflicts with another user's data.
+            // syncProfile's transaction has already rolled back any failed write.
+            Log::warning('Signup profile enrichment deferred', ['exception' => get_class($error)]);
+            return $existing;
+        }
+    }
+
+    private function syncProfile(string $subject): User
+    {
         $profile = $this->keycloak->getUserProfile($subject);
         $attributes = $profile['attributes'] ?? [];
         $nic = $this->attribute($attributes, 'NIC') ?? $this->attribute($attributes, 'nic');
