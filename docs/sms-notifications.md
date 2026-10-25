@@ -16,7 +16,7 @@ Add `ceylonica-login-sms` alongside the existing event listeners and set only:
 | --- | --- |
 | `ceylonica.sms-notifications.enabled` | `true` |
 | `ceylonica.sms-notifications.clients` | `ceylonica-frontend` |
-| `ceylonica.sms-notifications.config-id` | ID of the existing configured SMS registration authenticator |
+| `ceylonica.sms-notifications.config-id` | ID of an existing configured SMS authenticator in the frontend client's login flow (or registration step, if configured there) |
 
 The user-profile `mobile_number` attribute must be required for the `user` role
 and validated with `^(?:0[0-9]{9}|\+?94[0-9]{9})$`, so new Google registrants cannot
@@ -35,6 +35,11 @@ profile definition and database backups. Verify user-data fingerprints and the
 other containers before/after. Rollback restores the previous JAR and the three
 configuration objects, then restarts only Ceylonica Keycloak. It does not restore
 databases or replace users.
+
+When updating realm attributes, explicitly retain `browserSecurityHeaders`:
+Keycloak 24 otherwise resets them to defaults. Preserve `enabledEventTypes` from
+the realm representation when saving events; `/events/config` may expand an
+empty stored list into the default event set. Compare full settings after save.
 
 Messages are queued after transaction commit and sent asynchronously. Delivery
 is best effort with a bounded in-memory queue; gateway failure, queue saturation

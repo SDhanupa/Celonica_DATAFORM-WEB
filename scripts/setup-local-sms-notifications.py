@@ -42,6 +42,8 @@ backup.mkdir(parents=True)
 (backup / 'realm-attributes.json').write_text(json.dumps(attributes, indent=2))
 (backup / 'events-config.json').write_text(json.dumps(events, indent=2))
 updated_events = dict(events)
+# /events/config expands default event types; preserve the stored realm value.
+updated_events['enabledEventTypes'] = realm.get('enabledEventTypes', [])
 listeners = list(events.get('eventsListeners', []))
 enabled = '--disable' not in sys.argv[1:]
 if enabled:
@@ -60,10 +62,11 @@ else:
     listeners = [name for name in listeners if name != LISTENER]
 updated_events['eventsListeners'] = listeners
 try:
-    api(path, 'PUT', {'attributes': attributes})
+    api(path, 'PUT', {'attributes': attributes, 'browserSecurityHeaders': realm['browserSecurityHeaders']})
     api(path + '/events/config', 'PUT', updated_events)
 except Exception:
-    api(path, 'PUT', {'attributes': realm.get('attributes', {})})
+    api(path, 'PUT', {'attributes': realm.get('attributes', {}), 'browserSecurityHeaders': realm['browserSecurityHeaders']})
+    events['enabledEventTypes'] = realm.get('enabledEventTypes', [])
     api(path + '/events/config', 'PUT', events)
     raise
 assert (LISTENER in api(path + '/events/config')['eventsListeners']) == enabled
