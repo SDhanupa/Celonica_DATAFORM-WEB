@@ -60,6 +60,7 @@ Route::middleware(['throttle:180,1', 'keycloak.admin'])->prefix('rapid-fire')->g
     Route::post('/sessions', [\App\Http\Controllers\RapidFireController::class, 'start']);
     Route::post('/sessions/{id}/answers', [\App\Http\Controllers\RapidFireController::class, 'answer']);
     Route::post('/sessions/{id}/complete', [\App\Http\Controllers\RapidFireController::class, 'complete']);
+    Route::post('/sessions/{id}/counts', [\App\Http\Controllers\RapidFireController::class, 'counts']);
 });
 
 // Industry Survey submission — the page itself always requires a real Keycloak

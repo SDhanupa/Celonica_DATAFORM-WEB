@@ -43,6 +43,8 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { TextField, RadioGroup, FormControlLabel, Radio, Snackbar, Alert } from '@mui/material';
 import { useLanguage } from '../context/LanguageContext';
 import UserTopBar from './contribute/UserTopBar';
+import { cleanMojibake } from '../utils/mojibake';
+import { readSavedVillage } from './contribute/village';
 
 interface SubCategoryPageProps {
   slug: string;
@@ -71,7 +73,7 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
     notifyOnNetworkStatusChange: true,
   });
 
-  const selectedLocation = JSON.parse(localStorage.getItem('user_selected_location') || sessionStorage.getItem('user_selected_location') || 'null');
+  const selectedLocation = readSavedVillage();
 
   const handlePrefetch = (cat: any) => {
     // 0ms Navigation Trick: Pre-fetch everything while user is hovering!
@@ -194,8 +196,7 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
 
   const submitFinalData = async () => {
     // Get stored location
-    const savedLocation = localStorage.getItem('user_selected_location') || sessionStorage.getItem('user_selected_location');
-    const locationData = savedLocation ? JSON.parse(savedLocation) : null;
+    const locationData = readSavedVillage();
     
     const district = locationData?.pDistrict?.admin2NameEn || null;
     const dsDivision = locationData?.dsEn || null;
@@ -301,12 +302,12 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
               color="inherit" 
               to={currentPath}
             >
-              {lang === 'en' ? anc.nameEn : lang === 'si' ? (anc.nameSi || anc.nameEn) : (anc.nameTa || anc.nameEn)}
+              {cleanMojibake(lang === 'en' ? anc.nameEn : lang === 'si' ? (anc.nameSi || anc.nameEn) : (anc.nameTa || anc.nameEn))}
             </MuiLink>
           );
         })}
         <Typography color="text.primary">
-          {lang === 'en' ? parentCategory.nameEn : lang === 'si' ? (parentCategory.nameSi || parentCategory.nameEn) : (parentCategory.nameTa || parentCategory.nameEn)}
+          {cleanMojibake(lang === 'en' ? parentCategory.nameEn : lang === 'si' ? (parentCategory.nameSi || parentCategory.nameEn) : (parentCategory.nameTa || parentCategory.nameEn))}
         </Typography>
       </Breadcrumbs>
 
@@ -317,11 +318,11 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
           </IconButton>
           <Box>
             <Typography variant="h4" sx={{ fontWeight: 600 }}>
-              {lang === 'en' ? parentCategory.nameEn : lang === 'si' ? (parentCategory.nameSi || parentCategory.nameEn) : (parentCategory.nameTa || parentCategory.nameEn)}
+              {cleanMojibake(lang === 'en' ? parentCategory.nameEn : lang === 'si' ? (parentCategory.nameSi || parentCategory.nameEn) : (parentCategory.nameTa || parentCategory.nameEn))}
             </Typography>
             {(parentCategory.descriptionEn || parentCategory.descriptionSi) && (
               <Typography variant="subtitle1" sx={{ color: 'text.secondary', mt: 0.5 }}>
-                {lang === 'en' ? (parentCategory.descriptionEn || parentCategory.descriptionSi) : lang === 'si' ? (parentCategory.descriptionSi || parentCategory.descriptionEn) : (parentCategory.descriptionTa || parentCategory.descriptionEn)}
+                {cleanMojibake(lang === 'en' ? (parentCategory.descriptionEn || parentCategory.descriptionSi) : lang === 'si' ? (parentCategory.descriptionSi || parentCategory.descriptionEn) : (parentCategory.descriptionTa || parentCategory.descriptionEn))}
               </Typography>
             )}
           </Box>
@@ -445,7 +446,7 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
                   )}
                   <CardContent sx={{ flexGrow: 1, textAlign: 'center', p: '12px !important', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Typography variant="subtitle1" component="div" sx={{ fontWeight: 600, lineHeight: 1.2 }}>
-                      {lang === 'en' ? cat.nameEn : lang === 'si' ? (cat.nameSi || cat.nameEn) : (cat.nameTa || cat.nameEn)}
+                      {cleanMojibake(lang === 'en' ? cat.nameEn : lang === 'si' ? (cat.nameSi || cat.nameEn) : (cat.nameTa || cat.nameEn))}
                     </Typography>
                   </CardContent>
                   {!isAdmin && cat.progress !== undefined && (

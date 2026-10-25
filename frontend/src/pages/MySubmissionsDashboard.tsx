@@ -13,6 +13,7 @@ import CategoryIcon from '@mui/icons-material/Category';
 import PhoneIcon from '@mui/icons-material/Phone';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import PublicIcon from '@mui/icons-material/Public';
+import { cleanMojibake, sanitizeObject } from '../utils/mojibake';
 
 interface Survey {
   id: number | string;
@@ -71,7 +72,7 @@ const MySubmissionsDashboard: React.FC = () => {
             }
           }
           
-          setSurveys([...localSurveys, ...dbSurveys]);
+          setSurveys(sanitizeObject([...localSurveys, ...dbSurveys]));
         }
       } catch (err) {
         console.error('Failed to fetch user surveys:', err);
@@ -238,7 +239,7 @@ const MySubmissionsDashboard: React.FC = () => {
                     }}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2, alignItems: 'flex-start' }}>
                         <Typography variant="h6" fontWeight="bold" sx={{ color: '#0F172A', pr: 2 }}>
-                          {survey.form_data?.formValues?.b_name || survey.form_data?.b_name || 'Unnamed Business'}
+                          {cleanMojibake(survey.form_data?.formValues?.b_name || survey.form_data?.b_name || 'Unnamed Business')}
                         </Typography>
                         <Chip 
                           label={survey.status.toUpperCase()} 
@@ -253,16 +254,16 @@ const MySubmissionsDashboard: React.FC = () => {
                       </Box>
                       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 3 }}>
                         <Typography variant="body2" sx={{ color: '#475569', display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <LocationOnIcon fontSize="small" sx={{ color: '#94A3B8' }} /> {survey.gn_name}, {survey.ds_division}
+                          <LocationOnIcon fontSize="small" sx={{ color: '#94A3B8' }} /> {cleanMojibake(survey.gn_name)}, {cleanMojibake(survey.ds_division)}
                         </Typography>
                         {(survey.form_data?.formValues?.b_category || survey.form_data?.b_category) && (
                           <Typography variant="body2" sx={{ color: '#475569', display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <CategoryIcon fontSize="small" sx={{ color: '#94A3B8' }} /> {survey.form_data?.formValues?.b_category || survey.form_data?.b_category}
+                            <CategoryIcon fontSize="small" sx={{ color: '#94A3B8' }} /> {cleanMojibake(survey.form_data?.formValues?.b_category || survey.form_data?.b_category)}
                           </Typography>
                         )}
                         {(survey.form_data?.formValues?.b_mobile || survey.form_data?.b_mobile) && (
                           <Typography variant="body2" sx={{ color: '#475569', display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <PhoneIcon fontSize="small" sx={{ color: '#94A3B8' }} /> {survey.form_data?.formValues?.b_mobile || survey.form_data?.b_mobile}
+                            <PhoneIcon fontSize="small" sx={{ color: '#94A3B8' }} /> {cleanMojibake(survey.form_data?.formValues?.b_mobile || survey.form_data?.b_mobile)}
                           </Typography>
                         )}
                         <Typography variant="body2" sx={{ color: '#475569', display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -364,18 +365,18 @@ const MySubmissionsDashboard: React.FC = () => {
       {/* View Survey Modal */}
       <Dialog open={!!viewSurvey} onClose={() => setViewSurvey(null)} maxWidth="md" fullWidth PaperProps={{ sx: { bgcolor: '#FFFFFF', borderRadius: 4, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' } }}>
         <DialogTitle sx={{ fontWeight: 'bold', borderBottom: '1px solid rgba(0,0,0,0.06)', color: '#0F172A' }}>
-          {viewSurvey?.form_data?.formValues?.b_name || viewSurvey?.form_data?.b_name || 'Survey Details'}
+          {cleanMojibake(viewSurvey?.form_data?.formValues?.b_name || viewSurvey?.form_data?.b_name || 'Survey Details')}
         </DialogTitle>
         <DialogContent sx={{ p: 3, bgcolor: '#F8FAFC' }}>
           <Grid container spacing={3}>
             {Object.entries(viewSurvey?.form_data?.formValues || viewSurvey?.form_data || {}).map(([key, val]) => {
               if (['currentStep', 'surveyStartTime', 'gpsCoordinates'].includes(key)) return null;
               
-              const label = key
+              const label = cleanMojibake(key
                 .replace(/^b_/, 'Business ')
                 .replace(/^q_/, 'Question ')
                 .replace(/_/g, ' ')
-                .replace(/\b\w/g, c => c.toUpperCase());
+                .replace(/\b\w/g, c => c.toUpperCase()));
                 
               return (
                 <Grid item xs={12} sm={6} key={key}>
@@ -384,7 +385,7 @@ const MySubmissionsDashboard: React.FC = () => {
                       {label}
                     </Typography>
                     <Typography variant="body1" sx={{ color: '#1E293B', fontWeight: 500, mt: 0.5, wordBreak: 'break-word' }}>
-                      {typeof val === 'object' ? JSON.stringify(val) : String(val || '-')}
+                      {cleanMojibake(typeof val === 'object' ? JSON.stringify(val) : String(val || '-'))}
                     </Typography>
                   </Box>
                 </Grid>

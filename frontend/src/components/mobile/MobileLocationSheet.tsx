@@ -12,6 +12,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import PlaceIcon from '@mui/icons-material/Place';
 import { useLanguage } from '../../context/LanguageContext';
+import { cleanMojibake } from '../../utils/mojibake';
 
 interface MobileLocationSheetProps {
   open: boolean;
@@ -113,7 +114,7 @@ const MobileLocationSheet: React.FC<MobileLocationSheetProps> = ({
               MenuProps={{ PaperProps: { sx: { maxHeight: 320, bgcolor: surface, color: textMain } } }}
             >
               {districts.map((d: any) => {
-                const name = language === 'si' ? (d.admin2NameSi || d.nameSi || d.nameEn) : language === 'ta' ? (d.admin2NameTa || d.nameTa || d.nameEn) : (d.admin2NameEn || d.nameEn);
+                const name = cleanMojibake(language === 'si' ? (d.admin2NameSi || d.nameSi || d.nameEn) : language === 'ta' ? (d.admin2NameTa || d.nameTa || d.nameEn) : (d.admin2NameEn || d.nameEn));
                 return <MenuItem key={d.id || d.admin2Pcode} value={d.id || d.admin2Pcode}>{name}</MenuItem>;
               })}
             </Select>
@@ -130,7 +131,7 @@ const MobileLocationSheet: React.FC<MobileLocationSheetProps> = ({
               MenuProps={{ PaperProps: { sx: { maxHeight: 320, bgcolor: surface, color: textMain } } }}
             >
               {dsDivisions.map((city: any) => {
-                const name = language === 'si' ? (city.dsSi || city.dsEn) : language === 'ta' ? (city.dsTa || city.dsEn) : (city.dsEn || city.divisionalSecretariatCode);
+                const name = cleanMojibake(language === 'si' ? (city.dsSi || city.dsEn) : language === 'ta' ? (city.dsTa || city.dsEn) : (city.dsEn || city.divisionalSecretariatCode));
                 return <MenuItem key={city.divisionalSecretariatCode || city.dsCode} value={city.divisionalSecretariatCode || city.dsCode}>{name}</MenuItem>;
               })}
             </Select>
@@ -147,7 +148,7 @@ const MobileLocationSheet: React.FC<MobileLocationSheetProps> = ({
               MenuProps={{ PaperProps: { sx: { maxHeight: 320, bgcolor: surface, color: textMain } } }}
             >
               {gramaNiladharis.map((gn: any) => {
-                const name = language === 'si' ? (gn.nameSi || gn.nameEn) : language === 'ta' ? (gn.nameTa || gn.nameEn) : gn.nameEn;
+                const name = cleanMojibake(language === 'si' ? (gn.nameSi || gn.nameEn) : language === 'ta' ? (gn.nameTa || gn.nameEn) : gn.nameEn);
                 return <MenuItem key={gn.id || gn.CCODE || gn.ccode} value={String(gn.id) || gn.CCODE || gn.ccode}>{name}</MenuItem>;
               })}
             </Select>

@@ -2,6 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Alert, Box, Button, Paper, Stack, Typography } from '@mui/material';
 import { keyframes } from '@mui/system';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
+import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
+import TallyIcon from '@mui/icons-material/Numbers';
 import EmojiEventsRoundedIcon from '@mui/icons-material/EmojiEventsRounded';
 import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
 import ReplayRoundedIcon from '@mui/icons-material/ReplayRounded';
@@ -26,9 +29,11 @@ interface ResultsProps {
   onOtherDeck: () => void;
   onBack: () => void;
   onAddDetails: (card: RapidFireCard) => void;
+  onCount: () => void;
+  countsSaved: boolean;
 }
 
-const Results: React.FC<ResultsProps> = ({ summary, score, bestStreak, cardsCount, rules, villageName, error, onPlayAgain, onOtherDeck, onBack, onAddDetails }) => {
+const Results: React.FC<ResultsProps> = ({ summary, score, bestStreak, cardsCount, rules, villageName, error, onPlayAgain, onOtherDeck, onBack, onAddDetails, onCount, countsSaved }) => {
   const { t, language } = useContributeCopy();
   const finalScore = summary?.score ?? score;
   const shown = useCountUp(finalScore);
@@ -136,6 +141,38 @@ const Results: React.FC<ResultsProps> = ({ summary, score, bestStreak, cardsCoun
             </Box>
           )}
         </Paper>
+
+        {summary && summary.yes_topics.length > 0 && (
+          <Button
+            onClick={onCount}
+            fullWidth
+            sx={{
+              mb: 2,
+              p: 2,
+              borderRadius: '20px',
+              justifyContent: 'flex-start',
+              textAlign: 'left',
+              color: '#fff',
+              bgcolor: 'rgba(255,255,255,0.08)',
+              border: '1px solid rgba(255,255,255,0.18)',
+              boxShadow: 'none',
+              textTransform: 'none',
+              transition: 'background-color 200ms ease, border-color 200ms ease',
+              '&:hover': { bgcolor: 'rgba(255,255,255,0.14)', borderColor: 'rgba(255,255,255,0.3)', boxShadow: 'none', transform: 'none' },
+            }}
+          >
+            <Box sx={{ width: 44, height: 44, borderRadius: '14px', display: 'grid', placeItems: 'center', bgcolor: '#fff', color: ink[900], flexShrink: 0, mr: 1.75 }}>
+              {countsSaved ? <CheckRoundedIcon /> : <TallyIcon />}
+            </Box>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Typography sx={{ fontWeight: 800, fontSize: '1.02rem', color: 'inherit' }}>{t.rfCountCta}</Typography>
+              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)' }}>
+                {countsSaved ? t.rfCountDoneTitle : t.rfCountCtaHint}
+              </Typography>
+            </Box>
+            <ArrowForwardRoundedIcon sx={{ ml: 1, opacity: 0.7 }} />
+          </Button>
+        )}
 
         <Stack spacing={1}>
           <Button

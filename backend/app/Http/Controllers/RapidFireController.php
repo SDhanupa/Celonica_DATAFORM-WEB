@@ -319,6 +319,42 @@ class RapidFireController extends Controller
         ]);
     }
 
+    /** POST /api/rapid-fire/sessions/{id}/counts — how many of each "yes" topic exist; untimed, no points. */
+    public function counts(Request $request, string $id): JsonResponse
+    {
+        $sub = $this->sub($request);
+        if (!Str::isUuid($id)) {
+            return $this->fail('Round not found.', 404);
+        }
+
+        $session = DB::table('rapid_fire_sessions')->where('id', $id)->first();
+        if (!$session) {
+            return $this->fail('Round not found.', 404);
+        }
+        if ($session->contributor_sub !== $sub) {
+            return $this->fail('This round belongs to someone else.', 403);
+        }
+
+        $data = $request->validate([
+            'counts' => ['required', 'array', 'max:100'],
+            'counts.*.category_id' => ['required', 'integer'],
+            'counts.*.count' => ['required', 'integer', 'min:1', 'max:100000'],
+        ]);
+
+        $saved = 0;
+        foreach ($data['counts'] as $row) {
+            // Only this person's own "yes" from this round can carry a count.
+            $saved += DB::table('village_topic_answers')
+                ->where('session_id', $id)
+                ->where('contributor_sub', $sub)
+                ->where('category_id', (int) $row['category_id'])
+                ->where('answer', 'yes')
+                ->update(['quantity' => (int) $row['count'], 'updated_at' => now()]);
+        }
+
+        return response()->json(['success' => true, 'data' => ['saved' => $saved]]);
+    }
+
     /**
      * Stores the answer, returning the points it actually earns: a topic that
      * this person already answered for this village (in a concurrent round) is
