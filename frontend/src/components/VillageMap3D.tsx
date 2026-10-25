@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import maplibregl, { type LngLatBoundsLike, type Map as MlMap, type StyleSpecification } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { Box, Divider, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
+import { Box, CircularProgress, Divider, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
@@ -27,6 +27,14 @@ const TILT_ZOOM_OUT = 0.7;
 // Landing view is one zoom level (2x) closer than "whole village fits"; reached by a short pan-and-zoom on load.
 const LANDING_ZOOM_IN = 1;
 const LANDING_MS = 2200;
+// Upper bounds for the hidden steps before the reveal, so a slow network still shows the map.
+const PRECACHE_START_MS = 5000; // start (zoomed-out) view tiles
+const PRECACHE_TIMEOUT_MS = 5000; // terrain-heights wait
+
+// MapLibre runs at most 16 image downloads at once across all sources. The ~36 satellite tiles filled that queue
+// and the terrain tiles did not even start for ~8 s (measured), stalling the landing. Different hosts have their
+// own browser connection pools, so a higher limit lets terrain and imagery load side by side.
+maplibregl.setMaxParallelImageRequests(32);
 // Covers the whole map so the village ring can be cut out of it as a hole (everything else gets dimmed).
 const WORLD_RING: [number, number][] = [[-180, -85], [180, -85], [180, 85], [-180, 85], [-180, -85]];
 const NO_INSETS: MapInsets = { top: 0, right: 0, bottom: 0, left: 0 };
@@ -39,6 +47,9 @@ const BASE_LABEL: Record<Base, string> = { satellite: 'Satellite', streets: 'Str
 
 const style: StyleSpecification = {
   version: 8,
+  // No paint transitions: preloading toggles raster-opacity on hidden base maps, and the default 300 ms
+  // transition made them fade out visibly over the satellite imagery (the "topographic flash" on load).
+  transition: { duration: 0, delay: 0 },
   sources: {
     satellite: {
       type: 'raster',
@@ -91,9 +102,9 @@ const style: StyleSpecification = {
   },
   layers: [
     { id: 'background', type: 'background', paint: { 'background-color': '#dbe6ec' } },
-    { id: 'satellite', type: 'raster', source: 'satellite' },
-    { id: 'streets', type: 'raster', source: 'streets', layout: { visibility: 'none' } },
-    { id: 'topo', type: 'raster', source: 'topo', layout: { visibility: 'none' } },
+    { id: 'satellite', type: 'raster', source: 'satellite', paint: { 'raster-fade-duration': 500 } },
+    { id: 'streets', type: 'raster', source: 'streets', paint: { 'raster-fade-duration': 500 }, layout: { visibility: 'none' } },
+    { id: 'topo', type: 'raster', source: 'topo', paint: { 'raster-fade-duration': 500 }, layout: { visibility: 'none' } },
     { id: 'roads', type: 'raster', source: 'roads' },
     { id: 'places', type: 'raster', source: 'places' },
     {
@@ -197,14 +208,27 @@ function frame(map: MlMap, bounds: LngLatBoundsLike | null, insets: MapInsets, i
 }
 
 const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
-  const { boundary, height = 520, insets, gnName, ccode } = props;
+  const { height = 520, insets, gnName, ccode } = props;
+  // The page briefly passes `boundary` as undefined while it refetches the village (cached data being topped up).
+  // Treating that as "no village" tore the map down and restarted the landing on every refetch, so the map never
+  // finished loading. Hold the last known boundary through those gaps.
+  const lastBoundary = useRef<any>(undefined);
+  if (props.boundary !== undefined) lastBoundary.current = props.boundary;
+  const boundary = props.boundary !== undefined ? props.boundary : lastBoundary.current;
   const edge = insets ?? NO_INSETS;
+  // Latest panel insets for code that runs later than the render it was set up in (the landing sequence).
+  const edgeRef = useRef(edge);
+  edgeRef.current = edge;
+  // True from the start of a village's landing until its zoom finishes; panel re-framing stays out of the way.
+  const landingRef = useRef(false);
   const isDark = useTheme().palette.mode === 'dark';
 
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MlMap | null>(null);
   const markerRef = useRef<maplibregl.Marker | null>(null);
   const [loaded, setLoaded] = useState(false);
+  // The map stays hidden until both the start and the landing views are cached, then fades in and zooms.
+  const [revealed, setRevealed] = useState(false);
   const [failed, setFailed] = useState(false);
   const [is3D, setIs3D] = useState(true);
   const [base, setBase] = useState<Base>('satellite');
@@ -232,7 +256,10 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
   }, [base]);
 
   const ring = useMemo(() => boundaryRing(boundary?.polygons), [boundary?.polygons]);
-  const bounds = useMemo(() => villageBounds(boundary, ring), [boundary, ring]);
+  // Keyed on the coordinates, not the object: a refetch returns an equal boundary as a new object, which would
+  // otherwise restart the landing animation.
+  const [bS, bN, bW, bE] = [boundary?.minLat, boundary?.maxLat, boundary?.minLng, boundary?.maxLng];
+  const bounds = useMemo(() => villageBounds({ minLat: bS, maxLat: bN, minLng: bW, maxLng: bE }, ring), [bS, bN, bW, bE, ring]);
   const insetsKey = `${edge.top},${edge.right},${edge.bottom},${edge.left}`;
 
   // `boundary` is undefined while the village is still loading and null when it has none.
@@ -264,6 +291,17 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
       setFailed(true);
       return;
     }
+    // MapLibre opens the compact attribution ("i" button) the first time it fills in, and only closes it after a
+    // drag, so the credits popped open on every load. Close it that first time; the button still toggles it.
+    const attrib = map.getContainer().querySelector('.maplibregl-ctrl-attrib');
+    if (attrib) {
+      const collapseOnce = new MutationObserver(() => {
+        if (!attrib.classList.contains('maplibregl-compact')) return;
+        attrib.classList.remove('maplibregl-compact-show');
+        collapseOnce.disconnect();
+      });
+      collapseOnce.observe(attrib, { attributes: true, attributeFilter: ['class'] });
+    }
     // Page scroll must keep working over the full-bleed map; zoom is on the buttons and pinch.
     map.scrollZoom.disable();
     // Ready as soon as the style is parsed, not on 'load': 'load' waits for every visible tile (~250), but the
@@ -276,16 +314,19 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
     // Missing tiles (offline, rate-limited) are not fatal; MapLibre keeps rendering what it has.
     map.on('error', (e) => console.warn('3D map:', e.error?.message ?? e));
     mapRef.current = map;
-    return () => {
-      markerRef.current?.remove();
-      markerRef.current = null;
-      map.remove();
-      mapRef.current = null;
-      setLoaded(false);
-    };
-    // Created once; later village changes go through setData and frame() below.
+    // Created once; later village changes go through setData and frame() below. Removed only on unmount (below).
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [villageKnown]);
+
+  useEffect(
+    () => () => {
+      markerRef.current?.remove();
+      markerRef.current = null;
+      mapRef.current?.remove();
+      mapRef.current = null;
+    },
+    [],
+  );
 
   // Village shape, mask and pin follow the selected village.
   useEffect(() => {
@@ -309,36 +350,75 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
           .setLngLat([(bounds[0][0] + bounds[1][0]) / 2, (bounds[0][1] + bounds[1][1]) / 2])
           .addTo(map)
       : null;
-    // Show the whole village at once, then pan and zoom in to the 2x landing view. The landing waits for the
-    // terrain heights: framed before they load, the camera sits at sea level and ends up far too close once a
-    // hill-country village rises (Ella sits ~2.5 km up with exaggeration).
-    frame(map, bounds, edge, is3D, 0, 0);
+    // Landing: whole village -> pan and zoom to the 2x view. Done naively, the zoom outran the network and the
+    // close-up filled in as empty squares. So while the map is hidden: wait for terrain heights (framing before
+    // they load puts the camera at sea level, far too close on hill-country villages), then load the zoomed-out
+    // start view and fade in. During the zoom MapLibre draws those cached tiles stretched underneath and the sharp
+    // close-up tiles fade in over them: the picture is always complete and just sharpens. (Pre-caching the
+    // close-up too was measured at ~100 extra tiles and an 18 s wait on a slow connection.)
+    setRevealed(false);
+    landingRef.current = true;
+    let cancelled = false;
+    const timers: number[] = [];
+    const listeners: [string, (...a: any[]) => void][] = [];
+    const on = (type: string, fn: (...a: any[]) => void) => { map.on(type as any, fn); listeners.push([type, fn]); };
+    // Continues once every tile for the current camera has loaded, or after the timeout. Not 'idle': on this busy
+    // 3D scene it rarely fires, so each step fell through to its timeout. The first frames after a camera jump are
+    // skipped because the new view's tiles are only requested during those frames.
+    const loadedOrTimeout = (timeoutMs: number, next: () => void) => {
+      let done = false;
+      let frames = 0;
+      const go = () => {
+        if (done || cancelled) return;
+        done = true;
+        map.off('render', check);
+        next();
+      };
+      const check = () => {
+        if (++frames > 2 && map.areTilesLoaded()) go();
+      };
+      on('render', check);
+      timers.push(window.setTimeout(go, timeoutMs));
+      map.triggerRepaint();
+    };
+
+    let landed = false;
     const land = () => {
-      // Re-fit first so the ease starts from the terrain-aware "whole village" view.
-      frame(map, bounds, edge, is3D, 0, 0);
-      // After the landing view has fully loaded, warm the other base maps so switching is near-instant.
-      // Registered before the landing move: with reduced motion it is an instant jump that fires moveend at once.
-      map.once('moveend', () => map.once('idle', () => preloadBases(map, () => shownBase.current, preloading.current)));
-      frame(map, bounds, edge, is3D, LANDING_MS);
+      if (landed || cancelled) return;
+      landed = true;
+      frame(map, bounds, edgeRef.current, is3D, 0, 0); // whole-village start view, hidden: fetch its tiles
+      loadedOrTimeout(PRECACHE_START_MS, () => {
+        setRevealed(true);
+        // After the landing settles, warm the other base maps so switching is near-instant. Registered before
+        // the move: with reduced motion the ease is an instant jump that fires moveend at once.
+        map.once('moveend', () => {
+          landingRef.current = false;
+          map.once('idle', () => preloadBases(map, () => shownBase.current, preloading.current));
+        });
+        frame(map, bounds, edgeRef.current, is3D, LANDING_MS);
+      });
     };
-    if (!is3D) {
-      land();
-      return;
+
+    frame(map, bounds, edge, is3D, 0, 0);
+    {
+      // Wait until height tiles have actually arrived and none are still loading. Neither signal works alone:
+      // isSourceLoaded('dem') is already true before any tile is requested, and queryTerrainElevation returns 0
+      // (not null) for heights that have not loaded.
+      let sawHeightTile = false;
+      const onData = (e: maplibregl.MapSourceDataEvent) => {
+        if (e.sourceId !== 'dem') return;
+        if (e.tile) sawHeightTile = true;
+        if (!sawHeightTile || !map.isSourceLoaded('dem')) return;
+        map.off('sourcedata', onData);
+        land();
+      };
+      on('sourcedata', onData);
+      timers.push(window.setTimeout(() => { map.off('sourcedata', onData); land(); }, PRECACHE_TIMEOUT_MS));
     }
-    // Wait until height tiles have actually arrived and none are still loading. Neither signal works alone:
-    // isSourceLoaded('dem') is already true before any tile is requested, and queryTerrainElevation returns 0
-    // (not null) for heights that have not loaded.
-    let sawHeightTile = false;
-    const onData = (e: maplibregl.MapSourceDataEvent) => {
-      if (e.sourceId !== 'dem') return;
-      if (e.tile) sawHeightTile = true;
-      if (!sawHeightTile || !map.isSourceLoaded('dem')) return;
-      map.off('sourcedata', onData);
-      land();
-    };
-    map.on('sourcedata', onData);
     return () => {
-      map.off('sourcedata', onData);
+      cancelled = true;
+      timers.forEach((t) => window.clearTimeout(t));
+      listeners.forEach(([type, fn]) => map.off(type as any, fn));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loaded, ring, bounds]);
@@ -348,8 +428,9 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
     const map = mapRef.current;
     if (!map || !loaded) return;
     map.resize();
-    // A jump here would cut the landing animation short; panels settle long before it ends.
-    if (map.isMoving()) return;
+    // During a landing the panels often settle while the map is still hidden; jumping here replaced the zoomed-out
+    // start view with the close-up, so the landing zoom had nowhere to go. The landing reads edgeRef itself.
+    if (landingRef.current || map.isMoving()) return;
     frame(map, bounds, edge, is3D, 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [insetsKey]);
@@ -358,8 +439,10 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
     const map = mapRef.current;
     if (!map) return;
     const next = !is3D;
-    map.setTerrain(next ? { source: 'dem', exaggeration: EXAGGERATION } : null);
-    frame(map, bounds, edge, next, 900);
+    // Only the camera tilts; terrain stays on and the view keeps its centre and zoom. Toggling terrain moved the
+    // ground reference by the village's height (~2.5 km for Ella with exaggeration) and re-fitting against it
+    // drifted the village off screen a little more on every switch. Top-down over terrain reads as a flat 2D map.
+    map.easeTo({ pitch: next ? PITCH_3D : 0, bearing: next ? BEARING_3D : 0, duration: 900 });
     setIs3D(next);
   };
 
@@ -444,12 +527,51 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
         position: 'relative',
         width: '100%',
         height,
-        bgcolor: '#dbe6ec',
+        background: 'radial-gradient(120% 90% at 50% 45%, #3c5a43 0%, #22362a 55%, #15231b 100%)',
         // Keep MapLibre's attribution (licence requirement) beside the panels, not under them.
         '& .maplibregl-ctrl-bottom-right': { right: `${edge.right}px`, bottom: `${edge.bottom}px` },
       }}
     >
-      <Box ref={containerRef} sx={{ position: 'absolute', inset: 0 }} />
+      {/* The fade lives on a wrapper: re-rendering the map container itself rewrote its class attribute and
+          dropped MapLibre's own classes (maplibregl-map), which position the pin, controls and attribution. */}
+      <Box
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          opacity: revealed ? 1 : 0,
+          transition: 'opacity 600ms ease',
+          '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
+        }}
+      >
+        <Box ref={containerRef} sx={{ position: 'absolute', inset: 0 }} />
+      </Box>
+      {!revealed && (
+        <Box
+          role="status"
+          aria-label="Loading map"
+          sx={{
+            position: 'absolute',
+            zIndex: 2,
+            top: `calc(${edge.top}px + (100% - ${edge.top + edge.bottom}px) / 2)`,
+            left: `calc(${edge.left}px + (100% - ${edge.left + edge.right}px) / 2)`,
+            transform: 'translate(-50%, -50%)',
+            ...glassSx(isDark),
+            borderRadius: '999px',
+            px: 2,
+            py: 1,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.2,
+            fontSize: '0.85rem',
+            fontWeight: 600,
+            color: isDark ? '#fff' : '#0f172a',
+            pointerEvents: 'none',
+          }}
+        >
+          <CircularProgress size={16} thickness={5} sx={{ color: '#16a34a' }} />
+          Loading map…
+        </Box>
+      )}
 
       {/* ── LEFT FLOATING CONTROLS (+, -, Reset view, Compass) ── */}
       <Box sx={{ position: 'absolute', top: edge.top + 16, left: edge.left + 16, zIndex: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>

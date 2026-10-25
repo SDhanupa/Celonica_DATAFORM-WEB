@@ -36,7 +36,8 @@ const ContributeBanner: React.FC<ContributeBannerProps> = ({ ccode, villageName,
 
   const c = isDarkMode
     ? { bg: 'rgba(255,255,255,0.04)', border: 'rgba(255,255,255,0.1)', fg: '#F5F6F8', muted: 'rgba(245,246,248,0.62)', tile: 'rgba(255,255,255,0.1)', track: 'rgba(255,255,255,0.12)', bar: '#F5F6F8', btnBg: '#F5F6F8', btnFg: ink[900] }
-    : { bg: '#fff', border: ink[200], fg: ink[900], muted: ink[500], tile: ink[100], track: ink[100], bar: ink[900], btnBg: ink[900], btnFg: '#fff' };
+    // On glass over the map, ink[500] grey was too faint to read; ink[700] keeps the hierarchy and passes contrast.
+    : { bg: '#fff', border: ink[200], fg: ink[900], muted: glass ? ink[700] : ink[500], tile: glass ? 'rgba(255,255,255,0.55)' : ink[100], track: glass ? 'rgba(15,23,42,0.12)' : ink[100], bar: ink[900], btnBg: ink[900], btnFg: '#fff' };
 
   return (
     <Box
