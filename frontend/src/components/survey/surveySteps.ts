@@ -41,6 +41,8 @@ export const SURVEY_STEPS: SurveyStepMeta[] = [
   { index: 11, en: 'Business Environment & Government', si: '9 වන කොටස: ව්‍යාපාරික පරිසරය හා රාජ්‍ය මැදිහත්වීම', ta: '9 வது பகுதி: வணிகச் சூழல் & அரசு தலையீடு', hardcoded: false },
   { index: 12, en: 'Environmental & Social Impact', si: '10 වන කොටස: පාරිසරික හා සමාජීය බලපෑම', ta: '10 வது பகுதி: சுற்றுச்சூழல் & சமூக தாக்கம்', hardcoded: false },
   { index: 13, en: 'Future Needs & Logistics', si: '11 වන කොටස: අනාගත අවශ්‍යතා සහ ලොජිස්ටික්ස්', ta: '11 வது பகுதி: எதிர்கால தேவைகள் & தளவாடங்கள்', hardcoded: false },
+  { index: 14, en: 'Transport & Logistics', si: '14 වන කොටස: ප්‍රවාහන හා සැපයුම්', ta: '14 வது பகுதி: போக்குவரத்து & தளவாடங்கள்', hardcoded: false },
+  { index: 15, en: 'Additional Information', si: '15 වන කොටස: අතිරේක තොරතුරු', ta: '15 வது பகுதி: கூடுதல் தகவல்கள்', hardcoded: false },
 ];
 
 if (SURVEY_STEPS.length !== TOTAL_STEPS) {

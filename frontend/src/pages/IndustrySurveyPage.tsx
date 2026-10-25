@@ -39,6 +39,8 @@ import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
 import PolicyOutlinedIcon from '@mui/icons-material/PolicyOutlined';
 import ParkOutlinedIcon from '@mui/icons-material/ParkOutlined';
 import RocketLaunchOutlinedIcon from '@mui/icons-material/RocketLaunchOutlined';
+import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 
 /* UI icons */
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
@@ -433,6 +435,8 @@ const IndustrySurveyPage: React.FC = () => {
       { icon: <PolicyOutlinedIcon />, title: L('Business Environment & Government', 'ව්‍යාපාරික පරිසරය හා රාජ්‍ය මැදිහත්වීම', 'வணிகச் சூழல் & அரசு'), short: L('Environment', 'පරිසරය', 'சூழல்') },
       { icon: <ParkOutlinedIcon />, title: L('Environmental & Social Impact', 'පාරිසරික හා සමාජීය බලපෑම', 'சுற்றுச்சூழல் & சமூக தாக்கம்'), short: L('Impact', 'බලපෑම', 'தாக்கம்') },
       { icon: <RocketLaunchOutlinedIcon />, title: L('Future Needs & Logistics', 'අනාගත අවශ්‍යතා සහ ලොජිස්ටික්ස්', 'எதிர்கால தேவைகள் & தளவாடங்கள்'), short: L('Future', 'අනාගත', 'எதிர்காலம்') },
+      { icon: <LocalShippingOutlinedIcon />, title: t(14, 'Transport & Logistics', 'ප්‍රවාහන හා සැපයුම්', 'போக்குவரத்து & தளவாடங்கள்'), short: L('Transport', 'ප්‍රවාහන', 'போக்குவரத்து') },
+      { icon: <DescriptionOutlinedIcon />, title: t(15, 'Additional Information', 'අතිරේක තොරතුරු', 'கூடுதல் தகவல்கள்'), short: L('Additional', 'අතිරේක', 'கூடுதல்') },
     ];
   }, [language, L, dynamicQuestions]);
 
@@ -1575,7 +1579,7 @@ const IndustrySurveyPage: React.FC = () => {
               )}
 
 
-              {[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].includes(currentStep) && renderDynamicStep(currentStep)}
+              {isDynamicStep(currentStep) && renderDynamicStep(currentStep)}
                 </Box>
               </SurveyErrorContext.Provider>
             </Box>
