@@ -31,7 +31,6 @@ export const GET_ME = gql`
       gender
       createdAt
     }
-    needsOnboarding
   }
 `;
 export const GET_HOUSING_DATA = gql`

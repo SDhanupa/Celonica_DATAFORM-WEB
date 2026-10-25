@@ -142,7 +142,6 @@ const DashboardPage: React.FC = () => {
     pendingReports: 0,
   };
 
-  const needsOnboarding = data?.needsOnboarding === true;
   const adminName = data?.me?.name || userInfo?.name || 'User';
   const roles = userInfo?.realm_roles || [];
   const isAdmin = roles.includes('super_admin') || roles.includes('admin') || roles.includes('moderator');

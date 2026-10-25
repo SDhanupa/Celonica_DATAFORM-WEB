@@ -24,23 +24,10 @@ final class UserQueries
     }
 
     /**
-     * Return true if the user needs onboarding
+     * Compatibility for older clients: signup replaces duplicate onboarding.
      */
     public function needsOnboarding(mixed $root, array $args, $context): bool
     {
-        $request = request();
-        
-        if ($request->get('needs_onboarding', false) === true) {
-            return true;
-        }
-
-        $user = $request->get('current_user');
-        if ($user) {
-            if (empty($user->nic) || empty($user->mobile_number) || empty($user->address) || empty($user->dob) || empty($user->gender)) {
-                return true;
-            }
-        }
-
         return false;
     }
 

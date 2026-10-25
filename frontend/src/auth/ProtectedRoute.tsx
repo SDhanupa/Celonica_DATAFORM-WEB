@@ -2,7 +2,7 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthProvider';
 import keycloak from './keycloak';
-import { Box, CircularProgress, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Typography } from '@mui/material';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -10,7 +10,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles }) => {
-  const { isAuthenticated, isLoading, userInfo } = useAuth();
+  const { isAuthenticated, isLoading, userInfo, profileSyncFailed, logout } = useAuth();
   const location = useLocation();
 
   if (isLoading) {
@@ -52,6 +52,17 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
 
     keycloak.login({ redirectUri: redirectAfterLogin, prompt: 'login' });
     return null;
+  }
+
+  if (profileSyncFailed) {
+    return (
+      <Box sx={{ maxWidth: 480, mx: 'auto', p: 3, pt: 8, textAlign: 'center' }}>
+        <Typography variant="h6">We couldn’t load your account details</Typography>
+        <Typography sx={{ my: 2 }}>Your signup details are saved. Please try again, or contact greenceylonica@gmail.com if this continues.</Typography>
+        <Button variant="contained" onClick={() => window.location.reload()}>Try again</Button>
+        <Button onClick={logout} sx={{ ml: 1 }}>Sign out</Button>
+      </Box>
+    );
   }
 
   if (allowedRoles && allowedRoles.length > 0) {

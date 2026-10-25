@@ -25,7 +25,7 @@ class KeycloakAdminService
      */
     protected function getAccessToken()
     {
-        $response = Http::asForm()->post("{$this->baseUrl}/realms/{$this->realm}/protocol/openid-connect/token", [
+        $response = Http::asForm()->timeout(15)->post("{$this->baseUrl}/realms/{$this->realm}/protocol/openid-connect/token", [
             'client_id' => $this->clientId,
             'client_secret' => $this->clientSecret,
             'grant_type' => 'client_credentials',
@@ -36,6 +36,21 @@ class KeycloakAdminService
         }
 
         return $response->json('access_token');
+    }
+
+    /**
+     * Read signup details for the already authenticated Keycloak subject.
+     */
+    public function getUserProfile(string $subject): array
+    {
+        $response = Http::withToken($this->getAccessToken())->timeout(15)
+            ->get("{$this->baseUrl}/admin/realms/{$this->realm}/users/" . rawurlencode($subject));
+
+        if (!$response->successful() || $response->json('id') !== $subject) {
+            throw new Exception('Unable to retrieve the authenticated signup profile.');
+        }
+
+        return $response->json();
     }
 
     /**

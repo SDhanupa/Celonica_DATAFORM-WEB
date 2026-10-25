@@ -78,6 +78,12 @@ class UserIdGenerationTest extends TestCase
             $request->attributes->set($key, $value);
         }
         $this->app->instance('request', $request);
+        $keycloak = \Mockery::mock(\App\Services\KeycloakAdminService::class);
+        $keycloak->shouldReceive('getUserProfile')->with('new-google-sub')->andReturn([
+            'id' => 'new-google-sub', 'email' => 'new-google@example.test',
+            'firstName' => 'Google', 'lastName' => 'Test', 'attributes' => [],
+        ]);
+        $this->app->instance(\App\Services\KeycloakAdminService::class, $keycloak);
         $mutation = $this->app->make(UserMutations::class);
         $new = $mutation->syncUser(null, []);
         $this->assertInstanceOf(User::class, $new);

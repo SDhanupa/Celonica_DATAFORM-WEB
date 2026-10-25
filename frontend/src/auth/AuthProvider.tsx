@@ -5,6 +5,7 @@ import { useApolloClient, gql } from '@apollo/client';
 interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
+  profileSyncFailed: boolean;
   token: string | undefined;
   /**
    * Returns a token guaranteed valid for the next 30s, refreshing it first if
@@ -52,6 +53,7 @@ const SYNC_USER_MUTATION = gql`
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [profileSyncFailed, setProfileSyncFailed] = useState(false);
   const [token, setToken] = useState<string | undefined>(undefined);
   const [userInfo, setUserInfo] = useState<AuthContextType['userInfo']>(null);
   const isRun = React.useRef(false);
@@ -83,7 +85,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         pkceMethod: 'S256',
         checkLoginIframe: false,
       })
-      .then((authenticated) => {
+      .then(async (authenticated) => {
         setIsAuthenticated(authenticated);
         setToken(keycloak.token);
         if (authenticated && keycloak.tokenParsed) {
@@ -102,9 +104,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             realm_roles: keycloak.tokenParsed['realm_access']?.roles || [],
           });
 
-          apolloClient.mutate({
-            mutation: SYNC_USER_MUTATION,
-          }).catch((err) => console.error('Failed to sync user with DB:', err));
+          try {
+            const result = await apolloClient.mutate({ mutation: SYNC_USER_MUTATION });
+            if (!result.data?.syncUser?.id) throw new Error('Signup profile could not be loaded');
+            await apolloClient.refetchQueries({ include: ['GetMe'] });
+          } catch {
+            setProfileSyncFailed(true);
+          }
         }
         setIsLoading(false);
       })
@@ -145,6 +151,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       value={{
         isAuthenticated,
         isLoading,
+        profileSyncFailed,
         token,
         getToken,
         userInfo,

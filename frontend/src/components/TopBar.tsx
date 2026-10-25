@@ -9,7 +9,6 @@ import {
   Menu,
   MenuItem,
   Divider,
-  Badge,
   Tooltip,
   Button,
 } from '@mui/material';
@@ -29,8 +28,6 @@ import ProfilePage from '../pages/ProfilePage';
 import GlobalSearchBar from './GlobalSearchBar';
 
 
-import { useQuery } from '@apollo/client';
-import { GET_ME } from '../graphql/queries';
 
 const TopBar: React.FC = () => {
   const { userInfo, logout } = useAuth();
@@ -39,8 +36,6 @@ const TopBar: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [notifAnchorEl, setNotifAnchorEl] = useState<null | HTMLElement>(null);
   const [profileOpen, setProfileOpen] = useState(false);
-  const { data } = useQuery(GET_ME, { errorPolicy: 'ignore' });
-  const needsOnboarding = data?.needsOnboarding === true;
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -103,9 +98,7 @@ const TopBar: React.FC = () => {
               onClick={(e) => setNotifAnchorEl(e.currentTarget)}
               sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary', background: 'rgba(0,0,0,0.05)' } }}
             >
-              <Badge badgeContent={needsOnboarding ? 1 : 0} color="error">
-                <NotificationsIcon />
-              </Badge>
+              <NotificationsIcon />
             </IconButton>
           </Tooltip>
 
@@ -123,22 +116,11 @@ const TopBar: React.FC = () => {
               <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>Notifications</Typography>
             </Box>
             <Divider />
-            {needsOnboarding ? (
-              <MenuItem sx={{ py: 1.5, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                <Typography variant="body2" sx={{ fontWeight: 600, color: 'error.main' }}>
-                  Action Required
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Please complete your profile details.
-                </Typography>
-              </MenuItem>
-            ) : (
               <MenuItem sx={{ py: 2, justifyContent: 'center' }}>
                 <Typography variant="caption" color="text.secondary">
                   No new notifications
                 </Typography>
               </MenuItem>
-            )}
           </Menu>
 
           {/* User Menu */}

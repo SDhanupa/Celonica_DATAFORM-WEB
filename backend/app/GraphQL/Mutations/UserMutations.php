@@ -3,6 +3,7 @@
 namespace App\GraphQL\Mutations;
 
 use App\Services\KeycloakAdminService;
+use App\Services\SignupProfileSync;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -12,7 +13,7 @@ class UserMutations
 {
     protected $keycloakAdminService;
 
-    public function __construct(KeycloakAdminService $keycloakAdminService)
+    public function __construct(KeycloakAdminService $keycloakAdminService, private SignupProfileSync $signupProfiles)
     {
         $this->keycloakAdminService = $keycloakAdminService;
     }
@@ -31,9 +32,9 @@ class UserMutations
 
             Log::info('syncUser called', ['sub' => $sub, 'user_exists' => !!$user, 'admin_exists' => !!$admin]);
 
-            // If KeycloakAuthGuard already matched a user, return it
+            // Reuse signup data, filling only missing fields on this same identity.
             if ($user) {
-                return $user;
+                return $this->signupProfiles->sync($user->keycloak_sub);
             }
 
             if ($admin) {
@@ -67,41 +68,9 @@ class UserMutations
                 return null;
             }
 
-            $email = $request->get('keycloak_email');
-            if (!$email) {
-                $email = "user_{$sub}@celonica.local";
-            }
-
-            $firstName = $request->get('keycloak_first_name') ?? 'User';
-            $lastName = $request->get('keycloak_last_name') ?? '';
-
-            $newUser = User::where('keycloak_sub', $sub)->first();
-            if (!$newUser) {
-                $newUser = User::where('email', $email)->first();
-            }
-
-            if ($newUser) {
-                $newUser->update([
-                    'name' => trim("$firstName $lastName"),
-                    'keycloak_sub' => $sub,
-                ]);
-                return $newUser;
-            }
-
-            return User::create([
-                'email' => $email,
-                'name' => trim("$firstName $lastName"),
-                'first_name' => $firstName,
-                'last_name' => $lastName,
-                'password' => bcrypt(\Illuminate\Support\Str::random(16)),
-                'keycloak_sub' => $sub,
-                'nic' => null,
-                'mobile_number' => null,
-            ]);
+            return $this->signupProfiles->sync($sub);
         } catch (\Throwable $e) {
-            Log::error('syncUser error caught: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
-            ]);
+            Log::error('Signup profile synchronization failed', ['exception' => get_class($e)]);
             // Return null safely - schema is now nullable (syncUser: User)
             return null;
         }
@@ -185,9 +154,11 @@ class UserMutations
         $updateData = [];
         if (isset($args['nic'])) $updateData['nic'] = $args['nic'];
         if (isset($args['mobileNumber'])) $updateData['mobile_number'] = $args['mobileNumber'];
-        if (isset($args['address'])) $updateData['address'] = $args['address'];
-        if (isset($args['dob'])) $updateData['dob'] = $args['dob'];
-        if (isset($args['gender'])) $updateData['gender'] = $args['gender'];
+        foreach (['address', 'dob', 'gender'] as $field) {
+            if (array_key_exists($field, $args)) {
+                $updateData[$field] = is_string($args[$field]) && trim($args[$field]) !== '' ? trim($args[$field]) : null;
+            }
+        }
 
         if (!empty($updateData)) {
             try {

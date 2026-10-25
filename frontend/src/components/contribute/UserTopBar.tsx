@@ -21,6 +21,8 @@ import BoltRoundedIcon from '@mui/icons-material/BoltRounded';
 import EditLocationAltOutlinedIcon from '@mui/icons-material/EditLocationAltOutlined';
 import HistoryRoundedIcon from '@mui/icons-material/HistoryRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
+import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
+import ProfilePage from '../../pages/ProfilePage';
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import { useAuth } from '../../auth/AuthProvider';
 import { useLanguage } from '../../context/LanguageContext';
@@ -45,6 +47,7 @@ const UserTopBar: React.FC<UserTopBarProps> = ({ onChangeVillage }) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
+  const [profileOpen, setProfileOpen] = useState(false);
 
   const displayName = userInfo?.name || userInfo?.preferred_username || '';
   const initial = (displayName || '?').charAt(0).toUpperCase();
@@ -168,6 +171,10 @@ const UserTopBar: React.FC<UserTopBarProps> = ({ onChangeVillage }) => {
           </Box>
           <Divider />
           {/* Primary nav lives here on phones, where the inline nav is hidden. */}
+          <MenuItem onClick={() => { setMenuAnchor(null); setProfileOpen(true); }}>
+            <ListItemIcon><PersonOutlineRoundedIcon fontSize="small" /></ListItemIcon>
+            My Profile
+          </MenuItem>
           <MenuItem onClick={() => go('/user')} sx={{ display: { md: 'none' } }}>
             <ListItemIcon>
               <AddCircleOutlineRoundedIcon fontSize="small" />
@@ -231,6 +238,7 @@ const UserTopBar: React.FC<UserTopBarProps> = ({ onChangeVillage }) => {
           </MenuItem>
         </Menu>
       </Container>
+      <ProfilePage open={profileOpen} onClose={() => setProfileOpen(false)} />
     </Box>
   );
 };

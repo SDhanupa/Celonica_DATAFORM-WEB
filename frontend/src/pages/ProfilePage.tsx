@@ -345,7 +345,7 @@ const ProfilePage: React.FC<ProfileModalProps> = ({ open, onClose }) => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Date of Birth"
+                label="Date of birth (optional)"
                 name="dob"
                 type="date"
                 InputLabelProps={{ shrink: true }}
@@ -357,11 +357,12 @@ const ProfilePage: React.FC<ProfileModalProps> = ({ open, onClose }) => {
               <TextField
                 fullWidth
                 select
-                label="Gender"
+                label="Gender (optional)"
                 name="gender"
                 value={formData.gender}
                 onChange={handleEditChange}
               >
+                <MenuItem value="">Not specified</MenuItem>
                 <MenuItem value="Male">Male</MenuItem>
                 <MenuItem value="Female">Female</MenuItem>
                 <MenuItem value="Other">Other</MenuItem>
@@ -370,7 +371,7 @@ const ProfilePage: React.FC<ProfileModalProps> = ({ open, onClose }) => {
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Address"
+                label="Address (optional)"
                 name="address"
                 multiline
                 rows={2}
