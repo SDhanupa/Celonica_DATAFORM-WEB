@@ -45,4 +45,19 @@ class AdminDirectoryTest extends TestCase
         $this->expectException(\GraphQL\Error\Error::class);
         (new AdminQueries)->admins(null, []);
     }
+
+    public function test_legacy_admin_with_missing_dates_remains_readable(): void
+    {
+        DB::table('admins')->insert(['name'=>'Legacy Admin', 'email'=>'legacy@example.test', 'role'=>'super_admin']);
+        $request = Request::create('/graphql');
+        $request->attributes->set('current_admin', Admin::firstOrFail());
+        $this->app->instance('request', $request);
+        config(['lighthouse.schema_cache.enable'=>false]);
+        $schema=$this->app->make(\Nuwave\Lighthouse\Schema\SchemaBuilder::class)->schema();
+        $context=new \Nuwave\Lighthouse\Execution\HttpGraphQLContext($request);
+        $result=\GraphQL\GraphQL::executeQuery($schema, '{ admins { name createdAt updatedAt } }', null, $context)->toArray();
+        $this->assertArrayNotHasKey('errors', $result, json_encode($result['errors'] ?? []));
+        $this->assertSame(['name'=>'Legacy Admin','createdAt'=>null,'updatedAt'=>null], $result['data']['admins'][0]);
+        $this->assertNull(DB::table('admins')->value('created_at'));
+    }
 }

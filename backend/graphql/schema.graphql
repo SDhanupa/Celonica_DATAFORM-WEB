@@ -20,7 +20,7 @@ type Admin {
     role: AdminRole!
     isActive: Boolean! @rename(attribute: "is_active")
     lastLoginAt: DateTime @rename(attribute: "last_login_at")
-    createdAt: DateTime! @rename(attribute: "created_at")
+    createdAt: DateTime @rename(attribute: "created_at")
     updatedAt: DateTime @rename(attribute: "updated_at")
 }
 
