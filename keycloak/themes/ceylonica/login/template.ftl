@@ -1,11 +1,11 @@
-<#macro registrationLayout bodyClass="" displayInfo=false displayMessage=true displayRequiredFields=false>
+<#macro registrationLayout bodyClass="" displayInfo=false displayMessage=true displayRequiredFields=false displaySocial=true>
 <!DOCTYPE html>
 <html lang="<#if locale?? && locale.currentLanguageTag??>${locale.currentLanguageTag}<#else>en</#if>">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="robots" content="noindex, nofollow">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <#if bodyClass == 'password-page'>
         <style>
             .sms-pending-content { display: none; }
@@ -32,7 +32,7 @@
     
     <#if properties.styles?has_content>
         <#list properties.styles?split(' ') as style>
-            <link href="${url.resourcesPath}/${style}" rel="stylesheet" />
+            <link href="${url.resourcesPath}/${style}?v=${properties.assetVersion!'1'}" rel="stylesheet" />
         </#list>
     </#if>
 </head>
@@ -97,7 +97,7 @@
                 </div>
 
                 <!-- Social Identity Providers Section -->
-                <#if realm?? && social?? && social.providers?has_content>
+                <#if displaySocial && realm?? && social?? && social.providers?has_content>
                     <div class="social-section">
                         <div class="divider-text">
                             <span>or log in with</span>
@@ -130,6 +130,7 @@
                                     <#else>
                                         <span>${p.displayName}</span>
                                     </#if>
+                                    <#if p.alias?contains("google")><span>Continue with Google</span></#if>
                                 </a>
                             </#list>
                         </div>
@@ -139,11 +140,10 @@
                 <!-- Auxiliary Footer Navigation / Info -->
                 <div class="form-footer">
                     <#nested "info">
-                    <p style="font-size:12px;margin-top:20px;line-height:1.6">
+                    <nav class="policy-links" aria-label="Account policies">
                         <a href="${properties.policyBaseUrl!'https://ceystem.com'}/privacy-policy/" target="_blank" rel="noopener">Privacy policy</a>
-                        &nbsp; | &nbsp;
                         <a href="${properties.policyBaseUrl!'https://ceystem.com'}/terms-of-service/" target="_blank" rel="noopener">Terms of service</a>
-                    </p>
+                    </nav>
                 </div>
 
             </div>
