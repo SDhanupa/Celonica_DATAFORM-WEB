@@ -1,4 +1,5 @@
 import React from 'react';
+import { glassSx } from './glass';
 import {
   Box,
   Typography,
@@ -249,9 +250,7 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
       <Box
         sx={{
           borderRadius: { xs: '14px', md: '18px' },
-          bgcolor: surface,
-          border,
-          boxShadow: isDarkMode ? 'none' : '0 1px 2px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.04)',
+          ...glassSx(isDarkMode),
           overflow: 'visible',
           animation: 'fadeInUp 0.4s ease both',
         }}

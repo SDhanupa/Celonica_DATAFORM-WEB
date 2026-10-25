@@ -1,4 +1,5 @@
 import React from 'react';
+import { glassTileSx } from './glass';
 import { Box, Typography } from '@mui/material';
 import GroupsIcon from '@mui/icons-material/Groups';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
@@ -81,9 +82,7 @@ export const VillageQuickStats: React.FC<VillageQuickStatsProps> = ({
             borderRadius: '16px',
             px: compact ? 1.5 : 1.8,
             py: isColumn ? 1 : (compact ? 1.5 : 1.8),
-            bgcolor: isDarkMode ? '#111827' : '#ffffff',
-            border: isDarkMode ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e5e9f0',
-            boxShadow: isDarkMode ? 'none' : '0 1px 2px rgba(15,23,42,0.04)',
+            ...glassTileSx(isDarkMode),
             display: 'flex',
             flexDirection: isColumn ? 'row' : 'column',
             alignItems: isColumn ? 'center' : 'stretch',

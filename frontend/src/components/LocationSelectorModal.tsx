@@ -147,7 +147,7 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
           }
         </Typography>
         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.75)', fontFamily: "'Inter', sans-serif" }}>
-          {language === 'en' ? 'Census Data Explorer · Sri Lanka' : language === 'si' ? 'ජනලේඛන දත්ත · ශ්‍රී ලංකා' : 'மக்கள்தொகை கணக்கெடுப்பு · இலங்கை'}
+          {language === 'en' ? 'Village Data Explorer · Sri Lanka' : language === 'si' ? 'ජනලේඛන දත්ත · ශ්‍රී ලංකා' : 'மக்கள்தொகை கணக்கெடுப்பு · இலங்கை'}
         </Typography>
       </Box>
       <DialogContent sx={locationBodySx}>
