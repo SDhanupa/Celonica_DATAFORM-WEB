@@ -109,7 +109,8 @@ class LoginSmsEventListenerTest {
             transaction.get().commit();
         }
         assertEquals(3, delivered.size());
-        assertTrue(delivered.stream().allMatch(n -> n.message().equals("Welcome to ceystem.com, sample-user. You have logged in successfully.")));
+        assertTrue(delivered.stream().allMatch(n -> n.message().equals(
+                "Welcome back to ceystem.com! You have logged in successfully.\nDate: 2026-10-25\nTime: 01:30 AM (Sri Lanka)")));
     }
 
     @Test void unsuccessfulAuthenticationAndTokenRefreshDoNotSend() {
@@ -167,15 +168,19 @@ class LoginSmsEventListenerTest {
         Event mutable = event(EventType.LOGIN);
         listener.onEvent(mutable);
         mutable.setType(EventType.LOGIN_ERROR);
-        when(user.getUsername()).thenReturn("changed");
+        mutable.setTime(0);
+        when(user.getFirstAttribute("mobile_number")).thenReturn("0711111111");
         transaction.get().commit();
-        assertTrue(delivered.get(0).message().contains("sample-user."));
+        assertEquals("0700000000", delivered.get(0).mobile());
+        assertTrue(delivered.get(0).message().contains("Date: 2026-10-25\nTime: 01:30 AM (Sri Lanka)"));
         assertFalse(delivered.get(0).toString().contains("not-a-real-secret"));
     }
 
-    @Test void messagesAreShortAndDoNotIncludeControlCharacters() {
-        String message = LoginSmsEventListener.message("long\nname".repeat(40), false, 0);
+    @Test void loginTimeUsesSriLankanAfternoonAndFitsOnePlainTextSms() {
+        String message = LoginSmsEventListener.message(false,
+                java.time.Instant.parse("2026-10-25T10:00:00Z").toEpochMilli());
         assertTrue(message.length() <= 160);
-        assertFalse(message.contains("\n"));
+        assertTrue(message.endsWith("Date: 2026-10-25\nTime: 03:30 PM (Sri Lanka)"));
+        assertTrue(message.chars().allMatch(c -> c == '\n' || (c >= 32 && c <= 126)));
     }
 }

@@ -9,7 +9,16 @@ Welcome to ceystem.com! Your registration is complete.
 Date: 2026-10-25
 ```
 
-Login messages retain the username greeting. It handles form and Google
+Login messages also omit the username and include the actual login event date
+and time in Sri Lanka, independent of the server timezone or SMS delivery delay:
+
+```text
+Welcome back to ceystem.com! You have logged in successfully.
+Date: 2026-10-25
+Time: 03:30 PM (Sri Lanka)
+```
+
+Both messages fit within 160 plain-text characters. It handles form and Google
 registration, and password, SMS and Google login. The signup's automatic first
 login is suppressed so it produces one welcome message. Silent SSO, refreshes,
 failed attempts, admin-console clients and service accounts are excluded.

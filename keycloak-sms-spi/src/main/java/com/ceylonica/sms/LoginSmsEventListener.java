@@ -15,9 +15,11 @@ import org.keycloak.sessions.AuthenticationSessionModel;
 
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Locale;
 import java.util.function.Consumer;
 
 /** Transaction-aware notifications for successful Ceylonica browser authentication. */
@@ -95,7 +97,7 @@ public final class LoginSmsEventListener implements EventListenerProvider {
         }
 
         pending.put((registration ? "register:" : "login:") + key,
-                new Notification(gatewayUser, password, sender, mobile.trim(), message(user.getUsername(), registration, event.getTime())));
+                new Notification(gatewayUser, password, sender, mobile.trim(), message(registration, event.getTime())));
         if (registration) {
             pending.remove("login:" + key);
             if (auth != null) auth.setAuthNote(REGISTERED, event.getUserId());
@@ -119,14 +121,15 @@ public final class LoginSmsEventListener implements EventListenerProvider {
         }
     }
 
-    static String message(String username, boolean registration, long eventTime) {
+    static String message(boolean registration, long eventTime) {
+        var localTime = Instant.ofEpochMilli(eventTime).atZone(ZoneId.of("Asia/Colombo"));
+        String date = localTime.toLocalDate().toString();
         if (registration) {
-            String date = Instant.ofEpochMilli(eventTime).atZone(ZoneId.of("Asia/Colombo")).toLocalDate().toString();
             return "Welcome to ceystem.com! Your registration is complete.\nDate: " + date;
         }
-        String name = blank(username) ? "user" : username.replaceAll("[\\p{Cntrl}\\s]+", " ").trim();
-        if (name.length() > 40) name = name.substring(0, 40);
-        return "Welcome to ceystem.com, " + name + ". You have logged in successfully.";
+        String time = localTime.format(DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH));
+        return "Welcome back to ceystem.com! You have logged in successfully.\nDate: " + date
+                + "\nTime: " + time + " (Sri Lanka)";
     }
 
     private static boolean blank(String value) { return value == null || value.isBlank(); }
