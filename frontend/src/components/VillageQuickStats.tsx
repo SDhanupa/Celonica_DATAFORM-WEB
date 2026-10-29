@@ -113,9 +113,11 @@ export const VillageQuickStats: React.FC<VillageQuickStatsProps> = ({
                 color: isDarkMode ? '#94a3b8' : '#64748b',
                 textTransform: 'uppercase',
                 letterSpacing: '0.3px',
-                whiteSpace: 'nowrap',
+                lineHeight: 1.25,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
+                // Narrow side-by-side tiles: wrap to two lines rather than cut the label off.
+                ...(isColumn ? { whiteSpace: 'nowrap' } : { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }),
               }}
             >
               {stat.label}

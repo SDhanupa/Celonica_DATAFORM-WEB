@@ -202,6 +202,14 @@ export const SvgDonutChart: React.FC<{ data: Slice[]; isDarkMode: boolean; size?
 );
 
 // ── Bars: two values read as a comparison; more values as flat columns ──
+/** Bar colours, shared with the detail modal's legend so its swatches match the chart. */
+const barTones = (isDark: boolean) => ({ accent: isDark ? '#cfe3d6' : '#2d5e41', accentSoft: isDark ? '#5f8a72' : '#8fb39b' });
+/** Two bars: first = accent, second = soft. More bars: the tallest = accent, the rest soft (as the chart draws them). */
+const barItemColours = <T extends { value: number; color: string }>(items: T[], isDark: boolean): T[] => {
+  const { accent, accentSoft } = barTones(isDark);
+  const peak = items.reduce((best, it, i) => (it.value > items[best].value ? i : best), 0);
+  return items.map((it, i) => ({ ...it, color: (items.length === 2 ? i === 0 : i === peak) ? accent : accentSoft }));
+};
 export const SvgBarChart: React.FC<{
   bars: { label: string; count: number; color1: string; color2: string; shadowColor: string }[];
   isDarkMode: boolean;
@@ -211,8 +219,7 @@ export const SvgBarChart: React.FC<{
   const ink = chartInk(isDarkMode);
   const [hover, setHover] = useState<number | null>(null);
   const total = bars.reduce((a, b) => a + b.count, 0);
-  const accent = isDarkMode ? '#cfe3d6' : '#2d5e41';
-  const accentSoft = isDarkMode ? '#5f8a72' : '#8fb39b';
+  const { accent, accentSoft } = barTones(isDarkMode);
 
   // Two values (e.g. male / female): two headline figures and one split bar beat two floating columns.
   if (bars.length === 2) {
@@ -301,7 +308,7 @@ const ChartDetailModal: React.FC<{
   onNavigateCategory?: (slug: string) => void;
 }> = ({ open, onClose, data, isDarkMode, onNavigateCategory }) => {
   if (!data) return null;
-  const items = toneItems(data.items, isDarkMode);
+  const items = data.type === 'bar' ? barItemColours(data.items, isDarkMode) : toneItems(data.items, isDarkMode);
   const total = items.reduce((acc, i) => acc + i.value, 0) || 1;
 
   return (
@@ -322,7 +329,7 @@ const ChartDetailModal: React.FC<{
     >
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1, pb: 2 }}>
         <Box>
-          <Typography sx={{ fontWeight: 800, fontSize: { xs: '1.1rem', sm: '1.3rem' }, color: isDarkMode ? '#60a5fa' : '#2563eb' }}>
+          <Typography sx={{ fontWeight: 800, fontSize: { xs: '1.1rem', sm: '1.3rem' }, color: isDarkMode ? '#f8fafc' : '#0b1220', letterSpacing: '-0.01em' }}>
             {data.title}
           </Typography>
           <Typography sx={{ fontSize: '0.8rem', color: isDarkMode ? '#94a3b8' : '#64748b', mt: 0.3 }}>
@@ -371,8 +378,8 @@ const ChartDetailModal: React.FC<{
                           {item.label}
                         </Typography>
                       </Box>
-                      <Typography sx={{ fontWeight: 800, fontSize: '0.9rem', color: item.color }}>
-                        {item.value.toLocaleString()} <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>({pct}%)</span>
+                      <Typography sx={{ fontWeight: 800, fontSize: '0.9rem', color: isDarkMode ? '#f8fafc' : '#0b1220', fontVariantNumeric: 'tabular-nums' }}>
+                        {item.value.toLocaleString()} <Box component="span" sx={{ fontSize: '0.75rem', fontWeight: 600, color: isDarkMode ? '#cbd5e1' : '#475569' }}>({pct}%)</Box>
                       </Typography>
                     </Box>
 
@@ -403,8 +410,9 @@ const ChartDetailModal: React.FC<{
                 textTransform: 'none',
                 px: 3,
                 py: 1,
-                bgcolor: '#2563eb',
-                '&:hover': { bgcolor: '#1d4ed8' },
+                bgcolor: '#2d5e41',
+                boxShadow: 'none',
+                '&:hover': { bgcolor: '#23503a', boxShadow: 'none' },
               }}
             >
               Open Full Category Page
@@ -663,6 +671,67 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
   ];
 
   const activeSurvey = surveyCategories.find((c) => c.id === selectedSurveyId) || surveyCategories[0];
+  const activeIdx = Math.max(0, surveyCategories.findIndex((c) => c.id === selectedSurveyId));
+  // Direction of the last switch (1 = next, -1 = previous), so the new chart slides in from the side it came from.
+  const lastIdx = useRef(activeIdx);
+  const switchDir = useRef(1);
+  if (lastIdx.current !== activeIdx) {
+    switchDir.current = activeIdx > lastIdx.current ? 1 : -1;
+    lastIdx.current = activeIdx;
+  }
+
+  // ── Vertical swipe on the chart pane: up = next chart, down = previous ──
+  // The pane takes vertical touch itself (touch-action: pan-x): a tall legend scrolls first, and only a drag past its
+  // end switches charts. The chart follows the finger with resistance, then springs back.
+  const SWIPE_SWITCH_PX = 56;
+  const [dragY, setDragY] = useState(0);
+  const touch = useRef<{ y: number; x: number; top: number; t: number; vertical: boolean | null } | null>(null);
+  const swipedRef = useRef(false);
+  const step = (dir: 1 | -1) => {
+    const next = (activeIdx + dir + surveyCategories.length) % surveyCategories.length;
+    setSelectedSurveyId(surveyCategories[next].id);
+    navigator.vibrate?.(8);
+  };
+  const paneTouch = {
+    onTouchStart: (e: React.TouchEvent<HTMLElement>) => {
+      const t = e.touches[0];
+      touch.current = { y: t.clientY, x: t.clientX, top: e.currentTarget.scrollTop, t: Date.now(), vertical: null };
+      swipedRef.current = false;
+    },
+    onTouchMove: (e: React.TouchEvent<HTMLElement>) => {
+      const s = touch.current;
+      if (!s) return;
+      const t = e.touches[0];
+      const dy = t.clientY - s.y;
+      const dx = t.clientX - s.x;
+      if (s.vertical === null && Math.hypot(dx, dy) > 8) s.vertical = Math.abs(dy) > Math.abs(dx);
+      if (!s.vertical) return;
+      const pane = e.currentTarget;
+      const max = pane.scrollHeight - pane.clientHeight;
+      const want = s.top - dy;
+      pane.scrollTop = Math.min(Math.max(want, 0), max);
+      // Drag beyond the scrollable range, with rubber-band resistance.
+      const over = want < 0 ? -want : want > max ? -(want - max) : 0;
+      setDragY(over * 0.35);
+    },
+    onTouchEnd: (e: React.TouchEvent<HTMLElement>) => {
+      const s = touch.current;
+      touch.current = null;
+      if (!s?.vertical) return setDragY(0);
+      const dy = e.changedTouches[0].clientY - s.y;
+      const pane = e.currentTarget;
+      const max = pane.scrollHeight - pane.clientHeight;
+      const over = s.top - dy < 0 ? -(s.top - dy) : s.top - dy > max ? -(s.top - dy - max) : 0;
+      // A quick flick counts even if short.
+      const fast = Math.abs(dy) / Math.max(Date.now() - s.t, 1) > 0.5 && Math.abs(over) > 16;
+      if (Math.abs(over) > SWIPE_SWITCH_PX || fast) {
+        swipedRef.current = true;
+        step(over < 0 ? 1 : -1);
+        pane.scrollTop = 0;
+      }
+      setDragY(0);
+    },
+  };
 
   const railItems = () =>
     surveyCategories.map((cat, idx) => {
@@ -866,7 +935,10 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
           {/* Selected Dimension Chart Rendering */}
           <Box
             key={activeSurvey.id}
+            {...(isNarrow ? paneTouch : {})}
             onClick={() =>
+              // The click that ends a swipe is not a tap on the chart.
+              !swipedRef.current &&
               setModalData({
                 title: activeSurvey.title,
                 type: activeSurvey.type,
@@ -889,9 +961,13 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
               // instead of pushing the card past its rounded border.
               overflowY: isNarrow ? 'auto' : 'hidden',
               overflowX: 'hidden',
+              overscrollBehavior: 'contain',
+              touchAction: isNarrow ? 'pan-x' : undefined,
               minHeight: isNarrow ? 120 : 140,
             }}
           >
+            {/* Follows the finger during a swipe, springs back on release. */}
+            <Box sx={{ width: '100%', transform: dragY ? `translateY(${dragY}px)` : 'none', opacity: 1 - Math.min(Math.abs(dragY) / 160, 0.35), transition: dragY ? 'none' : 'transform 380ms cubic-bezier(0.22, 1, 0.36, 1), opacity 300ms ease' }}>
             <Box
               key={selectedSurveyId}
               sx={{
@@ -899,10 +975,12 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
                 display: 'flex',
                 justifyContent: 'center',
                 '@keyframes chartFlowIn': {
-                  from: { opacity: 0, transform: 'translateY(10px) scale(0.96)', filter: 'blur(8px)' },
+                  from: { opacity: 0, transform: 'translateY(var(--from-y)) scale(0.97)', filter: 'blur(6px)' },
                   to: { opacity: 1, transform: 'none', filter: 'blur(0)' },
                 },
-                animation: 'chartFlowIn 460ms cubic-bezier(0.22, 1, 0.36, 1) both',
+                // Slides in from below when moving forward, from above when going back.
+                '--from-y': `${switchDir.current * 28}px`,
+                animation: 'chartFlowIn 420ms cubic-bezier(0.22, 1, 0.36, 1) both',
                 '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
               }}
             >
@@ -915,6 +993,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
               {activeSurvey.type === 'donut' && activeSurvey.donutData && (
                 <SvgDonutChart data={activeSurvey.donutData} isDarkMode={isDarkMode} />
               )}
+            </Box>
             </Box>
           </Box>
         </Box>

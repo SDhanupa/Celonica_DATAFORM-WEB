@@ -4,7 +4,7 @@ import { Box, Typography, Button, FormControl, CircularProgress, Alert, Dialog, 
 import { useQuery } from '@apollo/client';
 import { GET_GN_BY_COORDINATES } from '../graphql/queries';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
-import { locationHeaderSx, locationContinueSx, locationBodySx, locationPaperSx } from './locationModalStyles';
+import { locationHeaderSx, locationContinueSx, locationBodySx, locationPaperSx, useFitToViewport } from './locationModalStyles';
 
 interface LocationSelectorModalProps {
   open: boolean;
@@ -99,6 +99,8 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
     }
   };
 
+  const fitPaper = useFitToViewport(open);
+
   return (
     <Dialog
       open={open}
@@ -111,6 +113,7 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
       }}
       disableEscapeKeyDown
       PaperProps={{
+        ref: fitPaper,
         sx: {
           borderRadius: '24px',
           minWidth: { xs: '90%', sm: 420 },

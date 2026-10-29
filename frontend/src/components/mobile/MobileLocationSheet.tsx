@@ -13,6 +13,11 @@ import CloseIcon from '@mui/icons-material/Close';
 import PlaceIcon from '@mui/icons-material/Place';
 import { useLanguage } from '../../context/LanguageContext';
 
+/** The selected id only once it is among the loaded options; MUI warns (and shows a blank box) for an unknown value. */
+const known = (options: any[], value: string | undefined, key: (o: any) => unknown) =>
+  value && options.some((o) => String(key(o)) === String(value)) ? value : '';
+
+
 interface MobileLocationSheetProps {
   open: boolean;
   onOpen: () => void;
@@ -83,7 +88,7 @@ const MobileLocationSheet: React.FC<MobileLocationSheetProps> = ({
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
             <Box sx={{
               width: 38, height: 38, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#fff', background: 'linear-gradient(135deg,#3b82f6,#2563eb)',
+              color: '#fff', bgcolor: '#2d5e41',
             }}>
               <PlaceIcon fontSize="small" />
             </Box>
@@ -107,7 +112,7 @@ const MobileLocationSheet: React.FC<MobileLocationSheetProps> = ({
             <InputLabel sx={labelSx}>{L('District', 'දිස්ත්‍රික්කය', 'மாவட்டம்')}</InputLabel>
             <Select
               label={L('District', 'දිස්ත්‍රික්කය', 'மாவட்டம்')}
-              value={selectedDistrict || ''}
+              value={known(districts, selectedDistrict, (d) => d.id || d.admin2Pcode)}
               onChange={(e) => onDistrictChange(e.target.value)}
               sx={selectSx}
               MenuProps={{ PaperProps: { sx: { maxHeight: 320, bgcolor: surface, color: textMain } } }}
@@ -124,7 +129,7 @@ const MobileLocationSheet: React.FC<MobileLocationSheetProps> = ({
             <InputLabel sx={labelSx}>{L('DS Division', 'ප්‍රාදේශීය ලේකම්', 'பிரதேச செயலகம்')}</InputLabel>
             <Select
               label={L('DS Division', 'ප්‍රාදේශීය ලේකම්', 'பிரதேச செயலகம்')}
-              value={selectedCity || ''}
+              value={known(dsDivisions, selectedCity, (c) => c.divisionalSecretariatCode || c.dsCode)}
               onChange={(e) => onCityChange(e.target.value)}
               sx={selectSx}
               MenuProps={{ PaperProps: { sx: { maxHeight: 320, bgcolor: surface, color: textMain } } }}
@@ -141,7 +146,7 @@ const MobileLocationSheet: React.FC<MobileLocationSheetProps> = ({
             <InputLabel sx={labelSx}>{L('Village (GN)', 'ග්‍රාම නිලධාරී', 'கிராமம்')}</InputLabel>
             <Select
               label={L('Village (GN)', 'ග්‍රාම නිලධාරී', 'கிராமம்')}
-              value={selectedGN || ''}
+              value={known(gramaNiladharis, selectedGN, (g) => String(g.id) || g.CCODE || g.ccode)}
               onChange={(e) => onGNChange(e.target.value)}
               sx={selectSx}
               MenuProps={{ PaperProps: { sx: { maxHeight: 320, bgcolor: surface, color: textMain } } }}

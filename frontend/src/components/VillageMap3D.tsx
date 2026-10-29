@@ -28,8 +28,8 @@ const TILT_ZOOM_OUT = 0.7;
 const LANDING_ZOOM_IN = 1;
 const LANDING_MS = 2200;
 // Upper bounds for the hidden steps before the reveal, so a slow network still shows the map.
-const PRECACHE_START_MS = 5000; // start (zoomed-out) view tiles
-const PRECACHE_TIMEOUT_MS = 5000; // terrain-heights wait
+const PRECACHE_START_MS = 3000; // start (zoomed-out) view tiles
+const PRECACHE_TIMEOUT_MS = 3000; // terrain-heights wait
 
 // MapLibre runs at most 16 image downloads at once across all sources. The ~36 satellite tiles filled that queue
 // and the terrain tiles did not even start for ~8 s (measured), stalling the landing. Different hosts have their
@@ -45,6 +45,16 @@ type Base = 'satellite' | 'streets' | 'topo';
 const BASE_ORDER: Base[] = ['satellite', 'streets', 'topo'];
 const BASE_LABEL: Record<Base, string> = { satellite: 'Satellite', streets: 'Street map', topo: 'Topographic' };
 
+// Both tile hosts speak HTTP/1.1 only (6 downloads at a time per host). Listing each server under the
+// alternate hostnames it already answers on (same bytes, same CORS, verified) multiplies the parallel downloads;
+// MapLibre maps every tile to one fixed hostname, so the browser cache still hits.
+const esri = (path: string) => ['server', 'services'].map((h) => `https://${h}.arcgisonline.com/ArcGIS/rest/services/${path}/MapServer/tile/{z}/{y}/{x}`);
+const TERRAIN_TILES = [
+  'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png',
+  'https://elevation-tiles-prod.s3.amazonaws.com/terrarium/{z}/{x}/{y}.png',
+  'https://elevation-tiles-prod.s3.us-east-1.amazonaws.com/terrarium/{z}/{x}/{y}.png',
+];
+
 const style: StyleSpecification = {
   version: 8,
   // No paint transitions: preloading toggles raster-opacity on hidden base maps, and the default 300 ms
@@ -53,7 +63,7 @@ const style: StyleSpecification = {
   sources: {
     satellite: {
       type: 'raster',
-      tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+      tiles: esri('World_Imagery'),
       tileSize: 256,
       maxzoom: 19,
       attribution: '&copy; Esri, Maxar, Earthstar Geographics',
@@ -74,14 +84,14 @@ const style: StyleSpecification = {
     },
     roads: {
       type: 'raster',
-      tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}'],
+      tiles: esri('Reference/World_Transportation'),
       tileSize: 256,
       maxzoom: 19,
       attribution: '&copy; Esri',
     },
     places: {
       type: 'raster',
-      tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}'],
+      tiles: esri('Reference/World_Boundaries_and_Places'),
       tileSize: 256,
       maxzoom: 19,
     },
@@ -89,12 +99,15 @@ const style: StyleSpecification = {
     parcels: { type: 'geojson', data: EMPTY },
     dem: {
       type: 'raster-dem',
-      tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
+      tiles: TERRAIN_TILES,
       encoding: 'terrarium',
-      // Declared 512 for 256px tiles: MapLibre then fetches one zoom level coarser (4x fewer tiles). Heights only
-      // shape the mesh, imagery stays full resolution, so the coarser grid is not visible at village scale.
-      tileSize: 512,
-      maxzoom: 15,
+      // Heights only shape the mesh; imagery stays full resolution. Capped at z11 (~75 m height samples) because at
+      // village zooms any finer cap let MapLibre flip the height tiles between two zoom levels while the camera
+      // moved, cancelling and re-requesting them in a loop (measured: 209 requests for 19 tiles, the terrain wait
+      // always timing out). At z11 the set is stable: ~9 requests, none cancelled. tileSize must be the real 256:
+      // declaring 512 to fetch coarser tiles triggered the same loop.
+      tileSize: 256,
+      maxzoom: 11,
       attribution: 'Terrain: Mapzen / AWS Open Data',
     },
     mask: { type: 'geojson', data: EMPTY },
@@ -196,19 +209,31 @@ function frame(map: MlMap, bounds: LngLatBoundsLike | null, insets: MapInsets, i
     map.jumpTo({ center: COLOMBO, zoom: 12, pitch, bearing });
     return;
   }
-  const padded = { top: insets.top + 40, right: insets.right + 40, bottom: insets.bottom + 40, left: insets.left + 40 };
-  // Panels can leave less room than the padding on small windows; cameraForBounds then gives up, so retry unpadded.
-  const cam = map.cameraForBounds(bounds, { padding: padded, maxZoom: 16 }) ?? map.cameraForBounds(bounds, { maxZoom: 16 });
+  // The panel insets become the map's own viewport padding, so the camera centre is the middle of the visible window
+  // at any pitch. (cameraForBounds' padding instead shifts the centre in flat map units, which drifts once tilted,
+  // badly so on phones where the cards cover the bottom half.) The fit itself then only needs an even margin.
+  map.setPadding(insets);
+  const cam = map.cameraForBounds(bounds, { padding: 40, bearing, maxZoom: 16 }) ?? map.cameraForBounds(bounds, { bearing, maxZoom: 16 });
   if (!cam) return;
   // cameraForBounds frames a flat, top-down view; tilting enlarges the near edge, so back off when in 3D.
-  const target = { center: cam.center, zoom: cam.zoom - (is3D ? TILT_ZOOM_OUT : 0) + zoomIn, pitch, bearing };
+  const target = { center: cam.center, zoom: cam.zoom - (is3D ? TILT_ZOOM_OUT : 0) + zoomIn, pitch, bearing, padding: insets };
   // easeTo is skipped automatically for users with prefers-reduced-motion (they land on the final view).
   if (animateMs > 0) map.easeTo({ ...target, duration: animateMs });
   else map.jumpTo(target);
 }
 
 const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
-  const { height = 520, insets, gnName, ccode } = props;
+  const { height = 520, insets, gnName, ccode, controlsScale: z = 1, landingZoomIn: zoomIn = LANDING_ZOOM_IN, controlsHidden = false } = props;
+  // Controls (and the attribution) fade and slide toward their edge while hidden, e.g. when cards scroll over the map.
+  const reveal = (dx: number) => ({
+    opacity: controlsHidden ? 0 : 1,
+    transform: controlsHidden ? `translateX(${dx}px) scale(0.96)` : 'none',
+    pointerEvents: controlsHidden ? ('none' as const) : undefined,
+    transition: 'opacity 260ms ease, transform 420ms cubic-bezier(0.22, 1, 0.36, 1)',
+    '@media (prefers-reduced-motion: reduce)': { transition: 'opacity 120ms linear', transform: 'none' },
+  });
+  // Hidden start view: one level further out than the landing view, so the reveal is a short zoom-in.
+  const startZoomIn = zoomIn - 1;
   // The page briefly passes `boundary` as undefined while it refetches the village (cached data being topped up).
   // Treating that as "no village" tore the map down and restarted the landing on every refetch, so the map never
   // finished loading. Hold the last known boundary through those gaps.
@@ -229,6 +254,11 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
   const [loaded, setLoaded] = useState(false);
   // The map stays hidden until both the start and the landing views are cached, then fades in and zooms.
   const [revealed, setRevealed] = useState(false);
+  // Imagery is held back until the terrain heights for the view have arrived. MapLibre sends every image tile
+  // (imagery and heights) through one download queue: ~120 imagery tiles queued first kept the ~20 height tiles
+  // waiting ~5 s (measured), and imagery fetched before the heights is for the wrong camera altitude and gets
+  // cancelled and fetched again once the ground rises.
+  const [terrainReady, setTerrainReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const [is3D, setIs3D] = useState(true);
   const [base, setBase] = useState<Base>('satellite');
@@ -357,6 +387,7 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
     // close-up tiles fade in over them: the picture is always complete and just sharpens. (Pre-caching the
     // close-up too was measured at ~100 extra tiles and an 18 s wait on a slow connection.)
     setRevealed(false);
+    setTerrainReady(false);
     landingRef.current = true;
     let cancelled = false;
     const timers: number[] = [];
@@ -386,7 +417,10 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
     const land = () => {
       if (landed || cancelled) return;
       landed = true;
-      frame(map, bounds, edgeRef.current, is3D, 0, 0); // whole-village start view, hidden: fetch its tiles
+      setTerrainReady(true);
+      // Hidden start view is top-down: a tilted view reaches toward the horizon and needs ~2x the imagery tiles,
+      // which kept the reveal waiting. The landing then tilts into 3D while zooming in.
+      frame(map, bounds, edgeRef.current, false, 0, startZoomIn);
       loadedOrTimeout(PRECACHE_START_MS, () => {
         setRevealed(true);
         // After the landing settles, warm the other base maps so switching is near-instant. Registered before
@@ -395,11 +429,11 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
           landingRef.current = false;
           map.once('idle', () => preloadBases(map, () => shownBase.current, preloading.current));
         });
-        frame(map, bounds, edgeRef.current, is3D, LANDING_MS);
+        frame(map, bounds, edgeRef.current, is3D, LANDING_MS, zoomIn);
       });
     };
 
-    frame(map, bounds, edge, is3D, 0, 0);
+    frame(map, bounds, edge, false, 0, startZoomIn);
     {
       // Wait until height tiles have actually arrived and none are still loading. Neither signal works alone:
       // isSourceLoaded('dem') is already true before any tile is requested, and queryTerrainElevation returns 0
@@ -408,7 +442,13 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
       const onData = (e: maplibregl.MapSourceDataEvent) => {
         if (e.sourceId !== 'dem') return;
         if (e.tile) sawHeightTile = true;
-        if (!sawHeightTile || !map.isSourceLoaded('dem')) return;
+        if (!sawHeightTile) return;
+        // Only the ground under the village decides the camera height; tiles toward the horizon can stream in
+        // later. Unloaded heights read as 0, so a non-zero reading means the village's tile is in (sea-level
+        // villages fall back to "all height tiles loaded", or the timeout).
+        const centre = bounds && ([(bounds[0][0] + bounds[1][0]) / 2, (bounds[0][1] + bounds[1][1]) / 2] as [number, number]);
+        const villageHeightKnown = !!centre && !!map.queryTerrainElevation(centre);
+        if (!villageHeightKnown && !map.isSourceLoaded('dem')) return;
         map.off('sourcedata', onData);
         land();
       };
@@ -431,7 +471,7 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
     // During a landing the panels often settle while the map is still hidden; jumping here replaced the zoomed-out
     // start view with the close-up, so the landing zoom had nowhere to go. The landing reads edgeRef itself.
     if (landingRef.current || map.isMoving()) return;
-    frame(map, bounds, edge, is3D, 0);
+    frame(map, bounds, edge, is3D, 0, zoomIn);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [insetsKey]);
 
@@ -469,6 +509,10 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
     const map = mapRef.current;
     if (!map || !loaded) return;
     shownBase.current = base;
+    if (!terrainReady) {
+      map.setLayoutProperty(base, 'visibility', 'none');
+      return;
+    }
     map.setPaintProperty(base, 'raster-opacity', 1); // a preloaded base sits at opacity 0
     map.setLayoutProperty(base, 'visibility', 'visible');
     const hideOthers = () => {
@@ -480,7 +524,7 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
       window.clearTimeout(timer);
       map.off('idle', hideOthers);
     };
-  }, [loaded, base]);
+  }, [loaded, base, terrainReady]);
 
   const snapshot = () => {
     const map = mapRef.current;
@@ -497,7 +541,7 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
     map.triggerRepaint();
   };
 
-  const focusVillage = () => mapRef.current && frame(mapRef.current, bounds, edge, is3D, 900);
+  const focusVillage = () => mapRef.current && frame(mapRef.current, bounds, edge, is3D, 900, zoomIn);
   const nextBase = BASE_ORDER[(BASE_ORDER.indexOf(base) + 1) % BASE_ORDER.length];
 
   if (failed) return <VillageMap {...props} />;
@@ -507,16 +551,19 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
   const tool = (title: string, onClick: () => void, icon: React.ReactNode, placement: 'left' | 'right', active = false) => (
     // describeChild keeps the label on the button only; otherwise screen readers announce each control twice.
     <Tooltip title={title} placement={placement} describeChild>
-      <IconButton
-        size="small"
-        aria-label={title}
-        aria-pressed={active}
-        onClick={onClick}
-        disabled={!loaded}
-        sx={{ p: 0.8, color: active ? '#3b82f6' : iconColor, '& .MuiSvgIcon-root': { fontSize: '1.15rem' } }}
-      >
-        {icon}
-      </IconButton>
+      {/* span: a disabled button fires no mouse events, so the tooltip needs a wrapper while the map loads */}
+      <span>
+        <IconButton
+          size="small"
+          aria-label={title}
+          aria-pressed={active}
+          onClick={onClick}
+          disabled={!loaded}
+          sx={{ p: 0.8, color: active ? '#3b82f6' : iconColor, '& .MuiSvgIcon-root': { fontSize: '1.15rem' } }}
+        >
+          {icon}
+        </IconButton>
+      </span>
     </Tooltip>
   );
   const group = { ...glassSx(isDark), borderRadius: '12px', display: 'flex', flexDirection: 'column' as const, overflow: 'hidden' };
@@ -529,7 +576,7 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
         height,
         background: 'radial-gradient(120% 90% at 50% 45%, #3c5a43 0%, #22362a 55%, #15231b 100%)',
         // Keep MapLibre's attribution (licence requirement) beside the panels, not under them.
-        '& .maplibregl-ctrl-bottom-right': { right: `${edge.right}px`, bottom: `${edge.bottom}px` },
+        '& .maplibregl-ctrl-bottom-right': { right: `${edge.right}px`, bottom: `${edge.bottom}px`, ...reveal(12) },
       }}
     >
       {/* The fade lives on a wrapper: re-rendering the map container itself rewrote its class attribute and
@@ -543,7 +590,8 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
           '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
         }}
       >
-        <Box ref={containerRef} sx={{ position: 'absolute', inset: 0 }} />
+        {/* Explicit size: maplibre-gl.css sets .maplibregl-map { position: relative }, which can win over the inset. */}
+        <Box ref={containerRef} sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
       </Box>
       {!revealed && (
         <Box
@@ -574,7 +622,8 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
       )}
 
       {/* ── LEFT FLOATING CONTROLS (+, -, Reset view, Compass) ── */}
-      <Box sx={{ position: 'absolute', top: edge.top + 16, left: edge.left + 16, zIndex: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+      {/* zoom also scales offsets, so they are divided by it to keep the controls on the panel edges */}
+      <Box sx={{ position: 'absolute', zoom: z, top: (edge.top + 16) / z, left: (edge.left + 16) / z, zIndex: 2, display: 'flex', flexDirection: 'column', gap: 1, ...reveal(-16) }}>
         <Box sx={group}>
           {tool('Zoom In', () => mapRef.current?.zoomIn(), <AddIcon />, 'right')}
           <Divider />
@@ -598,7 +647,9 @@ const VillageMap3DInner: React.FC<VillageMapProps> = (props) => {
       )}
 
       {/* ── RIGHT FLOATING TOOLBOX (same options as the original map) ── */}
-      <Box sx={{ position: 'absolute', top: edge.top + 16, right: edge.right + 16, zIndex: 2, ...glassSx(isDark), borderRadius: '14px', p: 0.5, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+      <Box sx={{ position: 'absolute', zoom: z, top: (edge.top + 16) / z, right: (edge.right + 16) / z, zIndex: 2, ...glassSx(isDark), borderRadius: '14px', p: 0.5, display: 'flex', flexDirection: 'column', gap: 0.5, ...reveal(16),
+        // Short map windows (phones): scroll the toolbox rather than run it under the cards.
+        maxHeight: `calc(${100 / z}% - ${(edge.top + edge.bottom + 32) / z}px)`, overflowY: 'auto', scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
         {tool(is3D ? 'Switch to 2D' : 'Switch to 3D', toggle3D,
           <Typography component="span" sx={{ fontWeight: 800, fontSize: '0.75rem', width: 18, lineHeight: '18px' }}>{is3D ? '2D' : '3D'}</Typography>, 'left')}
         {tool(`Map Layer: ${BASE_LABEL[base]} (next: ${BASE_LABEL[nextBase]})`, () => setBase(nextBase), <LayersIcon />, 'left', base !== 'satellite')}

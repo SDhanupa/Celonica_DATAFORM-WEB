@@ -11,35 +11,37 @@ import AdminLayout from './components/AdminLayout';
 import UserShell from './components/contribute/UserShell';
 import apolloClient from './api/apolloClient';
 
-import LandingPage from './pages/LandingPage';
-import LoginPage from './pages/LoginPage';
-import DashboardPage from './pages/DashboardPage';
-import AdminsPage from './pages/AdminsPage';
-import UserPage from './pages/UserPage';
-import MyContributionsPage from './pages/MyContributionsPage';
-import RapidFirePage from './pages/RapidFirePage';
-import MyDashboard from './pages/MyDashboard';
-
-import { UsersPage, ReportsPage } from './pages/PlaceholderPages';
-import RegistrationPage from './pages/RegistrationPage';
-import QuestionsPage from './pages/QuestionsPage';
-import BulkDataPage from './pages/BulkDataPage';
-import SurveyPage from './pages/SurveyPage';
-import CategoriesPage from './pages/CategoriesPage';
 import DynamicCategoryWrapper from './components/DynamicCategoryWrapper';
-import UserSubmissionsPage from './pages/UserSubmissionsPage';
-import GramaNiladharisPage from './pages/GramaNiladharisPage';
-import PoliceConnectionsPage from './pages/PoliceConnectionsPage';
-import PostOfficeConnectionsPage from './pages/PostOfficeConnectionsPage';
-import PhiConnectionsPage from './pages/PhiConnectionsPage';
-import TrsConnectionsPage from './pages/TrsConnectionsPage';
-import DistrictProvinceConnectionsPage from './pages/DistrictProvinceConnectionsPage';
-import CategoryDetailPage from './pages/CategoryDetailPage';
-import ApprovalsPage from './pages/ApprovalsPage';
-import IndustrySurveyPage from './pages/IndustrySurveyPage';
-import AdminIndustrySurveys from './pages/AdminIndustrySurveys';
-import AdminIndustrySurveysQuestions from './pages/AdminIndustrySurveysQuestions';
-import AdminRapidFireApprovals from './pages/AdminRapidFireApprovals';
+
+// Each page is its own chunk: visitors download only the page they open (the public gnpage no longer carries
+// every admin screen in its first download).
+const LoginPage = React.lazy(() => import('./pages/LoginPage'));
+const DashboardPage = React.lazy(() => import('./pages/DashboardPage'));
+const AdminsPage = React.lazy(() => import('./pages/AdminsPage'));
+const UserPage = React.lazy(() => import('./pages/UserPage'));
+const MyContributionsPage = React.lazy(() => import('./pages/MyContributionsPage'));
+const RapidFirePage = React.lazy(() => import('./pages/RapidFirePage'));
+const MyDashboard = React.lazy(() => import('./pages/MyDashboard'));
+const UsersPage = React.lazy(() => import('./pages/PlaceholderPages').then((m) => ({ default: m.UsersPage })));
+const ReportsPage = React.lazy(() => import('./pages/PlaceholderPages').then((m) => ({ default: m.ReportsPage })));
+const RegistrationPage = React.lazy(() => import('./pages/RegistrationPage'));
+const QuestionsPage = React.lazy(() => import('./pages/QuestionsPage'));
+const BulkDataPage = React.lazy(() => import('./pages/BulkDataPage'));
+const SurveyPage = React.lazy(() => import('./pages/SurveyPage'));
+const CategoriesPage = React.lazy(() => import('./pages/CategoriesPage'));
+const UserSubmissionsPage = React.lazy(() => import('./pages/UserSubmissionsPage'));
+const GramaNiladharisPage = React.lazy(() => import('./pages/GramaNiladharisPage'));
+const PoliceConnectionsPage = React.lazy(() => import('./pages/PoliceConnectionsPage'));
+const PostOfficeConnectionsPage = React.lazy(() => import('./pages/PostOfficeConnectionsPage'));
+const PhiConnectionsPage = React.lazy(() => import('./pages/PhiConnectionsPage'));
+const TrsConnectionsPage = React.lazy(() => import('./pages/TrsConnectionsPage'));
+const DistrictProvinceConnectionsPage = React.lazy(() => import('./pages/DistrictProvinceConnectionsPage'));
+const CategoryDetailPage = React.lazy(() => import('./pages/CategoryDetailPage'));
+const ApprovalsPage = React.lazy(() => import('./pages/ApprovalsPage'));
+const IndustrySurveyPage = React.lazy(() => import('./pages/IndustrySurveyPage'));
+const AdminIndustrySurveys = React.lazy(() => import('./pages/AdminIndustrySurveys'));
+const AdminIndustrySurveysQuestions = React.lazy(() => import('./pages/AdminIndustrySurveysQuestions'));
+const AdminRapidFireApprovals = React.lazy(() => import('./pages/AdminRapidFireApprovals'));
 
 const App: React.FC = () => {
   return (
@@ -49,6 +51,7 @@ const App: React.FC = () => {
           <CssBaseline />
           <Router>
             <AuthProvider>
+              <React.Suspense fallback={null}>
               <Routes>
               {/* Public */}
               <Route path="/login" element={<LoginPage />} />
@@ -333,6 +336,7 @@ const App: React.FC = () => {
               />
               <Route path="*" element={<Navigate to="/gnpage" replace />} />
             </Routes>
+              </React.Suspense>
           </AuthProvider>
         </Router>
       </ThemeProvider>

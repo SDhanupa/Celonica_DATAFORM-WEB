@@ -170,6 +170,12 @@ export interface VillageMapProps {
   /** Pixels of the map hidden under overlay panels. Controls sit just inside these edges and
    *  the village is framed in the remaining visible area. Omit for the normal card layout. */
   insets?: MapInsets;
+  /** CSS zoom for the floating map controls (3D map only), to match a scaled-down overlay UI. */
+  controlsScale?: number;
+  /** Zoom levels past "whole village fits" for the landing view (3D map only). Default 1 (2x closer); 0 fits it. */
+  landingZoomIn?: number;
+  /** Fade the floating controls and attribution out (3D map only), e.g. while page content covers the map. */
+  controlsHidden?: boolean;
 }
 
 export const VillageMap: React.FC<VillageMapProps> = ({

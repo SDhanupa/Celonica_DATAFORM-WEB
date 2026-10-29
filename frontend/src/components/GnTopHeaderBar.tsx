@@ -20,6 +20,11 @@ import { useLanguage } from '../context/LanguageContext';
 import { MOBILE_CATEGORIES } from './mobile/mobileCategories';
 import { useEdgeFadeMask } from './survey/SurveyKit';
 
+/** The selected id only once it is among the loaded options; MUI warns (and shows a blank box) for an unknown value. */
+const known = (options: any[], value: string | undefined, key: (o: any) => unknown) =>
+  value && options.some((o) => String(key(o)) === String(value)) ? value : '';
+
+
 interface GnTopHeaderBarProps {
   districts?: any[];
   selectedDistrict?: string;
@@ -145,7 +150,7 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
   const districtSelect = (
     <Select
       size="small"
-      value={selectedDistrict || ''}
+      value={known(districts, selectedDistrict, (d) => d.id || d.admin2Pcode)}
       onChange={(e) => onDistrictChange?.(e.target.value)}
       displayEmpty
       sx={selectSx}
@@ -166,7 +171,7 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
   const dsSelect = (
     <Select
       size="small"
-      value={selectedCity || ''}
+      value={known(dsDivisions, selectedCity, (c) => c.divisionalSecretariatCode || c.dsCode)}
       onChange={(e) => onCityChange?.(e.target.value)}
       displayEmpty
       disabled={!selectedDistrict || dsDivisions.length === 0}
@@ -188,7 +193,7 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
   const gnSelect = (
     <Select
       size="small"
-      value={selectedGN || ''}
+      value={known(gramaNiladharis, selectedGN, (g) => String(g.id) || g.CCODE || g.ccode)}
       onChange={(e) => onGNChange?.(e.target.value)}
       displayEmpty
       disabled={!selectedCity || gramaNiladharis.length === 0}
@@ -202,7 +207,7 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, minWidth: 0 }}>
             <Box component="span" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name || v}</Box>
             {code && (
-              <Box component="span" sx={{ flexShrink: 0, fontSize: '0.72rem', fontWeight: 800, bgcolor: isDarkMode ? 'rgba(59,130,246,0.25)' : '#dbeafe', color: '#2563eb', px: 0.6, py: 0.1, borderRadius: '4px', fontFamily: 'monospace' }}>
+              <Box component="span" sx={{ flexShrink: 0, fontSize: '0.72rem', fontWeight: 800, bgcolor: isDarkMode ? 'rgba(134,239,172,0.16)' : 'rgba(45,94,65,0.12)', color: isDarkMode ? '#bbf7d0' : '#2d5e41', px: 0.6, py: 0.1, borderRadius: '4px', fontFamily: 'monospace' }}>
                 {code}
               </Box>
             )}
@@ -217,7 +222,7 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
           <MenuItem key={gn.id || gn.CCODE || gn.ccode} value={String(gn.id) || gn.CCODE || gn.ccode} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2, py: 0.8 }}>
             <Typography sx={{ fontWeight: 600, fontSize: '0.85rem' }}>{name}</Typography>
             {code && (
-              <Typography sx={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 800, fontSize: '0.75rem', bgcolor: isDarkMode ? 'rgba(59,130,246,0.2)' : 'rgba(37,99,235,0.09)', color: '#2563eb', px: 0.8, py: 0.25, borderRadius: '6px' }}>
+              <Typography sx={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 800, fontSize: '0.75rem', bgcolor: isDarkMode ? 'rgba(134,239,172,0.16)' : 'rgba(45,94,65,0.12)', color: isDarkMode ? '#bbf7d0' : '#2d5e41', px: 0.8, py: 0.25, borderRadius: '6px' }}>
                 {code}
               </Typography>
             )}
