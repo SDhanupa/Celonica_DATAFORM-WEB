@@ -1,9 +1,9 @@
 import React from 'react';
 import { glassTileSx } from './glass';
 import { Box, Typography } from '@mui/material';
-import GroupsIcon from '@mui/icons-material/Groups';
-import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
-import WorkIcon from '@mui/icons-material/Work';
+import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
 import { useLanguage } from '../context/LanguageContext';
 
 export interface VillageQuickStatsProps {
@@ -47,20 +47,17 @@ export const VillageQuickStats: React.FC<VillageQuickStatsProps> = ({
     {
       label: { en: 'Population', si: 'ග්‍රාමීය ජනගහනය', ta: 'கிராம மக்கள்தொகை' }[language] || 'Population',
       value: totalPopulation,
-      icon: <GroupsIcon />,
-      color: '#2563eb',
+      icon: <GroupsOutlinedIcon />,
     },
     {
       label: { en: 'Households', si: 'ගෘහ ඒකක', ta: 'குடும்பங்கள்' }[language] || 'Households',
       value: totalHouseholds,
-      icon: <HomeRoundedIcon />,
-      color: '#0891b2',
+      icon: <HomeOutlinedIcon />,
     },
     {
       label: { en: 'Employed', si: 'රැකියා නියුක්ත', ta: 'வேலைவாய்ப்பு' }[language] || 'Employed',
       value: employedCount,
-      icon: <WorkIcon />,
-      color: '#16a34a',
+      icon: <WorkOutlineOutlinedIcon />,
     },
   ];
 
@@ -99,8 +96,9 @@ export const VillageQuickStats: React.FC<VillageQuickStatsProps> = ({
               alignItems: 'center',
               gap: 0.7,
               minWidth: 0,
-              color: stat.color,
-              '& .MuiSvgIcon-root': { fontSize: compact ? '1rem' : '1.1rem', flexShrink: 0 },
+              // One neutral outlined icon style, matching the label: per-stat colours read as decoration.
+              color: isDarkMode ? '#94a3b8' : '#64748b',
+              '& .MuiSvgIcon-root': { fontSize: compact ? '1.05rem' : '1.15rem', flexShrink: 0 },
             }}
           >
             {stat.icon}
@@ -111,9 +109,11 @@ export const VillageQuickStats: React.FC<VillageQuickStatsProps> = ({
                 color: isDarkMode ? '#94a3b8' : '#64748b',
                 textTransform: 'none',
                 letterSpacing: '0.3px',
-                whiteSpace: 'nowrap',
+                lineHeight: 1.25,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
+                // Narrow side-by-side tiles: wrap to two lines rather than cut the label off.
+                ...(isColumn ? { whiteSpace: 'nowrap' } : { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }),
               }}
             >
               {stat.label}

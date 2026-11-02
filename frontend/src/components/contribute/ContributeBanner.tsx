@@ -36,7 +36,7 @@ const ContributeBanner: React.FC<ContributeBannerProps> = ({ ccode, villageName,
 
   const c = isDarkMode
     ? { bg: 'rgba(255,255,255,0.04)', border: 'rgba(255,255,255,0.1)', fg: '#F5F6F8', muted: 'rgba(245,246,248,0.62)', tile: 'rgba(255,255,255,0.1)', track: 'rgba(255,255,255,0.12)', bar: '#7dd3b0', btnBg: '#7dd3b0', btnFg: '#102c24' }
-    : { bg: '#fff', border: ink[200], fg: ink[900], muted: ink[500], tile: ink[100], track: ink[100], bar: '#28715b', btnBg: '#205e4b', btnFg: '#fff' };
+    : { bg: '#fff', border: ink[200], fg: ink[900], muted: glass ? ink[700] : ink[500], tile: glass ? 'rgba(255,255,255,0.55)' : ink[100], track: glass ? 'rgba(15,23,42,0.12)' : ink[100], bar: '#28715b', btnBg: '#205e4b', btnFg: '#fff' };
 
   return (
     <Box

@@ -20,7 +20,7 @@ import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import TagRoundedIcon from '@mui/icons-material/TagRounded';
 import Tooltip from '@mui/material/Tooltip';
-import { locationHeaderSx, locationContinueSx, locationBodySx, locationPaperSx } from '../components/locationModalStyles';
+import { locationHeaderSx, locationContinueSx, locationBodySx, locationPaperSx, useFitToViewport } from '../components/locationModalStyles';
 import { CATEGORIES } from './CategoryDetailPage';
 import GnPageFooter from '../components/GnPageFooter';
 import { VillageMap } from '../components/VillageMap';
@@ -639,6 +639,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
     />
   );
 
+  const fitLocationPaper = useFitToViewport(showLocationModal);
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>
 
@@ -648,6 +650,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         scroll="body"
         disableEscapeKeyDown
         PaperProps={{
+          ref: fitLocationPaper,
           sx: {
             borderRadius: '24px',
             minWidth: { xs: '90%', sm: 420 },
@@ -997,6 +1000,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           householdHeadData={householdHeadData}
           contributeSlot={
             <ContributeBanner
+              glass
               compact
               ccode={displayCCODE || activeGn?.CCODE}
               villageName={displayGN || activeGn?.nameEn || ''}

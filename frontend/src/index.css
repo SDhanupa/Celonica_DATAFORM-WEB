@@ -36,6 +36,18 @@ button, input, textarea, select {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+/* Liquid-glass charts: a ring segment sweeping to its length (--seg of --circ), and a share bar growing in. */
+@keyframes ringDraw {
+  from { stroke-dasharray: 0 var(--circ); }
+  to { stroke-dasharray: var(--seg) var(--circ); }
+}
+@keyframes growBarX {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [style*="ringDraw"], [style*="growBarX"], [style*="growBarY"] { animation: none !important; }
+}
 @keyframes growBarY {
   from { transform: scaleY(0); }
   to { transform: scaleY(1); }
