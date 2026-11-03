@@ -17,6 +17,12 @@ use App\Http\Controllers\ImageUploadController;
 // Health check
 Route::get('/health', fn() => response()->json(['status' => 'ok', 'service' => 'Ceylonica Admin API']));
 
+// Machine-to-machine integration: keys grant only these two read-only endpoints.
+Route::prefix('v1')->middleware(['throttle:180,1,location-api-ip', \App\Http\Middleware\LocationApiKey::class])->group(function () {
+    Route::get('/gn/{code}', [\App\Http\Controllers\LocationApiController::class, 'show']);
+    Route::get('/locations/resolve', [\App\Http\Controllers\LocationApiController::class, 'resolve']);
+});
+
 use App\Http\Controllers\IndustrySurveyController;
 
 // Public API Endpoints — read-only + survey submission (throttled)
@@ -103,6 +109,15 @@ Route::middleware(['keycloak.admin'])->group(function () {
 
 // Protected API Endpoints (Super Admin Only)
 Route::middleware(['keycloak.admin', 'super_admin'])->group(function () {
+
+    Route::get('/admin/workspace', [\App\Http\Controllers\AdminWorkspaceController::class, 'index']);
+    Route::prefix('admin/location-api')->middleware('throttle:30,1,admin-location-api')->group(function () {
+        Route::get('/keys', [\App\Http\Controllers\AdminLocationApiController::class, 'index']);
+        Route::post('/keys', [\App\Http\Controllers\AdminLocationApiController::class, 'store']);
+        Route::post('/keys/{id}/revoke', [\App\Http\Controllers\AdminLocationApiController::class, 'revoke']);
+        Route::patch('/keys/{id}/expiry', [\App\Http\Controllers\AdminLocationApiController::class, 'updateExpiry']);
+        Route::get('/preview', [\App\Http\Controllers\AdminLocationApiController::class, 'preview']);
+    });
 
     Route::get('/industry-surveys', [IndustrySurveyController::class, 'index']);
     Route::patch('/industry-surveys/{id}/approve', [IndustrySurveyController::class, 'approve']);

@@ -2,6 +2,7 @@ import React, { useLayoutEffect, useRef, useState } from 'react';
 import { glassSx, glassEdge } from './glass';
 import { useLanguage } from '../context/LanguageContext';
 import VillageQuickStats from './VillageQuickStats';
+import { censusAgeGroups, hasCensusValues } from '../utils/censusData';
 import {
   Box,
   Typography,
@@ -290,10 +291,24 @@ export const SvgBarChart: React.FC<{
   );
 };
 
+const CensusUnavailable: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode }) => {
+  const { language } = useLanguage();
+  const copy = {
+    en: ['Data unavailable', 'No records are available for this village and category.'],
+    si: ['දත්ත නොමැත', 'මෙම ගම සහ කාණ්ඩය සඳහා දත්ත වාර්තා නොමැත.'],
+    ta: ['தரவு இல்லை', 'இந்தக் கிராமத்திற்கும் பிரிவிற்கும் பதிவுகள் இல்லை.'],
+  }[language];
+  return <Box role="status" sx={{ py: 3, width: '100%', color: isDarkMode ? '#e2e8f0' : '#334155' }}>
+    <Typography sx={{ fontWeight: 700, mb: 1 }}>{copy[0]}</Typography>
+    <Typography sx={{ fontSize: '0.85rem', lineHeight: 1.6 }}>{copy[1]}</Typography>
+  </Box>;
+};
+
 // ── DETAIL MODAL POPUP FOR EXPANDED VIEW ─────────────────────────────
 interface ChartModalData {
   title: string;
   subtitle?: string;
+  available?: boolean;
   type: 'bar' | 'pie' | 'donut';
   items: { label: string; value: number; color: string }[];
   bars?: { label: string; count: number; color1: string; color2: string; shadowColor: string }[];
@@ -309,7 +324,7 @@ const ChartDetailModal: React.FC<{
 }> = ({ open, onClose, data, isDarkMode, onNavigateCategory }) => {
   if (!data) return null;
   const items = data.type === 'bar' ? barItemColours(data.items, isDarkMode) : toneItems(data.items, isDarkMode);
-  const total = items.reduce((acc, i) => acc + i.value, 0) || 1;
+  const total = items.reduce((acc, i) => acc + i.value, 0);
 
   return (
     <Dialog
@@ -333,16 +348,17 @@ const ChartDetailModal: React.FC<{
             {data.title}
           </Typography>
           <Typography sx={{ fontSize: '0.8rem', color: isDarkMode ? '#94a3b8' : '#64748b', mt: 0.3 }}>
-            Detailed breakdown and census key counts (Total Sample: {total.toLocaleString()})
+            {data.available !== false && <>Census total: {total.toLocaleString()}</>}
           </Typography>
         </Box>
-        <IconButton onClick={onClose} sx={{ color: isDarkMode ? '#cbd5e1' : '#64748b' }}>
+        <IconButton aria-label="Close chart" onClick={onClose} sx={{ color: isDarkMode ? '#cbd5e1' : '#64748b' }}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
 
       <DialogContent sx={{ p: 1 }}>
         <Grid container spacing={3} alignItems="center">
+          {data.available === false ? <Grid item xs={12}><CensusUnavailable isDarkMode={isDarkMode} /></Grid> : <>
           {/* Visual Chart */}
           <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
             {data.type === 'bar' && data.bars ? (
@@ -360,7 +376,7 @@ const ChartDetailModal: React.FC<{
           <Grid item xs={12} md={6}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
               {items.map((item, idx) => {
-                const pct = ((item.value / total) * 100).toFixed(1);
+                const pct = (total > 0 ? (item.value / total) * 100 : 0).toFixed(1);
                 return (
                   <Box
                     key={idx}
@@ -392,6 +408,7 @@ const ChartDetailModal: React.FC<{
               })}
             </Box>
           </Grid>
+          </>}
         </Grid>
 
         {/* Footer Category Page Link */}
@@ -456,16 +473,16 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
 
   const maleCount = populationData?.male ?? 0;
   const femaleCount = populationData?.female ?? 0;
-  const totalCount = populationData?.both ?? (maleCount + femaleCount);
 
   const villagePopBars = [
     { label: t.male, count: maleCount, color1: '#3b82f6', color2: '#1d4ed8', shadowColor: 'rgba(59, 130, 246, 0.45)' },
     { label: t.female, count: femaleCount, color1: '#ec4899', color2: '#be185d', shadowColor: 'rgba(236, 72, 153, 0.45)' },
   ];
 
-  const surveyCategories = [
+  const allSurveyCategories = [
     {
       id: 'village-population',
+      available: hasCensusValues(populationData, ['male', 'female']),
       slug: 'boundaries',
       icon: <Diversity3OutlinedIcon />,
       type: 'bar' as const,
@@ -475,34 +492,31 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     },
     {
       id: 'population-by-age',
+      available: hasCensusValues(populationData, ['age_0_14', 'age_15_59', 'age_60_64', 'age_65_above']),
       slug: 'boundaries',
       icon: <ElderlyOutlinedIcon />,
       type: 'pie' as const,
       title: language === 'si' ? 'වයස් කාණ්ඩ අනුව ජනගහනය' : language === 'ta' ? 'வயதுக் குழுக்களின்படி மக்கள்தொகை' : 'POPULATION BY AGE GROUPS',
       shortTitle: language === 'si' ? 'වයස' : language === 'ta' ? 'வயது' : 'AGE GROUPS',
-      pieData: [
-        { label: '0-14', value: populationData?.age_0_14 ?? 0, color: '#3b82f6' },
-        { label: '15-24', value: Math.round((populationData?.age_15_59 ?? 0) * 0.35), color: '#10b981' },
-        { label: '25-54', value: Math.round((populationData?.age_15_59 ?? 0) * 0.65), color: '#f59e0b' },
-        { label: '55-64', value: populationData?.age_60_64 ?? 0, color: '#8b5cf6' },
-        { label: '65+', value: populationData?.age_65_above ?? 0, color: '#ec4899' },
-      ],
+      pieData: censusAgeGroups(populationData).map((group) => ({ ...group, value: group.value ?? 0 })),
     },
     {
       id: 'employment',
+      available: hasCensusValues(gnEconomyData, ['employed', 'unemployed', 'economically_not_active']),
       slug: 'economy',
       icon: <WorkOutlineOutlinedIcon />,
       type: 'donut' as const,
       title: language === 'si' ? 'රැකියා නියුක්තිය' : language === 'ta' ? 'வேலைவாய்ப்பு' : 'EMPLOYMENT',
       shortTitle: language === 'si' ? 'රැකියාව' : language === 'ta' ? 'வேலைவாய்ப்பு' : 'EMPLOYMENT',
       donutData: [
-        { label: language === 'si' ? 'රැකියා නියුක්ත' : language === 'ta' ? 'தொழில் புரிவோர்' : 'Employed', value: gnEconomyData?.employed || 2844, color: '#2563eb' },
-        { label: language === 'si' ? 'රැකියා විරහිත' : language === 'ta' ? 'வேலையற்றோர்' : 'Unemployed', value: gnEconomyData?.unemployed || 149, color: '#ef4444' },
-        { label: language === 'si' ? 'ශ්‍රම බලකායට අයත් නොවන' : language === 'ta' ? 'தொழில்படையல்லாதோர்' : 'Not in Labour Force', value: gnEconomyData?.economically_not_active || 2487, color: '#8b5cf6' },
+        { label: language === 'si' ? 'රැකියා නියුක්ත' : language === 'ta' ? 'தொழில் புரிவோர்' : 'Employed', value: gnEconomyData?.employed ?? 0, color: '#2563eb' },
+        { label: language === 'si' ? 'රැකියා විරහිත' : language === 'ta' ? 'வேலையற்றோர்' : 'Unemployed', value: gnEconomyData?.unemployed ?? 0, color: '#ef4444' },
+        { label: language === 'si' ? 'ශ්‍රම බලකායට අයත් නොවන' : language === 'ta' ? 'தொழில்படையல்லாதோர்' : 'Not in Labour Force', value: gnEconomyData?.economically_not_active ?? 0, color: '#8b5cf6' },
       ],
     },
     {
       id: 'religious-affiliation',
+      available: hasCensusValues(religionData, ['buddhist', 'hindu', 'islam', 'roman_catholic', 'other_christian']),
       slug: 'religion',
       icon: <TempleBuddhistOutlinedIcon />,
       type: 'pie' as const,
@@ -517,6 +531,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     },
     {
       id: 'housing-ownership',
+      available: hasCensusValues(housingOwnershipData, ['owned_by_member', 'rent_gov', 'rent_private', 'free_of_rent', 'encroached', 'other']),
       slug: 'housing-ownership',
       icon: <KeyOutlinedIcon />,
       type: 'donut' as const,
@@ -531,34 +546,29 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     },
     {
       id: 'construction-year',
+      // No construction-year measurements are supplied by the census query.
+      available: false,
       slug: 'construction-year',
       icon: <EventAvailableOutlinedIcon />,
       type: 'bar' as const,
       title: language === 'si' ? 'ඉදිකිරීම් වර්ෂය අනුව නිවාස' : language === 'ta' ? 'கட்டுமான ஆண்டு' : 'HOUSING UNITS BY CONSTRUCTION YEAR',
       shortTitle: language === 'si' ? 'වර්ෂය' : language === 'ta' ? 'ஆண்டு' : 'YEAR BUILT',
-      bars: [
-        { label: '< 1990', count: Math.round(totalCount * 0.28), color1: '#64748b', color2: '#334155', shadowColor: 'rgba(100,116,139,0.4)' },
-        { label: '1990-2000', count: Math.round(totalCount * 0.32), color1: '#0ea5e9', color2: '#0284c7', shadowColor: 'rgba(14,165,233,0.4)' },
-        { label: '2001-2010', count: Math.round(totalCount * 0.24), color1: '#8b5cf6', color2: '#6d28d9', shadowColor: 'rgba(139,92,246,0.4)' },
-        { label: '2011+', count: Math.round(totalCount * 0.16), color1: '#10b981', color2: '#059669', shadowColor: 'rgba(16,185,129,0.4)' },
-      ],
+      bars: [],
     },
     {
       id: 'economy',
+      // Employment totals do not provide an industry-sector breakdown.
+      available: false,
       slug: 'economy',
       icon: <AgricultureOutlinedIcon />,
       type: 'donut' as const,
       title: language === 'si' ? 'ආර්ථිකය සහ ජීවනෝපාය' : language === 'ta' ? 'பொருளாதாரம்' : 'ECONOMY & LIVELIHOOD',
       shortTitle: language === 'si' ? 'ආර්ථිකය' : language === 'ta' ? 'பொருளாதாரம்' : 'ECONOMY',
-      donutData: [
-        { label: language === 'si' ? 'කෘෂිකාර්මික' : 'Agriculture', value: Math.round(totalCount * 0.38), color: '#22c55e' },
-        { label: language === 'si' ? 'සේවා' : 'Services', value: Math.round(totalCount * 0.32), color: '#3b82f6' },
-        { label: language === 'si' ? 'කර්මාන්ත' : 'Industry', value: Math.round(totalCount * 0.18), color: '#f59e0b' },
-        { label: language === 'si' ? 'ස්වයං රැකියා' : 'Informal', value: Math.round(totalCount * 0.12), color: '#ec4899' },
-      ],
+      donutData: [],
     },
     {
       id: 'wall-type',
+      available: hasCensusValues(housingWallData, ['brick', 'cement_block_stone', 'cabook', 'soil_bricks', 'mud', 'cadjan_palmyrah', 'plank_metal_sheet', 'other']),
       slug: 'wall-type',
       icon: <FoundationOutlinedIcon />,
       type: 'bar' as const,
@@ -573,6 +583,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     },
     {
       id: 'unit-type',
+      available: hasCensusValues(housingUnitData, ['permanent', 'semi_permanent', 'improvised', 'unclassified']),
       slug: 'unit-type',
       icon: <HomeWorkOutlinedIcon />,
       type: 'pie' as const,
@@ -587,6 +598,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     },
     {
       id: 'toilet-facilities',
+      available: hasCensusValues(toiletFacilityData, ['water_seal_piped_sewer', 'water_seal_septic_tank', 'pour_flush', 'direct_pit', 'not_using', 'other']),
       slug: 'toilet-facilities',
       icon: <WcOutlinedIcon />,
       type: 'donut' as const,
@@ -601,6 +613,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     },
     {
       id: 'rooms',
+      available: hasCensusValues(roomsData, ['room_1', 'rooms_2', 'rooms_3', 'rooms_4', 'rooms_5', 'rooms_6', 'rooms_7', 'rooms_8', 'rooms_9', 'rooms_10_and_above']),
       slug: 'rooms',
       icon: <BedOutlinedIcon />,
       type: 'bar' as const,
@@ -614,6 +627,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     },
     {
       id: 'drinking-water',
+      available: hasCensusValues(drinkingWaterData, ['protected_well_within', 'protected_well_outside', 'unprotected_well', 'tap_within_unit', 'tap_within_premises_outside', 'tap_outside_premises', 'tube_well', 'rural_water_projects', 'bowser', 'river_tank_stream', 'other']),
       slug: 'drinking-water',
       icon: <WaterDropOutlinedIcon />,
       type: 'donut' as const,
@@ -628,6 +642,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     },
     {
       id: 'solid-waste',
+      available: hasCensusValues(solidWasteData, ['collected_by_local_authorities', 'occupants_burn', 'occupants_bury', 'occupants_composting', 'dispose_into_environment', 'other']),
       slug: 'solid-waste',
       icon: <RecyclingOutlinedIcon />,
       type: 'pie' as const,
@@ -642,6 +657,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     },
     {
       id: 'roof-type',
+      available: hasCensusValues(roofData, ['tile', 'asbestos', 'concrete', 'zink_aluminium_sheet', 'metal_sheet', 'cadjan_palmyrah_straw', 'other']),
       slug: 'roof-type',
       icon: <RoofingOutlinedIcon />,
       type: 'bar' as const,
@@ -656,6 +672,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     },
     {
       id: 'household',
+      available: hasCensusValues(householdHeadData, ['head', 'wife_husband', 'son_daughter', 'son_daughter_in_law', 'grandchild_great_grandchild', 'parent_of_head_or_spouse', 'other_relative', 'domestic_employee', 'boarder', 'non_relative', 'clergy', 'not_stated']),
       slug: 'household',
       icon: <FamilyRestroomOutlinedIcon />,
       type: 'pie' as const,
@@ -670,8 +687,11 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     },
   ];
 
+  // Use the same available categories for the rail, chips and keyboard/swipe navigation.
+  // Recorded zero values remain available; absent measurements do not.
+  const surveyCategories = allSurveyCategories.filter((category) => category.available);
   const activeSurvey = surveyCategories.find((c) => c.id === selectedSurveyId) || surveyCategories[0];
-  const activeIdx = Math.max(0, surveyCategories.findIndex((c) => c.id === selectedSurveyId));
+  const activeIdx = Math.max(0, surveyCategories.findIndex((c) => c.id === activeSurvey?.id));
   // Direction of the last switch (1 = next, -1 = previous), so the new chart slides in from the side it came from.
   const lastIdx = useRef(activeIdx);
   const switchDir = useRef(1);
@@ -688,6 +708,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
   const touch = useRef<{ y: number; x: number; top: number; t: number; vertical: boolean | null } | null>(null);
   const swipedRef = useRef(false);
   const step = (dir: 1 | -1) => {
+    if (!surveyCategories.length) return;
     const next = (activeIdx + dir + surveyCategories.length) % surveyCategories.length;
     setSelectedSurveyId(surveyCategories[next].id);
     navigator.vibrate?.(8);
@@ -735,7 +756,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
 
   const railItems = () =>
     surveyCategories.map((cat, idx) => {
-      const isSelected = cat.id === selectedSurveyId;
+      const isSelected = cat.id === activeSurvey?.id;
       // Arrow keys move through the rail and select (radio-group behaviour); only the selected option is a tab
       // stop, so Tab leaves the rail in one step.
       const move = (e: React.KeyboardEvent<HTMLElement>) => {
@@ -812,7 +833,16 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
     const ro = new ResizeObserver(place);
     ro.observe(inner);
     return () => ro.disconnect();
-  }, [selectedSurveyId, isNarrow]);
+  }, [activeSurvey?.id, surveyCategories.length, isNarrow]);
+
+  // All hooks run even while a village is loading or has no census records.
+  if (!activeSurvey) {
+    return <Box sx={{ width: '100%' }}>
+      {showQuickStats && <VillageQuickStats populationData={populationData} gnEconomyData={gnEconomyData}
+        housingOwnershipData={housingOwnershipData} roomsData={roomsData} isDarkMode={isDarkMode} />}
+      <CensusUnavailable isDarkMode={isDarkMode} />
+    </Box>;
+  }
 
   const getItemsForSurvey = (survey: typeof activeSurvey) => {
     if (survey.type === 'bar' && survey.bars) {
@@ -878,6 +908,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
               onClick={() =>
                 setModalData({
                   title: activeSurvey.title,
+                  available: activeSurvey.available,
                   type: activeSurvey.type,
                   items: getItemsForSurvey(activeSurvey),
                   bars: activeSurvey.bars,
@@ -908,6 +939,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
                 onClick={() =>
                   setModalData({
                     title: activeSurvey.title,
+                  available: activeSurvey.available,
                     type: activeSurvey.type,
                     items: getItemsForSurvey(activeSurvey),
                     bars: activeSurvey.bars,
@@ -941,6 +973,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
               !swipedRef.current &&
               setModalData({
                 title: activeSurvey.title,
+                  available: activeSurvey.available,
                 type: activeSurvey.type,
                 items: getItemsForSurvey(activeSurvey),
                 bars: activeSurvey.bars,
@@ -969,7 +1002,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
             {/* Follows the finger during a swipe, springs back on release. */}
             <Box sx={{ width: '100%', transform: dragY ? `translateY(${dragY}px)` : 'none', opacity: 1 - Math.min(Math.abs(dragY) / 160, 0.35), transition: dragY ? 'none' : 'transform 380ms cubic-bezier(0.22, 1, 0.36, 1), opacity 300ms ease' }}>
             <Box
-              key={selectedSurveyId}
+              key={activeSurvey.id}
               sx={{
                 width: '100%',
                 display: 'flex',
@@ -984,13 +1017,14 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
                 '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
               }}
             >
-              {activeSurvey.type === 'bar' && activeSurvey.bars && (
+              {!activeSurvey.available && <CensusUnavailable isDarkMode={isDarkMode} />}
+              {activeSurvey.available && activeSurvey.type === 'bar' && activeSurvey.bars && (
                 <SvgBarChart bars={activeSurvey.bars} isDarkMode={isDarkMode} compact={isNarrow} />
               )}
-              {activeSurvey.type === 'pie' && activeSurvey.pieData && (
+              {activeSurvey.available && activeSurvey.type === 'pie' && activeSurvey.pieData && (
                 <SvgPieChart data={activeSurvey.pieData} isDarkMode={isDarkMode} />
               )}
-              {activeSurvey.type === 'donut' && activeSurvey.donutData && (
+              {activeSurvey.available && activeSurvey.type === 'donut' && activeSurvey.donutData && (
                 <SvgDonutChart data={activeSurvey.donutData} isDarkMode={isDarkMode} />
               )}
             </Box>
@@ -1076,7 +1110,7 @@ export const DemographicCards: React.FC<DemographicCardsProps> = ({
                   {railItems()}
                 </Box>
               ) : surveyCategories.map((cat, idx) => {
-                const isSelected = cat.id === selectedSurveyId;
+                const isSelected = cat.id === activeSurvey?.id;
                 const label = (cat as any).shortTitle || cat.title.split(' ')[0];
 
                 return (

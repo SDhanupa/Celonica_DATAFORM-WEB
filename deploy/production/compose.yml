@@ -1,0 +1,121 @@
+# Standalone production template. NOT used by start.ps1 or local hardening.
+# Review DNS, credentials, image compatibility and external volumes before deployment.
+name: ceylonica-production
+services:
+  gateway:
+    image: ${GATEWAY_IMAGE:?Set a reviewed pinned Caddy image}
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN:?Set the website domain}
+      AUTH_DOMAIN: ${AUTH_DOMAIN:?Set the login domain}
+      ACME_EMAIL: ${ACME_EMAIL:?Set the certificate contact email}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    security_opt: ["no-new-privileges:true"]
+    restart: unless-stopped
+    networks: [app]
+  frontend:
+    image: ${FRONTEND_IMAGE:?Set the tested frontend image built for the hosted HTTPS origins}
+    restart: unless-stopped
+    networks: [app]
+  backend:
+    image: ${BACKEND_IMAGE:?Set the tested backend image containing the Location API changes}
+    restart: unless-stopped
+    environment:
+      APP_NAME: Ceylonica
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_KEY: ${APP_KEY:?Use the existing production APP_KEY when retaining data}
+      APP_URL: https://${APP_DOMAIN}
+      FRONTEND_URL: https://${APP_DOMAIN}
+      LOG_LEVEL: warning
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: ${DB_DATABASE:?Use the existing application database}
+      DB_USERNAME: ${DB_USERNAME:?Use the application database account}
+      DB_PASSWORD: ${DB_PASSWORD:?Load from a private secret source}
+      CACHE_STORE: redis
+      SESSION_DRIVER: redis
+      REDIS_CLIENT: phpredis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Set the Redis secret}
+      QUEUE_CONNECTION: sync
+      KEYCLOAK_BASE_URL: http://keycloak:8080
+      KEYCLOAK_PUBLIC_URL: https://${AUTH_DOMAIN}
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM:?Use the existing hosted realm}
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:?Use the existing frontend client}
+      KEYCLOAK_ADMIN_CLIENT_ID: ${KEYCLOAK_ADMIN_CLIENT_ID:?Use a dedicated least-privilege service client}
+      KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_ADMIN_CLIENT_SECRET:?Load the service client secret privately}
+      TEXTWARE_USERNAME: ${TEXTWARE_USERNAME:-}
+      TEXTWARE_PASSWORD: ${TEXTWARE_PASSWORD:-}
+      TEXTWARE_SENDER_ID: ${TEXTWARE_SENDER_ID:-}
+      TEXTWARE_API_URL: ${TEXTWARE_API_URL:-}
+    volumes:
+      - uploads:/var/www/public/uploads
+      - storage:/var/www/storage
+    networks: [app, data]
+  db:
+    image: ${POSTGRES_IMAGE:?Pin the compatible PostgreSQL major and tested image}
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes: ["app_db:/var/lib/postgresql/data"]
+    networks: [data]
+  keycloak-db:
+    image: ${POSTGRES_IMAGE}
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${KC_DB_DATABASE:?Use the existing Keycloak database}
+      POSTGRES_USER: ${KC_DB_USERNAME:?Use the existing Keycloak database account}
+      POSTGRES_PASSWORD: ${KC_DB_PASSWORD:?Load the existing password privately}
+    volumes: ["identity_db:/var/lib/postgresql/data"]
+    networks: [data]
+  redis:
+    image: ${REDIS_IMAGE:?Set a reviewed pinned Redis image}
+    restart: unless-stopped
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    command: ["sh", "-ec", "exec redis-server --requirepass \"$$REDIS_PASSWORD\""]
+    networks: [data]
+  keycloak:
+    image: ${KEYCLOAK_IMAGE:?Set a reviewed Keycloak image compatible with the custom SMS providers}
+    # Modern hostname-v2 configuration. Do not apply to a 24.x image unchanged.
+    command: ["start", "--hostname=https://${AUTH_DOMAIN}", "--proxy-headers=xforwarded", "--http-enabled=true"]
+    restart: unless-stopped
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/${KC_DB_DATABASE}
+      KC_DB_USERNAME: ${KC_DB_USERNAME}
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD}
+      KC_HOSTNAME_STRICT: "true"
+      KC_LOG_LEVEL: warn
+      CEYLONICA_LOGIN_URL: https://${APP_DOMAIN}/login
+    # Themes/providers must be baked into the reviewed image; no local source mounts.
+    networks: [app, data]
+networks:
+  app: {}
+  data:
+    internal: true
+volumes:
+  app_db:
+    external: true
+    name: ${APP_DB_VOLUME:?Identify the existing application database volume}
+  identity_db:
+    external: true
+    name: ${KC_DB_VOLUME:?Identify the existing Keycloak database volume}
+  uploads:
+    external: true
+    name: ${UPLOADS_VOLUME:?Identify the existing uploads volume}
+  storage:
+    external: true
+    name: ${STORAGE_VOLUME:?Identify the existing Laravel storage volume}
+  caddy_data: {}
+  caddy_config: {}

@@ -409,13 +409,13 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
     displayCCODE = g?.CCODE || g?.code || ccode || '';
     if (g?.pGn) {
       populationData = {
-        both: g.pGn.populationBoth || 0,
-        male: g.pGn.populationMale || 0,
-        female: g.pGn.populationFemale || 0,
-        age_0_14: g.pGn.age_0_14 || 0,
-        age_15_59: g.pGn.age_15_59 || 0,
-        age_60_64: g.pGn.age_60_64 || 0,
-        age_65_above: g.pGn.age_65_above || 0
+        both: g.pGn.populationBoth,
+        male: g.pGn.populationMale,
+        female: g.pGn.populationFemale,
+        age_0_14: g.pGn.age_0_14,
+        age_15_59: g.pGn.age_15_59,
+        age_60_64: g.pGn.age_60_64,
+        age_65_above: g.pGn.age_65_above
       };
     }
     if (g?.gnEconomy) {
@@ -499,13 +499,13 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
           displayCCODE = g.CCODE || g.code || g.ccode || selectedGN || '';
           if (g.pGn) {
             populationData = {
-              both: g.pGn.populationBoth || 0,
-              male: g.pGn.populationMale || 0,
-              female: g.pGn.populationFemale || 0,
-              age_0_14: g.pGn.age_0_14 || 0,
-              age_15_59: g.pGn.age_15_59 || 0,
-              age_60_64: g.pGn.age_60_64 || 0,
-              age_65_above: g.pGn.age_65_above || 0
+              both: g.pGn.populationBoth,
+              male: g.pGn.populationMale,
+              female: g.pGn.populationFemale,
+              age_0_14: g.pGn.age_0_14,
+              age_15_59: g.pGn.age_15_59,
+              age_60_64: g.pGn.age_60_64,
+              age_65_above: g.pGn.age_65_above
             };
           }
           if (g.gnEconomy) {

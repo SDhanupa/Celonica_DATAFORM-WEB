@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Box, Typography, Paper, FormControl, InputLabel, Select, MenuItem, CircularProgress, Alert, Button } from '@mui/material';
 import CategoryDataAdminTable from '../components/CategoryDataAdminTable';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import BulkUploadDialog from '../components/BulkUploadDialog';
 
 const BulkDataPage: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [tables, setTables] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,10 +24,7 @@ const BulkDataPage: React.FC = () => {
       .then(data => {
         if (data.success) {
           setTables(data.categories || []);
-          if (data.categories && data.categories.length > 0) {
-            setSelectedSlug(data.categories[0].slug);
-            setSelectedName(data.categories[0].name_en);
-          }
+
         } else {
           setError(data.message || 'Failed to load bulk data categories.');
         }
@@ -38,8 +37,17 @@ const BulkDataPage: React.FC = () => {
       });
   }, []);
 
+  useEffect(() => {
+    if (!tables.length) return;
+    const requested = searchParams.get('category');
+    const category = tables.find(table => table.slug === requested) || tables[0];
+    setSelectedSlug(category.slug);
+    setSelectedName(category.name_en);
+  }, [tables, searchParams]);
+
   const handleCategoryChange = (event: any) => {
     const slug = event.target.value as string;
+    setSearchParams({ category: slug }, { replace: true });
     setSelectedSlug(slug);
     const cat = tables.find(t => t.slug === slug);
     if (cat) setSelectedName(cat.name_en);
@@ -51,7 +59,7 @@ const BulkDataPage: React.FC = () => {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <CloudUploadIcon color="primary" sx={{ fontSize: 32 }} />
           <Typography variant="h4" sx={{ fontWeight: 700, color: 'text.primary' }}>
-            Global Bulk Uploaded Data
+            Category data records
           </Typography>
         </Box>
         {selectedSlug && (
@@ -68,7 +76,7 @@ const BulkDataPage: React.FC = () => {
 
       <Paper sx={{ p: 3, mb: 4, borderRadius: 2 }}>
         <Typography variant="body1" sx={{ mb: 3, color: 'text.secondary' }}>
-          Select a category below to view all bulk uploaded data across every District, DS Division, and GN in the country.
+          Select a category to browse imported and submitted records across districts, DS divisions and GN divisions.
         </Typography>
 
         {loading ? (
@@ -76,7 +84,7 @@ const BulkDataPage: React.FC = () => {
         ) : error ? (
           <Alert severity="error">{error}</Alert>
         ) : tables.length === 0 ? (
-          <Alert severity="info">No bulk uploaded data found in the system yet.</Alert>
+          <Alert severity="info">No category data collections are available yet.</Alert>
         ) : (
           <FormControl fullWidth sx={{ maxWidth: 400 }}>
             <InputLabel id="category-select-label">Data Category</InputLabel>

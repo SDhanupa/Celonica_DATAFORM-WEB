@@ -3,6 +3,10 @@
 param([switch]$Rebuild)
 $ErrorActionPreference = 'Stop'
 $projectRoot = $PSScriptRoot
+if (Test-Path (Join-Path $projectRoot '.local/security.env')) {
+    & (Join-Path $projectRoot 'scripts/start-secure-local.ps1') -Rebuild:$Rebuild
+    return
+}
 $composeProject = 'celonicaquecionweb'
 $composeArgs = @('compose', '-p', $composeProject, '-f', (Join-Path $projectRoot 'docker-compose.yml'), '-f', (Join-Path $projectRoot 'docker-compose.local.yml'))
 $logDirectory = Join-Path $projectRoot '.local'

@@ -1,0 +1,27 @@
+{
+    email {$ACME_EMAIL}
+}
+
+{$APP_DOMAIN} {
+    header {
+        Strict-Transport-Security "max-age=31536000"
+        X-Content-Type-Options nosniff
+        Referrer-Policy no-referrer
+        -Server
+    }
+    reverse_proxy frontend:80
+}
+
+{$AUTH_DOMAIN} {
+    header {
+        Strict-Transport-Security "max-age=31536000"
+        X-Content-Type-Options nosniff
+        Referrer-Policy no-referrer
+        -Server
+    }
+    # Admin console/API remain private. Use a separately authenticated management
+    # channel for operations; application services use the internal Docker endpoint.
+    @management path /admin /admin/* /metrics /health /health/*
+    respond @management 404
+    reverse_proxy keycloak:8080
+}

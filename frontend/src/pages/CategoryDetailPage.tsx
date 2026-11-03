@@ -562,7 +562,7 @@ const CategoryDetailPage: React.FC = () => {
                 {isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
               </IconButton>
               {isAuthenticated ? (
-                <Button onClick={() => { logout(); navigate('/gnpage'); }} disableRipple sx={{ ...navBtnSx, color: '#dc2626' }}>Logout</Button>
+                <Button onClick={() => logout()} disableRipple sx={{ ...navBtnSx, color: '#dc2626' }}>Logout</Button>
               ) : !isLoading ? (
                 <>
                   <Button onClick={() => login(window.location.href)} disableRipple sx={navBtnSx}>Login</Button>
@@ -591,7 +591,7 @@ const CategoryDetailPage: React.FC = () => {
                   <MenuItem onClick={() => { setMobileMenuAnchor(null); isSuperAdmin ? navigate('/admins') : navigate('/user'); }} sx={{ color: tc.text }}>
                     {isSuperAdmin ? 'Dashboard' : 'My Account'}
                   </MenuItem>
-                  <MenuItem onClick={() => { setMobileMenuAnchor(null); logout(); navigate('/gnpage'); }} sx={{ color: '#dc2626' }}>Logout</MenuItem>
+                  <MenuItem onClick={() => { setMobileMenuAnchor(null); logout(); }} sx={{ color: '#dc2626' }}>Logout</MenuItem>
                 </>
               )}
               <Divider sx={{ borderColor: tc.border }} />

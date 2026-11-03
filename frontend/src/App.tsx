@@ -17,7 +17,7 @@ import DynamicCategoryWrapper from './components/DynamicCategoryWrapper';
 // every admin screen in its first download).
 const LoginPage = React.lazy(() => import('./pages/LoginPage'));
 const DashboardPage = React.lazy(() => import('./pages/DashboardPage'));
-const AdminsPage = React.lazy(() => import('./pages/AdminsPage'));
+const AdminWorkspacePage = React.lazy(() => import('./pages/AdminWorkspacePage'));
 const UserPage = React.lazy(() => import('./pages/UserPage'));
 const MyContributionsPage = React.lazy(() => import('./pages/MyContributionsPage'));
 const RapidFirePage = React.lazy(() => import('./pages/RapidFirePage'));
@@ -133,7 +133,7 @@ const App: React.FC = () => {
                 element={
                   <ProtectedRoute allowedRoles={['super_admin']}>
                     <AdminLayout>
-                      <AdminsPage />
+                      <AdminWorkspacePage />
                     </AdminLayout>
                   </ProtectedRoute>
                 }

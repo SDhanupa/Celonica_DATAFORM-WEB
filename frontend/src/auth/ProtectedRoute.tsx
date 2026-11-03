@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthProvider';
 import keycloak from './keycloak';
@@ -12,8 +12,19 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles }) => {
   const { isAuthenticated, isLoading, userInfo, profileSyncFailed, logout } = useAuth();
   const location = useLocation();
+  const redirectStarted = useRef(false);
+  const [redirectFailed, setRedirectFailed] = useState(false);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (isLoading || isAuthenticated || redirectStarted.current) return;
+    redirectStarted.current = true;
+    void keycloak.login({
+      redirectUri: window.location.origin + location.pathname + location.search + location.hash,
+      prompt: 'login',
+    }).catch(() => setRedirectFailed(true));
+  }, [isLoading, isAuthenticated, location.pathname, location.search, location.hash]);
+
+  if (isLoading || (!isAuthenticated && !redirectFailed)) {
     return (
       <Box
         sx={{
@@ -23,35 +34,27 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
           justifyContent: 'center',
           height: '100vh',
           gap: 2,
-          background: 'linear-gradient(135deg, #0A0A1A 0%, #0D0D22 100%)',
+          background: '#f5f7f2',
         }}
       >
         <CircularProgress
-          size={60}
+          size={36}
           sx={{
-            color: '#6C63FF',
-            filter: 'drop-shadow(0 0 20px rgba(108, 99, 255, 0.6))',
+            color: '#2d5a27',
           }}
         />
-        <Typography variant="h6" sx={{ color: '#9898CC', mt: 2, fontWeight: 500 }}>
-          Authenticating...
+        <Typography role="status" sx={{ color: '#344a35', mt: 2, fontWeight: 500 }}>
+          {isLoading ? 'Checking your session…' : 'Opening secure login…'}
         </Typography>
       </Box>
     );
   }
 
   if (!isAuthenticated) {
-    // Admin-only pages redirect back to themselves after login.
-    // All other pages (including user-only pages like /gnpage) redirect to /gnpage after login.
-    const isAdminOnlyPage = allowedRoles && allowedRoles.length > 0 &&
-      allowedRoles.every(r => ['admin', 'superadmin', 'moderator'].includes(r.toLowerCase()));
-
-    const redirectAfterLogin = isAdminOnlyPage
-      ? window.location.origin + location.pathname
-      : window.location.origin + '/gnpage';
-
-    keycloak.login({ redirectUri: redirectAfterLogin, prompt: 'login' });
-    return null;
+    return <Box sx={{ p: 4, textAlign: 'center' }}>
+      <Typography role="alert">We couldn’t open login. Please try again.</Typography>
+      <Button onClick={() => window.location.reload()}>Try again</Button>
+    </Box>;
   }
 
   if (profileSyncFailed) {

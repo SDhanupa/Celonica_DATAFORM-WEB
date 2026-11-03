@@ -12,13 +12,13 @@
                         <div class="form-group <#if messagesPerField.existsError('username')>has-error</#if>">
                             <label for="username" class="input-label">Username (NIC)</label>
                             <div class="input-wrapper">
-                                <input tabindex="1" id="username" class="pill-input" name="username" value="${(login.username!'')}" type="text" autofocus autocomplete="username"
-                                    aria-invalid="<#if messagesPerField.existsError('username')>true</#if>"
+                                <input tabindex="1" id="username" class="pill-input" name="username" value="${(login.username!'')}" type="text" autofocus autocomplete="username" required
+                                    aria-invalid="${messagesPerField.existsError('username')?c}" <#if messagesPerField.existsError('username')>aria-describedby="username-error"</#if>
                                     placeholder="Enter your Username or NIC" />
                             </div>
                             <#if messagesPerField.existsError('username')>
-                                <span class="field-error-text" aria-live="polite">
-                                    User not found, please <a href="${url.registrationUrl}" style="color: var(--primary); text-decoration: underline;">register</a>!
+                                <span id="username-error" class="field-error-text" aria-live="polite">
+                                    ${kcSanitize(messagesPerField.getFirstError('username'))?no_esc}
                                 </span>
                             </#if>
                         </div>

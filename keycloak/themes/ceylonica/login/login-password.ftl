@@ -165,10 +165,10 @@
                             <div class="form-group <#if messagesPerField.existsError('password')>has-error</#if>">
                                 <label for="password" class="input-label">Password</label>
                                 <div class="input-wrapper password-wrapper">
-                                    <input tabindex="2" id="password" class="pill-input" name="password" type="password" autofocus autocomplete="current-password"
-                                        aria-invalid="<#if messagesPerField.existsError('password')>true</#if>"
+                                    <input tabindex="2" id="password" class="pill-input" name="password" type="password" autofocus autocomplete="current-password" required
+                                        aria-invalid="${messagesPerField.existsError('password')?c}"
                                         placeholder="Enter your password" />
-                                    <button type="button" class="eye-toggle-btn" aria-label="Toggle password visibility" onclick="togglePasswordVisibility('password', this)">
+                                    <button type="button" class="eye-toggle-btn" aria-label="Show password" aria-pressed="false" onclick="togglePasswordVisibility('password', this)">
                                         <svg class="eye-icon eye-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                             <circle cx="12" cy="12" r="3"></circle>

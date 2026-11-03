@@ -1,4 +1,5 @@
 import React from 'react';
+import { censusNumber, hasCensusValues } from '../utils/censusData';
 import { glassTileSx } from './glass';
 import { Box, Typography } from '@mui/material';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
@@ -39,9 +40,11 @@ export const VillageQuickStats: React.FC<VillageQuickStatsProps> = ({
   const { language } = useLanguage();
   const compact = variant === 'compact';
 
-  const totalPopulation = populationData?.both ?? ((populationData?.male ?? 0) + (populationData?.female ?? 0));
-  const totalHouseholds = housingOwnershipData?.total_households || roomsData?.total_housing_units || 0;
-  const employedCount = gnEconomyData?.employed || 0;
+  const totalPopulation = censusNumber(populationData?.both) ??
+    (hasCensusValues(populationData, ['male', 'female']) ? populationData.male + populationData.female : null);
+  const totalHouseholds = censusNumber(housingOwnershipData?.total_households);
+  const employedCount = censusNumber(gnEconomyData?.employed);
+  const unavailable = { en: 'Data unavailable', si: 'දත්ත නොමැත', ta: 'தரவு இல்லை' }[language];
 
   const stats = [
     {
@@ -121,15 +124,16 @@ export const VillageQuickStats: React.FC<VillageQuickStatsProps> = ({
           </Box>
           <Typography
             sx={{
-              fontSize: compact ? '1.6rem' : '1.5rem',
+              fontSize: stat.value === null ? '0.8rem' : (compact ? '1.6rem' : '1.5rem'),
               fontWeight: 800,
               color: isDarkMode ? '#f8fafc' : '#0f172a',
               fontVariantNumeric: 'tabular-nums',
-              lineHeight: 1,
               flexShrink: 0,
+              maxWidth: isColumn ? '48%' : '100%',
+              lineHeight: 1.3,
             }}
           >
-            {stat.value.toLocaleString()}
+            {stat.value === null ? unavailable : stat.value.toLocaleString()}
           </Typography>
         </Box>
       ))}

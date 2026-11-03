@@ -40,6 +40,13 @@
                     </div>
                 </#if>
             </#if>
+            <#if skipLink?? || (!pageRedirectUri?? && !actionUri?? && !(client?? && client.baseUrl?has_content))>
+                <div class="form-action" style="margin-top: 24px;">
+                    <a href="${properties.applicationLoginUrl}" class="btn-emerald" style="text-decoration: none; text-align: center; display: block;">
+                        <span>Go to login</span>
+                    </a>
+                </div>
+            </#if>
         </div>
     </#if>
 </@layout.registrationLayout>

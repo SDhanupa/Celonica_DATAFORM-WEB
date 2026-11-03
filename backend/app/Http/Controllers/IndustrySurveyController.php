@@ -344,7 +344,7 @@ class IndustrySurveyController extends Controller
                 $query->where('gn_name', $request->gn_name);
             }
 
-            $surveys = $query->latest()->paginate($request->get('per_page', 15));
+            $surveys = $query->latest()->orderByDesc('id')->paginate($request->get('per_page', 15));
 
             return response()->json($surveys);
         } catch (\Exception $e) {

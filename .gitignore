@@ -53,6 +53,14 @@ dump/
 /.local/
 /.env
 /.env.local
+/deploy/production/.env
+*.ppk
+*.key
+*.env.save
+/.env.save
+/*_backup.tar.gz
+__pycache__/
+*.pyc
 /maven.zip
 
 # Maven outputs; deployable provider JAR remains under keycloak/providers/

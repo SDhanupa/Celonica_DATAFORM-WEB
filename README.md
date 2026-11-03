@@ -22,7 +22,7 @@ It does not run migrations, seeders, realm imports, or deployments.
 | React development app | http://localhost:5174 |
 | API gateway | http://localhost:3001/graphql |
 | Keycloak admin | http://localhost:8081/admin/ |
-| App PostgreSQL | localhost:5434 / celonica_db |
+| App PostgreSQL | localhost:5434 / ceylonica_live_20261102 |
 | Keycloak realm / frontend client | celonica-admin / celonica-frontend |
 
 Port 3001 is the API gateway for Vite; use 5174 for the current development UI.
@@ -143,3 +143,16 @@ Local settings live in **docker-compose.local.yml**, loaded explicitly by
 `start.ps1`. Hosting must continue using its existing production Compose/env
 configuration without this override. Starting or editing locally does not deploy
 anything or change hosted users, production databases, or other projects.
+
+
+## Current local database snapshot
+
+The local app uses `ceylonica_live_20261102`, restored from a read-only live
+application database snapshot on 2026-11-02. All 69 tables / 341,351 source rows
+were verified before preserving the local administrator account, and 310 uploaded
+files were copied and verified. Local Keycloak remains independent of production.
+
+The previous `ceylonica_production_20261102` database is retained. Private backups
+and verification records are under `.local/production-clone-20261102-live/` and
+are excluded from Git and the frontend hosting package. Production employment
+linking issues were copied unchanged; no missing figures were invented.

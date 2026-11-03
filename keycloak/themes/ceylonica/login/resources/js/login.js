@@ -15,6 +15,8 @@ function togglePasswordVisibility(inputId, btn) {
         if (showIcon) showIcon.style.display = 'block';
         if (hideIcon) hideIcon.style.display = 'none';
     }
+    btn.setAttribute('aria-label', input.type === 'text' ? 'Hide password' : 'Show password');
+    btn.setAttribute('aria-pressed', String(input.type === 'text'));
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -22,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const bg = document.querySelector('.nature-bg');
     const card = document.querySelector('.paper-card');
     
-    if (window.innerWidth > 860 && bg && card) {
+    if (window.innerWidth > 860 && bg && card && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         document.addEventListener('mousemove', (e) => {
             const x = (e.clientX / window.innerWidth - 0.5) * 12;
             const y = (e.clientY / window.innerHeight - 0.5) * 12;

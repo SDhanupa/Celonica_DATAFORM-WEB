@@ -257,6 +257,8 @@ const VillageMap3DInner: React.FC<InteractiveMapProps> = (props) => {
   const styleReadyRef = useRef(false);
   const markerRef = useRef<maplibregl.Marker | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [tilesReady, setTilesReady] = useState(false);
+  const [tileError, setTileError] = useState(false);
   const [styleVersion, setStyleVersion] = useState(0);
   const [exportPreview, setExportPreview] = useState<{url: string; name: string} | null>(null);
   useEffect(() => {
@@ -355,7 +357,14 @@ const VillageMap3DInner: React.FC<InteractiveMapProps> = (props) => {
       setLoaded(true);
     });
     // Missing tiles (offline, rate-limited) are not fatal; MapLibre keeps rendering what it has.
-    map.on('error', (e) => console.warn('3D map:', e.error?.message ?? e));
+    map.on('error', (e) => {
+      console.warn('3D map:', e.error?.message ?? e);
+      setTileError(true);
+    });
+    // Terrain and background layers can keep the map busy after imagery is visible.
+    map.on('sourcedata', (e) => {
+      if (e.sourceId === 'satellite' && e.tile) setTilesReady(true);
+    });
     mapRef.current = map;
     // Created once; later village changes go through setData and frame() below. Removed only on unmount (below).
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -365,8 +374,14 @@ const VillageMap3DInner: React.FC<InteractiveMapProps> = (props) => {
     () => () => {
       markerRef.current?.remove();
       markerRef.current = null;
+      styleReadyRef.current = false;
       mapRef.current?.remove();
       mapRef.current = null;
+      setLoaded(false);
+      setTilesReady(false);
+      setTileError(false);
+      setRevealed(false);
+      setTerrainReady(false);
     },
     [],
   );
@@ -645,6 +660,17 @@ const VillageMap3DInner: React.FC<InteractiveMapProps> = (props) => {
         >
           <CircularProgress size={16} thickness={5} sx={{ color: '#16a34a' }} />
           Loading map…
+        </Box>
+      )}
+
+      {revealed && (!bounds || !tilesReady || tileError) && (
+        <Box role="status" sx={{ position: 'absolute', bottom: edge.bottom + 40, left: edge.left + 16,
+          right: edge.right + 16, width: 'fit-content', maxWidth: 'calc(100% - 32px)', zIndex: 2,
+          ...glassSx(isDark), px: 1.5, py: 1, borderRadius: 2, fontSize: '0.8rem',
+          color: isDark ? '#fff' : '#243c2b', pointerEvents: 'none' }}>
+          {!bounds ? 'No boundary available for this village. Showing the overview map.'
+            : tileError ? 'Some map layers could not load. Check your connection or try another map layer.'
+            : 'Loading map imagery…'}
         </Box>
       )}
 

@@ -1,9 +1,17 @@
 # Local development only. start.ps1 supplies this file explicitly; hosting does not.
 services:
+  frontend:
+    ports: !override
+      - "127.0.0.1:3001:80"
+  db:
+    ports: !override
+      - "127.0.0.1:5434:5432"
   backend:
     environment:
       APP_ENV: local
-      APP_DEBUG: "true"
+      DB_DATABASE: ceylonica_live_20261102
+      CACHE_PREFIX: ceylonica_live_20261102_cache_
+      APP_DEBUG: "false"
       APP_URL: http://localhost:5174
       FRONTEND_URL: http://localhost:5174
       KEYCLOAK_PUBLIC_URL: http://localhost:8081
@@ -21,4 +29,8 @@ services:
       - ./backend/docker/opcache.local.ini:/usr/local/etc/php/conf.d/zzz-local.ini:ro
       - ./backend/docker/entrypoint.local.sh:/usr/local/bin/entrypoint-local.sh:ro
   keycloak:
-    command: ["start-dev", "--spi-theme-cache-themes=false", "--spi-theme-cache-templates=false", "--spi-theme-static-max-age=-1"]
+    ports: !override
+      - "127.0.0.1:8081:8080"
+    environment:
+      CEYLONICA_LOGIN_URL: http://localhost:5174/login
+    command: ["start-dev", "--import-realm", "--spi-theme-cache-themes=false", "--spi-theme-cache-templates=false", "--spi-theme-static-max-age=-1"]

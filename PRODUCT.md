@@ -1,0 +1,20 @@
+# Ceylonica
+
+Ceylonica is a geographic and Grama Niladhari (GN) data application with authenticated management screens. Its source includes GN divisions and mapping, administrator accounts, approvals, questions, surveys, and category records. No target demographic is established by this documentation.
+
+## Current delivery
+
+The `/admins` route opens `AdminWorkspacePage`, protected for the `super_admin` realm role. Its URL-backed views are Overview, All tools, Data collections, Location API, and Administrators (`view=overview|tools|data|api|accounts`, with Overview as the default). The Administrators view retains `AdminsPage` and its existing account operations.
+
+The searchable catalogue contains 23 tools grouped into Review, Content, Locations, People, Contribute, and Explore, with role-based visibility. The super-admin rail has nine core destinations; All tools exposes the complete catalogue. The placeholder Users and Reports modules are described as unavailable and their routes remain intact. Static notifications are no longer advertised in the main interface. Visibility is not authorization: route and backend checks remain authoritative.
+
+Overview and Data collections use aggregate totals, review queues, and category collection counts from `GET /api/admin/workspace`. The endpoint requires `super_admin`, returns no record payloads, and uses a read-only, repeatable-read transaction on PostgreSQL. Unknown counts are null and display as a dash; a numeric zero means an empty result. Collection links open the existing category records tool with a `category` query parameter.
+
+The Location API view (`/admins?view=api`) lets super administrators create project keys with fixed `gn:read` scope and explicit Never expires or 7/30/90-day expiry, inspect usage/status, and revoke access. Creation still defaults to 30 days. Active keys can change expiry without changing their secret through the super-admin-only `PATCH /api/admin/location-api/keys/{id}/expiry`; timed durations start when saved. Expired or revoked keys cannot be revived this way. `expires_at: null` means no automatic expiry, while revocation remains effective. The raw secret appears once; only its hash is stored. Admin-session previews support GN code and coordinates. Partner endpoints return an allowlisted set of multilingual GN names, codes, and province/district/division hierarchy. Coordinate matching uses stored boundary polygons and exact official-code mapping; it does not guess names or call an external geocoder. Unknown fields remain null. The feature adds a local `location_api_keys` table without altering GN/content data. The subsequent nullable-expiry migration preserves existing expiry dates. Temporary test keys are rolled back; user-created keys are retained, including the existing key explicitly set to Never expires locally as requested by the user. Deployment and production changes were not performed. See `docs/location-api.md` for the API contract and integration instructions.
+Preserve Keycloak authentication and GraphQL administrator operations: register, update role, activate, and deactivate. Preserve existing data, working functions, routes, role checks, loading/error feedback, and account state handling. The user forbids data/function deletion and production modifications. This delivery is local only: no Git push and no production writes.
+
+The visual direction is white rounded cards, a pale gray canvas, emerald accents, compact navigation, and actual data summaries. The public site retains `frontend/src/theme/theme.ts`; `frontend/src/theme/adminTheme.ts` applies through the shared `AdminLayout`.
+
+## Evidence
+
+Verified in `frontend/src/App.tsx`, `frontend/src/pages/AdminWorkspacePage.tsx`, `frontend/src/config/adminTools.ts`, `frontend/src/components/Sidebar.tsx`, `frontend/src/pages/AdminsPage.tsx`, `frontend/src/pages/BulkDataPage.tsx`, `frontend/src/pages/LocationApiPage.tsx`, `docs/location-api.md`, and `backend/app/Http/Controllers/AdminWorkspaceController.php`. The user supplied the visual reference and preservation/local-only constraints.

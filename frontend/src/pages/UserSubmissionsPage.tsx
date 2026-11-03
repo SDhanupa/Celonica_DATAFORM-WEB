@@ -10,16 +10,20 @@ const UserSubmissionsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
-  const { token, userInfo } = useAuth();
+  const { getToken, isAuthenticated, userInfo } = useAuth();
 
-  const isSuperAdmin = userInfo?.role === 'super_admin';
+  const isSuperAdmin = userInfo?.realm_roles?.includes('super_admin') || userInfo?.role === 'super_admin';
 
   const fetchData = async () => {
     try {
       setLoading(true);
+      setError(null);
+      const token = await getToken();
+      if (!token) throw new Error('Please sign in again to load submissions.');
       const res = await fetch('/api/user-submissions', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      if (!res.ok) throw new Error('Unable to load submissions. Check your access and try again.');
       const json = await res.json();
       if (json.success) {
         // Only show current user's submissions if not super_admin
@@ -38,19 +42,23 @@ const UserSubmissionsPage: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchData();
-  }, [token, userInfo, isSuperAdmin]);
+    if (isAuthenticated) fetchData();
+  }, [isAuthenticated, getToken, isSuperAdmin]);
 
   const handleApprove = async (row: any) => {
     try {
       setActionLoading(true);
+      setError(null);
+      const token = await getToken();
+      if (!token) throw new Error('Please sign in again before saving changes.');
       const response = await fetch(`/api/category-data/${row.category_slug}/${row.id}/approve`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (response.ok) await fetchData();
+      if (!response.ok) throw new Error('The record could not be updated. Check your access and try again.');
+      await fetchData();
     } catch (err) {
-      console.error(err);
+      setError(err instanceof Error ? err.message : 'Unable to save the change.');
     } finally {
       setActionLoading(false);
     }
@@ -59,13 +67,17 @@ const UserSubmissionsPage: React.FC = () => {
   const handleReplace = async (row: any) => {
     try {
       setActionLoading(true);
+      setError(null);
+      const token = await getToken();
+      if (!token) throw new Error('Please sign in again before saving changes.');
       const response = await fetch(`/api/category-data/${row.category_slug}/${row.id}/replace`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (response.ok) await fetchData();
+      if (!response.ok) throw new Error('The record could not be updated. Check your access and try again.');
+      await fetchData();
     } catch (err) {
-      console.error(err);
+      setError(err instanceof Error ? err.message : 'Unable to save the change.');
     } finally {
       setActionLoading(false);
     }

@@ -97,13 +97,22 @@ const AdminIndustrySurveys: React.FC = () => {
       if (filterDS)       params.append('ds_division', filterDS);
       if (filterGN)       params.append('gn_name', filterGN);
 
-      const res = await fetch(`/api/industry-surveys?${params.toString()}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (res.ok) {
+      // The grid paginates locally, so collect every API page before updating it.
+      const allSurveys: Survey[] = [];
+      let page = 1;
+      let lastPage = 1;
+      do {
+        params.set('page', String(page));
+        const res = await fetch(`/api/industry-surveys?${params.toString()}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error(`Failed to load surveys (${res.status})`);
         const data = await res.json();
-        setSurveys(data.data || data);
-      }
+        allSurveys.push(...(Array.isArray(data) ? data : data.data));
+        lastPage = Array.isArray(data) ? 1 : data.last_page;
+        page += 1;
+      } while (page <= lastPage);
+      setSurveys(allSurveys);
     } catch (err) {
       console.error(err);
     } finally {

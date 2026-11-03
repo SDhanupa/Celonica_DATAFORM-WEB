@@ -9,14 +9,12 @@ import {
   Menu,
   MenuItem,
   Divider,
-  Tooltip,
   Button,
 } from '@mui/material';
 import {
-  Notifications as NotificationsIcon,
   Logout as LogoutIcon,
   Person as PersonIcon,
-  Settings as SettingsIcon,
+  SpaOutlined,
   KeyboardArrowDown,
   Menu as MenuIcon,
 } from '@mui/icons-material';
@@ -29,12 +27,11 @@ import GlobalSearchBar from './GlobalSearchBar';
 
 
 
-const TopBar: React.FC = () => {
+const TopBar: React.FC<{ onOpenNavigation?: () => void }> = ({ onOpenNavigation }) => {
   const { userInfo, logout } = useAuth();
   const { i18n } = useTranslation();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [notifAnchorEl, setNotifAnchorEl] = useState<null | HTMLElement>(null);
   const [profileOpen, setProfileOpen] = useState(false);
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -53,14 +50,16 @@ const TopBar: React.FC = () => {
       elevation={0}
       sx={{
         zIndex: 1100,
-        background: 'rgba(255, 255, 255, 0.8)',
-        backdropFilter: 'blur(12px)',
-        borderBottom: '1px solid rgba(0,0,0,0.05)',
+        background: '#ffffff',
+        color: 'text.primary',
+        borderRadius: '32px',
+        top: 12,
       }}
     >
-      <Toolbar sx={{ justifyContent: 'space-between', px: 3, minHeight: '64px' }}>
+      <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 1, sm: 2.5 }, minHeight: { xs: 60, sm: 72 }, gap: 1, flexWrap: { xs: 'wrap', sm: 'nowrap' }, py: { xs: 1, sm: 0 } }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          {/* Removed dynamic page title, adding Nav Links instead for non-admins */}
+          {onOpenNavigation && <IconButton aria-label="Open navigation" onClick={onOpenNavigation} sx={{ display: { md: 'none' }, mr: 0.5 }}><MenuIcon /></IconButton>}
+          {isAdmin && <Button onClick={() => navigate('/gnpage')} startIcon={<SpaOutlined />} sx={{ color: 'primary.main', fontSize: { xs: 17, sm: 21 }, fontWeight: 700, px: 1 }}>Ceylonica</Button>}
           {!isAdmin && (
             <Typography 
               variant="h6" 
@@ -75,56 +74,28 @@ const TopBar: React.FC = () => {
               <Button onClick={() => { window.location.href = '/'; }} sx={{ fontWeight: 500, textTransform: 'none', color: 'text.secondary' }}>
                 Home
               </Button>
-              <Button onClick={() => navigate('/survey')} sx={{ fontWeight: 500, textTransform: 'none', color: 'text.secondary' }}>
+              <Button onClick={() => navigate('/user')} sx={{ fontWeight: 500, textTransform: 'none', color: 'text.secondary' }}>
                 Survey
               </Button>
-              <Button onClick={() => navigate('/categories')} sx={{ fontWeight: 500, textTransform: 'none', color: 'text.secondary' }}>
-                Category
+              <Button onClick={() => navigate('/mydashboard')} sx={{ fontWeight: 500, textTransform: 'none', color: 'text.secondary' }}>
+                My dashboard
               </Button>
             </Box>
           )}
         </Box>
 
         {/* Center Search Bar */}
-        <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', mx: 2 }}>
+        <Box sx={{ flex: { xs: '1 1 100%', sm: 1 }, order: { xs: 3, sm: 0 }, minWidth: 0, maxWidth: { sm: 480 }, display: 'flex', justifyContent: 'center', mx: { xs: 0, sm: 2 } }}>
           <GlobalSearchBar isDarkMode={false} />
         </Box>
 
         {/* Right Controls */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          {/* Notifications */}
-          <Tooltip title="Notifications">
-            <IconButton 
-              onClick={(e) => setNotifAnchorEl(e.currentTarget)}
-              sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary', background: 'rgba(0,0,0,0.05)' } }}
-            >
-              <NotificationsIcon />
-            </IconButton>
-          </Tooltip>
-
-          <Menu
-            anchorEl={notifAnchorEl}
-            open={Boolean(notifAnchorEl)}
-            onClose={() => setNotifAnchorEl(null)}
-            PaperProps={{
-              sx: { mt: 1.5, minWidth: 250, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }
-            }}
-            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-          >
-            <Box sx={{ px: 2, py: 1.5 }}>
-              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>Notifications</Typography>
-            </Box>
-            <Divider />
-              <MenuItem sx={{ py: 2, justifyContent: 'center' }}>
-                <Typography variant="caption" color="text.secondary">
-                  No new notifications
-                </Typography>
-              </MenuItem>
-          </Menu>
-
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.25, sm: 1.5 }, ml: 'auto' }}>
           {/* User Menu */}
-          <Box
+          <Button
+            aria-label="Account menu"
+            aria-haspopup="menu"
+            aria-expanded={Boolean(anchorEl)}
             onClick={handleMenu}
             sx={{
               display: 'flex',
@@ -157,7 +128,7 @@ const TopBar: React.FC = () => {
               </Typography>
             </Box>
             <KeyboardArrowDown sx={{ color: 'text.secondary', fontSize: 18 }} />
-          </Box>
+          </Button>
 
           {/* User Dropdown Menu */}
           <Menu
@@ -190,9 +161,6 @@ const TopBar: React.FC = () => {
             <Divider />
             <MenuItem onClick={() => { setProfileOpen(true); handleClose(); }}>
               <PersonIcon sx={{ mr: 1.5, fontSize: 18, color: 'text.secondary' }} /> My Profile
-            </MenuItem>
-            <MenuItem onClick={handleClose}>
-              <SettingsIcon sx={{ mr: 1.5, fontSize: 18, color: 'text.secondary' }} /> Settings
             </MenuItem>
             <Divider />
             <Typography variant="caption" sx={{ px: 2, py: 1, display: 'block', color: 'text.secondary', fontWeight: 600 }}>Language / භාෂාව / மொழி</Typography>

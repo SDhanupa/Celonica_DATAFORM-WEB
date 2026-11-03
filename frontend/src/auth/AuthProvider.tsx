@@ -127,21 +127,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       keycloak.updateToken(30)
         .then(() => setToken(keycloak.token))
         .catch(() => {
-          keycloak.logout();
+          // Another tab may already have ended this session. Clear local auth
+          // instead of opening a second logout flow without an ID token.
+          keycloak.clearToken();
         });
     };
 
     keycloak.onAuthRefreshSuccess = () => setToken(keycloak.token);
     keycloak.onAuthSuccess = () => setToken(keycloak.token);
-    keycloak.onAuthLogout = () => setToken(undefined);
+    keycloak.onAuthLogout = () => {
+      setToken(undefined);
+      setIsAuthenticated(false);
+      setUserInfo(null);
+      setProfileSyncFailed(false);
+    };
   }, [apolloClient]);
 
   const logout = () => {
-    keycloak.logout({ redirectUri: window.location.origin + '/' });
+    keycloak.logout({ redirectUri: window.location.origin + '/login' });
   };
 
   const login = (redirectUri?: string) => {
-    keycloak.login({ redirectUri: redirectUri || window.location.origin + '/', prompt: 'login' });
+    keycloak.login({ redirectUri: redirectUri || window.location.href, prompt: 'login' });
   };
 
   const register = (redirectUri?: string) => {

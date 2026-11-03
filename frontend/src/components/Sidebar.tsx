@@ -1,289 +1,82 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import {
-  Drawer,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Typography,
-  Box,
-  Avatar,
-  Chip,
-  Tooltip,
-  IconButton,
-  useTheme,
-} from '@mui/material';
-import {
-  Dashboard as DashboardIcon,
-  SupervisorAccount as AdminsIcon,
-  People as UsersIcon,
-  Quiz as QuestionsIcon,
-  Flag as ReportsIcon,
-  Person as ProfileIcon,
-  ChevronLeft,
-  ChevronRight,
-  AutoAwesome,
-  Menu as MenuIcon,
-  PersonAdd as UserPlusIcon,
-  Category as CategoryIcon,
-  Map as MapIcon,
-  Assignment as AssignmentIcon,
-} from '@mui/icons-material';
+import { Box, Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText, Tooltip, Typography } from '@mui/material';
+import { DashboardOutlined as DashboardIcon, SupervisorAccountOutlined as AdminsIcon,
+  QuizOutlined as QuestionsIcon, FlagOutlined as ReportsIcon,
+  CategoryOutlined as CategoryIcon, MapOutlined as MapIcon, AssignmentOutlined as AssignmentIcon,
+  MenuOpen, Menu, Close } from '@mui/icons-material';
 import { useAuth } from '../auth/AuthProvider';
+import { visibleAdminTools, toolGroups, matchesToolLocation } from '../config/adminTools';
 
-const DRAWER_WIDTH = 280;
-const COLLAPSED_WIDTH = 70;
-
-const navItems = [
-  { label: 'Home', icon: <DashboardIcon />, path: '/gnpage' },
-  { label: 'sdashbord', icon: <AdminsIcon />, path: '/admins', roles: ['super_admin', 'admin'] },
-  { label: 'Users', icon: <UsersIcon />, path: '/users', roles: ['super_admin', 'admin', 'moderator'] },
-  { label: 'Approvals', icon: <ReportsIcon />, path: '/approvals', roles: ['super_admin', 'admin', 'moderator'] },
-  { label: 'User Submissions', icon: <ReportsIcon />, path: '/user-submissions', roles: ['super_admin', 'admin', 'moderator', 'user'] },
-  { label: 'Questions', icon: <QuestionsIcon />, path: '/questions', roles: ['super_admin', 'admin', 'moderator'] },
-  { label: 'Industry Survey Builder', icon: <QuestionsIcon />, path: '/admin/industry-survey-questions', roles: ['super_admin', 'admin'] },
-  { label: 'Industry Survey Data', icon: <ReportsIcon />, path: '/admin/industry-surveys', roles: ['super_admin', 'admin'] },
-  { label: 'GN Location Approvals', icon: <ReportsIcon />, path: '/admin/rapid-fire-approvals', roles: ['super_admin', 'admin', 'moderator'] },
-  { label: 'Dashboard', icon: <DashboardIcon />, path: '/mydashboard', roles: ['admin', 'moderator', 'user'] },
-  { label: 'Industry Survey', icon: <ReportsIcon />, path: '/industry-survey', roles: ['admin', 'moderator', 'user'] },
-  { label: 'Location form', icon: <AssignmentIcon />, path: '/user', roles: ['admin', 'moderator', 'user'] },
-  { label: 'Reports', icon: <ReportsIcon />, path: '/reports', roles: ['super_admin', 'admin', 'moderator'] },
-  { label: 'Categories', icon: <CategoryIcon />, path: '/categories', roles: ['super_admin'] },
-  { label: 'GM Divisions', icon: <MapIcon />, path: '/grama-niladharis', roles: ['super_admin'] },
-  { label: 'Register User', icon: <UserPlusIcon />, path: '/registration', roles: ['super_admin'] },
-  { label: 'Bulk Data', icon: <CategoryIcon />, path: '/bulk-data', roles: ['super_admin'] },
-  { label: 'Data Base Mapping', icon: <MapIcon />, path: '/police-connections', roles: ['super_admin'] },
-  { label: 'Post Office Mapping', icon: <MapIcon />, path: '/post-office-connections', roles: ['super_admin'] },
-  { label: 'Health Mapping', icon: <MapIcon />, path: '/phi-connections', roles: ['super_admin'] },
-  { label: 'Telecom Mapping', icon: <MapIcon />, path: '/trs-connections', roles: ['super_admin'] },
-  { label: 'District-Prov Mapping', icon: <MapIcon />, path: '/district-province-connections', roles: ['super_admin'] },
-  { label: 'Take Survey', icon: <QuestionsIcon />, path: '/survey', roles: ['user'] },
-];
-
-const roleColors: Record<string, 'primary' | 'success' | 'warning'> = {
-  super_admin: 'primary',
-  admin: 'success',
-  moderator: 'warning',
-};
-
-const Sidebar: React.FC = () => {
-  const theme = useTheme();
+const icons = { home: <DashboardIcon />, people: <AdminsIcon />, review: <ReportsIcon />, survey: <QuestionsIcon />, content: <CategoryIcon />, map: <MapIcon />, data: <AssignmentIcon /> };
+const workspaceItems = [
+  { id: 'workspace', title: 'Overview', path: '/admins', group: 'Workspace', icon: 'home' },
+  { id: 'tools', title: 'All tools', path: '/admins?view=tools', group: 'Workspace', icon: 'content' },
+  { id: 'data', title: 'Data collections', path: '/admins?view=data', group: 'Workspace', icon: 'data' },
+] as const;
+const Sidebar: React.FC<{ mobileOpen: boolean; onMobileClose: () => void }> = ({ mobileOpen, onMobileClose }) => {
+  const [expanded, setExpanded] = useState(false);
+  const { userInfo } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { userInfo } = useAuth();
-  
-  const handleNavigation = (itemPath: string) => {
-    if (itemPath === '/gnpage') {
-      // Read the last visited GN URL saved when user was on a GN page
-      const lastGnUrl = localStorage.getItem('last_gn_url');
-      if (lastGnUrl) {
-        navigate(lastGnUrl);
-        return;
-      }
-    }
-    navigate(itemPath);
+  const roles = userInfo?.realm_roles || [];
+  const allTools = visibleAdminTools(roles);
+  const isSuperAdmin = roles.includes('super_admin');
+  // Keep the rail small; the full, searchable catalogue remains one click away.
+  const quickTools = isSuperAdmin ? allTools.filter(tool => tool.group === 'Review' || tool.id === 'admins' || tool.id === 'map') : allTools;
+  const navItems = [...(isSuperAdmin ? workspaceItems : []), ...quickTools];
+  const groups = ['Workspace', ...toolGroups];
+  const go = (path: string) => {
+    const lastGn = localStorage.getItem('last_gn_url');
+    navigate(path === '/gnpage' && lastGn?.startsWith('/gnpage') ? lastGn : path);
+    onMobileClose();
   };
-  const [collapsed, setCollapsed] = useState(false);
-
-  const role = userInfo?.realm_roles?.find((r) =>
-    ['super_admin', 'admin', 'moderator'].includes(r)
-  ) || 'user';
-
-  return (
-    <Drawer
-      variant="permanent"
-      sx={{
-        width: collapsed ? COLLAPSED_WIDTH : DRAWER_WIDTH,
-        flexShrink: 0,
-        transition: 'width 0.2s',
-        '& .MuiDrawer-paper': {
-          width: collapsed ? COLLAPSED_WIDTH : DRAWER_WIDTH,
-          transition: 'width 0.2s',
-          overflow: 'hidden',
-          zIndex: 1000,
-          display: 'flex',
-          flexDirection: 'column',
-          backgroundColor: '#0f172a',
-          color: '#f8fafc',
-          borderRight: '1px solid #1e293b',
-        },
-      }}
-    >
-      {/* Logo Area */}
-      <Box
-        sx={{
-          p: collapsed ? 1 : '0 15px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-          minHeight: 64, // AdminBite topbar height
-          borderBottom: '1px solid #1e293b',
-          justifyContent: collapsed ? 'center' : 'flex-start',
-        }}
-      >
-        <IconButton onClick={() => setCollapsed(!collapsed)} size="small" sx={{ color: '#94a3b8', '&:hover': { color: '#f8fafc' } }}>
-          <MenuIcon />
+  const navigation = (labels: boolean, mobile = false) => <>
+    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: labels ? 'space-between' : 'center', px: 1, pb: 1 }}>
+      {labels && <Typography variant="body2" sx={{ fontWeight: 600, pl: 1 }}>Workspace</Typography>}
+      <Tooltip title={mobile ? 'Close navigation' : expanded ? 'Collapse navigation' : 'Expand navigation'}>
+        <IconButton aria-label={mobile ? 'Close navigation' : expanded ? 'Collapse navigation' : 'Expand navigation'}
+          onClick={mobile ? onMobileClose : () => setExpanded(!expanded)} sx={{ width: 44, height: 44 }}>
+          {mobile ? <Close /> : expanded ? <MenuOpen /> : <Menu />}
         </IconButton>
-        {!collapsed && (
-          <Box
-            sx={{
-              width: 35,
-              height: 35,
-              bgcolor: 'primary.main',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-              borderRadius: 1,
-            }}
-          >
-            <AutoAwesome sx={{ color: '#fff', fontSize: 20 }} />
-          </Box>
-        )}
-        {!collapsed && (
-          <Box>
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 600,
-                color: '#f8fafc',
-                lineHeight: 1,
-              }}
-            >
-              Ceylonica
-            </Typography>
-          </Box>
-        )}
-      </Box>
-
-      {/* User Info */}
-      {!collapsed && (
-        <Box
-          sx={{
-            p: 2,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1.5,
-            borderBottom: '1px solid #1e293b',
-          }}
-        >
-          <Avatar
-            sx={{
-              width: 40,
-              height: 40,
-              bgcolor: 'primary.main',
-              fontSize: '1rem',
-              fontWeight: 500,
-            }}
-          >
-            {userInfo?.name?.charAt(0)?.toUpperCase() || 'A'}
-          </Avatar>
-          <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Typography
-              variant="body2"
-              sx={{ fontWeight: 500, color: '#f8fafc', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-            >
-              {userInfo?.name || 'Admin'}
-            </Typography>
-            <Chip
-              label={role.replace('_', ' ').toUpperCase()}
-              size="small"
-              color={roleColors[role] as any}
-              sx={{
-                height: 18,
-                fontSize: '0.65rem',
-                fontWeight: 500,
-                mt: 0.5,
-              }}
-            />
-          </Box>
-        </Box>
-      )}
-
-      {/* Navigation */}
-      <List 
-        sx={{ 
-          px: 0, 
-          flex: 1, 
-          mt: 1,
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          '&::-webkit-scrollbar': {
-            width: '6px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: 'transparent',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: 'rgba(0,0,0,0.2)',
-            borderRadius: '4px',
-          },
-          '&::-webkit-scrollbar-thumb:hover': {
-            background: 'rgba(0,0,0,0.3)',
-          },
-        }}
-      >
-        {navItems.map((item: any) => {
-          if (item.roles && !item.roles.includes(role)) {
-            return null;
-          }
-          const isActive = item.path !== '#' && location.pathname.startsWith(item.path);
-          return (
-            <ListItem key={item.label} disablePadding>
-              <Tooltip title={collapsed ? item.label : ''} placement="right">
-                <ListItemButton
-                  selected={isActive}
-                  onClick={() => {
-                    if (item.path !== '#') handleNavigation(item.path);
-                  }}
-                  sx={{
-                    justifyContent: collapsed ? 'center' : 'flex-start',
-                    px: collapsed ? 2.5 : 2,
-                    mx: 2,
-                    mb: 0.5,
-                    borderRadius: 2,
-                    transition: 'all 0.2s ease-in-out',
-                    ...(isActive ? {
-                      background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important',
-                      boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
-                      '&:hover': {
-                        background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important',
-                      }
-                    } : {
-                      '&:hover': {
-                        background: 'rgba(255,255,255,0.05)',
-                      }
-                    })
-                  }}
-                >
-                  <ListItemIcon
-                    sx={{
-                      minWidth: collapsed ? 'auto' : 35,
-                      color: isActive ? '#ffffff' : '#94a3b8',
-                    }}
-                  >
-                    {React.cloneElement(item.icon as React.ReactElement, { fontSize: 'small' })}
-                  </ListItemIcon>
-                  {!collapsed && (
-                    <ListItemText
-                      primary={item.label}
-                      primaryTypographyProps={{
-                        fontSize: '0.875rem',
-                        fontWeight: isActive ? 600 : 400,
-                        color: isActive ? '#ffffff' : '#cbd5e1',
-                      }}
-                    />
-                  )}
-                </ListItemButton>
-              </Tooltip>
-            </ListItem>
-          );
-        })}
-      </List>
+      </Tooltip>
+    </Box>
+    {groups.map((group, index) => {
+      const items = navItems.filter(item => item.group === group);
+      if (!items.length) return null;
+      return <Box key={group} sx={{ borderTop: index ? '1px solid' : 'none', borderColor: 'divider', pt: index ? 1 : 0, mt: index ? 1 : 0 }}>
+        {labels && index > 0 && <Typography variant="caption" color="text.secondary" sx={{ display: 'block', px: 2, py: 1 }}>{group}</Typography>}
+        <List disablePadding>
+          {items.map(item => {
+            const hiddenToolActive = item.id === 'tools' && location.pathname !== '/admins' && allTools.some(tool =>
+              matchesToolLocation(tool.path, location.pathname, location.search) && !quickTools.some(quick => quick.id === tool.id));
+            const selected = hiddenToolActive || (matchesToolLocation(item.path, location.pathname, location.search) &&
+              !navItems.some(other => other.path !== item.path && other.path.startsWith(item.path + '/') && matchesToolLocation(other.path, location.pathname, location.search)));
+            return <Tooltip key={item.path} title={!labels ? item.title : ''} placement="right">
+              <ListItemButton aria-label={item.title} aria-current={selected ? 'page' : undefined} selected={selected} onClick={() => go(item.path)}
+                sx={{ minHeight: 44, borderRadius: '14px', mb: 0.5, mx: 0.5, px: labels ? 1.5 : 0, justifyContent: 'center',
+                  color: selected ? '#ffffff' : 'text.secondary',
+                  '&.Mui-selected': { bgcolor: 'primary.main', color: '#fff', '&:hover': { bgcolor: 'primary.dark' } },
+                  '&:hover': { bgcolor: '#edf4ee' } }}>
+                <ListItemIcon sx={{ minWidth: labels ? 34 : 0, color: 'inherit', '& svg': { fontSize: 21 } }}>{icons[item.icon]}</ListItemIcon>
+                {labels && <ListItemText primary={item.title} primaryTypographyProps={{ fontSize: 13, fontWeight: selected ? 600 : 400, color: 'inherit' }} />}
+              </ListItemButton>
+            </Tooltip>;
+          })}
+        </List>
+      </Box>;
+    })}
+  </>;
+  return <>
+    <Box component="nav" aria-label="Admin navigation" sx={{ display: { xs: 'none', md: 'block' }, width: expanded ? 248 : 64,
+      flexShrink: 0, bgcolor: 'background.paper', borderRadius: '24px', p: 0.75, position: 'sticky', top: 112,
+      maxHeight: 'calc(100vh - 136px)', overflowY: 'auto', scrollbarWidth: 'thin' }}>
+      {navigation(expanded)}
+    </Box>
+    <Drawer open={mobileOpen} onClose={onMobileClose} sx={{ display: { md: 'none' } }}
+      PaperProps={{ sx: { width: 288, p: 1.5 } }}>
+      <Box component="nav" aria-label="Mobile admin navigation">{navigation(true, true)}</Box>
     </Drawer>
-  );
+  </>;
 };
-
 export default Sidebar;
