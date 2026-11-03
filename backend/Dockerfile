@@ -40,8 +40,10 @@ COPY . /var/www
 # Install composer dependencies (runs package discovery via post-install scripts)
 RUN composer install --optimize-autoloader --no-dev --no-interaction --prefer-dist
 
-# Ensure permissions
-RUN mkdir -p /var/www/public/uploads \
+# Ensure copied code remains readable when the build checkout has a private umask.
+# Preserve executable bits; runtime secrets are excluded by .dockerignore.
+RUN chmod -R a+rX /var/www \
+    && mkdir -p /var/www/public/uploads \
     && chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache /var/www/public/uploads \
     && chmod -R 775 /var/www/storage /var/www/bootstrap/cache /var/www/public/uploads
 
