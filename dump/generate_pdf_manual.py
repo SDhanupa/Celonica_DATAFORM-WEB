@@ -416,8 +416,8 @@ def build_pdf(filename):
         [Paragraph("<b>Portal / Service</b>", body_style), Paragraph("<b>URL / Port</b>", body_style), Paragraph("<b>Default Credentials / Purpose</b>", body_style)],
         [Paragraph("React Web App", body_style), Paragraph("<code>http://localhost:5173</code> / <code>3001</code>", body_style), Paragraph("Main public & admin web application.", body_style)],
         [Paragraph("Laravel GraphQL API", body_style), Paragraph("<code>http://localhost:8000/graphql</code>", body_style), Paragraph("Backend GraphQL playground and endpoints.", body_style)],
-        [Paragraph("Keycloak Admin Console", body_style), Paragraph("<code>http://localhost:8080/admin</code>", body_style), Paragraph("<code>admin</code> / <code>admin123</code> (Realm: <code>ceylonica-admin</code>)", body_style)],
-        [Paragraph("PostgreSQL Database", body_style), Paragraph("<code>localhost:5432</code> / <code>5434</code>", body_style), Paragraph("<code>celonica_user</code> / <code>celonica_pass</code> (DB: <code>celonica_db</code>)", body_style)],
+        [Paragraph("Keycloak Admin Console", body_style), Paragraph("<code>http://localhost:8080/admin</code>", body_style), Paragraph("<code>admin</code> / <code>REPLACE_WITH_PRIVATE_KEYCLOAK_ADMIN_PASSWORD</code> (Realm: <code>ceylonica-admin</code>)", body_style)],
+        [Paragraph("PostgreSQL Database", body_style), Paragraph("<code>localhost:5432</code> / <code>5434</code>", body_style), Paragraph("<code>celonica_user</code> / <code>REPLACE_WITH_PRIVATE_DB_PASSWORD</code> (DB: <code>celonica_db</code>)", body_style)],
         [Paragraph("Redis Cache", body_style), Paragraph("<code>localhost:6379</code>", body_style), Paragraph("High-speed response caching.", body_style)]
     ]
     t_ports = Table(ports_summary, colWidths=[130, 140, 234])

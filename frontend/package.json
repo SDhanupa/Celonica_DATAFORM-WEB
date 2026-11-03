@@ -23,21 +23,22 @@
     "i18next": "^26.4.2",
     "keycloak-js": "^26.0.4",
     "leaflet": "^1.9.4",
-    "maplibre-gl": "4.7.1",
+    "maplibre-gl": "^6.16.0",
     "notistack": "^3.0.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-i18next": "^17.0.16",
     "react-leaflet": "^4.2.1",
-    "react-router-dom": "^6.27.0",
+    "react-router-dom": "^7.18.5",
     "react-swipeable": "^7.0.2"
   },
   "devDependencies": {
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
-    "@vitejs/plugin-react": "^4.3.3",
+    "@vitejs/plugin-react": "^5.2.0",
+    "esbuild": "^0.28.2",
     "typescript": "^5.6.3",
-    "vite": "^5.4.11"
+    "vite": "^7.3.7"
   },
   "overrides": {
     "@mapbox/jsonlint-lines-primitives": "2.0.2"

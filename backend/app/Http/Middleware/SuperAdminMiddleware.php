@@ -18,7 +18,7 @@ class SuperAdminMiddleware
     {
         $admin = $request->attributes->get('current_admin');
 
-        if (!$admin instanceof Admin || !$admin->is_active) {
+        if (!$admin instanceof Admin || !$admin->is_active || $admin->role !== 'super_admin') {
             return response()->json(['error' => 'Super Admin access required'], 403);
         }
 

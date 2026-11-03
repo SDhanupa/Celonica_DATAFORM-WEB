@@ -22,7 +22,7 @@ $realm = 'ceylonica-admin';
 // Get Admin Token
 $response = Http::asForm()->post("$keycloakUrl/realms/$realm/protocol/openid-connect/token", [
     'client_id' => 'admin-cli',
-    'client_secret' => 'my-super-secret-keycloak-client-secret',
+    'client_secret' => 'REPLACE_WITH_PRIVATE_KEYCLOAK_ADMIN_CLIENT_SECRET',
     'grant_type' => 'client_credentials'
 ]);
 

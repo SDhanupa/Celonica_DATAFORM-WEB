@@ -3,14 +3,15 @@ import fs from 'fs';
 const KEYCLOAK_URL = 'http://localhost:8081'; // Host machine port!
 const REALM = 'celonica-admin';
 const ADMIN = 'admin';
-const PASSWORD = 'admin123';
+const PASSWORD = process.env.KEYCLOAK_ADMIN_PASSWORD;
+if (!PASSWORD) throw new Error('Set KEYCLOAK_ADMIN_PASSWORD privately before running this local setup.');
 
 async function main() {
     console.log("Getting admin token...");
     const tokenRes = await fetch(`${KEYCLOAK_URL}/realms/master/protocol/openid-connect/token`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `client_id=admin-cli&username=${ADMIN}&password=${PASSWORD}&grant_type=password`
+        body: new URLSearchParams({ client_id: 'admin-cli', username: ADMIN, password: PASSWORD, grant_type: 'password' })
     });
     const tokenData = await tokenRes.json();
     const token = tokenData.access_token;

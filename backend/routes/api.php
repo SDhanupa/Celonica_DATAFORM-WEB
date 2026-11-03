@@ -148,8 +148,9 @@ Route::middleware(['keycloak.admin', 'super_admin'])->group(function () {
 
 // Serve images through PHP since frontend Nginx container doesn't share the volume
 Route::get('/uploads/{path}', function($path) {
-    $file = public_path('uploads/' . $path);
-    if (file_exists($file)) {
+    $root = realpath(public_path('uploads'));
+    $file = $root === false ? false : realpath($root . DIRECTORY_SEPARATOR . $path);
+    if ($file !== false && str_starts_with($file, $root . DIRECTORY_SEPARATOR) && is_file($file)) {
         return response()->file($file);
     }
     abort(404);

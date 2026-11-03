@@ -16,9 +16,16 @@ return Application::configure(basePath: dirname(__DIR__))
         // Identity keys are stripped from every request, guarded or not, so a
         // client can never pre-seed `current_admin` / `keycloak_sub`.
         $middleware->use([
+            \Illuminate\Http\Middleware\TrustProxies::class,
             \Illuminate\Http\Middleware\HandleCors::class,
             \App\Http\Middleware\StripClientIdentityKeys::class,
         ]);
+
+        // Only configured internal proxy networks may supply forwarding headers.
+        $middleware->trustProxies(
+            at: array_filter(explode(',', env('TRUSTED_PROXIES', '127.0.0.1,::1'))),
+            headers: \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR | \Illuminate\Http\Request::HEADER_X_FORWARDED_PROTO,
+        );
 
         // Register Keycloak guard as a named alias for use on routes
         $middleware->alias([

@@ -1,4 +1,5 @@
 $ErrorActionPreference = 'Stop'
+if (-not $env:KEYCLOAK_ADMIN_PASSWORD) { throw 'Set KEYCLOAK_ADMIN_PASSWORD privately before running this local setup.' }
 
 Write-Host "Building keycloak-sms-spi.jar..."
 Set-Location "keycloak-sms-spi"
@@ -50,7 +51,7 @@ K=/opt/keycloak/bin/kcadm.sh
 R=celonica-admin
 
 # Login
-`$K config credentials --server http://localhost:8080 --realm master --user admin --password admin123
+`$K config credentials --server http://localhost:8080 --realm master --user admin --password "`${KC_BOOTSTRAP_ADMIN_PASSWORD:?Current private admin password required}"
 
 # Check if flow already exists
 FLOW_ID=`$(`$K get authentication/flows -r `$R --fields id,alias --format csv --noquotes | grep 'registration-with-sms$' | cut -d',' -f1)
@@ -108,7 +109,7 @@ if ($execId) {
     $tokenResponse = Invoke-RestMethod -Uri "http://localhost:8081/realms/master/protocol/openid-connect/token" -Method Post -Body @{
         client_id = "admin-cli"
         username = "admin"
-        password = "admin123"
+        password = $env:KEYCLOAK_ADMIN_PASSWORD
         grant_type = "password"
     }
     Invoke-RestMethod -Uri "http://localhost:8081/admin/realms/celonica-admin/authentication/flows/registration-with-sms/executions" -Method Put -Headers @{

@@ -45,6 +45,16 @@ class KeycloakTokenVerifier
             throw new RuntimeException('Token has no subject');
         }
 
+        // ID tokens and access tokens issued for another resource/client must
+        // never authenticate to this API, even when signed by the same realm.
+        $audiences = isset($decoded->aud) ? (array) $decoded->aud : [];
+        if (!in_array(config('keycloak.audience'), $audiences, true)
+            || ($decoded->azp ?? '') !== config('keycloak.client_id')
+            || ($decoded->typ ?? '') !== 'Bearer'
+            || !isset($decoded->exp)) {
+            throw new RuntimeException('Token is not an access token for this API');
+        }
+
         return $decoded;
     }
 

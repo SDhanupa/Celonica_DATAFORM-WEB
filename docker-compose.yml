@@ -8,7 +8,7 @@ services:
       context: ./frontend
     container_name: celonica-web-frontend
     ports:
-      - "3001:80"
+      - "127.0.0.1:3001:80"
     depends_on:
       - backend
     restart: unless-stopped
@@ -29,7 +29,7 @@ services:
     environment:
       - APP_NAME=Celonica Admin
       - APP_ENV=${APP_ENV:-production}
-      - APP_KEY=base64:X4iEGmSPk6StQmdKtF3u8zgrjNYSOOuK59t4gCMrERs=
+      - APP_KEY=${APP_KEY:?Set APP_KEY in the private .env file}
       - APP_DEBUG=${APP_DEBUG:-false}
       - APP_URL=${APP_URL:-http://localhost:8000}
       - DB_CONNECTION=pgsql
@@ -37,7 +37,7 @@ services:
       - DB_PORT=5432
       - DB_DATABASE=celonica_db
       - DB_USERNAME=celonica_user
-      - DB_PASSWORD=celonica_pass
+      - DB_PASSWORD=${DB_PASSWORD:?Set DB_PASSWORD in the private .env file}
       - KEYCLOAK_BASE_URL=http://celonica-web-keycloak:8080
       - KEYCLOAK_PUBLIC_URL=${KC_HOSTNAME_URL:-http://localhost:8081}
       # Must match the realm actually imported by keycloak/celonica-admin-realm.json
@@ -47,8 +47,10 @@ services:
       # deployment target uses different values.
       - KEYCLOAK_REALM=${KEYCLOAK_REALM:-celonica-admin}
       - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID:-celonica-frontend}
+      - KEYCLOAK_API_AUDIENCE=${KEYCLOAK_API_AUDIENCE:-ceylonica-api}
+      - TRUSTED_PROXIES=${TRUSTED_PROXIES:-127.0.0.1,::1}
       - KEYCLOAK_ADMIN_CLIENT_ID=admin-cli
-      - KEYCLOAK_ADMIN_CLIENT_SECRET=my-super-secret-keycloak-client-secret
+      - KEYCLOAK_ADMIN_CLIENT_SECRET=${KEYCLOAK_ADMIN_CLIENT_SECRET:?Set KEYCLOAK_ADMIN_CLIENT_SECRET in the private .env file}
       - FRONTEND_URL=${FRONTEND_URL:-https://ceystem.com}
       - SUPER_ADMIN_KEYCLOAK_SUB=51050c63-27d4-40ff-9474-fa4d2ce6a6be
       # Laravel 11+ reads CACHE_STORE (CACHE_DRIVER is ignored); without this the
@@ -85,11 +87,11 @@ services:
     container_name: celonica-web-postgres
     restart: unless-stopped
     ports:
-      - "5434:5432"
+      - "127.0.0.1:5434:5432"
     environment:
       POSTGRES_DB: celonica_db
       POSTGRES_USER: celonica_user
-      POSTGRES_PASSWORD: celonica_pass
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -103,7 +105,7 @@ services:
     environment:
       POSTGRES_DB: keycloak_db
       POSTGRES_USER: keycloak_user
-      POSTGRES_PASSWORD: keycloak_pass
+      POSTGRES_PASSWORD: ${KC_DB_PASSWORD:?Set KC_DB_PASSWORD}
     volumes:
       - keycloak_db_data:/var/lib/postgresql/data
     healthcheck:
@@ -116,26 +118,27 @@ services:
 
   # ─── Keycloak ─────────────────────────────────────────────
   keycloak:
-    image: quay.io/keycloak/keycloak:24.0.3
+    image: ${KEYCLOAK_IMAGE:-quay.io/keycloak/keycloak:26.8.1}
     container_name: celonica-web-keycloak
     restart: unless-stopped
-    command: start-dev
+    command: ["start"]
     environment:
       KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak_db
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/${KC_DB_DATABASE:-keycloak_db}
       KC_DB_USERNAME: keycloak_user
-      KC_DB_PASSWORD: keycloak_pass
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin123
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD:?Set KC_DB_PASSWORD}
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN:-admin}
+      KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_ADMIN_CLIENT_SECRET:?Set KEYCLOAK_ADMIN_CLIENT_SECRET}
+      KEYCLOAK_INITIAL_USER_PASSWORD: ${KEYCLOAK_INITIAL_USER_PASSWORD:-}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?Set KEYCLOAK_ADMIN_PASSWORD}
       KC_HTTP_PORT: 8080
-      KC_HOSTNAME_STRICT: "false"
-      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_HOSTNAME_STRICT: "true"
       KC_HTTP_ENABLED: "true"
       KC_PROXY_HEADERS: xforwarded
-      KC_HOSTNAME_URL: ${KC_HOSTNAME_URL:-http://localhost:8081}
-      KC_HOSTNAME_ADMIN_URL: ${KC_HOSTNAME_ADMIN_URL:-http://localhost:8081}
+      KC_HOSTNAME: ${KC_HOSTNAME_URL:-http://localhost:8081}
+      KC_CACHE: local
     ports:
-      - "${KC_PORT:-8081}:8080"
+      - "127.0.0.1:${KC_PORT:-8081}:8080"
     volumes:
       - ./keycloak:/opt/keycloak/data/import
       - ./keycloak/themes/ceylonica:/opt/keycloak/themes/ceylonica

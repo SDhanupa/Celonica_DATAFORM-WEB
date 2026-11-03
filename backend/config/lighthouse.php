@@ -33,6 +33,7 @@ return [
 
             // Always set the `Accept: application/json` header.
             Nuwave\Lighthouse\Http\Middleware\AcceptJson::class,
+            \App\Http\Middleware\GraphqlRequestBudget::class,
 
             // Verify Keycloak JWT token and ensure user is in the admins table.
             \App\Http\Middleware\KeycloakAuthGuard::class,
@@ -227,9 +228,11 @@ return [
     */
 
     'security' => [
-        'max_query_complexity' => GraphQL\Validator\Rules\QueryComplexity::DISABLED,
-        'max_query_depth' => GraphQL\Validator\Rules\QueryDepth::DISABLED,
-        'disable_introspection' => (bool) env('LIGHTHOUSE_SECURITY_DISABLE_INTROSPECTION', false)
+        // Includes Lighthouse's pagination multiplier; the GN directory offers
+        // 100 rows with related police/post-office fields (~2,500 complexity).
+        'max_query_complexity' => 5000,
+        'max_query_depth' => 15,
+        'disable_introspection' => (bool) env('LIGHTHOUSE_SECURITY_DISABLE_INTROSPECTION', env('APP_ENV') === 'production')
             ? GraphQL\Validator\Rules\DisableIntrospection::ENABLED
             : GraphQL\Validator\Rules\DisableIntrospection::DISABLED,
     ],

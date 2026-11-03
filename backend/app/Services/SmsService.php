@@ -14,9 +14,9 @@ class SmsService
 
     public function __construct()
     {
-        $this->username = env('TEXTWARE_USERNAME', 'TW01176_vixva_tr');
-        $this->password = env('TEXTWARE_PASSWORD', ''); 
-        $this->senderId = env('TEXTWARE_SENDER_ID', 'VIXVA');
+        $this->username = config('services.textware.username');
+        $this->password = config('services.textware.password');
+        $this->senderId = config('services.textware.sender_id');
     }
 
     /**
@@ -24,14 +24,14 @@ class SmsService
      */
     public function sendSms(string $phoneNumber, string $message): bool
     {
-        // If no password is provided in .env, simulate for local dev
+        // Never log login codes or report an unsent code as delivered.
         if (empty($this->password)) {
-            Log::info("[SIMULATED SMS] to {$phoneNumber}: {$message}");
-            return true;
+            Log::warning('SMS gateway is not configured.');
+            return false;
         }
 
         try {
-            $response = Http::get('https://msg.text-ware.com/send_sms.php', [
+            $response = Http::timeout(10)->get(config('services.textware.api_url') ?: 'https://msg.text-ware.com/send_sms.php', [
                 'username' => $this->username,
                 'password' => $this->password,
                 'src'      => $this->senderId,
@@ -41,14 +41,14 @@ class SmsService
             ]);
 
             if ($response->successful()) {
-                Log::info("SMS sent to {$phoneNumber} via TextWare.");
+                Log::info('SMS gateway accepted a message.');
                 return true;
             } else {
-                Log::error("TextWare SMS Error for {$phoneNumber}: HTTP " . $response->status());
+                Log::error('SMS gateway rejected a message.', ['status' => $response->status()]);
                 return false;
             }
         } catch (Exception $e) {
-            Log::error("TextWare SMS Exception: " . $e->getMessage());
+            Log::error('SMS gateway request failed.', ['exception' => get_class($e)]);
             return false;
         }
     }

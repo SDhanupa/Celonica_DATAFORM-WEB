@@ -3,54 +3,59 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\RateLimiter;
+use GraphQL\Error\Error;
 
 class OtpService
 {
-    /**
-     * Generate an 8-digit cryptographically secure OTP
-     */
     public function generateOtp(): string
     {
-        try {
-            $otp = random_int(10000000, 99999999);
-        } catch (\Exception $e) {
-            // Fallback if random_int fails
-            $otp = rand(10000000, 99999999);
-        }
-        
-        return (string)$otp;
+        return (string) random_int(10000000, 99999999);
     }
 
-    /**
-     * Store OTP in cache for 5 minutes tied to an identifier (e.g. Mobile number)
-     */
+    /** Shared across registration/login and alternate phone formatting. */
+    public function reserveSend(string $identifier, string $mobile): void
+    {
+        $digits = preg_replace('/\D/', '', $mobile);
+        if (str_starts_with($digits, '0094')) $digits = substr($digits, 2);
+        if (str_starts_with($digits, '0')) $digits = '94' . substr($digits, 1);
+        $destination = 'otp-send:' . hash('sha256', $digits);
+        $account = 'otp-account:' . hash('sha256', strtolower(trim($identifier)));
+        Cache::lock($destination . ':lock', 5)->block(2, function () use ($destination, $account) {
+            if (RateLimiter::tooManyAttempts($destination, 5)
+                || RateLimiter::tooManyAttempts($account, 5)
+                || !Cache::add($destination . ':cooldown', true, 60)) {
+                throw new Error('Please wait before requesting another code.');
+            }
+            RateLimiter::hit($destination, 3600);
+            RateLimiter::hit($account, 3600);
+        });
+    }
+
     public function storeOtp(string $identifier, string $otp, int $minutes = 5): void
     {
-        $cacheKey = 'otp_' . md5($identifier);
-        Cache::put($cacheKey, $otp, now()->addMinutes($minutes));
+        Cache::put('otp_' . md5($identifier), hash('sha256', $otp), now()->addMinutes($minutes));
     }
 
-    /**
-     * Validate an OTP against an identifier.
-     * Returns true if valid and deletes it from cache to prevent reuse.
-     */
+    /** Five guesses per identifier in five minutes; success consumes the code. */
     public function validateOtp(string $identifier, string $enteredOtp): bool
     {
-        $cacheKey = 'otp_' . md5($identifier);
-        
-        // For testing/development, you can allow a backdoor OTP like '00000000' if needed.
-        if (config('app.env') === 'local' && $enteredOtp === '00000000') {
-            return true;
-        }
-
-        $cachedOtp = Cache::get($cacheKey);
-
-        if ($cachedOtp && $cachedOtp === $enteredOtp) {
-            // Remove the OTP to prevent reuse
-            Cache::forget($cacheKey);
-            return true;
-        }
-
-        return false;
+        $key = 'otp_' . md5($identifier);
+        return Cache::lock($key . ':lock', 5)->block(2, function () use ($key, $enteredOtp) {
+            $attempts = $key . ':attempts';
+            if (RateLimiter::tooManyAttempts($attempts, 5)) {
+                Cache::forget($key);
+                return false;
+            }
+            RateLimiter::hit($attempts, 300);
+            $hash = Cache::get($key);
+            if (is_string($hash) && hash_equals($hash, hash('sha256', $enteredOtp))) {
+                Cache::forget($key);
+                RateLimiter::clear($attempts);
+                return true;
+            }
+            if (RateLimiter::tooManyAttempts($attempts, 5)) Cache::forget($key);
+            return false;
+        });
     }
 }

@@ -15,10 +15,8 @@ services:
   keycloak:
     command: ["start"]
     environment:
-      KC_HOSTNAME_URL: https://localhost:8444
-      KC_HOSTNAME_ADMIN_URL: https://localhost:8444
+      KC_HOSTNAME: https://localhost:8444
       KC_HOSTNAME_STRICT: "true"
-      KC_HOSTNAME_STRICT_HTTPS: "true"
       KC_HTTP_ENABLED: "true"
       KC_PROXY_HEADERS: xforwarded
       CEYLONICA_LOGIN_URL: https://localhost:8443/login

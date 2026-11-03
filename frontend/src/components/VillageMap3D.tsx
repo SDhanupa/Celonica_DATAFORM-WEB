@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import maplibregl, { type LngLatBoundsLike, type Map as MlMap, type StyleSpecification } from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
+import type { LngLatBoundsLike, Map as MlMap, StyleSpecification } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import mapWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import { Box, CircularProgress, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
@@ -16,6 +18,10 @@ import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import { VillageMap, boundaryRing, simulatedParcels, type MapInsets, type VillageMapProps } from './VillageMap';
 import { glassSx } from './glass';
+
+// MapLibre 6 ships a separate ESM worker. Bundle its imports and give the map
+// the emitted URL instead of resolving relative to a hashed application chunk.
+maplibregl.setWorkerUrl(mapWorkerUrl);
 
 // 55° rather than 60°: past ~55° the view reaches toward the horizon and pulls in many distant, barely visible tiles.
 const PITCH_3D = 55;

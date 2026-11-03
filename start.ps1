@@ -18,10 +18,14 @@ if (-not (Test-Path (Join-Path $projectRoot 'frontend/node_modules/vite/bin/vite
     throw 'Frontend dependencies are missing. Run npm ci in the frontend directory first.'
 }
 Write-Host 'Starting local Ceylonica services; existing data volumes are preserved...' -ForegroundColor Cyan
+& python (Join-Path $projectRoot 'scripts/local-identity-security.py') backup
+if ($LASTEXITCODE -ne 0) { throw 'Local identity backup failed. No upgrade was started.' }
 $upArgs = @('up', '-d')
 if ($Rebuild) { $upArgs += '--build' }
 & docker @composeArgs @upArgs db keycloak-db redis keycloak backend frontend
 if ($LASTEXITCODE -ne 0) { throw 'Docker services could not start. No migrations or seeds were run.' }
+& python (Join-Path $projectRoot 'scripts/local-identity-security.py') audience
+if ($LASTEXITCODE -ne 0) { throw 'Local API audience setup failed. Do not reset the identity database.' }
 & docker @composeArgs exec -T frontend nginx -s reload
 if ($LASTEXITCODE -ne 0) { throw 'The local API gateway could not reload.' }
 $ready = $false

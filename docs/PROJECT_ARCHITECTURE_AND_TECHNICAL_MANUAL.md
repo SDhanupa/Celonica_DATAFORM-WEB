@@ -192,8 +192,8 @@ php artisan db:seed --class=AdminSeeder
 |---|---|---|
 | **React Web App** | `http://localhost:5173` (or `http://localhost:3001`) | Public / Admin Portal |
 | **Laravel GraphQL API** | `http://localhost:8000/graphql` | GraphQL Playground |
-| **Keycloak Admin** | `http://localhost:8080/admin` (or `8081`) | `admin` / `admin123` (Realm: `ceylonica-admin`) |
-| **PostgreSQL Database** | `localhost:5432` (or `5434`) | `celonica_user` / `celonica_pass` (DB: `celonica_db`) |
+| **Keycloak Admin** | `http://localhost:8080/admin` (or `8081`) | `admin` / `REPLACE_WITH_PRIVATE_KEYCLOAK_ADMIN_PASSWORD` (Realm: `ceylonica-admin`) |
+| **PostgreSQL Database** | `localhost:5432` (or `5434`) | `celonica_user` / `REPLACE_WITH_PRIVATE_DB_PASSWORD` (DB: `celonica_db`) |
 | **Redis Cache** | `localhost:6379` | High-speed cache |
 
 ---

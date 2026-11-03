@@ -50,7 +50,7 @@ class KeycloakAuthGuard
             $decoded = $this->verifier->verify($token);
         } catch (\Throwable $e) {
             error_log('[KeycloakAuthGuard] token rejected: ' . $e->getMessage());
-            return response()->json(['error' => 'Unauthorized: ' . $e->getMessage()], 401);
+            return response()->json(['error' => 'Unauthorized: Invalid or expired access token'], 401);
         }
 
         $sub = $decoded->sub;
@@ -62,7 +62,6 @@ class KeycloakAuthGuard
 
         try {
             $admin = Admin::findByKeycloakSub($sub);
-            \Log::info('[KeycloakAuthGuard] Checked admin for sub:', ['sub' => $sub, 'admin_found' => !!$admin, 'email' => $decoded->email ?? 'no-email']);
             if ($admin) {
                 if (!$admin->is_active) {
                     return response()->json(['error' => 'Forbidden: Admin account is deactivated'], 403);

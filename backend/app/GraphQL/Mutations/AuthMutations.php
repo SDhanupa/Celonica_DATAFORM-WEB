@@ -46,6 +46,8 @@ class AuthMutations
             throw new Error("A user with this mobile number already exists.");
         }
 
+        $this->otpService->reserveSend($nic, $mobile);
+
         // Cache registration payload temporarily (10 mins)
         Cache::put('reg_payload_' . md5($nic), $args, now()->addMinutes(10));
 
@@ -54,7 +56,9 @@ class AuthMutations
         $this->otpService->storeOtp('reg_' . $nic, $otp, 5);
 
         $message = "Your Ceylonica registration OTP is: {$otp}. Do not share this with anyone.";
-        $this->smsService->sendSms($mobile, $message);
+        if (!$this->smsService->sendSms($mobile, $message)) {
+            throw new Error('Unable to send the verification code. Please try again later.');
+        }
 
         return true;
     }
@@ -140,12 +144,16 @@ class AuthMutations
             throw new Error("Mobile number does not match our records.");
         }
 
+        $this->otpService->reserveSend($nic, $mobile);
+
         // Generate and send OTP
         $otp = $this->otpService->generateOtp();
         $this->otpService->storeOtp('login_' . $nic, $otp, 5);
 
         $message = "Your Ceylonica login OTP is: {$otp}. Do not share this with anyone.";
-        $this->smsService->sendSms($mobile, $message);
+        if (!$this->smsService->sendSms($mobile, $message)) {
+            throw new Error('Unable to send the verification code. Please try again later.');
+        }
 
         return true;
     }

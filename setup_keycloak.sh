@@ -2,7 +2,7 @@
 export PATH=$PATH:/opt/keycloak/bin
 
 # 1. Authenticate
-kcadm.sh config credentials --server http://localhost:8080 --realm master --user admin --password admin123
+kcadm.sh config credentials --server http://localhost:8080 --realm master --user admin --password "${KC_BOOTSTRAP_ADMIN_PASSWORD:?Set the current private admin password}"
 
 # 1.5. Import realm
 echo "Importing realm..."

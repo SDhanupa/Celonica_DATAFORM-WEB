@@ -44,7 +44,7 @@
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": false,
       "serviceAccountsEnabled": true,
-      "secret": "my-super-secret-keycloak-client-secret",
+      "secret": "${KEYCLOAK_ADMIN_CLIENT_SECRET}",
       "protocol": "openid-connect"
     }
   ],
@@ -75,11 +75,13 @@
       "credentials": [
         {
           "type": "password",
-          "value": "Admin@1234",
+          "value": "${KEYCLOAK_INITIAL_USER_PASSWORD}",
           "temporary": false
         }
       ],
-      "realmRoles": ["super_admin"]
+      "realmRoles": [
+        "super_admin"
+      ]
     },
     {
       "username": "service-account-admin-cli",

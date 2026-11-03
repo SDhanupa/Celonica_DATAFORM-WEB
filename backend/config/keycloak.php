@@ -16,6 +16,7 @@ return [
 
     'realm'     => env('KEYCLOAK_REALM', 'ceylonica-admin'),
     'client_id' => env('KEYCLOAK_CLIENT_ID', 'ceylonica-frontend'),
+    'audience' => env('KEYCLOAK_API_AUDIENCE', 'ceylonica-api'),
 
     // JWKS endpoint (uses internal URL for fetching)
     'jwks_url'  => env('KEYCLOAK_BASE_URL', 'http://localhost:8080')
