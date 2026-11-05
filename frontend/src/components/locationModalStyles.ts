@@ -209,6 +209,88 @@ export const locationContinueSx = (_enabled: boolean) => ({
   transition: 'background-color 0.2s',
 });
 
+// Plain variant for the contributor dashboard: no glass, map or wordmark, square corners.
+const ink = '#101814';
+const inkSoft = '#4B5650';
+const hairline = '#E3E6E1';
+
+export const plainBackdropSx = { bgcolor: 'rgba(16,24,20,0.5)' };
+
+export const plainPaperSx = {
+  width: 'min(420px, calc(100vw - 24px))',
+  minWidth: 0,
+  maxWidth: 'none !important',
+  m: '12px',
+  bgcolor: '#fff',
+  color: ink,
+  borderRadius: 0,
+  border: `1px solid ${ink}`,
+  boxShadow: 'none',
+  '& .MuiTypography-root, & .MuiButton-root, & .MuiInputBase-root, & .MuiInputLabel-root, & .MuiAlert-root': {
+    fontFamily: "'Poppins', 'Noto Sans Sinhala', 'Noto Sans Tamil', sans-serif !important",
+  },
+};
+
+export const plainHeaderSx = {
+  pt: 2.5,
+  px: { xs: 2, sm: 3 },
+  display: 'flex',
+  flexDirection: 'column' as const,
+  alignItems: 'flex-start',
+  gap: 0.5,
+  '& > div:has(> img)': { mb: 1 },
+  '& img': { height: '36px !important' },
+  '& .MuiTypography-root': { color: ink },
+  '& .MuiTypography-h6': { fontSize: '1.5rem', fontWeight: 700 },
+};
+
+export const plainBodySx = {
+  display: 'flex',
+  flexDirection: 'column' as const,
+  gap: 2,
+  pt: '16px !important',
+  pb: 1.5,
+  px: { xs: 2, sm: 3 },
+  '& .MuiTypography-root': { color: ink },
+  '& .MuiTypography-body2, & .MuiTypography-caption': { color: inkSoft },
+  '& .MuiOutlinedInput-root': {
+    borderRadius: 0,
+    '& fieldset': { borderColor: inkSoft },
+    '&:hover fieldset': { borderColor: ink },
+    '&.Mui-focused fieldset': { borderColor: ink, borderWidth: 2 },
+    '& input::placeholder': { color: inkSoft, opacity: 1 },
+    '& .MuiIconButton-root': { borderRadius: 0 },
+    '& .MuiInputBase-input': { fontSize: '1rem' }, // 16px minimum: smaller makes iOS Safari zoom on focus
+  },
+  '& .MuiInputLabel-root.Mui-focused': { color: ink },
+  '& .MuiAlert-root': { borderRadius: 0 },
+  '& .MuiDivider-root::before, & .MuiDivider-root::after': { borderColor: hairline },
+  '& .MuiButton-outlined': {
+    alignSelf: 'stretch',
+    minHeight: 44,
+    color: ink,
+    fontWeight: 600,
+    textTransform: 'none',
+    borderRadius: 0,
+    borderColor: hairline,
+    boxShadow: 'none',
+    '&:hover': { borderColor: inkSoft, bgcolor: '#F4F5F2', boxShadow: 'none', transform: 'none' },
+  },
+};
+
+export const plainContinueSx = {
+  width: '100%',
+  minHeight: 48,
+  borderRadius: 0,
+  bgcolor: forest,
+  color: '#fff',
+  fontWeight: 600,
+  textTransform: 'none',
+  boxShadow: 'none',
+  '&:hover': { bgcolor: '#1f4530', boxShadow: 'none', transform: 'none' },
+  '&.Mui-disabled': { bgcolor: hairline, color: inkSoft },
+};
+
 /**
  * Scales the location popup (wordmark, map and form together, via CSS zoom) so all of it, Continue button included,
  * fits the screen height without scrolling. Never below MIN_FIT so text stays legible; a screen shorter than that

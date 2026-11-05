@@ -1,14 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Box, Button, CircularProgress, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import { keyframes } from '@mui/system';
-import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
-import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-import HelpOutlineRoundedIcon from '@mui/icons-material/HelpOutlineRounded';
-import LocalFireDepartmentRoundedIcon from '@mui/icons-material/LocalFireDepartmentRounded';
+import CheckSharpIcon from '@mui/icons-material/CheckSharp';
+import CloseSharpIcon from '@mui/icons-material/CloseSharp';
+import HelpOutlineSharpIcon from '@mui/icons-material/HelpOutlineSharp';
 import { getCategoryVisual } from '../categories/categoryVisuals';
 import { fill, localName, useContributeCopy } from '../contribute/copy';
-import { ink } from '../contribute/tokens';
-import { Ambient } from '../contribute/motion';
+import { DANGER, FOREST, FOREST_DEEP, LINE, SURFACE_HOVER, TEXT, TEXT_SOFT, UI_SCALE, WARNING } from './Backdrop';
 import type { RapidFireAnswer, RapidFireCard, RapidFireRules } from './api';
 import type { Feedback, Outcome } from './gameReducer';
 import { useCardTimer } from './useCardTimer';
@@ -16,44 +14,40 @@ import { useCardTimer } from './useCardTimer';
 /** Taps within this window of a card appearing are ignored: a double tap must not answer the next card. */
 const INPUT_LOCK_MS = 250;
 const SWIPE_THRESHOLD_PX = 96;
-const EXIT_MS = 320;
+const EXIT_MS = 200;
 
-const YES = '#FFFFFF';
-const NO = 'rgba(255,255,255,0.25)';
-const UNSURE = 'rgba(255,255,255,0.5)';
+const YES = FOREST;
+const NO = 'rgba(16,24,20,0.45)';
+const UNSURE = 'rgba(16,24,20,0.25)';
 
-const popIn = keyframes`
-  0% { opacity: 0; transform: scale(0.4); }
-  45% { opacity: 1; transform: scale(1.12); }
-  100% { opacity: 0; transform: scale(1); }
-`;
 const cardIn = keyframes`
-  from { opacity: 0; transform: translateY(24px) scale(0.96); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
 `;
 const floatUp = keyframes`
-  0% { opacity: 0; transform: translate(-50%, 8px) scale(0.9); }
-  20% { opacity: 1; transform: translate(-50%, 0) scale(1.05); }
-  100% { opacity: 0; transform: translate(-50%, -48px) scale(1); }
+  0% { opacity: 0; transform: translate(-50%, 8px); }
+  20% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -32px); }
 `;
 // Exit animations are keyframes, not transitions: the leaving card mounts
 // fresh, so a transition would have no "from" state and it would just vanish.
 const exitRight = keyframes`
-  from { opacity: 1; transform: translateX(0) rotate(0); }
-  to { opacity: 0; transform: translateX(130%) rotate(18deg); }
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateX(110%); }
 `;
 const exitLeft = keyframes`
-  from { opacity: 1; transform: translateX(0) rotate(0); }
-  to { opacity: 0; transform: translateX(-130%) rotate(-18deg); }
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateX(-110%); }
 `;
 const exitDown = keyframes`
-  from { opacity: 1; transform: translateY(0) scale(1); }
-  to { opacity: 0; transform: translateY(40%) scale(0.9); }
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(24px); }
 `;
-const flameBeat = keyframes`
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.18); }
-`;
+/** Countdown colour: calm green, amber in the last 5 seconds, red in the last 3. */
+const urgency = (secondsLeft: number) => (secondsLeft <= 3 ? DANGER : secondsLeft <= 5 ? WARNING : FOREST);
+
+/** Small phones and landscape: the answer buttons must stay on screen without scrolling during a timed card. */
+const shortScreen = (styles: object) => ({ '@media (max-height: 640px)': styles });
 
 const prefersReducedMotion = () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
@@ -155,66 +149,43 @@ const PlayStage: React.FC<PlayStageProps> = ({ phase, cards, index, rules, outco
   const swipeRatio = Math.max(-1, Math.min(1, dragX / SWIPE_THRESHOLD_PX));
 
   return (
-    <Box
-      sx={{
-        position: 'relative',
-        minHeight: '100dvh',
-        display: 'flex',
-        flexDirection: 'column',
-        color: '#fff',
-        overflow: 'hidden',
-        background: `linear-gradient(180deg, ${ink[800]} 0%, ${ink[900]} 60%)`,
-        userSelect: 'none',
-        isolation: 'isolate',
-      }}
-    >
-      <Ambient />
+    <Box component="main" sx={{ minHeight: { xs: '100dvh', md: `calc(100dvh / ${UI_SCALE})` }, display: 'flex', flexDirection: 'column', color: TEXT, overflow: 'hidden', userSelect: 'none' }}>
       {/* HUD */}
       <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 2.5 }, maxWidth: 720, width: '100%', mx: 'auto' }}>
         <Tooltip title={t.rfQuit}>
-          <IconButton onClick={onQuit} aria-label={t.rfQuit} sx={{ color: 'rgba(255,255,255,0.8)', bgcolor: 'rgba(255,255,255,0.08)', '&:hover': { bgcolor: 'rgba(255,255,255,0.16)' } }}>
-            <CloseRoundedIcon />
+          <IconButton onClick={onQuit} aria-label={t.rfQuit} sx={{ width: 44, height: 44, color: TEXT, border: `1px solid ${TEXT_SOFT}`, '&:hover': { bgcolor: SURFACE_HOVER } }}>
+            <CloseSharpIcon />
           </IconButton>
         </Tooltip>
         <Stack direction="row" spacing={0.5} sx={{ flex: 1 }} role="progressbar" aria-valuemin={0} aria-valuemax={cards.length} aria-valuenow={outcomes.length}>
           {cards.map((c, i) => {
             const o = outcomes[i];
-            const color = !o ? 'rgba(255,255,255,0.14)' : o.hasty || o.answer === 'skip' ? 'rgba(255,255,255,0.4)' : o.answer === 'yes' ? YES : o.answer === 'no' ? NO : UNSURE;
-            return <Box key={c.id} sx={{ flex: 1, height: 6, borderRadius: 999, bgcolor: color, outline: i === index && phase === 'playing' ? '2px solid rgba(255,255,255,0.7)' : 'none', outlineOffset: 1, transition: 'background-color 200ms ease' }} />;
+            const color = !o ? 'rgba(16,24,20,0.1)' : o.hasty || o.answer === 'skip' ? UNSURE : o.answer === 'yes' ? YES : o.answer === 'no' ? NO : UNSURE;
+            return <Box key={c.id} sx={{ flex: 1, height: 6, bgcolor: color, outline: i === index && phase === 'playing' ? `2px solid ${TEXT}` : 'none', outlineOffset: 1 }} />;
           })}
         </Stack>
         <Box sx={{ textAlign: 'right', minWidth: 64 }} aria-live="polite">
-          <Typography sx={{ color: 'inherit', fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.7 }}>{t.rfScore}</Typography>
-          <Typography key={score} sx={{ color: 'inherit', fontWeight: 800, fontSize: '1.35rem', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
-            {score}
-          </Typography>
+          <Typography sx={{ color: TEXT_SOFT, fontSize: '0.75rem', lineHeight: 1.3 }}>{t.rfScore}</Typography>
+          <Typography sx={{ color: TEXT, fontWeight: 700, fontSize: '1.5rem', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{score}</Typography>
         </Box>
       </Stack>
 
-      <Box sx={{ height: 36, display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 1.5 }}>
+      <Box sx={{ height: 36, display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 1.5, ...shortScreen({ height: 24, mt: 0.5 }) }}>
         {streak >= 2 && (
-          <Stack
-            direction="row"
-            spacing={0.5}
-            sx={{ alignItems: 'center', px: 1.5, py: 0.5, borderRadius: 999, bgcolor: 'rgba(255,255,255,0.1)', color: '#fff', fontWeight: 800 }}
-            aria-label={`${t.rfStreak} ${streak}`}
-          >
-            <LocalFireDepartmentRoundedIcon sx={{ animation: `${flameBeat} 900ms ease-in-out infinite`, '@media (prefers-reduced-motion: reduce)': { animation: 'none' } }} />
-            <span>
-              {t.rfStreak} ×{streak}
-            </span>
-          </Stack>
+          <Typography sx={{ color: FOREST, fontWeight: 700, fontSize: '0.9375rem' }}>
+            {t.rfStreak} ×{streak}
+          </Typography>
         )}
       </Box>
 
       {/* Card area */}
       <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', px: { xs: 2, sm: 3 }, pb: 2 }}>
-        <Box sx={{ position: 'relative', width: '100%', maxWidth: 560, minHeight: { xs: 300, sm: 330 } }}>
+        <Box sx={{ position: 'relative', width: '100%', maxWidth: 560, minHeight: { xs: 300, sm: 330 }, ...shortScreen({ minHeight: 210 }) }}>
           {phase === 'countdown' && <Countdown onDone={onCountdownDone} goLabel={t.rfGo} />}
 
           {phase === 'finishing' && (
             <Box sx={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center' }}>
-              <CircularProgress sx={{ color: '#fff' }} />
+              <CircularProgress size={32} />
             </Box>
           )}
 
@@ -235,7 +206,7 @@ const PlayStage: React.FC<PlayStageProps> = ({ phase, cards, index, rules, outco
                 touchAction: 'pan-y',
                 cursor: 'grab',
                 '&:active': { cursor: 'grabbing' },
-                animation: `${cardIn} 260ms ease-out both`,
+                animation: `${cardIn} 160ms ease-out both`,
                 '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
               }}
             >
@@ -246,7 +217,7 @@ const PlayStage: React.FC<PlayStageProps> = ({ phase, cards, index, rules, outco
                 question={t.rfQuestion}
                 dragX={dragX}
                 swipeRatio={swipeRatio}
-                timerBar={<Box ref={barRef} sx={{ height: '100%', bgcolor: '#fff', opacity: secondsLeft <= 3 ? 0.45 : 1, transformOrigin: 'left center', transition: 'opacity 300ms ease' }} />}
+                timerBar={<Box ref={barRef} sx={{ height: '100%', bgcolor: urgency(secondsLeft), transformOrigin: 'left center' }} />}
                 secondsLeft={secondsLeft}
                 yesLabel={t.rfYes}
                 noLabel={t.rfNo}
@@ -264,11 +235,13 @@ const PlayStage: React.FC<PlayStageProps> = ({ phase, cards, index, rules, outco
                 left: '50%',
                 zIndex: 5,
                 pointerEvents: 'none',
-                whiteSpace: 'nowrap',
-                fontWeight: 800,
-                fontSize: feedback.points > 0 ? '1.8rem' : '1rem',
-                color: feedback.hasty ? 'rgba(255,255,255,0.6)' : feedback.points > 0 ? '#fff' : 'rgba(255,255,255,0.6)',
-                textShadow: '0 4px 16px rgba(0,0,0,0.35)',
+                // The "too fast" sentence is long, and longer in Sinhala and Tamil: it wraps rather than running off a phone.
+                width: 'max-content',
+                maxWidth: '90vw',
+                textAlign: 'center',
+                fontWeight: 700,
+                fontSize: feedback.points > 0 ? '1.75rem' : '1rem',
+                color: feedback.points > 0 && !feedback.hasty ? FOREST : TEXT_SOFT,
                 animation: `${floatUp} 900ms ease-out both`,
                 '@media (prefers-reduced-motion: reduce)': { animation: 'none', opacity: 0 },
               }}
@@ -281,23 +254,23 @@ const PlayStage: React.FC<PlayStageProps> = ({ phase, cards, index, rules, outco
 
       {/* Controls */}
       <Box sx={{ px: { xs: 2, sm: 3 }, pb: { xs: 'max(20px, env(safe-area-inset-bottom))', sm: 4 }, maxWidth: 560, width: '100%', mx: 'auto' }}>
-        <Stack direction="row" spacing={1.5}>
-          <AnswerButton variant="ghost" icon={<CloseRoundedIcon />} label={t.rfNo} hint="←" disabled={!card} onClick={() => answer('no')} />
-          <AnswerButton variant="solid" icon={<CheckRoundedIcon />} label={t.rfYes} hint="→" disabled={!card} onClick={() => answer('yes')} />
+        <Stack direction="row" spacing={1}>
+          <AnswerButton solid={false} icon={<CloseSharpIcon />} label={t.rfNo} hint="←" disabled={!card} onClick={() => answer('no')} />
+          <AnswerButton solid icon={<CheckSharpIcon />} label={t.rfYes} hint="→" disabled={!card} onClick={() => answer('yes')} />
         </Stack>
-        <Stack direction="row" sx={{ justifyContent: 'center', alignItems: 'center', mt: 1.25, minHeight: 40 }}>
+        <Stack direction="row" sx={{ justifyContent: 'center', alignItems: 'center', mt: 1, minHeight: 44 }}>
           <Button
             onClick={() => answer('unsure')}
             disabled={!card}
-            startIcon={<HelpOutlineRoundedIcon />}
-            sx={{ color: 'rgba(255,255,255,0.85)', boxShadow: 'none', fontWeight: 600, '&:hover': { bgcolor: 'rgba(255,255,255,0.08)', boxShadow: 'none', transform: 'none' }, '&.Mui-disabled': { color: 'rgba(255,255,255,0.35)' } }}
+            startIcon={<HelpOutlineSharpIcon />}
+            sx={{ minHeight: 44, color: TEXT_SOFT, '&:hover': { bgcolor: SURFACE_HOVER }, '&.Mui-disabled': { color: 'rgba(16,24,20,0.3)' } }}
           >
             {t.rfUnsure}
           </Button>
           {saving && (
-            <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', ml: 1.5, opacity: 0.7 }}>
-              <CircularProgress size={12} sx={{ color: '#fff' }} />
-              <Typography variant="caption" sx={{ color: 'inherit' }}>{t.rfSaving}</Typography>
+            <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', ml: 1.5 }}>
+              <CircularProgress size={12} />
+              <Typography sx={{ color: TEXT_SOFT, fontSize: '0.75rem' }}>{t.rfSaving}</Typography>
             </Stack>
           )}
         </Stack>
@@ -324,6 +297,7 @@ const QuestionCard: React.FC<{
   const name = localName(card, language);
   const context = language === 'si' ? card.context_si || card.context_en : language === 'ta' ? card.context_ta || card.context_en : card.context_en;
   const exitAnimation = exit === 'right' ? exitRight : exit === 'left' ? exitLeft : exitDown;
+  const { Icon } = getCategoryVisual({ slug: card.deck_slug, nameEn: card.deck_name_en });
 
   return (
     <Box
@@ -331,19 +305,18 @@ const QuestionCard: React.FC<{
         position: exit ? 'absolute' : 'relative',
         inset: exit ? 0 : undefined,
         zIndex: exit ? 3 : 2,
-        borderRadius: '28px',
         bgcolor: '#fff',
-        color: '#0f172a',
+        border: `1px solid ${TEXT}`,
+        color: TEXT,
         overflow: 'hidden',
-        boxShadow: '0 30px 60px rgba(2,8,23,0.45)',
         pointerEvents: exit ? 'none' : 'auto',
         ...(exit
-          ? { animation: `${exitAnimation} ${EXIT_MS}ms cubic-bezier(.5,0,.75,0) forwards` }
-          : { transform: `translateX(${dragX}px) rotate(${dragX / 22}deg)`, transition: dragX === 0 ? 'transform 200ms ease' : 'none' }),
+          ? { animation: `${exitAnimation} ${EXIT_MS}ms ease-in forwards` }
+          : { transform: `translateX(${dragX}px)`, transition: dragX === 0 ? 'transform 160ms ease' : 'none' }),
         '@media (prefers-reduced-motion: reduce)': { transition: 'none', animation: 'none', ...(exit ? { opacity: 0 } : {}) },
       }}
     >
-      <Box sx={{ height: 6, bgcolor: 'rgba(15,23,42,0.08)' }}>{timerBar}</Box>
+      <Box sx={{ height: 6, bgcolor: LINE }}>{timerBar}</Box>
 
       {/* Swipe stamps */}
       {!exit && (
@@ -353,40 +326,35 @@ const QuestionCard: React.FC<{
         </>
       )}
 
-      <Box sx={{ p: { xs: 3, sm: 4 }, minHeight: { xs: 290, sm: 320 }, display: 'flex', flexDirection: 'column' }}>
-        <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-          <Stack direction="row" spacing={1} sx={{ alignItems: 'center', px: 1.25, py: 0.6, borderRadius: 999, bgcolor: ink[100], color: ink[600], maxWidth: '75%' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}><CardIcon card={card} /></Box>
-            <Typography sx={{ color: 'inherit', fontSize: '0.78rem', fontWeight: 700 }} noWrap>
+      <Box sx={{ p: { xs: 2.5, sm: 4 }, minHeight: { xs: 290, sm: 320 }, display: 'flex', flexDirection: 'column', ...shortScreen({ minHeight: 200, p: 2 }) }}>
+        <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', gap: 1.5, mb: 3 }}>
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center', minWidth: 0, color: TEXT_SOFT }}>
+            <Icon sx={{ fontSize: 18 }} />
+            <Typography sx={{ color: 'inherit', fontSize: '0.8125rem', fontWeight: 600 }} noWrap>
               {card.deck_name_en}
             </Typography>
           </Stack>
           {secondsLeft !== undefined && (
-            <Typography sx={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: secondsLeft <= 3 ? ink[400] : ink[300], opacity: secondsLeft <= 3 ? 1 : 0.8 }} aria-live="off">
-              {secondsLeft}s
+            <Typography aria-hidden sx={{ flexShrink: 0, fontWeight: 700, fontSize: '1.25rem', lineHeight: 1, color: secondsLeft <= 5 ? urgency(secondsLeft) : TEXT, fontVariantNumeric: 'tabular-nums' }}>
+              {secondsLeft}
             </Typography>
           )}
         </Stack>
 
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center' }}>
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           {context && (
-            <Typography sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.9rem', mb: 1 }} noWrap>
+            <Typography sx={{ color: TEXT_SOFT, fontWeight: 500, fontSize: '0.875rem', mb: 1 }} noWrap>
               {context}
             </Typography>
           )}
-          <Typography component="h2" sx={{ fontWeight: 800, fontSize: { xs: '1.9rem', sm: '2.3rem' }, letterSpacing: '-0.03em', lineHeight: 1.12, wordBreak: 'break-word' }}>
+          <Typography component="h2" sx={{ color: TEXT, fontWeight: 700, fontSize: { xs: '1.875rem', sm: '2.25rem' }, letterSpacing: language === 'en' ? '-0.02em' : 0, lineHeight: language === 'en' ? 1.15 : 1.3, wordBreak: 'break-word' }}>
             {name}
           </Typography>
-          <Typography sx={{ mt: 2.5, fontWeight: 600, fontSize: '1.05rem', color: ink[500] }}>{fill(question, { village: villageName })}</Typography>
+          <Typography sx={{ mt: 2, fontWeight: 500, fontSize: '1rem', color: TEXT_SOFT }}>{fill(question, { village: villageName })}</Typography>
         </Box>
       </Box>
     </Box>
   );
-};
-
-const CardIcon: React.FC<{ card: RapidFireCard }> = ({ card }) => {
-  const { Icon } = getCategoryVisual({ slug: card.deck_slug, nameEn: card.deck_name_en });
-  return <Icon sx={{ fontSize: 18, color: ink[600] }} />;
 };
 
 const Stamp: React.FC<{ label: string; side: 'left' | 'right'; opacity: number }> = ({ label, side, opacity }) => (
@@ -394,19 +362,16 @@ const Stamp: React.FC<{ label: string; side: 'left' | 'right'; opacity: number }
     aria-hidden
     sx={{
       position: 'absolute',
-      top: 28,
+      top: 24,
       [side]: 20,
       zIndex: 4,
       px: 1.5,
       py: 0.5,
-      border: `3px solid ${ink[900]}`,
-      borderRadius: '10px',
-      color: ink[900],
-      fontWeight: 900,
-      fontSize: '1.4rem',
-      letterSpacing: '0.06em',
-      textTransform: 'uppercase',
-      transform: `rotate(${side === 'left' ? -12 : 12}deg)`,
+      border: `2px solid ${side === 'left' ? FOREST : TEXT}`,
+      bgcolor: '#fff',
+      color: side === 'left' ? FOREST : TEXT,
+      fontWeight: 700,
+      fontSize: '1.25rem',
       opacity,
       pointerEvents: 'none',
     }}
@@ -415,42 +380,31 @@ const Stamp: React.FC<{ label: string; side: 'left' | 'right'; opacity: number }
   </Box>
 );
 
-const AnswerButton: React.FC<{ variant: 'solid' | 'ghost'; icon: React.ReactNode; label: string; hint: string; disabled: boolean; onClick: () => void }> = ({ variant, icon, label, hint, disabled, onClick }) => {
-  const solid = variant === 'solid';
-  return (
-    <Button
-      onClick={onClick}
-      disabled={disabled}
-      startIcon={icon}
-      fullWidth
-      sx={{
-        py: { xs: 1.75, sm: 2 },
-        borderRadius: '18px',
-        fontSize: '1.15rem',
-        fontWeight: 800,
-        color: solid ? ink[900] : '#fff',
-        bgcolor: solid ? '#fff' : 'rgba(255,255,255,0.1)',
-        border: solid ? 'none' : '1px solid rgba(255,255,255,0.2)',
-        boxShadow: solid ? '0 8px 20px rgba(0,0,0,0.25)' : 'none',
-        '& .MuiButton-startIcon svg': { fontSize: 26 },
-        '&:hover': {
-          bgcolor: solid ? ink[50] : 'rgba(255,255,255,0.16)',
-          boxShadow: solid ? '0 12px 28px rgba(0,0,0,0.3)' : 'none',
-          transform: 'translateY(-1px)',
-        },
-        '&:active': { transform: 'scale(0.97)' },
-        '&.Mui-disabled': { bgcolor: 'rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.4)', boxShadow: 'none', border: 'none' },
-        '&:focus-visible': { outline: '3px solid #fff', outlineOffset: 3 },
-        '@media (prefers-reduced-motion: reduce)': { '&:hover, &:active': { transform: 'none' } },
-      }}
-    >
-      {label}
-      <Box component="kbd" sx={{ ml: 1, display: { xs: 'none', md: 'inline' }, fontFamily: 'inherit', fontSize: '0.8rem', opacity: 0.7 }}>
-        {hint}
-      </Box>
-    </Button>
-  );
-};
+const AnswerButton: React.FC<{ solid: boolean; icon: React.ReactNode; label: string; hint: string; disabled: boolean; onClick: () => void }> = ({ solid, icon, label, hint, disabled, onClick }) => (
+  <Button
+    onClick={onClick}
+    disabled={disabled}
+    startIcon={icon}
+    fullWidth
+    sx={{
+      minHeight: 64,
+      fontSize: '1.125rem',
+      fontWeight: 700,
+      color: solid ? '#fff' : TEXT,
+      bgcolor: solid ? FOREST : '#fff',
+      border: `1px solid ${solid ? FOREST : TEXT}`,
+      '& .MuiButton-startIcon svg': { fontSize: 24 },
+      '&:hover': { bgcolor: solid ? FOREST_DEEP : '#fff', borderColor: solid ? FOREST_DEEP : TEXT },
+      '&.Mui-disabled': { bgcolor: 'rgba(16,24,20,0.06)', color: 'rgba(16,24,20,0.45)', border: `1px solid ${LINE}` },
+      '&:focus-visible': { outline: `2px solid ${TEXT}`, outlineOffset: 2 },
+    }}
+  >
+    {label}
+    <Box component="kbd" sx={{ ml: 1, display: { xs: 'none', md: 'inline' }, fontFamily: 'inherit', fontSize: '0.8125rem', fontWeight: 400 }}>
+      {hint}
+    </Box>
+  </Button>
+);
 
 const Countdown: React.FC<{ onDone: () => void; goLabel: string }> = ({ onDone, goLabel }) => {
   const steps = ['3', '2', '1', goLabel];
@@ -471,18 +425,7 @@ const Countdown: React.FC<{ onDone: () => void; goLabel: string }> = ({ onDone, 
   if (step >= steps.length) return null;
   return (
     <Box sx={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center' }} role="status" aria-live="assertive">
-      <Typography
-        key={step}
-        sx={{
-          fontWeight: 900,
-          fontSize: step === steps.length - 1 ? { xs: '4rem', sm: '5rem' } : { xs: '7rem', sm: '9rem' },
-          lineHeight: 1,
-          color: '#fff',
-          textShadow: '0 12px 40px rgba(0,0,0,0.35)',
-          animation: `${popIn} 650ms ease-out both`,
-          '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
-        }}
-      >
+      <Typography sx={{ color: TEXT, fontWeight: 700, fontSize: step === steps.length - 1 ? { xs: '3.5rem', sm: '4.5rem' } : { xs: '6rem', sm: '8rem' }, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
         {steps[step]}
       </Typography>
     </Box>

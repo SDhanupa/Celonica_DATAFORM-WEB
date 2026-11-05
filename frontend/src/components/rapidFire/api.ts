@@ -104,7 +104,6 @@ const request = async <T>(getToken: TokenSource, path: string, init: RequestInit
   if (signal) signal.addEventListener('abort', onExternalAbort, { once: true });
 
   try {
-    console.log('[RapidFire] fetch ->', init.method ?? 'GET', path);
     const res = await fetch(`/api/rapid-fire${path}`, {
       ...init,
       signal: timeoutCtrl.signal,
@@ -115,7 +114,6 @@ const request = async <T>(getToken: TokenSource, path: string, init: RequestInit
       },
     });
     const body = await res.json().catch(() => null);
-    console.log('[RapidFire] response', res.status, path, body?.success ?? body?.message);
     if (!res.ok || !body?.success) {
       const first = body?.errors && Object.values(body.errors)[0];
       throw new ApiError((Array.isArray(first) && first[0]) || body?.message || `Request failed (${res.status})`, res.status);

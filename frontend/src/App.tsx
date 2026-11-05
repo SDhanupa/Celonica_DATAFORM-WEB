@@ -22,6 +22,7 @@ const UserPage = React.lazy(() => import('./pages/UserPage'));
 const MyContributionsPage = React.lazy(() => import('./pages/MyContributionsPage'));
 const RapidFirePage = React.lazy(() => import('./pages/RapidFirePage'));
 const MyDashboard = React.lazy(() => import('./pages/MyDashboard'));
+const UserCategoryPage = React.lazy(() => import('./pages/UserCategoryPage'));
 const UsersPage = React.lazy(() => import('./pages/PlaceholderPages').then((m) => ({ default: m.UsersPage })));
 const ReportsPage = React.lazy(() => import('./pages/PlaceholderPages').then((m) => ({ default: m.ReportsPage })));
 const RegistrationPage = React.lazy(() => import('./pages/RegistrationPage'));
@@ -85,49 +86,21 @@ const App: React.FC = () => {
                 path="/gnpage/:gnName/:ccode/:categorySlug"
                 element={<CategoryDetailPage />}
               />
+              {/* Contributor dashboard — one guard and one shell for every page in it */}
+              <Route
+                element={
+                  <ProtectedRoute>
+                    <UserShell />
+                  </ProtectedRoute>
+                }
+              >
+                <Route path="/mydashboard" element={<MyDashboard />} />
+                <Route path="/user" element={<UserPage />} />
+                <Route path="/user/rapid-fire" element={<RapidFirePage />} />
+                <Route path="/user/contributions" element={<MyContributionsPage />} />
+                <Route path="/user/categories/*" element={<UserCategoryPage />} />
+              </Route>
               {/* Protected — wrapped in AdminLayout */}
-              <Route
-                path="/user"
-                element={
-                  <ProtectedRoute>
-                    <UserPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/user/rapid-fire"
-                element={
-                  <ProtectedRoute>
-                    <RapidFirePage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/mydashboard"
-                element={
-                  <ProtectedRoute>
-                    <UserShell>
-                      <MyDashboard />
-                    </UserShell>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/user/contributions"
-                element={
-                  <ProtectedRoute>
-                    <MyContributionsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/user/categories/*"
-                element={
-                  <ProtectedRoute>
-                    <DynamicCategoryWrapper />
-                  </ProtectedRoute>
-                }
-              />
               <Route
                 path="/admins"
                 element={

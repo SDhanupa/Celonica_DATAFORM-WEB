@@ -640,13 +640,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         PaperProps={{
           ref: fitLocationPaper,
           sx: {
-            borderRadius: '24px',
-            minWidth: { xs: '90%', sm: 420 },
             position: 'relative',
-            overflow: 'visible',
-            background: isDarkMode
-              ? 'linear-gradient(160deg, #1a1c2e 0%, #2a2c40 100%)'
-              : 'linear-gradient(160deg, #ffffff 0%, #f0f4ff 100%)',
             ...locationPaperSx,
           }
         }}
@@ -1128,7 +1122,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                   </>
                 ) : !isLoading ? (
                   <>
-                    <Button onClick={() => login(window.location.href)} disableRipple sx={{ ...navPillSx, color: inkSoft }}>
+                    <Button onClick={() => login(`${window.location.origin}/mydashboard`)} disableRipple sx={{ ...navPillSx, color: inkSoft }}>
                       Login
                     </Button>
                     <Button
@@ -1164,7 +1158,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
                 isDarkMode={isDarkMode}
                 onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
                 isAuthenticated={isAuthenticated}
-                onLoginClick={() => (isAuthenticated ? navigate('/profile') : login())}
+                onLoginClick={() => (isAuthenticated ? navigate('/mydashboard') : login(`${window.location.origin}/mydashboard`))}
                 onSelectCategory={openCategory}
               />
             </Box>

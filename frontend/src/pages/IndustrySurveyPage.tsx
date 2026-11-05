@@ -6,7 +6,8 @@ import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import DeleteIcon from '@mui/icons-material/Delete';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import { Tooltip, IconButton } from '@mui/material';
+import { Tooltip, IconButton, ButtonBase } from '@mui/material';
+import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
 import { useAuth } from '../auth/AuthProvider';
 import { useLanguage } from '../context/LanguageContext';
 import { useQuery, useLazyQuery } from '@apollo/client';
@@ -89,7 +90,7 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({ fieldKey, value, multiple
           component="label"
           variant="outlined"
           startIcon={<FolderOpenIcon />}
-          sx={{ borderRadius: 3, textTransform: 'none', fontWeight: 600 }}
+          sx={{ borderRadius: 0, textTransform: 'none', fontWeight: 600 }}
         >
           {language === 'si' ? 'ගැලරිය / ෆයිල්' : language === 'ta' ? 'கோப்பு / கேலரி' : 'Gallery / Drive'}
           <input
@@ -107,7 +108,7 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({ fieldKey, value, multiple
           variant="contained"
           color="secondary"
           startIcon={<CameraAltIcon />}
-          sx={{ borderRadius: 3, textTransform: 'none', fontWeight: 600 }}
+          sx={{ borderRadius: 0, textTransform: 'none', fontWeight: 600 }}
         >
           {language === 'si' ? 'කැමරාවෙන් ගන්න' : language === 'ta' ? 'புகைப்படம் எடு' : 'Take Photo'}
           <input
@@ -137,7 +138,7 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({ fieldKey, value, multiple
                 sx={{
                   width: 90, height: 90,
                   objectFit: 'cover',
-                  borderRadius: 2,
+                  borderRadius: 0,
                   border: '2px solid',
                   borderColor: 'primary.main',
                   boxShadow: 2,
@@ -251,12 +252,95 @@ const DynamicQuestionRenderer: React.FC<DynamicQuestionRendererProps> = ({ quest
       }
     >
       {question.explanation_image_url ? (
-        <Box sx={{ mb: 2, borderRadius: 2, overflow: 'hidden', border: '1px solid', borderColor: 'divider', bgcolor: 'grey.50', display: 'flex', justifyContent: 'center', p: 1 }}>
-          <img src={question.explanation_image_url} alt="Example" style={{ maxWidth: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 4 }} />
+        <Box sx={{ mb: 2, borderRadius: 0, overflow: 'hidden', border: '1px solid', borderColor: 'divider', bgcolor: 'grey.50', display: 'flex', justifyContent: 'center', p: 1 }}>
+          <img src={question.explanation_image_url} alt="Example" style={{ maxWidth: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 0 }} />
         </Box>
       ) : null}
       {renderInput()}
     </QuestionField>
+  );
+};
+// ── Dynamic Island — floating location pill ──────────────────────────────────
+const ISLAND_EASE = '280ms cubic-bezier(.32,.72,0,1)';
+
+const LocationIsland: React.FC<{ name: string; detail?: string }> = ({ name, detail }) => {
+  const [open, setOpen] = React.useState(false);
+  const expanded = open && !!detail;
+
+  return (
+    /* In the page flow, so it sits below the navbar; it only pins once the navbar has scrolled away. */
+    <Box
+      sx={{
+        position: 'sticky',
+        top: 'calc(8px + env(safe-area-inset-top, 0px))',
+        zIndex: 20,
+        display: 'flex',
+        justifyContent: 'center',
+        mb: { xs: 2, sm: 3 },
+        pointerEvents: 'none',
+      }}
+    >
+      <ButtonBase
+        onClick={() => setOpen(o => !o)}
+        disabled={!detail}
+        aria-expanded={detail ? expanded : undefined}
+        aria-label={detail ? `${name}, ${detail}` : name}
+        sx={{
+          pointerEvents: 'auto',
+          maxWidth: '100%',
+          minHeight: 44,
+          px: 2,
+          py: 0.75,
+          gap: 1,
+          justifyContent: 'flex-start',
+          textAlign: 'left',
+          fontFamily: 'inherit',
+          color: T.ink,
+          bgcolor: T.surface,
+          border: `1px solid ${T.line}`,
+          borderRadius: '22px',
+          boxShadow: '0 1px 2px rgba(15,23,42,0.06), 0 6px 20px rgba(15,23,42,0.10)',
+          animation: 'sk-rise .3s ease both',
+          WebkitTapHighlightColor: 'transparent',
+          '&:focus-visible': { outline: `2px solid ${T.brand}`, outlineOffset: 2 },
+        }}
+      >
+        <PlaceOutlinedIcon sx={{ fontSize: '1.15rem', flexShrink: 0, color: T.brand }} />
+        <Box component="span" sx={{ display: 'block', minWidth: 0 }}>
+          <Typography component="span" noWrap sx={{ display: 'block', fontSize: '0.875rem', fontWeight: 700, lineHeight: 1.3 }}>
+            {name}
+          </Typography>
+          {/* Fractional tracks animate both axes without measuring the text. */}
+          <Box
+            component="span"
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: expanded ? '1fr' : '0fr',
+              gridTemplateRows: expanded ? '1fr' : '0fr',
+              transition: `grid-template-columns ${ISLAND_EASE}, grid-template-rows ${ISLAND_EASE}`,
+              '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
+            }}
+          >
+            <Box component="span" sx={{ display: 'block', minWidth: 0, minHeight: 0, overflow: 'hidden' }}>
+              <Typography component="span" noWrap sx={{ display: 'block', fontSize: '0.75rem', color: T.muted, lineHeight: 1.4 }}>
+                {detail}
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+        {detail && (
+          <ExpandMoreRoundedIcon
+            sx={{
+              fontSize: '1.15rem',
+              flexShrink: 0,
+              color: T.muted,
+              transform: expanded ? 'rotate(180deg)' : 'none',
+              transition: `transform ${ISLAND_EASE}`,
+            }}
+          />
+        )}
+      </ButtonBase>
+    </Box>
   );
 };
 // ────────────────────────────────────────────────────────────────────────────
@@ -815,40 +899,60 @@ const IndustrySurveyPage: React.FC = () => {
      the same system as the form card rather than default MUI paper. */
   const dialogPaperProps = {
     sx: {
-      borderRadius: `${T.radius}px`,
-      border: `1px solid ${T.line}`,
-      boxShadow: '0 24px 64px rgba(15,23,42,0.18)',
+      borderRadius: 0,
+      border: '2px solid #0f172a',
+      /* Hard offset shadow — the Gen Z editorial card signature. */
+      boxShadow: '0 4px 6px -1px rgba(15,23,42,0.08), 0 10px 32px rgba(15,23,42,0.10)',
+      bgcolor: '#fff',
 
-      /* Phones: near-full-bleed with a small inset, and `dvh` so the sheet is
-         not cut off by mobile browser chrome. */
       m: { xs: 1.5, sm: 4 },
       width: { xs: 'calc(100% - 24px)', sm: 'auto' },
       maxWidth: { xs: 'calc(100% - 24px)', sm: undefined },
       maxHeight: { xs: 'calc(100dvh - 24px)', sm: 'calc(100% - 64px)' },
 
       '& .MuiDialogTitle-root': {
-        fontWeight: 800, color: T.ink, letterSpacing: '-0.01em',
-        fontSize: { xs: '1.05rem', sm: '1.25rem' },
+        fontWeight: 900,
+        color: '#0f172a',
+        letterSpacing: '-0.025em',
+        fontSize: { xs: '1.1rem', sm: '1.3rem' },
         px: { xs: 2, sm: 3 },
+        pt: { xs: 2.5, sm: 3 },
+        pb: 1.5,
+        borderBottom: '1px solid #e2e8f0',
       },
       '& .MuiDialogContent-root': { px: { xs: 2, sm: 3 } },
 
-      /* Actions stack on phones so each button keeps a full-width, 48px target
-         instead of three cramped buttons fighting for one row. */
       '& .MuiDialogActions-root': {
         flexDirection: { xs: 'column-reverse', sm: 'row' },
         alignItems: { xs: 'stretch', sm: 'center' },
         gap: 1,
         px: { xs: 2, sm: 3 },
-        pb: { xs: 'calc(16px + env(safe-area-inset-bottom, 0px))', sm: 2 },
+        pb: { xs: 'calc(16px + env(safe-area-inset-bottom, 0px))', sm: 2.5 },
         '& > :not(style) ~ :not(style)': { ml: { xs: 0, sm: 1 } },
       },
+
+      /* All dialog buttons use B&W regardless of the `color` prop. */
       '& .MuiButton-root': {
-        borderRadius: `${T.field}px`, textTransform: 'none', fontWeight: 700,
+        borderRadius: 0, textTransform: 'none', fontWeight: 700,
+        letterSpacing: '-0.01em',
         minHeight: { xs: 48, sm: 40 },
         width: { xs: '100%', sm: 'auto' },
+        boxShadow: 'none',
+        transition: 'background 120ms ease, box-shadow 120ms ease',
       },
-      '& .MuiOutlinedInput-root': { borderRadius: `${T.field}px` },
+      '& .MuiButton-contained, & .MuiButton-containedPrimary, & .MuiButton-containedSuccess, & .MuiButton-containedWarning, & .MuiButton-containedError, & .MuiButton-containedInfo': {
+        bgcolor: '#0f172a', color: '#fff',
+        '&:hover': { bgcolor: '#1e293b', boxShadow: 'none' },
+        '&:active': { bgcolor: '#334155' },
+        '&.Mui-disabled': { bgcolor: '#94a3b8', color: '#fff' },
+      },
+      '& .MuiButton-outlined, & .MuiButton-outlinedPrimary, & .MuiButton-outlinedError, & .MuiButton-outlinedWarning': {
+        border: '1.5px solid #0f172a', color: '#0f172a', bgcolor: 'transparent',
+        '&:hover': { bgcolor: 'rgba(15,23,42,0.04)', borderColor: '#0f172a' },
+        '&:active': { bgcolor: 'rgba(15,23,42,0.08)' },
+      },
+      '& .MuiButton-text': { color: '#0f172a' },
+      '& .MuiOutlinedInput-root': { borderRadius: 0 },
     },
   };
 
@@ -909,10 +1013,8 @@ const IndustrySurveyPage: React.FC = () => {
             borderRadius: `${T.field}px`, textTransform: 'none',
             fontWeight: 800, fontSize: { xs: '0.92rem', sm: '0.95rem' },
             px: { xs: 1.5, sm: 2 },
-            background: submit
-              ? `linear-gradient(135deg, ${T.accent} 0%, #047857 100%)`
-              : `linear-gradient(135deg, ${T.brand} 0%, ${T.brandDark} 100%)`,
-            boxShadow: submit ? '0 8px 20px rgba(5,150,105,0.28)' : '0 8px 20px rgba(37,99,235,0.26)',
+            bgcolor: submit ? T.accent : T.brand,
+            boxShadow: 'none',
             WebkitTapHighlightColor: 'transparent',
             '& .MuiButton-label, & span': { minWidth: 0 },
             '&:active': { filter: 'brightness(0.96)' },
@@ -940,11 +1042,8 @@ const IndustrySurveyPage: React.FC = () => {
       </Button>
 
       <Dialog PaperProps={dialogPaperProps} open={duplicatePromptOpen} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <CheckCircleRoundedIcon color="primary" />
-          <Typography variant="h6" fontWeight="bold">
-            {language === 'si' ? 'ඔබට දැනටමත් ගිණුමක් ඇත' : 'You Already Have a Submission'}
-          </Typography>
+        <DialogTitle>
+          {language === 'si' ? 'ඔබට දැනටමත් ගිණුමක් ඇත' : 'You Already Have a Submission'}
         </DialogTitle>
         <DialogContent dividers>
           <Typography variant="body1">
@@ -975,11 +1074,8 @@ const IndustrySurveyPage: React.FC = () => {
       </Dialog>
 
       <Dialog PaperProps={dialogPaperProps} open={otpRequiredAlertOpen} maxWidth="xs" fullWidth>
-        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'warning.main' }}>
-          <ErrorOutlineRoundedIcon />
-          <Typography variant="h6" fontWeight="bold">
-            {language === 'si' ? 'අවධානයයි' : 'Attention'}
-          </Typography>
+        <DialogTitle>
+          {language === 'si' ? 'අවධානයයි' : 'Attention'}
         </DialogTitle>
         <DialogContent dividers>
           <Typography variant="body1">
@@ -1159,6 +1255,10 @@ const IndustrySurveyPage: React.FC = () => {
   const mockDs = gnData?.gnByCcode ? [{ divisionalSecretariatCode: 'mock-ds', dsEn: gnData.gnByCcode.dsEn }] : [];
   const mockGns = gnData?.gnByCcode ? [{ id: ccode, CCODE: ccode, nameEn: gnData.gnByCcode.nameEn }] : [];
 
+  const gn = gnData?.gnByCcode;
+  const islandName = (language === 'si' ? gn?.nameSi : language === 'ta' ? gn?.nameTa : null) || gn?.nameEn || gnName?.replace(/-/g, ' ');
+  const islandDetail = [(language === 'si' ? gn?.dsSi : language === 'ta' ? gn?.dsTa : null) || gn?.dsEn, gn?.disEn].filter(Boolean).join(' · ') || undefined;
+
   return (
     <Box>
       <GnTopHeaderBar
@@ -1181,10 +1281,13 @@ const IndustrySurveyPage: React.FC = () => {
             /* Clear the gesture-nav home indicator on phones. */
             pb: { xs: 'calc(24px + env(safe-area-inset-bottom, 0px))', sm: 5 },
             /* Nothing inside the survey may widen the page. */
-            overflowX: 'hidden',
+            /* clip, not hidden: hidden would make this a scroll container and stop the island sticking. */
+            overflowX: 'clip',
           }}
         >
           <Container maxWidth="md" sx={{ px: { xs: 1.5, sm: 3 }, minWidth: 0 }}>
+
+            {islandName && <LocationIsland name={islandName} detail={islandDetail} />}
 
             {/* Intro */}
             <Box sx={{ textAlign: 'center', mb: { xs: 2.5, sm: 3.5 }, animation: 'sk-rise .4s ease both' }}>
@@ -1267,21 +1370,20 @@ const IndustrySurveyPage: React.FC = () => {
 
                   {formValues['b_reg_no'] && (
                     <Box sx={{
-                      bgcolor: 'success.50',
+                      bgcolor: T.accentSoft,
                       p: 2,
-                      borderRadius: 2,
-                      border: '1px dashed',
-                      borderColor: 'success.main',
+                      borderRadius: 0,
+                      border: `1px solid ${T.accent}`,
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: 'center',
                       justifyContent: 'center',
                       mb: 2
                     }}>
-                      <Typography variant="subtitle2" color="success.main" gutterBottom>
+                      <Typography variant="subtitle2" sx={{ color: T.accent }} gutterBottom>
                         {language === 'si' ? 'ඔබගේ ලියාපදිංචි අංකය' : 'Your Registration Number'}
                       </Typography>
-                      <Typography variant="h4" fontWeight="bold" color="success.dark" sx={{ letterSpacing: 2 }}>
+                      <Typography variant="h4" fontWeight="bold" sx={{ color: T.ink, letterSpacing: 2 }}>
                         {formValues['b_reg_no']}
                       </Typography>
                     </Box>
@@ -1698,8 +1800,8 @@ const IndustrySurveyPage: React.FC = () => {
 
       {/* GPS Confirmation Popup */}
       <Dialog PaperProps={dialogPaperProps} open={showGpsPopup} onClose={() => { }}>
-        <DialogTitle sx={{ fontWeight: 'bold', color: 'primary.main', display: 'flex', alignItems: 'center', gap: 1 }}>
-          📍 {language === 'si' ? 'භූගෝලීය ඛණ්ඩාංක (GPS)' : language === 'ta' ? 'புவியியல் ஆயத்தொலைவுகள் (GPS)' : 'GPS Coordinates'}
+        <DialogTitle>
+          {language === 'si' ? 'භූගෝලීය ඛණ්ඩාංක (GPS)' : language === 'ta' ? 'புவியியல் ஆயத்தொலைவுகள் (GPS)' : 'GPS Coordinates'}
         </DialogTitle>
         <DialogContent>
           <Typography variant="body1" sx={{ mb: 2 }}>
@@ -1708,8 +1810,8 @@ const IndustrySurveyPage: React.FC = () => {
               : 'Are you currently at the correct survey location? (If Yes, location will be recorded automatically)'}
           </Typography>
           {gnData?.gnByCcode && (
-            <Box sx={{ bgcolor: 'primary.50', border: '1px solid', borderColor: 'primary.200', borderRadius: 2, p: 1.5 }}>
-              <Typography variant="caption" color="primary.main" fontWeight={700}>
+            <Box sx={{ bgcolor: '#f8fafc', borderLeft: '1px solid #0f172a', pl: 1.5, pr: 1.5, py: 1.25 }}>
+              <Typography variant="caption" sx={{ color: '#0f172a', fontWeight: 700 }}>
                 {language === 'si' ? 'සමීක්ෂණ ස්ථානය:' : 'Survey Location:'}
               </Typography>
               <Typography variant="body2" fontWeight={600}>{gnData.gnByCcode.nameEn}</Typography>
@@ -1824,8 +1926,8 @@ const IndustrySurveyPage: React.FC = () => {
 
       {/* Wrong Location Warning Popup */}
       <Dialog PaperProps={dialogPaperProps} open={!!gpsWrongLocationPopup} onClose={() => { }} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ fontWeight: 'bold', color: 'warning.dark', display: 'flex', alignItems: 'center', gap: 1 }}>
-          ⚠️ {language === 'si' ? 'ස්ථානය නිවැරදි නොවේ' : language === 'ta' ? 'தவறான இடம்' : 'Wrong Location'}
+        <DialogTitle>
+          {language === 'si' ? 'ස්ථානය නිවැරදි නොවේ' : language === 'ta' ? 'தவறான இடம்' : 'Wrong Location'}
         </DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -1837,8 +1939,8 @@ const IndustrySurveyPage: React.FC = () => {
                   : 'You are not currently in the correct survey location (GN Division). Please fill the survey from the correct location.'}
             </Typography>
             {gpsWrongLocationPopup && (
-              <Box sx={{ bgcolor: 'warning.50', border: '1px solid', borderColor: 'warning.300', borderRadius: 2, p: 1.5 }}>
-                <Typography variant="caption" color="warning.dark" fontWeight={700} display="block">
+              <Box sx={{ bgcolor: '#f8fafc', borderLeft: '1px solid #0f172a', pl: 1.5, pr: 1.5, py: 1.25 }}>
+                <Typography variant="caption" sx={{ color: '#0f172a', fontWeight: 700, display: 'block' }}>
                   {language === 'si' ? 'ඔබගේ වර්තමාන ස්ථානය:' : 'Your current location:'}
                 </Typography>
                 <Typography variant="body2" fontFamily="monospace">
@@ -1852,8 +1954,8 @@ const IndustrySurveyPage: React.FC = () => {
                 )}
               </Box>
             )}
-            <Box sx={{ bgcolor: 'info.50', border: '1px solid', borderColor: 'info.200', borderRadius: 2, p: 1.5 }}>
-              <Typography variant="body2" color="info.dark">
+            <Box sx={{ bgcolor: '#f8fafc', borderLeft: '1px solid #64748b', pl: 1.5, pr: 1.5, py: 1.25 }}>
+              <Typography variant="body2" sx={{ color: '#475569' }}>
                 {language === 'si'
                   ? '"දිගටම" ක්ලික් කළ හොත්, ඔබේ ස්ථාන තොරතුරු සුරකිනු නොලැබේ, නමුත් අනෙකුත් සමීක්ෂණ දත්ත සුරකිනු ලැබේ.'
                   : language === 'ta'
@@ -1872,7 +1974,7 @@ const IndustrySurveyPage: React.FC = () => {
               setShowGpsPopup(true);
             }}
           >
-            🔄 {language === 'si' ? 'නැවත උත්සාහ කරන්න' : language === 'ta' ? 'மீண்டும் முயற்சிக்கவும்' : 'Try Again'}
+            {language === 'si' ? 'නැවත උත්සාහ කරන්න' : language === 'ta' ? 'மீண்டும் முயற்சிக்கவும்' : 'Try Again'}
           </Button>
           <Button
             variant="contained"
@@ -1891,10 +1993,10 @@ const IndustrySurveyPage: React.FC = () => {
 
       {/* Save Draft Success Dialog */}
       <Dialog PaperProps={dialogPaperProps} open={saveDraftDialogOpen} onClose={() => setSaveDraftDialogOpen(false)} maxWidth="xs" fullWidth>
-        <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold', color: 'success.main', pt: 3 }}>
+        <DialogTitle>
           {language === 'si' ? 'ෆෝරමය සේව් කෙරිණ!' : language === 'ta' ? 'படிவம் சேமிக்கப்பட்டது!' : 'Progress Saved!'}
         </DialogTitle>
-        <DialogContent sx={{ textAlign: 'center', pb: 1 }}>
+        <DialogContent sx={{ pb: 1 }}>
           <Typography variant="body1" sx={{ mb: 1 }}>
             {language === 'si'
               ? 'ඔබගේ තොරතුරු සාර්ථකව සේව් කෙරිණ. ඔබ ඊළඟ වර ෆෝරමය විවෘත කළ විට, ඔබ නතර කළ තැනින් නැවත ආරම්භ වේ.'
@@ -1911,19 +2013,19 @@ const IndustrySurveyPage: React.FC = () => {
             variant="contained"
             color="primary"
             fullWidth
-            sx={{ borderRadius: '20px', py: 1.5, fontWeight: 'bold' }}
+            sx={{ borderRadius: 0, py: 1.5, fontWeight: 'bold' }}
             onClick={() => {
               setSaveDraftDialogOpen(false);
               const lastGnUrl = localStorage.getItem('last_gn_url');
               navigate(lastGnUrl || '/');
             }}
           >
-            🏠 {language === 'si' ? 'ප්‍රධාන පිටුවට යන්න' : language === 'ta' ? 'முகப்பு பக்கத்திற்கு செல்லவும்' : 'Go to Home Page'}
+            {language === 'si' ? 'ප්‍රධාන පිටුවට යන්න' : language === 'ta' ? 'முகப்பு பக்கத்திற்கு செல்லவும்' : 'Go to Home Page'}
           </Button>
           <Button
             variant="outlined"
             fullWidth
-            sx={{ borderRadius: '20px', py: 1, fontWeight: 'bold' }}
+            sx={{ borderRadius: 0, py: 1, fontWeight: 'bold' }}
             onClick={() => setSaveDraftDialogOpen(false)}
           >
             {language === 'si' ? 'ෆෝරමය දිගටම කරන්න' : language === 'ta' ? 'படிவத்தை தொடரவும்' : 'Continue Filling Form'}
@@ -1933,7 +2035,7 @@ const IndustrySurveyPage: React.FC = () => {
 
       {/* Resume Draft Popup */}
       <Dialog PaperProps={dialogPaperProps} open={showResumePopup} onClose={() => { }}>
-        <DialogTitle sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+        <DialogTitle>
           {language === 'si' ? 'අසම්පූර්ණ සමීක්ෂණයක් සොයා ගන්නා ලදී' : language === 'ta' ? 'முடிக்கப்படாத கணக்கெடுப்பு' : 'Unfinished Survey Found'}
         </DialogTitle>
         <DialogContent>
@@ -1991,7 +2093,7 @@ const IndustrySurveyPage: React.FC = () => {
 
 
       <Dialog PaperProps={dialogPaperProps} open={submitDialogOpen} onClose={() => setSubmitDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+        <DialogTitle>
           {language === 'si' ? 'තහවුරු කරන්න' : 'Confirm Submission'}
         </DialogTitle>
         <DialogContent dividers>
@@ -1999,9 +2101,6 @@ const IndustrySurveyPage: React.FC = () => {
             {language === 'si'
               ? 'ඔබගේ සියලුම තොරතුරු නිවැරදි දැයි තහවුරු කරගන්න. ඉදිරිපත් කිරීමට පෙර අවශ්‍ය නම් ආපසු ගොස් පරීක්ෂා කළ හැක. ඔබ ඉදිරිපත් කළ පසු මෙම තොරතුරු පද්ධතියට සුරැකෙනු ඇත.'
               : 'Please review all your details. You can scroll back and check before submitting. Once you click Done, the data will be securely saved to the database.'}
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            * Note: Saving up to {Object.keys(formValues).length} fields!
           </Typography>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
@@ -2048,7 +2147,7 @@ const IndustrySurveyPage: React.FC = () => {
 
       {/* GPS Error Popup */}
       <Dialog PaperProps={dialogPaperProps} open={!!gpsErrorPopup} onClose={() => { }}>
-        <DialogTitle sx={{ fontWeight: 'bold', color: 'error.main' }}>
+        <DialogTitle>
           {language === 'si' ? 'දෝෂයකි' : language === 'ta' ? 'பிழை' : 'Error'}
         </DialogTitle>
         <DialogContent>
@@ -2082,8 +2181,8 @@ const IndustrySurveyPage: React.FC = () => {
       </Dialog>
 
       {/* Login Required Dialog */}
-      <Dialog open={showLoginPopup} disableEscapeKeyDown>
-        <DialogTitle sx={{ fontWeight: 'bold', color: 'error.main' }}>
+      <Dialog PaperProps={dialogPaperProps} open={showLoginPopup} disableEscapeKeyDown maxWidth="xs" fullWidth>
+        <DialogTitle>
           {language === 'si' ? 'ලොග් වීම අවශ්‍යයි' : language === 'ta' ? 'உள்நுழைவு தேவை' : 'Login Required'}
         </DialogTitle>
         <DialogContent>

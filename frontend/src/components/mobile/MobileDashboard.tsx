@@ -253,7 +253,7 @@ const MobileDashboard: React.FC<MobileDashboardProps> = (props) => {
               ]
             ) : !isLoading ? (
               [
-                <MenuItem key="login" onClick={closeMenuThen(() => login(window.location.href))}>{L('Login', 'පිවිසෙන්න', 'உள்நுழைய')}</MenuItem>,
+                <MenuItem key="login" onClick={closeMenuThen(() => login(`${window.location.origin}/mydashboard`))}>{L('Login', 'පිවිසෙන්න', 'உள்நுழைய')}</MenuItem>,
                 <MenuItem key="join" onClick={closeMenuThen(() => register(window.location.href))} sx={{ color: isDarkMode ? '#86efac' : '#2d5e41', fontWeight: '700 !important' }}>{L('Join with us', 'අප හා එක්වන්න', 'எங்களுடன் இணையுங்கள்')}</MenuItem>,
               ]
             ) : null}

@@ -216,7 +216,7 @@ function frame(map: MlMap, bounds: LngLatBoundsLike | null, insets: MapInsets, i
   const cam = map.cameraForBounds(bounds, { padding: 40, bearing, maxZoom: 16 }) ?? map.cameraForBounds(bounds, { bearing, maxZoom: 16 });
   if (!cam) return;
   // cameraForBounds frames a flat, top-down view; tilting enlarges the near edge, so back off when in 3D.
-  const target = { center: cam.center, zoom: cam.zoom - (is3D ? TILT_ZOOM_OUT : 0) + zoomIn, pitch, bearing, padding: insets };
+  const target = { center: cam.center, zoom: (cam.zoom ?? map.getZoom()) - (is3D ? TILT_ZOOM_OUT : 0) + zoomIn, pitch, bearing, padding: insets };
   // easeTo is skipped automatically for users with prefers-reduced-motion (they land on the final view).
   if (animateMs > 0) map.easeTo({ ...target, duration: animateMs });
   else map.jumpTo(target);

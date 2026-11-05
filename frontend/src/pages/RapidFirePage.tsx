@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { Box, Button, Container, Paper, Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
+import { Button, Container, Typography } from '@mui/material';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import { ApiError } from '../api/contributions';
-import UserTopBar from '../components/contribute/UserTopBar';
+import type { UserShellContext } from '../components/contribute/UserShell';
 import { useContributeCopy } from '../components/contribute/copy';
 import { readSavedVillage, villageCode, villageName } from '../components/contribute/village';
 import { DecksResponse, RapidFireAnswer, RapidFireCard, rapidFireApi } from '../components/rapidFire/api';
@@ -13,11 +12,13 @@ import Lobby from '../components/rapidFire/Lobby';
 import PlayStage from '../components/rapidFire/PlayStage';
 import Results from '../components/rapidFire/Results';
 import { useAnswerQueue } from '../components/rapidFire/useAnswerQueue';
+import { pageTitleSx, squareButton, TEXT_SOFT } from '../components/rapidFire/Backdrop';
 
 const RapidFirePage: React.FC = () => {
-  const { getToken, isAuthenticated, login } = useAuth();
+  const { getToken } = useAuth();
   const { t, language } = useContributeCopy();
   const navigate = useNavigate();
+  const { setFocusMode } = useOutletContext<UserShellContext>();
   const api = useMemo(() => rapidFireApi(getToken), [getToken]);
 
   const village = useMemo(readSavedVillage, []);
@@ -116,44 +117,24 @@ const RapidFirePage: React.FC = () => {
 
   const addDetails = (card: RapidFireCard) => navigate(`/user/categories/${card.path}`);
 
-  /* ── Render ────────────────────────────────────────────────────────────── */
-  /* ── Not authenticated ─────────────────────────────────────────────────── */
-  if (!isAuthenticated) {
-    return (
-      <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-        <UserTopBar />
-        <Container maxWidth="sm" sx={{ py: 8 }}>
-          <Paper variant="outlined" sx={{ p: 4, borderRadius: '20px', textAlign: 'center' }}>
-            <Typography sx={{ fontWeight: 700, fontSize: '1.2rem', mb: 1 }}>Session Expired</Typography>
-            <Typography color="text.secondary" sx={{ mb: 3 }}>
-              Your session has expired. Please sign in again to play Rapid Fire.
-            </Typography>
-            <Button variant="contained" disableElevation onClick={() => login(window.location.href)}>
-              Sign In
-            </Button>
-          </Paper>
-        </Container>
-      </Box>
-    );
-  }
+  const inRound = Boolean(state.rules) && (state.phase === 'countdown' || state.phase === 'playing' || state.phase === 'finishing');
+  useEffect(() => {
+    setFocusMode(inRound);
+    return () => setFocusMode(false);
+  }, [inRound, setFocusMode]);
 
+  /* ── Render ────────────────────────────────────────────────────────────── */
   if (!ccode) {
     return (
-      <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-        <UserTopBar />
-        <Container maxWidth="sm" sx={{ py: 8 }}>
-          <Paper variant="outlined" sx={{ p: 4, borderRadius: '20px', textAlign: 'center' }}>
-            <PlaceOutlinedIcon sx={{ fontSize: 40, color: 'success.main', mb: 1 }} />
-            <Typography sx={{ fontWeight: 700, fontSize: '1.2rem', mb: 1 }}>{t.chooseVillage}</Typography>
-            <Typography color="text.secondary" sx={{ mb: 3 }}>
-              {t.rfTaglineNoVillage}
-            </Typography>
-            <Button variant="contained" disableElevation onClick={() => navigate('/user')}>
-              {t.chooseVillage}
-            </Button>
-          </Paper>
-        </Container>
-      </Box>
+      <Container component="main" maxWidth="lg" sx={{ px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 3, md: 5 }, pb: 6 }}>
+        <Typography component="h1" sx={pageTitleSx(language)}>
+          {t.rfTitle}
+        </Typography>
+        <Typography sx={{ color: TEXT_SOFT, fontSize: '1rem', lineHeight: 1.65, maxWidth: 620, mt: 1.5, mb: 3 }}>{t.rfTaglineNoVillage}</Typography>
+        <Button onClick={() => navigate('/user')} sx={squareButton}>
+          {t.chooseVillage}
+        </Button>
+      </Container>
     );
   }
 
@@ -196,19 +177,16 @@ const RapidFirePage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-      <UserTopBar />
-      <Lobby
-        villageName={vName}
-        decks={decks}
-        loading={decksLoading}
-        loadError={decksError}
-        onRetry={reloadDecks}
-        onStart={start}
-        startingDeck={state.phase === 'starting' ? state.deck : null}
-        notice={notice}
-      />
-    </Box>
+    <Lobby
+      villageName={vName}
+      decks={decks}
+      loading={decksLoading}
+      loadError={decksError}
+      onRetry={reloadDecks}
+      onStart={start}
+      startingDeck={state.phase === 'starting' ? state.deck : null}
+      notice={notice}
+    />
   );
 };
 

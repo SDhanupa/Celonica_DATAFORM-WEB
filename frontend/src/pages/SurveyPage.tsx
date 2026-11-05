@@ -4,7 +4,6 @@ import {
   Autocomplete,
   Box,
   Button,
-  Chip,
   CircularProgress,
   Dialog,
   DialogActions,
@@ -12,26 +11,24 @@ import {
   DialogContentText,
   DialogTitle,
   IconButton,
-  Paper,
   Stack,
   TextField,
   Typography,
 } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useLazyQuery, useQuery } from '@apollo/client';
-import AddAPhotoOutlinedIcon from '@mui/icons-material/AddAPhotoOutlined';
-import AddRoundedIcon from '@mui/icons-material/AddRounded';
-import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
-import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
-import HistoryRoundedIcon from '@mui/icons-material/HistoryRounded';
-import MyLocationRoundedIcon from '@mui/icons-material/MyLocationRounded';
+import AddAPhotoSharpIcon from '@mui/icons-material/AddAPhotoSharp';
+import AddSharpIcon from '@mui/icons-material/AddSharp';
+import CheckSharpIcon from '@mui/icons-material/CheckSharp';
+import CloseSharpIcon from '@mui/icons-material/CloseSharp';
+import EditNoteSharpIcon from '@mui/icons-material/EditNoteSharp';
+import MyLocationSharpIcon from '@mui/icons-material/MyLocationSharp';
 import { GET_GN_BY_COORDINATES, GET_P_DISTRICTS, GET_P_DISTRICT_WITH_GNS } from '../graphql/queries';
 import { useAuth } from '../auth/AuthProvider';
 import { ApiError, submitContribution, SubmitResult } from '../api/contributions';
 import { fill, useContributeCopy } from '../components/contribute/copy';
 import { readSavedVillage, villageName } from '../components/contribute/village';
-import { ghostButton, ink, inkButton } from '../components/contribute/tokens';
+import { LINE, quietButton, sectionRule, squareButton, squareOutlineButton, TEXT, TEXT_SOFT } from '../components/rapidFire/Backdrop';
 
 interface ContributionForm {
   reg_number: string;
@@ -317,63 +314,46 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp, categoryName, o
   /* ── Thank-you ────────────────────────────────────────────────────────── */
   if (result) {
     return (
-      <Paper elevation={0} sx={{ maxWidth: 620, mx: 'auto', p: { xs: 3, sm: 5 }, borderRadius: '16px', border: '1px solid', borderColor: ink[200], textAlign: 'center' }}>
-        <Box
-          sx={{
-            width: 64,
-            height: 64,
-            mx: 'auto',
-            mb: 2.5,
-            borderRadius: '50%',
-            display: 'grid',
-            placeItems: 'center',
-            bgcolor: ink[900],
-            color: '#fff',
-            boxShadow: `0 0 0 8px ${ink[100]}`,
-          }}
-        >
-          <CheckRoundedIcon sx={{ fontSize: 34 }} />
-        </Box>
-        <Typography component="h2" sx={{ fontSize: { xs: '1.45rem', sm: '1.75rem' }, fontWeight: 700, letterSpacing: '-0.03em', color: ink[900], mb: 1 }}>
+      <Box sx={{ ...sectionRule, maxWidth: 760 }}>
+        <Typography component="h2" sx={{ fontSize: { xs: '1.5rem', sm: '1.75rem' }, fontWeight: 700, color: TEXT, mb: 1 }}>
           {t.thanksTitle}
         </Typography>
-        <Typography sx={{ color: ink[500], maxWidth: 460, mx: 'auto', mb: 3, lineHeight: 1.6 }}>
+        <Typography sx={{ color: TEXT_SOFT, maxWidth: 560, mb: 2, lineHeight: 1.6 }}>
           {vName ? fill(t.thanksBody, { category: catName, village: vName }) : fill(t.thanksBodyNoVillage, { category: catName })}
         </Typography>
 
-        <Stack direction="row" spacing={1} sx={{ justifyContent: 'center', flexWrap: 'wrap', rowGap: 1, mb: 4 }}>
-          {result.reg_number && <Chip label={`${t.thanksReg}: ${result.reg_number}`} sx={{ fontFamily: 'monospace', fontWeight: 600, bgcolor: ink[100], color: ink[700] }} />}
-          <Chip
-            label={result.credited ? t.thanksCredited : t.thanksAnonymous}
-            sx={result.credited ? { bgcolor: ink[900], color: '#fff', fontWeight: 600 } : { bgcolor: 'transparent', color: ink[600], fontWeight: 600, border: '1px solid', borderColor: ink[300] }}
-          />
-        </Stack>
+        {result.reg_number && (
+          <Typography sx={{ color: TEXT, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
+            {t.thanksReg}: {result.reg_number}
+          </Typography>
+        )}
+        <Typography sx={{ color: TEXT_SOFT, fontSize: '0.875rem', mb: 3 }}>{result.credited ? t.thanksCredited : t.thanksAnonymous}</Typography>
 
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ justifyContent: 'center' }}>
-          <Button disableElevation startIcon={<AddRoundedIcon />} onClick={addAnother} sx={{ py: 1, px: 2.25, ...inkButton }}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
+          <Button startIcon={<AddSharpIcon />} onClick={addAnother} sx={squareButton}>
             {t.addAnother}
           </Button>
           {isAuthenticated && (
-            <Button startIcon={<HistoryRoundedIcon />} onClick={() => navigate('/user/contributions')} sx={{ py: 1, px: 2.25, ...ghostButton }}>
+            <Button onClick={() => navigate('/user/contributions')} sx={squareOutlineButton}>
               {t.navMyContributions}
             </Button>
           )}
-          <Button onClick={backToTopics} sx={{ py: 1, boxShadow: 'none', textTransform: 'none', fontWeight: 600, color: ink[500], '&:hover': { boxShadow: 'none', transform: 'none', bgcolor: ink[100] } }}>
+          <Button onClick={backToTopics} sx={quietButton}>
             {t.backToTopics}
           </Button>
         </Stack>
-      </Paper>
+      </Box>
     );
   }
 
   /* ── Form ─────────────────────────────────────────────────────────────── */
   return (
-    <Box component="form" noValidate onSubmit={handleSubmit} sx={{ maxWidth: 760, mx: 'auto' }}>
+    <Box component="form" noValidate onSubmit={handleSubmit} sx={{ maxWidth: 760 }}>
       <Box sx={{ mb: 3 }}>
-        <Typography component="h2" sx={{ fontSize: { xs: '1.4rem', sm: '1.7rem' }, fontWeight: 700, letterSpacing: '-0.03em', color: ink[900] }}>
+        <Typography component="h2" sx={{ fontSize: { xs: '1.5rem', sm: '1.75rem' }, fontWeight: 700, color: TEXT }}>
           {fill(t.formTitle, { category: catName })}
         </Typography>
-        <Typography sx={{ color: ink[500], mt: 0.5 }}>
+        <Typography sx={{ color: TEXT_SOFT, mt: 0.5 }}>
           {vName ? fill(t.formSubtitle, { village: vName }) : t.formSubtitleNoVillage}
         </Typography>
       </Box>
@@ -381,7 +361,7 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp, categoryName, o
       {!isAuthenticated && (
         <Alert
           severity="info"
-          sx={{ mb: 2, borderRadius: '14px' }}
+          sx={{ mb: 2 }}
           action={
             <Button color="inherit" size="small" onClick={() => login(window.location.href)} sx={{ boxShadow: 'none' }}>
               {t.signIn}
@@ -392,7 +372,7 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp, categoryName, o
         </Alert>
       )}
 
-      <Stack spacing={2}>
+      <Stack spacing={4}>
         <FormSection index={1} title={t.stepLocation} error={fieldErrors.location}>
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr' }, gap: 2 }}>
             <Autocomplete
@@ -492,9 +472,8 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp, categoryName, o
           <Stack spacing={2}>
             {existingName ? (
               <Alert
-                icon={<EditNoteRoundedIcon />}
+                icon={<EditNoteSharpIcon />}
                 severity="info"
-                sx={{ borderRadius: '12px' }}
                 action={
                   <Button
                     color="inherit"
@@ -546,7 +525,7 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp, categoryName, o
                       {[o.name_en, o.name_si, o.name_ta].filter(Boolean).join(' · ')}
                     </Typography>
                     {o.reg_number && (
-                      <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
+                      <Typography variant="caption" color="text.secondary">
                         {o.reg_number}
                       </Typography>
                     )}
@@ -576,23 +555,20 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp, categoryName, o
           <Stack spacing={2}>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ alignItems: { sm: 'center' } }}>
               <Button
-                variant="outlined"
-                startIcon={locating ? <CircularProgress size={18} /> : <MyLocationRoundedIcon />}
+                startIcon={locating ? <CircularProgress size={18} /> : <MyLocationSharpIcon />}
                 onClick={() => setGeoPrompt(true)}
                 disabled={locating}
-                sx={{ boxShadow: 'none', '&:hover': { boxShadow: 'none', transform: 'none' } }}
+                sx={squareOutlineButton}
               >
                 {t.captureLocation}
               </Button>
               {form.latitude && form.longitude && (
-                <Chip icon={<CheckRoundedIcon sx={{ color: `${ink[900]} !important` }} />} label={`${t.locationCaptured} · ${form.latitude}, ${form.longitude}`} sx={{ maxWidth: '100%', bgcolor: ink[100], color: ink[700], fontWeight: 500 }} />
+                <Typography sx={{ color: TEXT_SOFT, fontSize: '0.875rem', fontVariantNumeric: 'tabular-nums' }}>
+                  {t.locationCaptured} · {form.latitude}, {form.longitude}
+                </Typography>
               )}
             </Stack>
-            {form.coordinate_mismatch && (
-              <Alert severity="warning" sx={{ borderRadius: '12px' }}>
-                {t.locationMismatch}
-              </Alert>
-            )}
+            {form.coordinate_mismatch && <Alert severity="warning">{t.locationMismatch}</Alert>}
 
             {form.image_path ? (
               <Box sx={{ position: 'relative', alignSelf: 'flex-start' }}>
@@ -600,24 +576,22 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp, categoryName, o
                   component="img"
                   src={`/api/uploads/survey_images/${form.image_path}`}
                   alt=""
-                  sx={{ display: 'block', maxWidth: '100%', maxHeight: 220, borderRadius: '12px', border: 1, borderColor: 'divider', objectFit: 'contain' }}
+                  sx={{ display: 'block', maxWidth: '100%', maxHeight: 220, border: `1px solid ${LINE}`, objectFit: 'contain' }}
                 />
                 <IconButton
-                  size="small"
                   aria-label="Remove photo"
                   onClick={() => patch({ image_path: '' })}
-                  sx={{ position: 'absolute', top: 8, right: 8, bgcolor: 'background.paper', border: 1, borderColor: 'divider', '&:hover': { bgcolor: 'background.paper' } }}
+                  sx={{ position: 'absolute', top: 8, right: 8, width: 44, height: 44, bgcolor: '#fff', border: `1px solid ${TEXT_SOFT}`, borderRadius: 0, '&:hover': { bgcolor: '#fff' } }}
                 >
-                  <CloseRoundedIcon fontSize="small" />
+                  <CloseSharpIcon fontSize="small" />
                 </IconButton>
               </Box>
             ) : null}
             <Button
               component="label"
-              variant="outlined"
-              startIcon={uploading ? <CircularProgress size={18} /> : <AddAPhotoOutlinedIcon />}
+              startIcon={uploading ? <CircularProgress size={18} /> : <AddAPhotoSharpIcon />}
               disabled={uploading}
-              sx={{ height: 64, borderStyle: 'dashed', boxShadow: 'none', '&:hover': { boxShadow: 'none', transform: 'none', borderStyle: 'dashed' } }}
+              sx={{ ...squareOutlineButton, alignSelf: 'flex-start' }}
             >
               {uploading ? t.uploading : form.image_path ? t.replacePhoto : t.uploadPhoto}
               <input
@@ -636,35 +610,33 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp, categoryName, o
       </Stack>
 
       {error && (
-        <Alert severity="error" sx={{ mt: 2, borderRadius: '12px' }} onClose={() => setError(null)}>
+        <Alert severity="error" sx={{ mt: 2 }} onClose={() => setError(null)}>
           {error}
         </Alert>
       )}
 
-      <Box sx={{ position: 'sticky', bottom: 0, mt: 3, py: 2, bgcolor: `${ink[50]}EB`, backdropFilter: 'blur(8px)', zIndex: 2 }}>
+      <Box sx={{ mt: 4 }}>
         <Button
           type="submit"
-          disableElevation
-          size="large"
           fullWidth
           disabled={submitting || uploading || locating}
-          startIcon={submitting ? <CircularProgress size={20} color="inherit" /> : <CheckRoundedIcon />}
-          sx={{ py: 1.5, fontSize: '1rem', ...inkButton }}
+          startIcon={submitting ? <CircularProgress size={20} color="inherit" /> : <CheckSharpIcon />}
+          sx={squareButton}
         >
           {submitting ? t.submitting : t.submit}
         </Button>
       </Box>
 
-      <Dialog open={geoPrompt} onClose={() => setGeoPrompt(false)} PaperProps={{ sx: { borderRadius: '14px', border: '1px solid', borderColor: ink[200] } }}>
-        <DialogTitle sx={{ fontWeight: 700, color: ink[900] }}>{t.geoConfirmTitle}</DialogTitle>
+      <Dialog open={geoPrompt} onClose={() => setGeoPrompt(false)}>
+        <DialogTitle sx={{ fontWeight: 700, color: TEXT }}>{t.geoConfirmTitle}</DialogTitle>
         <DialogContent>
-          <DialogContentText sx={{ color: ink[500] }}>{t.geoConfirmBody}</DialogContentText>
+          <DialogContentText sx={{ color: TEXT_SOFT }}>{t.geoConfirmBody}</DialogContentText>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setGeoPrompt(false)} sx={{ boxShadow: 'none', textTransform: 'none', fontWeight: 600, color: ink[500] }}>
+          <Button onClick={() => setGeoPrompt(false)} sx={quietButton}>
             {t.geoConfirmNo}
           </Button>
-          <Button disableElevation onClick={captureLocation} autoFocus sx={{ px: 2.25, ...inkButton }}>
+          <Button onClick={captureLocation} autoFocus sx={squareButton}>
             {t.geoConfirmYes}
           </Button>
         </DialogActions>
@@ -674,20 +646,17 @@ const SurveyPage: React.FC<SurveyPageProps> = ({ slug: slugProp, categoryName, o
 };
 
 const FormSection: React.FC<{ index: number; title: string; optional?: string; error?: boolean; children: React.ReactNode }> = ({ index, title, optional, error, children }) => (
-  <Paper
+  <Box
     component="fieldset"
-    elevation={0}
-    sx={{ m: 0, p: { xs: 2, sm: 2.75 }, borderRadius: '14px', border: '1px solid', borderColor: error ? 'error.main' : ink[200], bgcolor: '#fff', minWidth: 0 }}
+    sx={{ m: 0, p: 0, pt: 2, border: 0, borderTop: '2px solid', borderColor: error ? 'error.main' : TEXT, minWidth: 0 }}
   >
-    <Stack component="legend" direction="row" spacing={1.25} sx={{ alignItems: 'center', mb: 2.5, p: 0, float: 'left', width: '100%' }}>
-      <Box sx={{ width: 26, height: 26, borderRadius: '50%', display: 'grid', placeItems: 'center', fontSize: '0.78rem', fontWeight: 700, bgcolor: ink[900], color: '#fff', flexShrink: 0 }}>
-        {index}
-      </Box>
-      <Typography sx={{ fontWeight: 700, color: ink[900] }}>{title}</Typography>
-      {optional && <Typography variant="caption" sx={{ color: ink[400] }}>· {optional}</Typography>}
+    <Stack component="legend" direction="row" spacing={1} sx={{ alignItems: 'baseline', mb: 2, p: 0, float: 'left', width: '100%' }}>
+      <Typography sx={{ fontWeight: 700, color: TEXT_SOFT, fontVariantNumeric: 'tabular-nums' }}>{index}</Typography>
+      <Typography sx={{ fontWeight: 700, color: TEXT }}>{title}</Typography>
+      {optional && <Typography sx={{ color: TEXT_SOFT, fontSize: '0.8125rem' }}>· {optional}</Typography>}
     </Stack>
     <Box sx={{ clear: 'both' }}>{children}</Box>
-  </Paper>
+  </Box>
 );
 
 export default SurveyPage;

@@ -22,9 +22,14 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     i18n.changeLanguage(lang);
   };
 
+  // Screen readers and the browser's font fallback both read this.
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
+
   useEffect(() => {
     i18n.changeLanguage(language);
-    
+
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'app_language' && e.newValue) {
         setLanguageState(e.newValue as Language);

@@ -1,9 +1,10 @@
 import React from 'react';
-import { Alert, Box, Button, Paper, Skeleton, Stack, Typography } from '@mui/material';
+import { Alert, Box, Button, Skeleton, Stack, Typography } from '@mui/material';
 import type { VillageProgress } from '../../api/contributions';
 import { fill, useContributeCopy } from './copy';
-import { CountUp, EASE, useMounted } from './motion';
-import { ink } from './tokens';
+import { StatGrid } from './ledger';
+import { EASE, useMounted } from './motion';
+import { FOREST, LINE, TEXT, TEXT_SOFT } from '../rapidFire/Backdrop';
 
 export const formatPercent = (value: number): string => (value > 0 && value < 10 ? value.toFixed(1) : String(Math.round(value)));
 
@@ -15,13 +16,8 @@ interface VillageProgressCardProps {
   actions?: React.ReactNode;
 }
 
-const SIZE = 112;
-const STROKE = 9;
-const R = (SIZE - STROKE) / 2;
-const C = 2 * Math.PI * R;
-
 /**
- * How complete a village's record is, as the reason to contribute. The ring
+ * How complete a village's record is, as the reason to contribute. The bar
  * tracks topics (leaf categories) with at least one approved record.
  */
 const VillageProgressCard: React.FC<VillageProgressCardProps> = ({ progress, loading, error, onRetry, actions }) => {
@@ -32,9 +28,9 @@ const VillageProgressCard: React.FC<VillageProgressCardProps> = ({ progress, loa
     return (
       <Alert
         severity="warning"
-        sx={{ borderRadius: '16px' }}
+        sx={{ borderRadius: 0 }}
         action={
-          <Button color="inherit" size="small" onClick={onRetry} sx={{ boxShadow: 'none' }}>
+          <Button color="inherit" size="small" onClick={onRetry} sx={{ boxShadow: 'none', borderRadius: 0 }}>
             {t.retry}
           </Button>
         }
@@ -46,106 +42,48 @@ const VillageProgressCard: React.FC<VillageProgressCardProps> = ({ progress, loa
 
   const s = progress?.summary;
   const pct = s?.completion ?? 0;
-  // A sliver keeps the ring legible when a village has barely started.
-  const shown = !loading && mounted ? (pct > 0 ? Math.max(pct, 3) : 0) : 0;
+  const label = fill(t.progressComplete, { pct: formatPercent(pct) });
 
   return (
-    <Paper
-      elevation={0}
-      sx={{
-        p: { xs: 2.5, sm: 3 },
-        borderRadius: { xs: '20px', sm: '24px' },
-        bgcolor: 'rgba(255,255,255,.96)',
-        backdropFilter: 'blur(12px)',
-        border: '1px solid rgba(255,255,255,.6)',
-        boxShadow: '0 1px 2px rgba(10,12,15,.06), 0 30px 60px -24px rgba(10,12,15,.45)',
-      }}
-    >
-      <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 3, md: 4 }} sx={{ alignItems: { md: 'center' } }}>
-        <Stack direction="row" spacing={2.5} sx={{ alignItems: 'center', flexShrink: 0 }}>
-          <Box sx={{ position: 'relative', width: SIZE, height: SIZE, flexShrink: 0 }} role="img" aria-label={fill(t.progressComplete, { pct: formatPercent(pct) })}>
-            <Box component="svg" viewBox={`0 0 ${SIZE} ${SIZE}`} sx={{ width: SIZE, height: SIZE, transform: 'rotate(-90deg)' }}>
-              <circle cx={SIZE / 2} cy={SIZE / 2} r={R} fill="none" stroke={ink[100]} strokeWidth={STROKE} />
-              <Box
-                component="circle"
-                cx={SIZE / 2}
-                cy={SIZE / 2}
-                r={R}
-                fill="none"
-                stroke={ink[900]}
-                strokeWidth={STROKE}
-                strokeLinecap="round"
-                strokeDasharray={C}
-                strokeDashoffset={C * (1 - shown / 100)}
-                sx={{ transition: `stroke-dashoffset 1400ms ${EASE}`, '@media (prefers-reduced-motion: reduce)': { transition: 'none' } }}
-              />
-            </Box>
-            <Box sx={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', textAlign: 'center' }}>
-              {loading ? (
-                <Skeleton width={44} height={30} />
-              ) : (
-                <Typography sx={{ fontWeight: 800, fontSize: '1.55rem', letterSpacing: '-0.04em', lineHeight: 1, color: ink[900], fontVariantNumeric: 'tabular-nums' }}>
-                  {formatPercent(pct)}
-                  <Box component="span" sx={{ fontSize: '0.85rem', fontWeight: 600, color: ink[400] }}>
-                    %
-                  </Box>
-                </Typography>
-              )}
-            </Box>
-          </Box>
-
-          <Box sx={{ minWidth: 0 }}>
-            <Typography variant="caption" sx={{ fontWeight: 700, color: ink[400], textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-              {t.progressTitle}
-            </Typography>
-            {loading || !s ? (
-              <>
-                <Skeleton width={180} height={26} />
-                <Skeleton width={150} height={20} />
-              </>
-            ) : (
-              <>
-                <Typography sx={{ fontWeight: 700, fontSize: '1.15rem', mt: 0.25, color: ink[900], letterSpacing: '-0.01em' }}>
-                  {fill(t.progressTopics, { covered: s.topics_covered, total: s.topics_total })}
-                </Typography>
-                <Typography variant="body2" sx={{ color: ink[500] }}>
-                  {fill(t.progressCategories, { covered: s.categories_covered, total: s.categories_total })}
-                </Typography>
-              </>
-            )}
-          </Box>
+    <Box>
+      {loading || !s ? (
+        <>
+          <Skeleton width={220} height={36} />
+          <Skeleton width={260} height={22} />
+        </>
+      ) : (
+        <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ alignItems: { sm: 'baseline' }, justifyContent: 'space-between', columnGap: 2, rowGap: 0.25 }}>
+          <Typography sx={{ color: TEXT, fontWeight: 700, fontSize: { xs: '1.375rem', sm: '1.5rem' }, lineHeight: 1.3, fontVariantNumeric: 'tabular-nums' }}>{label}</Typography>
+          <Typography sx={{ color: TEXT_SOFT, fontSize: '0.875rem', lineHeight: 1.5 }}>
+            {fill(t.progressTopics, { covered: s.topics_covered, total: s.topics_total })}
+            <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}> · {fill(t.progressCategories, { covered: s.categories_covered, total: s.categories_total })}</Box>
+          </Typography>
         </Stack>
+      )}
 
-        <Box sx={{ flex: 1, display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)' }, gap: '1px', bgcolor: ink[100], borderRadius: '16px', overflow: 'hidden', border: `1px solid ${ink[100]}` }}>
-          <Stat label={t.statRecords} value={s?.records} loading={loading} />
-          <Stat label={t.statInReview} value={s?.in_review} loading={loading} />
-          <Stat label={t.statContributors} value={s?.contributors} loading={loading} />
-          <Stat label={t.statBusinesses} value={s?.businesses_surveyed} loading={loading} />
-        </Box>
-      </Stack>
+      <Box role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(pct)} sx={{ height: 8, mt: 1.5, bgcolor: LINE }}>
+        {/* A sliver keeps the bar legible when a village has barely started. */}
+        <Box sx={{ height: '100%', width: !loading && mounted ? `${pct > 0 ? Math.max(pct, 2) : 0}%` : 0, bgcolor: FOREST, transition: `width 900ms ${EASE}`, '@media (prefers-reduced-motion: reduce)': { transition: 'none' } }} />
+      </Box>
+
+      <StatGrid
+        loading={loading}
+        sx={{ mt: { xs: 2, sm: 3 } }}
+        stats={[
+          { label: t.statRecords, value: s?.records },
+          { label: t.statInReview, value: s?.in_review },
+          { label: t.statContributors, value: s?.contributors },
+          { label: t.statBusinesses, value: s?.businesses_surveyed },
+        ]}
+      />
 
       {actions && (
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ mt: 3, pt: 2.5, borderTop: `1px solid ${ink[100]}` }}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ mt: { xs: 2, sm: 3 } }}>
           {actions}
         </Stack>
       )}
-    </Paper>
+    </Box>
   );
 };
-
-const Stat: React.FC<{ label: string; value?: number; loading: boolean }> = ({ label, value, loading }) => (
-  <Box sx={{ p: 1.75, bgcolor: '#fff', transition: 'background-color 200ms ease', '&:hover': { bgcolor: ink[50] } }}>
-    <Typography variant="caption" sx={{ display: 'block', fontWeight: 600, color: ink[400] }} noWrap>
-      {label}
-    </Typography>
-    {loading || value === undefined ? (
-      <Skeleton width={40} height={30} />
-    ) : (
-      <Typography sx={{ fontWeight: 800, fontSize: '1.4rem', letterSpacing: '-0.03em', color: ink[900], fontVariantNumeric: 'tabular-nums' }}>
-        <CountUp value={value} />
-      </Typography>
-    )}
-  </Box>
-);
 
 export default VillageProgressCard;

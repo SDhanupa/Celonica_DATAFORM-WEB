@@ -1,17 +1,11 @@
-import React from 'react';
-import { Alert, Box, Button, ButtonBase, Chip, CircularProgress, Container, LinearProgress, Paper, Skeleton, Stack, Typography } from '@mui/material';
-import BoltRoundedIcon from '@mui/icons-material/BoltRounded';
-import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
-import KeyboardRoundedIcon from '@mui/icons-material/KeyboardRounded';
-import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
-import ShuffleRoundedIcon from '@mui/icons-material/ShuffleRounded';
-import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
-import TrendingUpRoundedIcon from '@mui/icons-material/TrendingUpRounded';
+import React, { useEffect } from 'react';
+import { Alert, Box, Button, ButtonBase, CircularProgress, Container, Skeleton, Stack, Typography } from '@mui/material';
+import CheckSharpIcon from '@mui/icons-material/CheckSharp';
+import PlayArrowSharpIcon from '@mui/icons-material/PlayArrowSharp';
 import { getCategoryVisual } from '../categories/categoryVisuals';
 import { fill, localName, useContributeCopy } from '../contribute/copy';
-import { ink, reducedMotion } from '../contribute/tokens';
-import { Ambient, EASE, enter, floatY, lift, Reveal, sheenOnHover, spotlight, spotlightMove } from '../contribute/motion';
 import type { DecksResponse, RapidFireDeck } from './api';
+import { FOREST, LINE, pageTitleSx, rowSx, sectionTitleSx, squareButton, TEXT, TEXT_SOFT } from './Backdrop';
 
 interface LobbyProps {
   villageName: string;
@@ -25,51 +19,88 @@ interface LobbyProps {
 }
 
 const Lobby: React.FC<LobbyProps> = ({ villageName, decks, loading, loadError, onRetry, onStart, startingDeck, notice }) => {
-  const { t } = useContributeCopy();
+  const { t, language } = useContributeCopy();
   const rules = decks?.rules;
   const busy = startingDeck !== null;
+  const canMix = !busy && !loading && (decks?.remaining ?? 0) > 0;
+
+  // Enter starts Quick Mix, unless focus is on a control that handles Enter itself.
+  useEffect(() => {
+    if (!canMix) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Enter' || e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
+      const el = document.activeElement as HTMLElement | null;
+      if (el && el !== document.body && el.closest('button, a, input, select, textarea, [role="button"], [role="menuitem"]')) return;
+      e.preventDefault();
+      onStart('mix');
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [canMix, onStart]);
+
+  // Cleared decks go last so the next playable one is always first.
+  const ordered = decks ? [...decks.decks].sort((a, b) => Number(a.remaining === 0) - Number(b.remaining === 0)) : [];
+  const cleared = decks ? decks.decks.filter((d) => d.remaining === 0).length : 0;
+  const pct = decks && decks.total > 0 ? (decks.answered / decks.total) * 100 : 0;
 
   return (
-    <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3 }, py: { xs: 3.5, md: 6 } }}>
-      <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 2.5, md: 4 }} sx={{ ...enter(0), alignItems: { md: 'flex-end' }, mb: { xs: 3, md: 4 } }}>
-        <Box sx={{ flex: 1 }}>
-          <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', mb: 1.5 }}>
-            <Box
-              sx={{
-                width: 48,
-                height: 48,
-                borderRadius: '15px',
-                display: 'grid',
-                placeItems: 'center',
-                color: '#fff',
-                bgcolor: ink[900],
-                boxShadow: '0 12px 28px -10px rgba(10,12,15,.55)',
-                animation: `${floatY} 3.2s ease-in-out infinite`,
-                '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
-              }}
-            >
-              <BoltRoundedIcon />
-            </Box>
-            <Typography component="h1" sx={{ fontSize: { xs: '2rem', sm: '2.5rem' }, fontWeight: 800, letterSpacing: '-0.04em', color: ink[900] }}>
-              {t.rfTitle}
-            </Typography>
-          </Stack>
-          <Typography sx={{ fontSize: { xs: '0.98rem', sm: '1.08rem' }, maxWidth: 600, lineHeight: 1.6, color: ink[500] }}>
-            {villageName ? fill(t.rfTagline, { village: villageName }) : t.rfTaglineNoVillage}
-          </Typography>
-        </Box>
+    <Container component="main" maxWidth="lg" sx={{ px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 3, md: 5 }, pb: { xs: 6, md: 10 } }}>
+      <Typography component="h1" sx={pageTitleSx(language)}>
+        {t.rfTitle}
+      </Typography>
+      <Typography sx={{ color: TEXT_SOFT, fontSize: '1rem', lineHeight: 1.65, maxWidth: 620, mt: 1.5 }}>
+        {villageName ? fill(t.rfTagline, { village: villageName }) : t.rfTaglineNoVillage}
+      </Typography>
+      {rules && (
+        <Typography sx={{ color: TEXT, fontSize: '0.875rem', fontWeight: 500, lineHeight: 1.6, mt: 1 }}>
+          {[fill(t.rfRuleCards, { n: rules.session_size }), fill(t.rfRuleSeconds, { n: rules.seconds_per_question }), t.rfRuleBonus].join(' · ')}
+        </Typography>
+      )}
 
-        {rules && (
-          <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1 }}>
-            <RuleChip icon={<ShuffleRoundedIcon />} label={fill(t.rfRuleCards, { n: rules.session_size })} />
-            <RuleChip icon={<TimerOutlinedIcon />} label={fill(t.rfRuleSeconds, { n: rules.seconds_per_question })} />
-            <RuleChip icon={<TrendingUpRoundedIcon />} label={t.rfRuleBonus} />
-          </Stack>
-        )}
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 0.75, sm: 2 }} sx={{ alignItems: { sm: 'center' }, mt: { xs: 2, sm: 3 } }}>
+        <Button
+          onClick={() => onStart('mix')}
+          disabled={!canMix}
+          startIcon={startingDeck === 'mix' ? <CircularProgress size={18} color="inherit" /> : <PlayArrowSharpIcon />}
+          sx={{ ...squareButton, alignSelf: { sm: 'flex-start' } }}
+        >
+          {t.rfStart} · {t.rfMix}
+        </Button>
+        <Typography sx={{ color: TEXT_SOFT, fontSize: '0.8125rem' }}>
+          {t.rfMixHint}
+          {decks ? ` · ${fill(t.rfLeft, { n: decks.remaining })}` : ''}
+          <Box component="span" sx={{ display: { xs: 'none', md: 'inline' } }}>{canMix ? ` · ${t.rfPressStart}` : ''}</Box>
+        </Typography>
       </Stack>
 
+      {/* How much of the village has been checked: the reason to play another round. */}
+      <Box sx={{ mt: { xs: 3, md: 4 } }}>
+        {decks ? (
+          <>
+            <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ alignItems: { sm: 'baseline' }, justifyContent: 'space-between', columnGap: 2 }}>
+              <Typography sx={{ color: TEXT, fontWeight: 700, fontSize: { xs: '1.375rem', sm: '1.5rem' }, lineHeight: 1.3, fontVariantNumeric: 'tabular-nums' }}>
+                {t.rfMapped}: {Math.round(pct)}%
+              </Typography>
+              <Typography sx={{ color: TEXT_SOFT, fontSize: '0.875rem', fontVariantNumeric: 'tabular-nums' }}>
+                {decks.answered.toLocaleString()} / {decks.total.toLocaleString()} · {fill(t.rfDecksCleared, { n: cleared, total: decks.decks.length })}
+              </Typography>
+            </Stack>
+            <Box role="progressbar" aria-label={t.rfMapped} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(pct)} sx={{ height: 8, mt: 1, bgcolor: LINE }}>
+              <Box sx={{ height: '100%', width: `${pct > 0 ? Math.max(pct, 2) : 0}%`, bgcolor: FOREST }} />
+            </Box>
+          </>
+        ) : (
+          !loadError && (
+            <>
+              <Skeleton width={220} height={36} />
+              <Skeleton variant="rectangular" height={8} sx={{ mt: 1 }} />
+            </>
+          )
+        )}
+      </Box>
+
       {notice && (
-        <Alert severity="warning" sx={{ mb: 3, borderRadius: '14px' }}>
+        <Alert severity="warning" sx={{ mt: 3 }}>
           {notice}
         </Alert>
       )}
@@ -77,9 +108,9 @@ const Lobby: React.FC<LobbyProps> = ({ villageName, decks, loading, loadError, o
       {loadError ? (
         <Alert
           severity="error"
-          sx={{ borderRadius: '14px' }}
+          sx={{ mt: 3 }}
           action={
-            <Button color="inherit" size="small" onClick={onRetry} sx={{ boxShadow: 'none' }}>
+            <Button color="inherit" size="small" onClick={onRetry}>
               {t.retry}
             </Button>
           }
@@ -87,169 +118,57 @@ const Lobby: React.FC<LobbyProps> = ({ villageName, decks, loading, loadError, o
           {t.rfDecksError}
         </Alert>
       ) : (
-        <>
-          <Typography component="h2" sx={{ fontWeight: 700, fontSize: '1.1rem', mb: 1.5, color: ink[900] }}>
+        <Box component="section" aria-labelledby="decks-title" sx={{ mt: { xs: 4, md: 6 } }}>
+          <Typography id="decks-title" component="h2" sx={sectionTitleSx(language)}>
             {t.rfChooseDeck}
           </Typography>
+          <Typography sx={{ display: { xs: 'none', md: 'block' }, color: TEXT_SOFT, fontSize: '0.875rem', mt: 0.5 }}>{t.rfKeysHint}</Typography>
 
-          {/* Featured: quick mix */}
-          <ButtonBase
-            onClick={() => onStart('mix')}
-            disabled={busy || loading || (decks?.remaining ?? 0) === 0}
-            aria-label={`${t.rfMix}. ${decks ? fill(t.rfLeft, { n: decks.remaining }) : ''}`}
-            sx={{
-              width: '100%',
-              display: 'block',
-              textAlign: 'left',
-              borderRadius: '22px',
-              mb: 2,
-              overflow: 'hidden',
-              color: '#fff',
-              bgcolor: ink[900],
-              position: 'relative',
-              isolation: 'isolate',
-              ...sheenOnHover,
-              ...enter(1),
-              transition: `transform 450ms ${EASE}, box-shadow 450ms ${EASE}`,
-              '&:hover': { transform: 'translateY(-3px)', boxShadow: '0 30px 60px -24px rgba(10,12,15,.6)', '& .mix-cta': { gap: 1.25 } },
-              '&:focus-visible': { outline: '3px solid', outlineColor: ink[600], outlineOffset: 3 },
-              '&.Mui-disabled': { opacity: 0.6 },
-              ...reducedMotion,
-            }}
-          >
-            <Ambient />
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ p: { xs: 3, sm: 4 }, alignItems: { sm: 'center' }, position: 'relative', zIndex: 2 }}>
-              <Box sx={{ width: 56, height: 56, borderRadius: '16px', display: 'grid', placeItems: 'center', bgcolor: 'rgba(255,255,255,0.12)', flexShrink: 0 }}>
-                <ShuffleRoundedIcon sx={{ fontSize: 30 }} />
-              </Box>
-              <Box sx={{ flex: 1 }}>
-                <Typography sx={{ color: 'inherit', fontWeight: 800, fontSize: '1.35rem', letterSpacing: '-0.02em' }}>{t.rfMix}</Typography>
-                <Typography sx={{ color: 'inherit', opacity: 0.7 }}>
-                  {t.rfMixHint}
-                  {decks ? ` · ${fill(t.rfLeft, { n: decks.remaining })}` : ''}
-                </Typography>
-              </Box>
-              <Box
-                className="mix-cta"
-                sx={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 0.75,
-                  transition: `gap 300ms ${EASE}`,
-                  alignSelf: { xs: 'flex-start', sm: 'center' },
-                  px: 2.25,
-                  py: 1.1,
-                  borderRadius: 999,
-                  bgcolor: '#fff',
-                  color: ink[900],
-                  fontWeight: 800,
-                }}
-              >
-                {startingDeck === 'mix' ? <CircularProgress size={18} sx={{ color: ink[900] }} /> : <PlayArrowRoundedIcon />}
-                {t.rfStart}
-              </Box>
+          {loading || !decks ? (
+            <Stack spacing={0.5} sx={{ mt: 2 }}>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Skeleton key={i} variant="rectangular" height={64} />
+              ))}
             </Stack>
-          </ButtonBase>
-
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: { xs: 1.25, sm: 2 } }}>
-            {loading || !decks
-              ? Array.from({ length: 9 }).map((_, i) => (
-                  <Paper key={i} variant="outlined" sx={{ p: 2, borderRadius: '18px' }}>
-                    <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
-                      <Skeleton variant="rounded" width={44} height={44} sx={{ borderRadius: '12px' }} />
-                      <Box sx={{ flex: 1 }}>
-                        <Skeleton width="60%" />
-                        <Skeleton width="40%" />
-                      </Box>
-                    </Stack>
-                  </Paper>
-                ))
-              : decks.decks.map((deck, i) => (
-                  <Reveal key={deck.slug} index={i % 9}>
-                    <DeckCard deck={deck} onStart={onStart} disabled={busy} starting={startingDeck === deck.slug} />
-                  </Reveal>
-                ))}
-          </Box>
-
-          <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mt: 3, color: ink[400], display: { xs: 'none', md: 'flex' } }}>
-            <KeyboardRoundedIcon fontSize="small" />
-            <Typography variant="body2">{t.rfKeysHint}</Typography>
-          </Stack>
-        </>
+          ) : (
+            <Box component="ul" sx={{ listStyle: 'none', m: 0, mt: 2, p: 0, display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' }, columnGap: 4, borderBottom: `1px solid ${LINE}` }}>
+              {ordered.map((deck) => (
+                <Box component="li" key={deck.slug}>
+                  <DeckRow deck={deck} onStart={onStart} disabled={busy} starting={startingDeck === deck.slug} />
+                </Box>
+              ))}
+            </Box>
+          )}
+        </Box>
       )}
     </Container>
   );
 };
 
-const RuleChip: React.FC<{ icon: React.ReactElement; label: string }> = ({ icon, label }) => (
-  <Chip
-    icon={icon}
-    label={label}
-    sx={{
-      fontWeight: 600,
-      bgcolor: '#fff',
-      border: 1,
-      borderColor: ink[200],
-      color: ink[700],
-      '& .MuiChip-icon': { color: ink[500], fontSize: 18 },
-    }}
-  />
-);
-
-const DeckCard: React.FC<{ deck: RapidFireDeck; onStart: (deck: string) => void; disabled: boolean; starting: boolean }> = ({ deck, onStart, disabled, starting }) => {
+const DeckRow: React.FC<{ deck: RapidFireDeck; onStart: (deck: string) => void; disabled: boolean; starting: boolean }> = ({ deck, onStart, disabled, starting }) => {
   const { t, language } = useContributeCopy();
   const { Icon } = getCategoryVisual({ slug: deck.slug, nameEn: deck.name_en });
   const done = deck.remaining === 0;
   const pct = deck.total > 0 ? (deck.answered / deck.total) * 100 : 0;
   const name = localName(deck, language);
+  const status = done ? t.rfDone : fill(t.rfLeft, { n: deck.remaining });
 
   return (
     <ButtonBase
       onClick={() => onStart(deck.slug)}
-      onPointerMove={spotlightMove}
       disabled={disabled || done}
-      aria-label={`${name}. ${done ? t.rfDone : fill(t.rfLeft, { n: deck.remaining })}`}
-      sx={{
-        display: 'block',
-        textAlign: 'left',
-        width: '100%',
-        ...spotlight(),
-        ...lift,
-        borderRadius: '20px',
-        border: `1px solid ${ink[100]}`,
-        bgcolor: '#fff',
-        p: 2.25,
-        '&:hover': { ...lift['&:hover'], borderColor: ink[200], '& .deck-play': { bgcolor: ink[900], color: '#fff', transform: 'scale(1.08)' }, '& .deck-icon': { bgcolor: ink[900], color: '#fff' } },
-        '&:focus-visible': { outline: `2px solid ${ink[900]}`, outlineOffset: 2 },
-        '&.Mui-disabled': { opacity: done ? 0.75 : 0.5 },
-        ...reducedMotion,
-      }}
+      aria-label={`${name}. ${status}`}
+      sx={{ ...rowSx, display: 'grid', gridTemplateColumns: '24px minmax(0, 1fr) 24px', columnGap: 1.5, alignItems: 'center' }}
     >
-      <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', mb: 1.5 }}>
-        <Box className="deck-icon" sx={{ width: 44, height: 44, borderRadius: '13px', display: 'grid', placeItems: 'center', bgcolor: ink[100], color: ink[600], flexShrink: 0, transition: 'background-color 250ms ease, color 250ms ease' }}>
-          <Icon />
+      <Icon sx={{ fontSize: 22, color: TEXT_SOFT }} />
+      <Box sx={{ minWidth: 0 }}>
+        <Typography component="span" sx={{ display: 'block', color: TEXT, fontWeight: 600, fontSize: '0.9375rem', lineHeight: 1.4 }}>{name}</Typography>
+        <Typography component="span" sx={{ display: 'block', color: done ? FOREST : TEXT_SOFT, fontSize: '0.8125rem', fontWeight: done ? 600 : 400, lineHeight: 1.4, mb: 0.5 }}>{status}</Typography>
+        <Box aria-hidden sx={{ height: 4, bgcolor: LINE }}>
+          <Box sx={{ height: '100%', width: `${pct}%`, bgcolor: FOREST }} />
         </Box>
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Typography sx={{ fontWeight: 700, color: ink[900] }} noWrap>
-            {name}
-          </Typography>
-          <Typography variant="body2" sx={{ color: done ? ink[400] : ink[500], fontWeight: done ? 600 : 400 }}>
-            {done ? t.rfDone : fill(t.rfLeft, { n: deck.remaining })}
-          </Typography>
-        </Box>
-        <Box
-          className="deck-play"
-          sx={{ width: 36, height: 36, borderRadius: '50%', display: 'grid', placeItems: 'center', bgcolor: ink[100], color: ink[600], transition: `background-color 200ms ease, color 200ms ease, transform 350ms ${EASE}`, flexShrink: 0 }}
-        >
-          {starting ? <CircularProgress size={18} sx={{ color: ink[600] }} /> : done ? <CheckCircleRoundedIcon fontSize="small" /> : <PlayArrowRoundedIcon fontSize="small" />}
-        </Box>
-      </Stack>
-      <LinearProgress
-        variant="determinate"
-        value={pct}
-        aria-hidden
-        sx={{ height: 6, borderRadius: 999, bgcolor: ink[100], '& .MuiLinearProgress-bar': { borderRadius: 999, bgcolor: ink[900], transition: `transform 1200ms ${EASE}` } }}
-      />
+      </Box>
+      {starting ? <CircularProgress size={18} /> : done ? <CheckSharpIcon sx={{ fontSize: 20, color: FOREST }} /> : <PlayArrowSharpIcon sx={{ fontSize: 22, color: TEXT }} />}
     </ButtonBase>
   );
 };

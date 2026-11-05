@@ -52,3 +52,7 @@ export const villageName = (village: SavedVillage | null | undefined, language: 
 
 export const villagePath = (village: SavedVillage): string =>
   `/gnpage/${encodeURIComponent(String(village.nameEn || '').replace(/ /g, '-'))}/${encodeURIComponent(villageCode(village) || '')}`;
+
+/** Business survey form, opened for the chosen village when there is one. */
+export const surveyPath = (village: SavedVillage | null): string =>
+  village ? `/industry-survey/${encodeURIComponent(String(village.nameEn || '').replace(/ /g, '-'))}/${encodeURIComponent(villageCode(village) || '')}` : '/industry-survey';

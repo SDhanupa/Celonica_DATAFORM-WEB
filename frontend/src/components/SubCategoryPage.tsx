@@ -41,8 +41,6 @@ import QuestionDialog from './QuestionDialog';
 import { useAuth } from '../auth/AuthProvider';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { TextField, RadioGroup, FormControlLabel, Radio, Snackbar, Alert } from '@mui/material';
-import { useLanguage } from '../context/LanguageContext';
-import UserTopBar from './contribute/UserTopBar';
 
 interface SubCategoryPageProps {
   slug: string;
@@ -50,13 +48,7 @@ interface SubCategoryPageProps {
 }
 
 const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
-  // Contributors follow the app-wide language (the top bar switches it); the
-  // admin view keeps its own page-local toggle.
-  const isUserArea = backUrl.startsWith('/user');
-  const globalLanguage = useLanguage();
-  const [localLang, setLocalLang] = useState<'en' | 'si' | 'ta'>('en');
-  const lang = isUserArea ? globalLanguage.language : localLang;
-  const setLang = isUserArea ? globalLanguage.setLanguage : setLocalLang;
+  const [lang, setLang] = useState<'en' | 'si' | 'ta'>('en');
   const navigate = useNavigate();
   const { userInfo } = useAuth();
   const client = useApolloClient();
@@ -285,10 +277,9 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
 
   return (
     <>
-      {isUserArea && <UserTopBar />}
       <Box sx={{ p: { xs: 2, sm: 4 }, maxWidth: 1200, mx: 'auto' }}>
         <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
-          <MuiLink component={RouterLink} underline="hover" color="inherit" to={isUserArea ? backUrl : "/categories"}>
+          <MuiLink component={RouterLink} underline="hover" color="inherit" to="/categories">
             {lang === 'en' ? 'Categories' : lang === 'si' ? 'වර්ග' : 'வகைகள்'}
           </MuiLink>
           {ancestors.map((anc: any) => {
@@ -340,8 +331,8 @@ const SubCategoryPage: React.FC<SubCategoryPageProps> = ({ slug, backUrl }) => {
               </Button>
             </>
           )}
-          <Box sx={{ display: isUserArea ? 'none' : 'block' }}>
-            <Button 
+          <Box>
+            <Button
               variant={lang === 'en' ? 'contained' : 'outlined'} 
               onClick={() => setLang('en')}
               sx={{ mr: 1 }}

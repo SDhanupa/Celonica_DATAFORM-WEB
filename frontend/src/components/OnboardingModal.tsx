@@ -13,12 +13,12 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
-import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
+import ArrowBackSharpIcon from '@mui/icons-material/ArrowBackSharp';
+import LogoutSharpIcon from '@mui/icons-material/LogoutSharp';
 import { useMutation, gql } from '@apollo/client';
 import { useAuth } from '../auth/AuthProvider';
-import { ink, inkButton, semantic } from './contribute/tokens';
-import { EASE, slideInLeft, slideInRight } from './contribute/motion';
+import { ink, semantic } from './contribute/tokens';
+import { FOREST, LINE, squareButton, squareOutlineButton, TEXT, TEXT_SOFT } from './rapidFire/Backdrop';
 
 const COMPLETE_ONBOARDING = gql`
   mutation CompleteUserOnboarding(
@@ -72,12 +72,12 @@ const serverFieldError = (message: string): { field?: Field; text: string } => {
 const fieldSx = {
   '& .MuiInputBase-input': { fontSize: '16px' },
   '& .MuiOutlinedInput-root': {
-    borderRadius: '12px',
+    borderRadius: 0,
     bgcolor: '#fff',
     minHeight: 52,
-    '& fieldset': { borderColor: ink[200] },
-    '&:hover fieldset': { borderColor: ink[300] },
-    '&.Mui-focused fieldset': { borderColor: ink[900], borderWidth: '1.5px' },
+    '& fieldset': { borderColor: TEXT_SOFT },
+    '&:hover fieldset': { borderColor: TEXT },
+    '&.Mui-focused fieldset': { borderColor: TEXT, borderWidth: '2px' },
   },
   '& .MuiInputLabel-root': { fontSize: '16px' },
   '& .MuiFormHelperText-root': { fontSize: '0.78rem', mx: 0, mt: 0.5 },
@@ -195,12 +195,11 @@ export default function OnboardingModal({ open, onComplete }: OnboardingModalPro
       fullScreen={isMobile}
       maxWidth="sm"
       fullWidth
-      slotProps={{ backdrop: { sx: { bgcolor: 'rgba(10,12,15,.55)', backdropFilter: 'blur(8px)' } } }}
+      slotProps={{ backdrop: { sx: { bgcolor: 'rgba(16,24,20,0.5)' } } }}
       PaperProps={{
         ref: containerRef,
         sx: {
-          bgcolor: ink[50],
-          borderRadius: isMobile ? 0 : '20px',
+          bgcolor: '#fff',
           ...(isMobile ? { height: '100dvh', maxHeight: '100dvh' } : {}),
           display: 'flex',
           flexDirection: 'column',
@@ -209,28 +208,27 @@ export default function OnboardingModal({ open, onComplete }: OnboardingModalPro
       }}
     >
       {/* Header */}
-      <Box sx={{ px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 2.5 }, pb: 2, bgcolor: '#fff', borderBottom: `1px solid ${ink[100]}` }}>
+      <Box sx={{ px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 2.5 }, pb: 2, borderBottom: `1px solid ${LINE}` }}>
         <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             {step === 1 && (
-              <IconButton size="small" onClick={() => setStep(0)} sx={{ color: ink[600], p: 0.5 }}>
-                <ArrowBackRoundedIcon fontSize="small" />
+              <IconButton onClick={() => setStep(0)} aria-label="Back" sx={{ width: 44, height: 44, color: TEXT }}>
+                <ArrowBackSharpIcon fontSize="small" />
               </IconButton>
             )}
             <Box>
-              <Typography component="h2" sx={{ fontWeight: 700, fontSize: '1.15rem', color: ink[900], lineHeight: 1.2 }}>
+              <Typography component="h2" sx={{ fontWeight: 700, fontSize: '1.125rem', color: TEXT, lineHeight: 1.3 }}>
                 Welcome to Ceylonica
               </Typography>
-              <Typography variant="body2" sx={{ color: ink[500] }}>
+              <Typography variant="body2" sx={{ color: TEXT_SOFT }}>
                 {step === 0 ? 'Tell us about yourself' : 'Contact details'}
               </Typography>
             </Box>
           </Box>
           <Button
-            size="small"
-            startIcon={<LogoutRoundedIcon fontSize="small" />}
+            startIcon={<LogoutSharpIcon fontSize="small" />}
             onClick={logout}
-            sx={{ color: ink[400], fontSize: '0.8rem', '&:hover': { color: ink[600], bgcolor: ink[100] } }}
+            sx={{ minHeight: 44, flexShrink: 0, color: TEXT_SOFT, fontSize: '0.8125rem', '&:hover': { color: TEXT, bgcolor: ink[100] } }}
           >
             Sign out
           </Button>
@@ -239,22 +237,14 @@ export default function OnboardingModal({ open, onComplete }: OnboardingModalPro
         {/* Progress bar */}
         <Box sx={{ display: 'flex', gap: 0.75, height: 4 }}>
           {[0, 1].map(i => (
-            <Box
-              key={i}
-              sx={{ flex: 1, borderRadius: 999, bgcolor: ink[200], overflow: 'hidden' }}
-            >
-              <Box sx={{ height: '100%', width: i <= step ? '100%' : 0, bgcolor: ink[900], borderRadius: 999, transition: `width 600ms ${EASE}` }} />
-            </Box>
+            <Box key={i} sx={{ flex: 1, bgcolor: i <= step ? FOREST : LINE }} />
           ))}
         </Box>
       </Box>
 
       {/* Body */}
       <DialogContent sx={{ flex: 1, overflowY: 'auto', px: { xs: 2, sm: 3 }, py: 3, overscrollBehavior: 'contain' }}>
-        <Box
-          key={step}
-          sx={{ animation: `${step === 1 ? slideInRight : slideInLeft} 420ms ${EASE} both`, '@media (prefers-reduced-motion: reduce)': { animation: 'none' } }}
-        >
+        <Box key={step}>
         {step === 0 ? (
           <Stack spacing={2.5}>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
@@ -306,17 +296,16 @@ export default function OnboardingModal({ open, onComplete }: OnboardingModalPro
                     onClick={() => setField('gender', g)}
                     sx={{
                       flex: 1,
-                      py: 1.5,
+                      minHeight: 48,
                       px: 1,
-                      borderRadius: '12px',
-                      border: `1.5px solid ${form.gender === g ? ink[900] : ink[200]}`,
-                      bgcolor: form.gender === g ? ink[900] : '#fff',
-                      color: form.gender === g ? '#fff' : ink[600],
+                      fontFamily: 'inherit',
+                      border: `1px solid ${form.gender === g ? TEXT : TEXT_SOFT}`,
+                      bgcolor: form.gender === g ? TEXT : '#fff',
+                      color: form.gender === g ? '#fff' : TEXT,
                       fontWeight: 600,
-                      fontSize: '0.9rem',
-                      transition: `background-color 220ms ease, color 220ms ease, border-color 220ms ease, transform 300ms ${EASE}`,
-                      '&:active': { transform: 'scale(.97)' },
-                      '&:focus-visible': { outline: `2px solid ${ink[900]}`, outlineOffset: 2 },
+                      fontSize: '0.875rem',
+                      transition: 'background-color 120ms ease, color 120ms ease',
+                      '&:focus-visible': { outline: `2px solid ${TEXT}`, outlineOffset: 2 },
                     }}
                   >
                     {g}
@@ -371,7 +360,7 @@ export default function OnboardingModal({ open, onComplete }: OnboardingModalPro
             />
 
             {serverError && (
-              <Box sx={{ p: 2, borderRadius: '12px', bgcolor: semantic.dangerSoft, border: `1px solid ${semantic.dangerBorder}` }}>
+              <Box sx={{ p: 2, bgcolor: semantic.dangerSoft, border: `1px solid ${semantic.dangerBorder}` }}>
                 <Typography variant="body2" sx={{ color: semantic.danger }}>
                   {serverError}
                 </Typography>
@@ -388,19 +377,18 @@ export default function OnboardingModal({ open, onComplete }: OnboardingModalPro
           px: { xs: 2, sm: 3 },
           py: 2,
           pb: `max(16px, env(safe-area-inset-bottom))`,
-          bgcolor: '#fff',
-          borderTop: `1px solid ${ink[100]}`,
+          borderTop: `1px solid ${LINE}`,
         }}
       >
         {step === 0 ? (
-          <Button fullWidth onClick={handleNext} sx={{ py: 1.6, borderRadius: '14px', fontWeight: 700, fontSize: '1rem', ...inkButton }}>
+          <Button fullWidth onClick={handleNext} sx={squareButton}>
             Continue
           </Button>
         ) : (
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
             <Button
               onClick={() => setStep(0)}
-              sx={{ py: 1.4, borderRadius: '14px', fontWeight: 600, color: ink[600], border: `1px solid ${ink[200]}`, display: { xs: 'none', sm: 'flex' } }}
+              sx={{ ...squareOutlineButton, display: { xs: 'none', sm: 'flex' } }}
             >
               Back
             </Button>
@@ -408,7 +396,7 @@ export default function OnboardingModal({ open, onComplete }: OnboardingModalPro
               fullWidth
               onClick={handleSubmit}
               disabled={loading}
-              sx={{ py: 1.6, borderRadius: '14px', fontWeight: 700, fontSize: '1rem', ...inkButton }}
+              sx={squareButton}
             >
               {loading ? <CircularProgress size={22} sx={{ color: '#fff' }} /> : 'Complete setup'}
             </Button>

@@ -43,29 +43,28 @@ const SurveyProgress: React.FC<{
         position: 'sticky',
         top: 0,
         zIndex: 5,
-        bgcolor: 'rgba(255,255,255,0.85)',
-        backdropFilter: 'blur(12px)',
+        bgcolor: T.surface,
         borderBottom: `1px solid ${T.lineSoft}`,
         px: { xs: 2, sm: 3.5 },
         pt: { xs: 2, sm: 2.5 },
         pb: { xs: 1.5, sm: 2 },
       }}
     >
-      {/* Header row: icon + section title + counter */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
+      {/* Header row: icon + section title + progress % */}
+      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: 1.5 }}>
         <Box
           sx={{
             flexShrink: 0,
-            width: { xs: 42, sm: 48 },
-            height: { xs: 42, sm: 48 },
-            borderRadius: '14px',
+            width: { xs: 40, sm: 44 },
+            height: { xs: 40, sm: 44 },
+            borderRadius: 0,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            background: `linear-gradient(135deg, ${T.brand} 0%, ${T.brandDark} 100%)`,
+            bgcolor: T.brand,
             color: '#fff',
-            boxShadow: '0 6px 16px rgba(37,99,235,0.30)',
-            '& .MuiSvgIcon-root': { fontSize: { xs: '1.35rem', sm: '1.5rem' } },
+            boxShadow: '0 1px 3px rgba(15,23,42,0.12)',
+            '& .MuiSvgIcon-root': { fontSize: { xs: '1.25rem', sm: '1.35rem' } },
             animation: 'sk-fade .4s ease both',
           }}
         >
@@ -73,42 +72,28 @@ const SurveyProgress: React.FC<{
         </Box>
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Typography
-            sx={{
-              fontSize: '0.68rem',
-              fontWeight: 800,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              color: T.brand,
-              lineHeight: 1,
-              mb: 0.4,
-            }}
-          >
-            {`Section ${current + 1} / ${total}`}
-          </Typography>
-          <Typography
             noWrap
-            sx={{ fontSize: { xs: '1.02rem', sm: '1.18rem' }, fontWeight: 800, color: T.ink, lineHeight: 1.25 }}
+            sx={{ fontSize: { xs: '1.02rem', sm: '1.15rem' }, fontWeight: 800, color: T.ink, lineHeight: 1.3 }}
           >
             {active?.title}
           </Typography>
         </Box>
         <Box sx={{ flexShrink: 0, textAlign: 'right' }}>
-          <Typography sx={{ fontSize: { xs: '1.15rem', sm: '1.35rem' }, fontWeight: 900, color: T.accent, lineHeight: 1 }}>
-            {pct}
-            <Box component="span" sx={{ fontSize: '0.7rem', fontWeight: 700 }}>%</Box>
+          <Typography sx={{ fontSize: { xs: '1.05rem', sm: '1.2rem' }, fontWeight: 700, color: T.ink, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+            {pct}<Box component="span" sx={{ fontSize: '0.7rem', fontWeight: 600, color: T.muted }}>%</Box>
           </Typography>
         </Box>
       </Box>
 
       {/* Progress track */}
-      <Box sx={{ position: 'relative', height: 7, borderRadius: 999, bgcolor: T.lineSoft, overflow: 'hidden', mb: 1.5 }}>
+      <Box sx={{ position: 'relative', height: 3, borderRadius: 0, bgcolor: T.lineSoft, overflow: 'hidden', mb: 1.5 }}>
         <Box
           sx={{
             position: 'absolute',
             inset: 0,
             width: `${pct}%`,
-            borderRadius: 999,
-            background: `linear-gradient(90deg, ${T.accent} 0%, #34d399 100%)`,
+            borderRadius: 0,
+            bgcolor: T.accent,
             transition: 'width .45s cubic-bezier(.4,0,.2,1)',
           }}
         />
@@ -165,16 +150,15 @@ const SurveyProgress: React.FC<{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    width: isCurrent ? { xs: 34, sm: 30 } : { xs: 30, sm: 26 },
-                    height: isCurrent ? { xs: 34, sm: 30 } : { xs: 30, sm: 26 },
-                    borderRadius: '9px',
-                    fontSize: { xs: '0.78rem', sm: '0.72rem' },
+                    width: isCurrent ? { xs: 32, sm: 28 } : { xs: 28, sm: 24 },
+                    height: isCurrent ? { xs: 32, sm: 28 } : { xs: 28, sm: 24 },
+                    borderRadius: 0,
+                    fontSize: { xs: '0.75rem', sm: '0.7rem' },
                     fontWeight: 800,
                     transition: 'all .2s ease',
                     color: isCurrent ? '#fff' : done ? '#fff' : reachable ? T.muted : T.faint,
                     bgcolor: isCurrent ? T.brand : done ? T.accent : reachable ? '#fff' : '#f1f5f9',
                     border: `1.5px solid ${isCurrent ? T.brand : done ? T.accent : T.line}`,
-                    boxShadow: isCurrent ? '0 0 0 4px rgba(37,99,235,0.14)' : 'none',
                     '@media (hover: hover)': {
                       '&:hover': reachable && !isCurrent ? { borderColor: T.brand, color: T.brand } : {},
                     },

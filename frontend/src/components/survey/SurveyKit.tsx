@@ -35,8 +35,8 @@ export const T = {
   canvasTop: '#f4f7fc',
   canvasBottom: '#eef2f9',
   danger: '#dc2626',
-  radius: 16,
-  field: 12,
+  radius: 0,
+  field: 0,
 };
 
 /* ──────────────────────────────────────────────────────────────────────────

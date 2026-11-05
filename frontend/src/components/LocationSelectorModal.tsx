@@ -4,7 +4,7 @@ import { Box, Typography, Button, FormControl, CircularProgress, Alert, Dialog, 
 import { useQuery } from '@apollo/client';
 import { GET_GN_BY_COORDINATES } from '../graphql/queries';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
-import { locationHeaderSx, locationContinueSx, locationBodySx, locationPaperSx, useFitToViewport } from './locationModalStyles';
+import { locationHeaderSx, locationContinueSx, locationBodySx, locationPaperSx, plainBackdropSx, plainBodySx, plainContinueSx, plainHeaderSx, plainPaperSx, useFitToViewport } from './locationModalStyles';
 
 interface LocationSelectorModalProps {
   open: boolean;
@@ -12,12 +12,14 @@ interface LocationSelectorModalProps {
   onLocationSelected?: (gn: any) => void;
   isDarkMode?: boolean;
   language?: string;
+  /** Square, unblurred look for the contributor dashboard. */
+  plain?: boolean;
 }
 
-const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onClose, onLocationSelected, isDarkMode = false }) => {
+const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onClose, onLocationSelected, isDarkMode = false, plain = false }) => {
   const { language } = useLanguage();
   const themeColors = {
-    primary: '#00A8FF',
+    primary: plain ? '#101814' : '#00A8FF',
     textMuted: isDarkMode ? '#AAAAAA' : '#666666',
   };
 
@@ -115,20 +117,14 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
       PaperProps={{
         ref: fitPaper,
         sx: {
-          borderRadius: '24px',
-          minWidth: { xs: '90%', sm: 420 },
           position: 'relative',
-          overflow: 'visible',
-          background: isDarkMode
-            ? 'linear-gradient(160deg, #1a1c2e 0%, #2a2c40 100%)'
-            : 'linear-gradient(160deg, #ffffff 0%, #f0f4ff 100%)',
-          ...locationPaperSx,
+          ...(plain ? plainPaperSx : locationPaperSx),
         }
       }}
-      slotProps={{ backdrop: { sx: { backdropFilter: 'blur(14px)', bgcolor: 'rgba(0,0,0,0.6)' } } }}
+      slotProps={{ backdrop: { sx: plain ? plainBackdropSx : { backdropFilter: 'blur(14px)', bgcolor: 'rgba(0,0,0,0.6)' } } }}
     >
       <Box
-        sx={locationHeaderSx(isDarkMode)}
+        sx={plain ? plainHeaderSx : locationHeaderSx(isDarkMode)}
       >
         {/* Plain Transparent PNG Logos (No border, No box) */}
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 3, mb: 1 }}>
@@ -141,18 +137,20 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
 
         <Typography
           variant="h6"
-          sx={{ color: '#ffffff', fontWeight: 700, fontFamily: "'Inter', sans-serif", textAlign: 'left', letterSpacing: '-0.01em', lineHeight: 1.25 }}
+          sx={{ color: plain ? '#101814' : '#ffffff', fontWeight: 700, fontFamily: "'Inter', sans-serif", textAlign: 'left', letterSpacing: plain ? 0 : '-0.01em', lineHeight: plain ? 1.35 : 1.25 }}
         >
           {!showManualForm
             ? (language === 'en' ? 'Your Location' : language === 'si' ? 'ඔබගේ ස්ථානය' : 'உங்கள் இடம்')
             : (language === 'en' ? 'Select Your Location' : language === 'si' ? 'ස්ථානය තෝරන්න' : 'உங்கள் இடத்தை தேர்வு செய்யவும்')
           }
         </Typography>
-        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.75)', fontFamily: "'Inter', sans-serif" }}>
-          {language === 'en' ? 'Village Data Explorer · Sri Lanka' : language === 'si' ? 'ජනලේඛන දත්ත · ශ්‍රී ලංකා' : 'மக்கள்தொகை கணக்கெடுப்பு · இலங்கை'}
-        </Typography>
+        {!plain && (
+          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.75)', fontFamily: "'Inter', sans-serif" }}>
+            {language === 'en' ? 'Village Data Explorer · Sri Lanka' : language === 'si' ? 'ජනලේඛන දත්ත · ශ්‍රී ලංකා' : 'மக்கள்தொகை கணக்கெடுப்பு · இலங்கை'}
+          </Typography>
+        )}
       </Box>
-      <DialogContent sx={locationBodySx}>
+      <DialogContent sx={plain ? plainBodySx : locationBodySx}>
         {!showManualForm ? (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {locating ? (
@@ -161,11 +159,11 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
                 <Typography>Fetching GPS coordinates...</Typography>
               </Box>
             ) : locationError ? (
-              <Alert severity="warning" sx={{ bgcolor: 'rgba(255, 152, 0, 0.1)', color: '#ff9800' }}>
+              <Alert severity="warning" sx={plain ? { bgcolor: '#FFF4E5', color: '#101814' } : { bgcolor: 'rgba(255, 152, 0, 0.1)', color: '#ff9800' }}>
                 {locationError}
               </Alert>
             ) : location ? (
-              <Box sx={{ p: 2, bgcolor: 'rgba(0, 168, 255, 0.1)', borderRadius: 2, position: 'relative' }}>
+              <Box sx={{ p: 2, bgcolor: plain ? '#F4F5F2' : 'rgba(0, 168, 255, 0.1)', borderRadius: plain ? 0 : 2, position: 'relative' }}>
                 <Typography variant="body2" color="text.secondary">Coordinates: {location.lat.toFixed(4)}, {location.lng.toFixed(4)}</Typography>
 
                 {autoGnLoading ? (
@@ -208,7 +206,8 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
             <Button
               variant="outlined"
               onClick={() => setShowManualForm(true)}
-              sx={{ mt: 2, color: themeColors.primary, borderColor: themeColors.primary }}
+              // Plain look: while Continue is disabled this is the only way forward, so it carries the main action's green.
+              sx={{ mt: 2, color: themeColors.primary, borderColor: themeColors.primary, ...(plain && !canContinue ? { '&&': { bgcolor: '#2d5e41', color: '#fff', borderColor: '#2d5e41', '&:hover': { bgcolor: '#1f4530', borderColor: '#1f4530' } } } : {}) }}
             >
               Select Manually
             </Button>
@@ -247,6 +246,7 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
                 loading={gnSearching}
                 onInputChange={(_, v) => setGnSearchInput(v)}
                 filterOptions={(x) => x} // Backend filtering
+                slotProps={plain ? { paper: { sx: { borderRadius: 0 } } } : undefined}
                 onChange={(_, v) => setSelectedGN(v)}
                 renderInput={(p) => (
                   <TextField 
@@ -317,7 +317,7 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
                 color: themeColors.primary,
                 borderColor: themeColors.primary,
                 alignSelf: 'center',
-                borderRadius: '12px',
+                borderRadius: plain ? 0 : '12px',
                 px: 3,
                 py: 1,
                 fontWeight: 600,
@@ -335,7 +335,7 @@ const LocationSelectorModal: React.FC<LocationSelectorModalProps> = ({ open, onC
           variant="contained"
           onClick={handleContinue}
           disabled={!canContinue}
-          sx={locationContinueSx(canContinue)}
+          sx={plain ? plainContinueSx : locationContinueSx(canContinue)}
         >
           {language === 'en' ? 'Continue' : language === 'si' ? 'ඉදිරියට' : 'தொடரவும்'}
         </Button>

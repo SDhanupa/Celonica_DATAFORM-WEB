@@ -45,9 +45,7 @@ const ContributeBanner: React.FC<ContributeBannerProps> = ({ ccode, villageName,
       aria-label={t.bannerTitle}
       sx={{
         position: 'relative',
-        borderRadius: compact ? '14px' : '16px',
-        p: compact ? 2.25 : { xs: 2.5, md: 3 },
-        ...(glass ? { ...glassSx(isDarkMode), borderRadius: '20px', p: { xs: 2, md: 2.25 } } : { border: '1px solid', borderColor: c.border, bgcolor: c.bg }),
+        ...(glass ? { ...glassSx(isDarkMode), borderRadius: '20px', p: { xs: 2, md: 2.25 } } : { borderRadius: compact ? '14px' : '16px', p: compact ? 2.25 : { xs: 2.5, md: 3 }, border: '1px solid', borderColor: c.border, bgcolor: c.bg }),
       }}
     >
       <Stack direction={{ xs: 'column', md: compact ? 'column' : 'row' }} spacing={compact ? 2 : { xs: 2.5, md: 4 }} sx={{ alignItems: { md: compact ? 'stretch' : 'center' } }}>

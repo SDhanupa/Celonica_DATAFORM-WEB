@@ -175,18 +175,26 @@ export const GET_CATEGORIES = gql`
         id
         slug
         nameEn
+        nameSi
+        nameTa
         children {
           id
           slug
           nameEn
+          nameSi
+          nameTa
           children {
             id
             slug
             nameEn
+            nameSi
+            nameTa
             children {
               id
               slug
               nameEn
+              nameSi
+              nameTa
             }
           }
         }

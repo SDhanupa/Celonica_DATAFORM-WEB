@@ -148,6 +148,59 @@ export const useMyContributions = () => {
   });
 };
 
+/* ── Leaderboard (mirrors LeaderboardController) ─────────────────────────── */
+
+export type LeaderboardScope = 'all' | 'village';
+export type LeaderboardPeriod = 'all' | 'month';
+export type LeaderboardLevelKey = 'seedling' | 'scout' | 'mapper' | 'guardian' | 'legend';
+
+export interface LeaderboardEntry {
+  rank: number;
+  name: string | null;
+  score: number;
+  approved: number;
+  in_review: number;
+  answers: number;
+  level: LeaderboardLevelKey;
+  is_me: boolean;
+}
+
+export interface Leaderboard {
+  scope: LeaderboardScope;
+  period: LeaderboardPeriod;
+  players: number;
+  entries: LeaderboardEntry[];
+  me: {
+    rank: number | null;
+    name: string | null;
+    score: number;
+    approved: number;
+    in_review: number;
+    answers: number;
+    all_time_score: number;
+    level: { key: LeaderboardLevelKey; index: number; min: number; next_key: LeaderboardLevelKey | null; next_min: number | null };
+  };
+  scoring: { approved_place: number; review_place: number; approved_update: number; approved_business: number; game_points_per_point: number };
+}
+
+export const useLeaderboard = (scope: LeaderboardScope, period: LeaderboardPeriod, ccode: string | null | undefined) => {
+  const { getToken, isAuthenticated } = useAuth();
+  const villageCode = scope === 'village' ? ccode || '' : '';
+  const ready = isAuthenticated && (scope === 'all' || Boolean(villageCode));
+  return useApi<Leaderboard>(ready ? `leaderboard:${scope}:${period}:${villageCode}` : null, async (signal) => {
+    const token = await getToken();
+    if (!token) throw new ApiError('Your session has expired. Please sign in again.', 401);
+    const params = new URLSearchParams({ scope, period });
+    if (villageCode) params.set('ccode', villageCode);
+    const res = await fetch(`/api/contributions/leaderboard?${params}`, {
+      signal,
+      headers: { Accept: 'application/json', Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) throw await readError(res);
+    return (await res.json()).data as Leaderboard;
+  });
+};
+
 /* ── Submission ──────────────────────────────────────────────────────────── */
 
 export interface SubmitResult {

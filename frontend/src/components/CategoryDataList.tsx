@@ -127,14 +127,7 @@ const CategoryDataList: React.FC<CategoryDataListProps> = ({
               elevation={0}
               sx={{ 
                 height: '100%', 
-                borderRadius: 4,
                 border: '1px solid #e2e8f0',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: '0 12px 24px -10px rgba(0,0,0,0.1)',
-                  borderColor: 'primary.light'
-                }
               }}
             >
               {item.image_path && (

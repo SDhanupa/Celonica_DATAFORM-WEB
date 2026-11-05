@@ -133,7 +133,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     keycloak.onAuthRefreshSuccess = () => setToken(keycloak.token);
     keycloak.onAuthSuccess = () => setToken(keycloak.token);
-    keycloak.onAuthLogout = () => setToken(undefined);
+    // An ended session must stop rendering protected pages, not just lose its token.
+    keycloak.onAuthLogout = () => {
+      setToken(undefined);
+      setIsAuthenticated(false);
+      setUserInfo(null);
+    };
   }, [apolloClient]);
 
   const logout = () => {

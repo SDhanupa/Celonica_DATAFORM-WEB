@@ -52,6 +52,7 @@ Route::middleware(['throttle:30,1', 'keycloak.optional'])->group(function () {
 
 Route::middleware(['throttle:60,1', 'keycloak.admin'])->group(function () {
     Route::get('/contributions/mine', [\App\Http\Controllers\ContributionController::class, 'mine']);
+    Route::get('/contributions/leaderboard', [\App\Http\Controllers\LeaderboardController::class, 'index']);
 });
 
 // Rapid fire rounds: signed-in only, because answers are attributed and deduped per person.
