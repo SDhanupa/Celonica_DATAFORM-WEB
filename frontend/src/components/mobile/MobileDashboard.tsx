@@ -239,7 +239,8 @@ const MobileDashboard: React.FC<MobileDashboardProps> = (props) => {
             transformOrigin={{ horizontal: 'right', vertical: 'top' }}
             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             PaperProps={{ sx: { ...glassSx(isDarkMode), mt: 1, minWidth: 200, borderRadius: '16px', color: ink } }}
-            MenuListProps={{ sx: { '& .MuiMenuItem-root': { fontFamily: font, fontSize: '0.88rem', fontWeight: 500, py: 1.1 } } }}
+            // The theme's body1 hard-codes dark text, so items must take the menu's ink explicitly (else invisible in dark mode).
+            MenuListProps={{ sx: { '& .MuiMenuItem-root': { color: ink, fontFamily: font, fontSize: '0.88rem', fontWeight: 500, py: 1.1 } } }}
           >
             <MenuItem onClick={closeMenuThen(goHome)}>{L('Home', 'මුල් පිටුව', 'முகப்பு')}</MenuItem>
             <MenuItem onClick={closeMenuThen(() => setCategoriesOpen(true))}>{L('Categories', 'ප්‍රවර්ග', 'வகைகள்')}</MenuItem>
@@ -249,12 +250,12 @@ const MobileDashboard: React.FC<MobileDashboardProps> = (props) => {
               [
                 <MenuItem key="dash" onClick={closeMenuThen(() => navigate(isSuperAdmin ? '/admins' : '/mydashboard'))}>{L('Dashboard', 'උපකරණ පුවරුව', 'கட்டுப்பாடு')}</MenuItem>,
                 !isSuperAdmin && <MenuItem key="forms" onClick={closeMenuThen(() => navigate('/user'))}>{L('Location form', 'ස්ථාන පෝරමය', 'இடப் படிவம்')}</MenuItem>,
-                <MenuItem key="logout" onClick={closeMenuThen(logout)} sx={{ color: '#dc2626' }}>{L('Logout', 'ඉවත් වන්න', 'வெளியேறு')}</MenuItem>,
+                <MenuItem key="logout" onClick={closeMenuThen(logout)} sx={{ '&&': { color: isDarkMode ? '#f87171' : '#dc2626' } }}>{L('Logout', 'ඉවත් වන්න', 'வெளியேறு')}</MenuItem>,
               ]
             ) : !isLoading ? (
               [
                 <MenuItem key="login" onClick={closeMenuThen(() => login(`${window.location.origin}/mydashboard`))}>{L('Login', 'පිවිසෙන්න', 'உள்நுழைய')}</MenuItem>,
-                <MenuItem key="join" onClick={closeMenuThen(() => register(window.location.href))} sx={{ color: isDarkMode ? '#86efac' : '#2d5e41', fontWeight: '700 !important' }}>{L('Join with us', 'අප හා එක්වන්න', 'எங்களுடன் இணையுங்கள்')}</MenuItem>,
+                <MenuItem key="join" onClick={closeMenuThen(() => register(window.location.href))} sx={{ '&&': { color: isDarkMode ? '#86efac' : '#2d5e41', fontWeight: 700 } }}>{L('Join with us', 'අප හා එක්වන්න', 'எங்களுடன் இணையுங்கள்')}</MenuItem>,
               ]
             ) : null}
           </Menu>

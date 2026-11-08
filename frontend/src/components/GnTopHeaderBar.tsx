@@ -398,14 +398,15 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
                     px: { xs: 1.5, md: 1.3 },
                     py: { xs: 0, md: 0.7 },
                     borderRadius: '9px',
-                    color: isActive ? (isDarkMode ? '#60a5fa' : '#2563eb') : (isDarkMode ? '#f8fafc' : '#475569'),
+                    // Light mode sits on bright, busy map imagery seen through clear glass: inactive tabs need near-black ink.
+                    color: isActive ? (isDarkMode ? '#60a5fa' : '#1d4ed8') : (isDarkMode ? '#f8fafc' : '#0f172a'),
                     bgcolor: isActive ? (isDarkMode ? 'rgba(59,130,246,0.22)' : 'rgba(37,99,235,0.08)') : 'transparent',
                     transition: 'background-color 150ms ease, color 150ms ease, transform 150ms ease',
                     animation: `fadeInUp 0.35s ease ${idx * 30}ms both`,
                     WebkitTapHighlightColor: 'transparent',
                     '& .MuiSvgIcon-root': {
                       fontSize: '1.05rem',
-                      color: isActive ? (isDarkMode ? '#60a5fa' : '#2563eb') : (isDarkMode ? '#93c5fd' : '#64748b'),
+                      color: isActive ? (isDarkMode ? '#60a5fa' : '#1d4ed8') : (isDarkMode ? '#93c5fd' : '#334155'),
                       transition: 'transform 150ms ease, color 150ms ease',
                     },
                     /* Press feedback for touch, hover polish for pointers. */
@@ -446,7 +447,7 @@ export const GnTopHeaderBar: React.FC<GnTopHeaderBarProps> = ({
                 sx={{
                   width: { xs: 44, md: 32 },
                   height: { xs: 44, md: 32 },
-                  color: isDarkMode ? '#e2e8f0' : '#64748b',
+                  color: isDarkMode ? '#e2e8f0' : '#334155',
                   '&:active': { bgcolor: isDarkMode ? 'rgba(255,255,255,0.12)' : 'rgba(15,23,42,0.06)' },
                   '@media (hover: hover)': { '&:hover': { color: isDarkMode ? '#ffffff' : '#0f172a' } },
                 }}
